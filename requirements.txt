@@ -1,0 +1,47 @@
+# -----------------------------------------------------------------------------
+# BuffettRAG -- full stack requirements
+# Tested with Python 3.10 / 3.11
+# -----------------------------------------------------------------------------
+
+# Core LangChain stack (kept for compatibility with existing pipeline)
+langchain>=0.1.16
+langchain-core>=0.1.45
+langchain-community>=0.0.34
+langchain-text-splitters>=0.0.1
+
+# PDF processing (PyMuPDF is primary; pdfplumber kept as fallback)
+PyMuPDF>=1.23.0
+pdfplumber>=0.10.3
+
+# Embeddings & models
+sentence-transformers>=2.7.0
+transformers>=4.40.0
+accelerate>=0.29.0
+torch>=2.1.0
+
+# Vector stores
+# pgvector is the production backend on Nuvolos.
+# chromadb / faiss-cpu are kept for local development and the comparison eval.
+psycopg2-binary>=2.9.9
+pgvector>=0.2.5
+chromadb>=0.4.24
+faiss-cpu>=1.7.4
+
+# Hybrid retrieval
+rank-bm25>=0.2.2
+
+# Backend / Frontend services
+fastapi>=0.110.0
+uvicorn[standard]>=0.27.0
+requests>=2.31.0
+streamlit>=1.32.0
+
+# Utilities
+python-dotenv>=1.0.0
+tqdm>=4.66.1
+numpy>=1.24.0
+pandas>=2.0.0
+scikit-learn>=1.3.0
+
+# Eval
+nltk>=3.8.1

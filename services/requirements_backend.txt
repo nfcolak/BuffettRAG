@@ -1,0 +1,24 @@
+# -----------------------------------------------------------------------------
+# Backend app requirements (Backend instance on Nuvolos -- 4 CU, no GPU)
+# -----------------------------------------------------------------------------
+# Kept lighter than the full requirements.txt: no transformers/accelerate
+# (LLM lives on the Trainer), but we still need sentence-transformers for
+# embeddings + reranker on CPU.
+
+langchain-text-splitters>=0.0.1
+PyMuPDF>=1.23.0
+pdfplumber>=0.10.3
+
+sentence-transformers>=2.7.0
+torch>=2.1.0  # CPU build is fine here
+
+psycopg2-binary>=2.9.9
+pgvector>=0.2.5
+
+rank-bm25>=0.2.2
+fastapi>=0.110.0
+uvicorn[standard]>=0.27.0
+requests>=2.31.0
+
+tqdm>=4.66.1
+numpy>=1.24.0

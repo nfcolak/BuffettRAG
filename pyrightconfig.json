@@ -1,0 +1,11 @@
+{
+  "pythonPath": "/opt/conda/bin/python",
+  "venvPath": "/opt/conda",
+  "venv": ".",
+  "pythonVersion": "3.13",
+  "extraPaths": [
+    "/opt/conda/lib/python3.13/site-packages"
+  ],
+  "typeCheckingMode": "basic",
+  "reportMissingModuleSource": "none"
+}
