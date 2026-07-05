@@ -98,7 +98,7 @@ class ChromaStore:
         result = self._collection.query(
             query_embeddings=[list(map(float, query_embedding))],
             n_results=top_k,
-            where=where or None,
+            where=_chroma_where(where),
             include=["documents", "metadatas", "distances"],
         )
 
@@ -262,6 +262,28 @@ def _save_faiss_docs_json(path: Path, docs: Sequence[StoredDoc]) -> None:
     ]
     with open(path, "w", encoding="utf-8") as f:
         json.dump(payload, f, ensure_ascii=False)
+
+
+def _chroma_where(where: Optional[Dict[str, Any]]) -> Optional[Dict[str, Any]]:
+    """Translate the app's filter format into Chroma's.
+
+    Chroma requires operator expressions to hold exactly one operator, so a
+    range like {"year": {"$gte": a, "$lte": b}} must become
+    {"$and": [{"year": {"$gte": a}}, {"year": {"$lte": b}}]}.
+    """
+    if not where:
+        return None
+
+    clauses: List[Dict[str, Any]] = []
+    for field, cond in where.items():
+        if isinstance(cond, dict) and len(cond) > 1:
+            clauses.extend({field: {op: value}} for op, value in cond.items())
+        else:
+            clauses.append({field: cond})
+
+    if len(clauses) == 1:
+        return clauses[0]
+    return {"$and": clauses}
 
 
 def validate_where_filter(where: Optional[Dict[str, Any]]) -> None:

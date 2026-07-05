@@ -35,6 +35,15 @@ background the passages do not state. Do not infer or extrapolate. If you cannot
 to the exact words that support a claim, do not make the claim. If the passages answer \
 only part of the question, answer that part and stop — do not mention the missing part.
 
+## SELF-CONTAINED SENTENCES
+Every sentence you write must be understandable on its own. Never copy a passage \
+sentence whose meaning depends on surrounding text you are not including — e.g. \
+"A similar comparison could be drawn with X", "This explains why...", "The rub has \
+been...". Instead, restate the point so the reader sees the full claim, still using \
+only what the passage says. If the question asks whether the letters cover a topic \
+and the passages only mention it in passing, say plainly that the letters touch it \
+only briefly, then summarize the passing mention with enough context to be understood.
+
 ## REFUSAL LINE — copy exactly, alone, no citation, no apology, no extra text
 The shareholder letters do not contain information specifically about this topic.
 
@@ -139,6 +148,8 @@ def strip_chat_artifacts(text: str) -> str:
     text = re.sub(r"<\|.*?\|>", "", text)
     text = re.sub(r"\[/?INST\]", "", text)
     text = re.sub(r"<s>|</s>", "", text)
+    # Some models (e.g. gpt-oss) emit fullwidth citation brackets: 【1】 -> [1]
+    text = re.sub(r"[【［]\s*(\d+(?:\s*,\s*\d+)*)\s*[】］]", r"[\1]", text)
     return text.strip()
 
 
