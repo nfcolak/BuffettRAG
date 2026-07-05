@@ -4,19 +4,27 @@ import { BookOpen, ChevronRight, Paperclip, Send, Settings, Trash2 } from "lucid
 
 import "./styles.css";
 
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:8000";
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "/api";
+const BACKEND_API_KEY = import.meta.env.VITE_BACKEND_API_KEY || "";
 const HISTORY_KEY = "buffettrag.messages.v1";
+const LLM_SETTINGS_KEY = "buffettrag.llmSettings.v1";
+
+const LLM_PROVIDERS = [
+  { value: "openai", label: "OpenAI", defaultModel: "gpt-4.1-mini" },
+  { value: "anthropic", label: "Anthropic", defaultModel: "claude-haiku-4-5-20251001" },
+  { value: "openrouter", label: "OpenRouter", defaultModel: "openrouter/free" },
+];
 
 const EXAMPLE_QUERIES = [
   "How did Buffett react to the 2008 financial crisis?",
-  "What does Buffett look for when evaluating a company for acquisition?",
-  "How has Buffett's view on technology stocks changed from the 1990s to the 2020s?",
+  "What did Buffett say about GEICO and the insurance float?",
+  "Buffett on succession planning at Berkshire",
   "What did Buffett say about derivatives?",
   "Buffett on inflation and purchasing power",
+  "How has Buffett's view on technology stocks changed from the 1990s to the 2020s?",
 ];
 
 const DECADES = [
-  { value: null, label: "All" },
   { value: 1970, label: "'70s" },
   { value: 1980, label: "'80s" },
   { value: 1990, label: "'90s" },
@@ -49,6 +57,45 @@ function persistHistory(messages) {
   localStorage.setItem(HISTORY_KEY, JSON.stringify(messages.slice(-200)));
 }
 
+function defaultModelForProvider(provider) {
+  return LLM_PROVIDERS.find((item) => item.value === provider)?.defaultModel || "";
+}
+
+function labelForProvider(provider) {
+  return LLM_PROVIDERS.find((item) => item.value === provider)?.label || provider;
+}
+
+function readLlmSettings() {
+  try {
+    const raw = localStorage.getItem(LLM_SETTINGS_KEY);
+    const parsed = raw ? JSON.parse(raw) : {};
+    const provider = parsed.provider || "openai";
+    return {
+      llmProvider: provider,
+      llmModel: parsed.model || defaultModelForProvider(provider),
+      llmApiKey: parsed.remember ? parsed.apiKey || "" : "",
+      rememberLlmSettings: Boolean(parsed.remember),
+    };
+  } catch {
+    return {
+      llmProvider: "openai",
+      llmModel: defaultModelForProvider("openai"),
+      llmApiKey: "",
+      rememberLlmSettings: false,
+    };
+  }
+}
+
+function persistLlmSettings(settings) {
+  const payload = {
+    provider: settings.llmProvider,
+    model: settings.llmModel,
+    remember: Boolean(settings.rememberLlmSettings),
+    ...(settings.rememberLlmSettings ? { apiKey: settings.llmApiKey } : {}),
+  };
+  localStorage.setItem(LLM_SETTINGS_KEY, JSON.stringify(payload));
+}
+
 function buildWhere(config) {
   if (config.scope === "year") return { year: Number(config.year) };
   if (config.scope === "decade" && config.decade !== null) return { decade: config.decade };
@@ -58,7 +105,10 @@ function buildWhere(config) {
 async function postBackend(path, payload) {
   const response = await fetch(`${BACKEND_URL}${path}`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      ...(BACKEND_API_KEY ? { "X-API-Key": BACKEND_API_KEY } : {}),
+    },
     body: JSON.stringify(payload),
   });
   if (!response.ok) {
@@ -76,6 +126,9 @@ async function askBackend(query, config) {
     rerank: config.rerank,
     where: buildWhere(config),
     auto_year_filter: true,
+    ...(config.useLlm ? { llm_provider: config.llmProvider } : {}),
+    ...(config.useLlm && config.llmApiKey ? { llm_api_key: config.llmApiKey } : {}),
+    ...(config.useLlm && config.llmModel ? { llm_model: config.llmModel } : {}),
   };
   return postBackend(config.useLlm ? "/ask" : "/search", payload);
 }
@@ -90,12 +143,12 @@ async function getBackendHealth() {
   }
 }
 
-function TopBar({ health }) {
+function TopBar({ health, provider, onOpenSettings }) {
   return (
     <header className="topbar">
       <div className="brand">
         <div className="brand-mark">
-          <img src="/assets/header_logo.png" alt="BuffettRAG" />
+          <img src={`${import.meta.env.BASE_URL}assets/chatbot_avatar.png`} alt="BuffettRAG" />
         </div>
         <div className="brand-text">
           <div className="brand-name">BuffettRAG</div>
@@ -128,7 +181,11 @@ function TopBar({ health }) {
           <span>embed</span>
           <strong>bge-small</strong>
         </span>
-        <button className="icon-btn" title="Settings">
+        <span className="status-chip">
+          <span>llm</span>
+          <strong>{labelForProvider(provider)}</strong>
+        </span>
+        <button className="icon-btn" title="Settings" onClick={onOpenSettings}>
           <Settings />
         </button>
       </div>
@@ -263,6 +320,106 @@ function Toggle({ label, hint, on, onChange }) {
   );
 }
 
+function LlmSettingsModal({ open, config, setConfig, onClose }) {
+  const [draft, setDraft] = React.useState(config);
+
+  React.useEffect(() => {
+    if (open) setDraft(config);
+  }, [open, config]);
+
+  if (!open) return null;
+
+  const setDraftKey = (key, value) => {
+    setDraft((current) => ({ ...current, [key]: value }));
+  };
+
+  const chooseProvider = (provider) => {
+    setDraft((current) => ({
+      ...current,
+      llmProvider: provider,
+      llmModel:
+        !current.llmModel || current.llmModel === defaultModelForProvider(current.llmProvider)
+          ? defaultModelForProvider(provider)
+          : current.llmModel,
+    }));
+  };
+
+  const save = () => {
+    setConfig((current) => ({ ...current, ...draft }));
+    persistLlmSettings(draft);
+    onClose();
+  };
+
+  const clearKey = () => {
+    const next = { ...draft, llmApiKey: "", rememberLlmSettings: false };
+    setDraft(next);
+    localStorage.removeItem(LLM_SETTINGS_KEY);
+    setConfig((current) => ({ ...current, llmApiKey: "", rememberLlmSettings: false }));
+  };
+
+  return (
+    <div className="modal-backdrop" onMouseDown={onClose}>
+      <div className="settings-modal" onMouseDown={(event) => event.stopPropagation()}>
+        <div className="modal-head">
+          <div>
+            <div className="modal-title">LLM settings</div>
+            <div className="modal-kicker">Choose the answer engine for this browser.</div>
+          </div>
+          <button className="icon-btn" onClick={onClose} title="Close">x</button>
+        </div>
+
+        <div className="field">
+          <div className="field-label">Provider</div>
+          <div className="segmented cols-3">
+            {LLM_PROVIDERS.map((provider) => (
+              <button
+                key={provider.value}
+                className={`seg-btn ${draft.llmProvider === provider.value ? "active" : ""}`}
+                onClick={() => chooseProvider(provider.value)}
+              >
+                {provider.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="field">
+          <div className="field-label">Model</div>
+          <input
+            className="settings-input"
+            value={draft.llmModel}
+            placeholder={defaultModelForProvider(draft.llmProvider)}
+            onChange={(event) => setDraftKey("llmModel", event.target.value)}
+          />
+        </div>
+
+        <div className="field">
+          <div className="field-label">API key</div>
+          <input
+            className="settings-input"
+            type="password"
+            value={draft.llmApiKey}
+            placeholder={`${labelForProvider(draft.llmProvider)} API key`}
+            onChange={(event) => setDraftKey("llmApiKey", event.target.value)}
+          />
+        </div>
+
+        <Toggle
+          label="Remember on this device"
+          hint="stores provider settings locally"
+          on={draft.rememberLlmSettings}
+          onChange={(value) => setDraftKey("rememberLlmSettings", value)}
+        />
+
+        <div className="modal-actions">
+          <button className="clear-btn" onClick={clearKey}>Clear key</button>
+          <button className="save-btn" onClick={save}>Save settings</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function CiteText({ text }) {
   const chunks = String(text || "").split(/(\[\d+(?:,\s*\d+)*\])/g);
   return chunks.map((chunk, index) => {
@@ -273,10 +430,36 @@ function CiteText({ text }) {
   });
 }
 
+function renderBlock(block, index) {
+  const lines = block.split("\n").filter(l => l.trim() !== "");
+  const isBullet = lines.length >= 2 && lines.every(l => /^\s*[-*]\s+/.test(l));
+  const isNumbered = lines.length >= 2 && lines.every(l => /^\s*\d+\.\s+/.test(l));
+
+  if (isBullet) {
+    return (
+      <ul key={index} className="answer-list">
+        {lines.map((l, i) => (
+          <li key={i}><CiteText text={l.replace(/^\s*[-*]\s+/, "")} /></li>
+        ))}
+      </ul>
+    );
+  }
+  if (isNumbered) {
+    return (
+      <ol key={index} className="answer-list">
+        {lines.map((l, i) => (
+          <li key={i}><CiteText text={l.replace(/^\s*\d+\.\s+/, "")} /></li>
+        ))}
+      </ol>
+    );
+  }
+  return <p key={index}><CiteText text={block} /></p>;
+}
+
 function Message({ msg, isSelected, onSelectSources }) {
   const isUser = msg.role === "user";
-  const avatar = isUser ? "/assets/user_avatar.png" : "/assets/chatbot_avatar.png";
-  const paragraphs = String(msg.content || "").split(/\n{2,}/).filter(Boolean);
+  const avatar = isUser ? `${import.meta.env.BASE_URL}assets/user_avatar.png` : `${import.meta.env.BASE_URL}assets/assistant_avatar.png`;
+  const blocks = String(msg.content || "").split(/\n{2,}/).filter(Boolean);
 
   return (
     <div className={`msg ${isUser ? "user" : "assistant"}`}>
@@ -289,9 +472,7 @@ function Message({ msg, isSelected, onSelectSources }) {
           <span className="msg-time">{msg.created_at}</span>
         </div>
         <div className="msg-bubble">
-          {paragraphs.length ? paragraphs.map((paragraph, index) => (
-            <p key={index}><CiteText text={paragraph} /></p>
-          )) : <p />}
+          {blocks.length ? blocks.map((block, index) => renderBlock(block, index)) : <p />}
         </div>
 
         {!isUser && (
@@ -318,7 +499,7 @@ function Message({ msg, isSelected, onSelectSources }) {
 function TypingMessage() {
   return (
     <div className="msg assistant">
-      <div className="msg-avatar"><img src="/assets/chatbot_avatar.png" alt="assistant" /></div>
+      <div className="msg-avatar"><img src={`${import.meta.env.BASE_URL}assets/assistant_avatar.png`} alt="assistant" /></div>
       <div className="msg-body">
         <div className="msg-head">
           <span className="msg-name assistant">BuffettRAG</span>
@@ -338,7 +519,7 @@ function EmptyState() {
   return (
     <div className="empty-state">
       <div className="empty-emblem">
-        <img src="/assets/chatbot_avatar.png" alt="" />
+        <img src={`${import.meta.env.BASE_URL}assets/chatbot_avatar.png`} alt="" />
       </div>
       <h2 className="empty-title">Ask anything about Buffett's letters</h2>
       <p className="empty-sub">
@@ -523,11 +704,30 @@ function RightRail({ selectedMsg, question }) {
   );
 }
 
+// function formatFilter(filter) {
+//   if (!filter) return "none";
+//   if (typeof filter === "string") return filter;
+//   if (filter.year) return `year:${filter.year}`;
+//   if (filter.decade) return `decade:${filter.decade}s`;
+//   return "custom";
+// }
 function formatFilter(filter) {
   if (!filter) return "none";
   if (typeof filter === "string") return filter;
+
+  // range filter: { year: { $gte: 1990, $lte: 2024 } }
+  if (filter.year && typeof filter.year === "object") {
+    const gte = filter.year["$gte"] ?? "?";
+    const lte = filter.year["$lte"] ?? "?";
+    return `year:${gte}–${lte}`;
+  }
+
+  // single year: { year: 2008 }
   if (filter.year) return `year:${filter.year}`;
+
+  // decade: { decade: 1990 }
   if (filter.decade) return `decade:${filter.decade}s`;
+
   return "custom";
 }
 
@@ -548,6 +748,7 @@ function App() {
   const [isTyping, setIsTyping] = React.useState(false);
   const [error, setError] = React.useState("");
   const [health, setHealth] = React.useState(null);
+  const [settingsOpen, setSettingsOpen] = React.useState(false);
   const inputRef = React.useRef(null);
 
   const [config, setConfig] = React.useState({
@@ -557,7 +758,8 @@ function App() {
     useLlm: true,
     scope: "all",
     year: 2024,
-    decade: null,
+    decade: 1970,
+    ...readLlmSettings(),
   });
 
   React.useEffect(() => {
@@ -609,6 +811,7 @@ function App() {
           strategy: response.strategy ?? config.strategy,
           reranked: response.reranked ?? config.rerank,
           used_filter: response.used_filter ?? buildWhere(config),
+          provider: config.llmProvider,
         },
       };
       setMessages((current) => [...current, assistantMessage]);
@@ -634,7 +837,17 @@ function App() {
 
   return (
     <>
-      <TopBar health={health} />
+      <TopBar
+        health={health}
+        provider={config.llmProvider}
+        onOpenSettings={() => setSettingsOpen(true)}
+      />
+      <LlmSettingsModal
+        open={settingsOpen}
+        config={config}
+        setConfig={setConfig}
+        onClose={() => setSettingsOpen(false)}
+      />
       {error && <div className="error-banner">{error}</div>}
       <div className="workspace">
         <LeftRail config={config} setConfig={setConfig} onPickExample={pickExample} onClear={clearChat} />

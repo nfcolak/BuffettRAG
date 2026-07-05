@@ -18,20 +18,20 @@ echo "Installing dependencies..."
 pip install -q -r requirements.txt
 echo "✓ Dependencies installed"
 
-# Create processed_data directory
-mkdir -p processed_data
+# Create processed data directory
+mkdir -p data/processed
 echo "✓ Created output directory"
 
 # Run the pipeline
 echo ""
 echo "Starting ingestion pipeline..."
 echo "=================================="
-python3 ingestion_pipeline.py
+python3 scripts/ingestion_pipeline.py
 
 echo ""
 echo "Pipeline complete! 🎉"
 echo ""
 echo "Validate results with:"
-echo "  python3 validate_chunks.py"
-echo "  python3 validate_chunks.py --sample 5"
-echo "  python3 validate_chunks.py --year 1977"
+echo "  python3 scripts/validate_chunks.py"
+echo "  python3 scripts/validate_chunks.py --sample 5"
+echo "  python3 scripts/validate_chunks.py --year 1977"

@@ -19,9 +19,11 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 from config import CHUNKS_FILE, CHUNKS_V2_FILE
-from src.ingestion.chunker import split_text
+from src.ingestion.chunker import merge_short_chunks, split_text
 from src.ingestion.pdf_extractor import clean_extracted_text
+from src.ingestion.pipeline_v2 import infer_section_title
 from src.ingestion.topic_tagger import tag_topics
+from src.retrieval.context import build_doc_lookup, expand_hits_with_neighbors
 from src.retrieval.bm25 import BM25Retriever, tokenize
 from src.retrieval.retriever import detect_year_filter, reciprocal_rank_fusion
 from src.vector_store import SearchHit, StoredDoc, load_chunks_as_docs
@@ -46,6 +48,20 @@ class TestIngestion(unittest.TestCase):
         chunks = split_text(text, chunk_size=400, chunk_overlap=50)
         self.assertGreater(len(chunks), 1)
         self.assertTrue(all(len(c) <= 600 for c in chunks))  # incl. some overlap slack
+
+    def test_chunker_merges_short_fragments(self) -> None:
+        chunks = merge_short_chunks(
+            ["Insurance Operations", "GEICO float gives Berkshire low-cost capital."],
+            min_chunk_chars=160,
+            target_chars=400,
+        )
+        self.assertEqual(len(chunks), 1)
+        self.assertIn("Insurance Operations", chunks[0])
+        self.assertIn("GEICO float", chunks[0])
+
+    def test_infer_section_title(self) -> None:
+        title = infer_section_title("Insurance Operations\n\nGEICO had a strong year.", "")
+        self.assertEqual(title, "Insurance Operations")
 
     def test_topic_tagger_finds_inflation(self) -> None:
         text = (
@@ -116,6 +132,35 @@ class TestRetrievalUtilities(unittest.TestCase):
         ids = [h.id for h in fused]
         # "0" is rank 1 in a and rank 2 in b -- best combined.
         self.assertEqual(ids[0], "0")
+
+    def test_context_expansion_adds_neighbors(self) -> None:
+        docs = [
+            StoredDoc(
+                id="0",
+                text="before context",
+                metadata={"next_chunk_id": "1"},
+            ),
+            StoredDoc(
+                id="1",
+                text="current context",
+                metadata={"previous_chunk_id": "0", "next_chunk_id": "2"},
+            ),
+            StoredDoc(
+                id="2",
+                text="after context",
+                metadata={"previous_chunk_id": "1"},
+            ),
+        ]
+        hit = SearchHit(id="1", text="current context", metadata={}, score=1.0)
+        expanded = expand_hits_with_neighbors(
+            [hit],
+            build_doc_lookup(docs),
+            neighbors=1,
+            max_chars=1000,
+        )
+        self.assertIn("before context", expanded[0].text)
+        self.assertIn("current context", expanded[0].text)
+        self.assertIn("after context", expanded[0].text)
 
 
 class TestBM25(unittest.TestCase):

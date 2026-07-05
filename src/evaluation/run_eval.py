@@ -4,9 +4,9 @@ Compares the four retrieval strategies x {with rerank, without rerank},
 plus an LLM answer-correctness pass on the top configuration.
 
 Outputs:
-    eval_results/retrieval_<timestamp>.json  -- full per-query metrics
-    eval_results/retrieval_<timestamp>.csv   -- mean metrics per config
-    eval_results/faithfulness_<timestamp>.json  (only if --with-llm)
+    data/evaluation/retrieval_<timestamp>.json  -- full per-query metrics
+    data/evaluation/retrieval_<timestamp>.csv   -- mean metrics per config
+    data/evaluation/faithfulness_<timestamp>.json  (only if --with-llm)
 
 Usage:
     python -m src.evaluation.run_eval

@@ -7,7 +7,7 @@ from typing import Any, Dict, Optional
 import requests
 import streamlit as st
 
-from src.frontend.settings import BACKEND_URL
+from src.frontend.settings import BACKEND_API_KEY, BACKEND_URL
 
 
 def build_where(year: Optional[int], decade: Optional[int]) -> Optional[Dict[str, Any]]:
@@ -20,8 +20,14 @@ def build_where(year: Optional[int], decade: Optional[int]) -> Optional[Dict[str
 
 
 def backend_post(path: str, payload: dict, timeout: int = 180) -> Optional[dict]:
+    headers = {"X-API-Key": BACKEND_API_KEY} if BACKEND_API_KEY else None
     try:
-        response = requests.post(f"{BACKEND_URL}{path}", json=payload, timeout=timeout)
+        response = requests.post(
+            f"{BACKEND_URL}{path}",
+            json=payload,
+            headers=headers,
+            timeout=timeout,
+        )
         response.raise_for_status()
         return response.json()
     except requests.RequestException:

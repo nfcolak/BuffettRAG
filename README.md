@@ -1,8 +1,55 @@
-# UZH CL — RAG Research Project Workspace
+# BuffettRAG
 
-## BuffettRAG Frontend
+BuffettRAG is a retrieval-augmented research workspace for Warren Buffett shareholder letters.
+It includes a Python retrieval backend with OpenAI answer generation, a Streamlit fallback UI, and a React/Vite frontend.
 
-The primary BuffettRAG frontend is now the React/Vite app in `frontend/`.
+## Project Layout
+
+```text
+.
+├── app.py                  # Streamlit fallback UI
+├── config.py               # Central paths and runtime settings
+├── assets/                 # Streamlit static assets
+├── data/
+│   ├── raw/                # Source shareholder letters
+│   ├── processed/          # Chunk files and metadata
+│   ├── indices/            # Vector-store persistence
+│   └── evaluation/         # Evaluation reports
+├── docs/
+│   └── reference/          # Historical project notes
+├── frontend/               # React/Vite frontend
+├── scripts/                # CLI and maintenance scripts
+├── src/
+│   ├── evaluation/         # Evaluation pipeline
+│   ├── frontend/           # Streamlit frontend helpers
+│   ├── generation/         # Prompting and OpenAI generation wrapper
+│   ├── ingestion/          # Parsing, chunking, and tagging
+│   ├── retrieval/          # BM25, vector retrieval, reranking
+│   └── services/           # FastAPI backend service
+└── tests/                  # Automated tests
+```
+
+## Quick Start
+
+Install Python dependencies:
+
+```bash
+pip install -r requirements.txt
+```
+
+Build or refresh processed chunks:
+
+```bash
+python -m src.ingestion.pipeline_v2
+```
+
+Run the backend:
+
+```bash
+uvicorn src.services.backend_app:app --host 0.0.0.0 --port 8000 --reload
+```
+
+Run the React frontend:
 
 ```bash
 cd frontend
@@ -10,100 +57,57 @@ npm install
 VITE_BACKEND_URL=http://localhost:8000 npm run dev
 ```
 
-Then open `http://127.0.0.1:5173`.
+The frontend Settings button lets you choose OpenAI or OpenRouter per browser.
+If you enter a provider API key there, it is sent only with `/ask` requests.
+Selecting "remember on this device" stores the key in that browser's local storage.
 
-The old Streamlit frontend (`app.py`) is kept as a fallback/legacy UI.
+The Streamlit fallback UI is still available:
 
-Welcome to your team workspace on [Nuvolos](https://nuvolos.cloud). This document explains the tools available to you and how they work together. For more details on the platform, refer to the [Nuvolos documentation](https://docs.nuvolos.com) or contact Nuvolos support for assistance. 
-
-***
-
-## Your Applications
-
-Each team member has their own instance with <strong>four applications</strong>. The **Master instance** additionally includes a **Trainer** app.
-
-| App | What it is | What it's for |
-| --- | ---------- | ------------- |
-| **Editor** | VS Code (1 NCU) | General-purpose code editing, scripting, and file management |
-| **Frontend** | VS Code (2 NCU) | Building and serving your RAG frontend (e.g., Streamlit, Gradio) |
-| **Backend** | VS Code (2 NCU) | Running your RAG backend or API server |
-| **Database** | pgvector (2 NCU) | PostgreSQL database with vector search support for embeddings |
-| **Trainer** | PyTorch (Master only) | Fine-tuning and training models — available only on the Master instance |
-
-> **NCU** = Nuvolos Compute Unit. Apps with more NCUs have access to more CPU and memory. 1 NCU = 1 vCPU with 4 GB RAM. [web:3]
-
-***
-
-## Networking Between Apps
-
-The <strong>Frontend</strong>, <strong>Backend</strong>, and **Database** apps are configured with **instance-wide networking** (`ipc_mode: instance`). This means:
-
-* All three apps within the same instance can reach each other over fixed hostnames. The hostname is shown in the Nuvolos UI under Applications → “… > CONFIGURE”.
-* The **Backend** can connect directly to the **Database** (PostgreSQL on port 5432).
-* The **Frontend** can communicate with the **Backend API** without external routing.
-
-The **Editor** app runs in isolation and does **not** share the network namespace with the other apps. 
-
-**Typical connection flow:**
-
-```text
-Frontend → Backend → Database (pgvector)
-   ↑          ↑          ↑
-   └── all reachable via unique, fixed hostnames within the same instance ──┘
+```bash
+streamlit run app.py
 ```
 
-See the \[Nuvolos documentation\]\(https://docs\.nuvolos\.com/features/applications/configuring\-applications\#connecting\-to\-apps\-from\-other\-applications\) for more\.
+## Security Configuration
 
-***
+For shared or public deployments, set API keys and restrict browser origins:
 
-## Large File Storage (LFS)
-
-Each team space includes a <strong>shared 30 GiB file storage</strong>, mounted at:
-
-```text
-/space_mounts/pars
+```bash
+export API_KEYS="replace-with-backend-key"
+export BACKEND_API_KEY="replace-with-backend-key"
+export CORS_ORIGINS="https://your-frontend.example"
+export DEFAULT_LLM_PROVIDER="openai"
+export OPENAI_API_KEY="your-openai-api-key"
+export OPENAI_MODEL="gpt-4.1-mini"
 ```
 
-* The mount is **read/write** and shared across all instances in your space.
-* Use it for model weights, checkpoints, datasets, or other large shared files.
-* Changes made by one team member are visible to all team members.
+To use Anthropic instead:
 
-***
+```bash
+export DEFAULT_LLM_PROVIDER="anthropic"
+export ANTHROPIC_API_KEY="your-anthropic-api-key"
+export ANTHROPIC_MODEL="claude-haiku-4-5-20251001"
+```
 
-## Team Credits
+To use OpenRouter instead:
 
-Your team has a **shared credit pool** that is consumed while apps are running. To conserve credits:
+```bash
+export DEFAULT_LLM_PROVIDER="openrouter"
+export OPENROUTER_API_KEY="your-openrouter-api-key"
+export OPENROUTER_MODEL="openrouter/free"
+```
 
-* **Stop apps** when not in use.
-* Use the **Editor** (1 NCU) for lightweight tasks.
-* Check remaining credits in your Nuvolos dashboard under **Space Settings**
-* You can use `git` with SSH key support for private repositories. We recommend each instance work on its own branch, with the Master using the `main` branch.
+Optional hardening knobs:
 
-***
+```bash
+export RATE_LIMIT_REQUESTS=60
+export RATE_LIMIT_WINDOW_SECONDS=60
+export EXPOSE_DEBUG_STATUS=0
+```
 
-## Scaling the Trainer App
+Local development can leave keys empty, but production should not.
 
-You can scale the **Trainer** app for larger training workloads:
+## Notes
 
-1. Go to the <strong>Master instance</strong>.
-2. Open the **Trainer** app settings.
-3. Increase NCU allocation for more CPU/memory (or request GPU access if available).
-4. Start your training job.
-5. **Scale back down** once training is complete to save credits. 
-
-***
-
-## Quick Start
-
-1. **Accept your invitation** from the email you received.
-2. **Open your instance** — it’s listed under your group’s space. 
-3. **Start the Editor** to explore files and set up your project.
-4. **Start the Database** and initialize your pgvector schema.
-5. **Start Backend and Frontend** to develop your RAG pipeline.
-6. Use `/space_mounts/pars` for shared model weights and large files.
-
-***
-
-## Questions?
-
-For any questions, please contact: [stylianos.psychias@uzh.ch](mailto:stylianos.psychias@uzh.ch)
+- Active data paths are configured in `config.py`.
+- Historical docs and older project notes live in `docs/reference/`.
+- Old frontend prototype files live in `archive/frontend-prototype/`.

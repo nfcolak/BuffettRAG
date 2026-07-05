@@ -68,7 +68,7 @@ def render_page_chrome() -> None:
             <div class="topbar-spacer"></div>
             <div class="topbar-status">
                 <span class="status-chip"><span class="status-dot"></span>backend <strong>configured</strong></span>
-                <span class="status-chip">model <strong>qwen2.5</strong></span>
+                <span class="status-chip">model <strong>openai</strong></span>
                 <span class="status-chip">embed <strong>bge-small</strong></span>
             </div>
         </header>''',

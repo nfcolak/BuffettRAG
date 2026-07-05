@@ -5,10 +5,12 @@ from __future__ import annotations
 import os
 
 BACKEND_URL = os.getenv("BACKEND_URL", "http://localhost:8000")
+BACKEND_API_KEY = os.getenv("BACKEND_API_KEY", "")
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 ASSETS_DIR = os.path.join(BASE_DIR, "assets")
-PROCESSED_DATA_DIR = os.path.join(BASE_DIR, "processed_data")
+DATA_DIR = os.path.join(BASE_DIR, "data")
+PROCESSED_DATA_DIR = os.path.join(DATA_DIR, "processed")
 
 METADATA_V2_FILE = os.path.join(PROCESSED_DATA_DIR, "metadata_v2.json")
 METADATA_FILE = os.path.join(PROCESSED_DATA_DIR, "metadata.json")
