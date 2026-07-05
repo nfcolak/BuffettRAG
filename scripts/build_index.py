@@ -3,7 +3,7 @@
 
 Usage:
     python scripts/build_index.py
-    python scripts/build_index.py --chunks processed_data/chunks_v2.jsonl --backend faiss
+    python scripts/build_index.py --chunks data/processed/chunks_v2.jsonl --backend faiss
     python scripts/build_index.py --embedder base --device cuda
 """
 

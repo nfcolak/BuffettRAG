@@ -1,0 +1,1041 @@
+[
+  {
+    "qid": "g01",
+    "query": "How did Buffett react to the 2008 financial crisis in his shareholder letter?",
+    "answer": "In his 2008 shareholder letter, Warren Buffett described the 2008 financial crisis as \"devastating\" and compared it to small birds straying into a badminton game, indicating confusion and chaos among investors [1]. He noted that Berkshire's book value decreased by $11.5 billion, reducing the per-share book value of both Class A and Class B stock by 9.6%, reflecting the severe impact on the company's financial health [1]. Buffett expressed concern about the credit default swaps (CDS) Berkshire had entered into, stating that while he initially expected profits, losses had accelerated due to the increasing number of bankruptcies, raising the possibility of an eventual loss [2]. He emphasized maintaining Berkshire's financial position, widening competitive advantages, acquiring new streams of earnings, and nurturing strong managerial teams, highlighting strategies to mitigate risks [3]. Buffett acknowledged that most of Berkshire's businesses performed below their potential due to the economic downturn, particularly affecting retailers and other sectors [4]. He also reflected on his own mistakes in investments, including commissions and omissions, and noted that the market value of the bonds and stocks held by Berkshire declined alongside the broader market [5]. Lastly, he observed the worsening conditions within financial institutions, describing a \"vicious negative-feedback loop\" where the credit crisis coupled with falling home and stock prices created a paralyzing fear and business activity decline [6].",
+    "citations": [
+      {
+        "marker": "[1]",
+        "passage_indices": [
+          0
+        ],
+        "raw_numbers": [
+          1
+        ],
+        "years": [
+          2008
+        ],
+        "sources": [
+          "buffet_2008.pdf"
+        ]
+      },
+      {
+        "marker": "[1]",
+        "passage_indices": [
+          0
+        ],
+        "raw_numbers": [
+          1
+        ],
+        "years": [
+          2008
+        ],
+        "sources": [
+          "buffet_2008.pdf"
+        ]
+      },
+      {
+        "marker": "[2]",
+        "passage_indices": [
+          1
+        ],
+        "raw_numbers": [
+          2
+        ],
+        "years": [
+          2008
+        ],
+        "sources": [
+          "buffet_2008.pdf"
+        ]
+      },
+      {
+        "marker": "[3]",
+        "passage_indices": [
+          2
+        ],
+        "raw_numbers": [
+          3
+        ],
+        "years": [
+          2008
+        ],
+        "sources": [
+          "buffet_2008.pdf"
+        ]
+      },
+      {
+        "marker": "[4]",
+        "passage_indices": [
+          3
+        ],
+        "raw_numbers": [
+          4
+        ],
+        "years": [
+          2008
+        ],
+        "sources": [
+          "buffet_2008.pdf"
+        ]
+      },
+      {
+        "marker": "[5]",
+        "passage_indices": [
+          4
+        ],
+        "raw_numbers": [
+          5
+        ],
+        "years": [
+          2008
+        ],
+        "sources": [
+          "buffet_2008.pdf"
+        ]
+      },
+      {
+        "marker": "[6]",
+        "passage_indices": [
+          5
+        ],
+        "raw_numbers": [
+          6
+        ],
+        "years": [
+          2008
+        ],
+        "sources": [
+          "buffet_2008.pdf"
+        ]
+      }
+    ],
+    "answer_keyword_hit_rate": 1.0,
+    "faithfulness": {
+      "n_sentences": 7,
+      "citation_coverage": 1.0,
+      "invalid_citation_rate": 0.0,
+      "mean_support": 0.24703362891218678
+    }
+  },
+  {
+    "qid": "g02",
+    "query": "What did Buffett say about derivatives being weapons of mass destruction?",
+    "answer": "According to Warren Buffett, in [1], \"derivatives are financial weapons of mass destruction, carrying dangers that, while now latent, are potentially lethal.\" Additionally, [3] mentions that \"In Darwin’s words, ‘Ignorance more frequently begets confidence than does knowledge.’\" While not directly stating derivatives are weapons of mass destruction, it highlights the complexity and potential dangers associated with derivatives.",
+    "citations": [
+      {
+        "marker": "[1]",
+        "passage_indices": [
+          0
+        ],
+        "raw_numbers": [
+          1
+        ],
+        "years": [
+          2002
+        ],
+        "sources": [
+          "buffet_2002.pdf"
+        ]
+      },
+      {
+        "marker": "[3]",
+        "passage_indices": [
+          2
+        ],
+        "raw_numbers": [
+          3
+        ],
+        "years": [
+          1989
+        ],
+        "sources": [
+          "buffet_1989.txt"
+        ]
+      }
+    ],
+    "answer_keyword_hit_rate": 1.0,
+    "faithfulness": {
+      "n_sentences": 1,
+      "citation_coverage": 1.0,
+      "invalid_citation_rate": 0.0,
+      "mean_support": 0.2830188679245283
+    }
+  },
+  {
+    "qid": "g03",
+    "query": "What is Buffett's view on share repurchases and buybacks?",
+    "answer": "Buffett views share repurchases positively when certain conditions are met. He believes repurchases are beneficial for exiting shareholders because they provide additional buyers in the market, enhancing liquidity [1,2,3]. For continuing shareholders, repurchases are only advantageous if the shares are bought at a price below intrinsic value, thereby increasing the intrinsic value of the remaining shares [2,3]. However, Buffett cautions against repurchases driven by short-term stock price manipulation, which he sees as detrimental to long-term shareholder value [1,6]. He also notes that repurchases should align with a company's financial health and strategic objectives, ensuring that the repurchased shares are below intrinsic value [3,7]. Overall, Buffett advocates for repurchases when they are part of a broader strategy to enhance shareholder wealth, provided they are executed prudently and not as a means to manipulate stock prices [1,2,3,7].",
+    "citations": [
+      {
+        "marker": "[1,2,3]",
+        "passage_indices": [
+          0,
+          1,
+          2
+        ],
+        "raw_numbers": [
+          1,
+          2,
+          3
+        ],
+        "years": [
+          1999,
+          2016,
+          2011
+        ],
+        "sources": [
+          "buffet_1999.pdf",
+          "buffet_2016.pdf",
+          "buffet_2011.pdf"
+        ]
+      },
+      {
+        "marker": "[2,3]",
+        "passage_indices": [
+          1,
+          2
+        ],
+        "raw_numbers": [
+          2,
+          3
+        ],
+        "years": [
+          2016,
+          2011
+        ],
+        "sources": [
+          "buffet_2016.pdf",
+          "buffet_2011.pdf"
+        ]
+      },
+      {
+        "marker": "[1,6]",
+        "passage_indices": [
+          0,
+          5
+        ],
+        "raw_numbers": [
+          1,
+          6
+        ],
+        "years": [
+          1999,
+          2014
+        ],
+        "sources": [
+          "buffet_1999.pdf",
+          "buffet_2014.pdf"
+        ]
+      },
+      {
+        "marker": "[3,7]",
+        "passage_indices": [
+          2,
+          6
+        ],
+        "raw_numbers": [
+          3,
+          7
+        ],
+        "years": [
+          2011,
+          2012
+        ],
+        "sources": [
+          "buffet_2011.pdf",
+          "buffet_2012.pdf"
+        ]
+      },
+      {
+        "marker": "[1,2,3,7]",
+        "passage_indices": [
+          0,
+          1,
+          2,
+          6
+        ],
+        "raw_numbers": [
+          1,
+          2,
+          3,
+          7
+        ],
+        "years": [
+          1999,
+          2016,
+          2011,
+          2012
+        ],
+        "sources": [
+          "buffet_1999.pdf",
+          "buffet_2016.pdf",
+          "buffet_2011.pdf",
+          "buffet_2012.pdf"
+        ]
+      }
+    ],
+    "answer_keyword_hit_rate": 0.5,
+    "faithfulness": {
+      "n_sentences": 6,
+      "citation_coverage": 0.8333333333333334,
+      "invalid_citation_rate": 0.0,
+      "mean_support": 0.18321417069243157
+    }
+  },
+  {
+    "qid": "g04",
+    "query": "What did Buffett write about See's Candies as an investment?",
+    "answer": "According to [1], See's Candies, a 99% owned subsidiary of Blue Chip Stamps, achieved a significant growth in pre-tax operating earnings from $4.2 million in 1972 to $12.6 million in 1977 with minimal additional capital investment. Additionally, [3] provides insight into See's unique competitive advantage, noting that it had a \"huge asset that did not appear on its balance sheet: a broad and durable competitive advantage that gave it significant pricing power.\" Furthermore, [5] highlights Chuck Huggins' leadership in See's, stating that under his management, the company saw a \"more-than-tenfold increase in profits\" despite operating in an industry with slow or no volume growth. Therefore, Buffett wrote about See's Candies as an investment that leveraged strong competitive advantages and demonstrated consistent profitability over time. [1,3,5]",
+    "citations": [
+      {
+        "marker": "[1]",
+        "passage_indices": [
+          0
+        ],
+        "raw_numbers": [
+          1
+        ],
+        "years": [
+          1977
+        ],
+        "sources": [
+          "buffet_1977.txt"
+        ]
+      },
+      {
+        "marker": "[3]",
+        "passage_indices": [
+          2
+        ],
+        "raw_numbers": [
+          3
+        ],
+        "years": [
+          2014
+        ],
+        "sources": [
+          "buffet_2014.pdf"
+        ]
+      },
+      {
+        "marker": "[5]",
+        "passage_indices": [
+          4
+        ],
+        "raw_numbers": [
+          5
+        ],
+        "years": [
+          1999
+        ],
+        "sources": [
+          "buffet_1999.pdf"
+        ]
+      },
+      {
+        "marker": "[1,3,5]",
+        "passage_indices": [
+          0,
+          2,
+          4
+        ],
+        "raw_numbers": [
+          1,
+          3,
+          5
+        ],
+        "years": [
+          1977,
+          2014,
+          1999
+        ],
+        "sources": [
+          "buffet_1977.txt",
+          "buffet_2014.pdf",
+          "buffet_1999.pdf"
+        ]
+      }
+    ],
+    "answer_keyword_hit_rate": 1.0,
+    "faithfulness": {
+      "n_sentences": 3,
+      "citation_coverage": 1.0,
+      "invalid_citation_rate": 0.0,
+      "mean_support": 0.31297875415522475
+    }
+  },
+  {
+    "qid": "g05",
+    "query": "What does Buffett look for when acquiring a company?",
+    "answer": "According to [7], when acquiring a company, Buffett looks for businesses with excellent economic characteristics and management that he likes, trusts, and admires. He emphasizes the importance of patience and not rushing into decisions, stating that such acquisitions are \"not easy to make but we look for them constantly.\" [7] Additionally, [1] provides insight into the process, mentioning that Berkshire looks for individuals with large Berkshire holdings over a long period, indicating a preference for those with substantial experience and knowledge within the company. Therefore, Buffett seeks companies with strong financial performance, solid management, and a history of successful operations.",
+    "citations": [
+      {
+        "marker": "[7]",
+        "passage_indices": [
+          6
+        ],
+        "raw_numbers": [
+          7
+        ],
+        "years": [
+          1992
+        ],
+        "sources": [
+          "buffet_1992.txt"
+        ]
+      },
+      {
+        "marker": "[7]",
+        "passage_indices": [
+          6
+        ],
+        "raw_numbers": [
+          7
+        ],
+        "years": [
+          1992
+        ],
+        "sources": [
+          "buffet_1992.txt"
+        ]
+      },
+      {
+        "marker": "[1]",
+        "passage_indices": [
+          0
+        ],
+        "raw_numbers": [
+          1
+        ],
+        "years": [
+          2002
+        ],
+        "sources": [
+          "buffet_2002.pdf"
+        ]
+      }
+    ],
+    "answer_keyword_hit_rate": 0.5,
+    "faithfulness": {
+      "n_sentences": 3,
+      "citation_coverage": 0.6666666666666666,
+      "invalid_citation_rate": 0.0,
+      "mean_support": 0.21363636363636362
+    }
+  },
+  {
+    "qid": "g06",
+    "query": "Buffett's discussion of inflation in the late 1970s and early 1980s",
+    "answer": "In the late 1970s and early 1980s, Warren Buffett discussed the significant impact of inflation on the insurance industry. [5] highlights that costs in the insurance sectors were rising at a rate of approximately 1% per month due to monetary inflation and \"social inflation,\" leading to potential shrinking of underwriting profits unless rates increase at a similar rate. [1] further emphasizes the investor's misery index, where the combination of inflation rates and taxes reduces the purchasing power of investors despite their consumption remaining unchanged. Buffett noted that high inflation rates did not help in earning higher rates of return on equity, indicating the challenging environment for insurers. [6] underscores the shift in the outlook for successful investments, suggesting that the inflation rate, along with individual tax rates, would determine whether the company's internal operating performance yields successful investment returns for shareholders.",
+    "citations": [
+      {
+        "marker": "[5]",
+        "passage_indices": [
+          4
+        ],
+        "raw_numbers": [
+          5
+        ],
+        "years": [
+          1977
+        ],
+        "sources": [
+          "buffet_1977.txt"
+        ]
+      },
+      {
+        "marker": "[1]",
+        "passage_indices": [
+          0
+        ],
+        "raw_numbers": [
+          1
+        ],
+        "years": [
+          1979
+        ],
+        "sources": [
+          "buffet_1979.txt"
+        ]
+      },
+      {
+        "marker": "[6]",
+        "passage_indices": [
+          5
+        ],
+        "raw_numbers": [
+          6
+        ],
+        "years": [
+          1979
+        ],
+        "sources": [
+          "buffet_1979.txt"
+        ]
+      }
+    ],
+    "answer_keyword_hit_rate": 1.0,
+    "faithfulness": {
+      "n_sentences": 2,
+      "citation_coverage": 1.0,
+      "invalid_citation_rate": 0.0,
+      "mean_support": 0.1410488245931284
+    }
+  },
+  {
+    "qid": "g07",
+    "query": "What did Buffett say about GEICO and the insurance float?",
+    "answer": "According to [1], Buffett said that Ajit Jain created an immense reinsurance business that produced both a huge \"float\" and a large underwriting gain. Furthermore, [3] states that the acquisition of GEICO will immediately increase their float by nearly $3 billion, with additional growth almost certain. Additionally, [5] mentions that GEICO's float has grown from $2.7 billion to $9.6 billion, indicating significant growth in their float. Moreover, [7] notes that GEICO's sales volume among U.S. auto insurers increased 1,200% greater than it recorded in 1995, suggesting that the company's growth in float contributed to its profitability. Thus, GEICO's float has played a crucial role in Berkshire's success, contributing to both immediate and long-term gains. [1,3,5,7]",
+    "citations": [
+      {
+        "marker": "[1]",
+        "passage_indices": [
+          0
+        ],
+        "raw_numbers": [
+          1
+        ],
+        "years": [
+          2014
+        ],
+        "sources": [
+          "buffet_2014.pdf"
+        ]
+      },
+      {
+        "marker": "[3]",
+        "passage_indices": [
+          2
+        ],
+        "raw_numbers": [
+          3
+        ],
+        "years": [
+          1995
+        ],
+        "sources": [
+          "buffet_1995.txt"
+        ]
+      },
+      {
+        "marker": "[5]",
+        "passage_indices": [
+          4
+        ],
+        "raw_numbers": [
+          5
+        ],
+        "years": [
+          2009
+        ],
+        "sources": [
+          "buffet_2009.pdf"
+        ]
+      },
+      {
+        "marker": "[7]",
+        "passage_indices": [
+          6
+        ],
+        "raw_numbers": [
+          7
+        ],
+        "years": [
+          2018
+        ],
+        "sources": [
+          "buffet_2018.pdf"
+        ]
+      },
+      {
+        "marker": "[1,3,5,7]",
+        "passage_indices": [
+          0,
+          2,
+          4,
+          6
+        ],
+        "raw_numbers": [
+          1,
+          3,
+          5,
+          7
+        ],
+        "years": [
+          2014,
+          1995,
+          2009,
+          2018
+        ],
+        "sources": [
+          "buffet_2014.pdf",
+          "buffet_1995.txt",
+          "buffet_2009.pdf",
+          "buffet_2018.pdf"
+        ]
+      }
+    ],
+    "answer_keyword_hit_rate": 1.0,
+    "faithfulness": {
+      "n_sentences": 5,
+      "citation_coverage": 1.0,
+      "invalid_citation_rate": 0.0,
+      "mean_support": 0.46066374018688183
+    }
+  },
+  {
+    "qid": "g08",
+    "query": "How has Buffett's view on technology stocks changed from the 1990s to the 2020s?",
+    "answer": "To understand how Buffett's view on technology stocks has changed from the 1990s to the 2020s, we need to look at relevant passages. In [3], Buffett mentions that \"There is no such thing as a 100% sure thing when investing. Thus, the use of leverage is dangerous.\" This suggests a cautious approach to investments, including technology stocks, which often rely heavily on leverage through high valuations. \n\nHowever, in [5], there is a statement that \"An offset is that some business owners seek out Berkshire because of our steadfast behavior. Occasionally, that can be a decided plus for us.\" This implies that despite being cautious, Berkshire does occasionally invest in businesses, possibly including technology companies, due to their strong management and history. \n\nTherefore, while Buffett maintains a cautious stance towards leveraging and the inherent risks of technology stocks, he also recognizes the value of certain companies and their management, indicating a nuanced view that evolves over time. [3,5]",
+    "citations": [
+      {
+        "marker": "[3]",
+        "passage_indices": [
+          2
+        ],
+        "raw_numbers": [
+          3
+        ],
+        "years": [
+          2022
+        ],
+        "sources": [
+          "buffet_2022.pdf"
+        ]
+      },
+      {
+        "marker": "[5]",
+        "passage_indices": [
+          4
+        ],
+        "raw_numbers": [
+          5
+        ],
+        "years": [
+          2024
+        ],
+        "sources": [
+          "buffet_2024.pdf"
+        ]
+      },
+      {
+        "marker": "[3,5]",
+        "passage_indices": [
+          2,
+          4
+        ],
+        "raw_numbers": [
+          3,
+          5
+        ],
+        "years": [
+          2022,
+          2024
+        ],
+        "sources": [
+          "buffet_2022.pdf",
+          "buffet_2024.pdf"
+        ]
+      }
+    ],
+    "answer_keyword_hit_rate": 0.5,
+    "faithfulness": {
+      "n_sentences": 6,
+      "citation_coverage": 0.5,
+      "invalid_citation_rate": 0.0,
+      "mean_support": 0.4598063973063973
+    }
+  },
+  {
+    "qid": "g09",
+    "query": "Buffett on succession planning at Berkshire",
+    "answer": "Buffett emphasizes the importance of succession planning at Berkshire Hathaway, stating that the company has prepared for CEO succession by identifying three outstanding internal candidates [3,5]. He mentions that the board knows exactly whom it would pick if he were unavailable, either due to death or diminished abilities, and there are two backups [3,5]. Buffett aims to ensure that the transition of responsibility is seamless, maintaining Berkshire's bright prospects [4]. He notes that the system at Berkshire was designed to maximize the rationality, skills, and devotion of the most important people, starting with himself [5]. Buffett's approach includes avoiding the equivalent of a \"department of acquisitions\" and displaying almost inhuman patience, rarely buying when he could have [6,8]. He acknowledges that while mistakes of commission were common, the biggest errors were in not making purchases, especially overlooking opportunities like Walmart stock [8].",
+    "citations": [
+      {
+        "marker": "[3,5]",
+        "passage_indices": [
+          2,
+          4
+        ],
+        "raw_numbers": [
+          3,
+          5
+        ],
+        "years": [
+          2007,
+          2014
+        ],
+        "sources": [
+          "buffet_2007.pdf",
+          "buffet_2014.pdf"
+        ]
+      },
+      {
+        "marker": "[3,5]",
+        "passage_indices": [
+          2,
+          4
+        ],
+        "raw_numbers": [
+          3,
+          5
+        ],
+        "years": [
+          2007,
+          2014
+        ],
+        "sources": [
+          "buffet_2007.pdf",
+          "buffet_2014.pdf"
+        ]
+      },
+      {
+        "marker": "[4]",
+        "passage_indices": [
+          3
+        ],
+        "raw_numbers": [
+          4
+        ],
+        "years": [
+          2011
+        ],
+        "sources": [
+          "buffet_2011.pdf"
+        ]
+      },
+      {
+        "marker": "[5]",
+        "passage_indices": [
+          4
+        ],
+        "raw_numbers": [
+          5
+        ],
+        "years": [
+          2014
+        ],
+        "sources": [
+          "buffet_2014.pdf"
+        ]
+      },
+      {
+        "marker": "[6,8]",
+        "passage_indices": [
+          5,
+          7
+        ],
+        "raw_numbers": [
+          6,
+          8
+        ],
+        "years": [
+          2014,
+          2014
+        ],
+        "sources": [
+          "buffet_2014.pdf",
+          "buffet_2014.pdf"
+        ]
+      },
+      {
+        "marker": "[8]",
+        "passage_indices": [
+          7
+        ],
+        "raw_numbers": [
+          8
+        ],
+        "years": [
+          2014
+        ],
+        "sources": [
+          "buffet_2014.pdf"
+        ]
+      }
+    ],
+    "answer_keyword_hit_rate": 1.0,
+    "faithfulness": {
+      "n_sentences": 6,
+      "citation_coverage": 1.0,
+      "invalid_citation_rate": 0.0,
+      "mean_support": 0.3522907044646175
+    }
+  },
+  {
+    "qid": "g10",
+    "query": "What does Buffett mean by intrinsic value and margin of safety?",
+    "answer": "Buffett defines intrinsic value as the discounted value of the cash that can be taken out of a business during its remaining life [1]. He emphasizes that intrinsic value is inherently subjective and changes with revisions in future cash flow estimates and shifts in interest rates [1]. Additionally, Buffett highlights that intrinsic value is crucial for evaluating the attractiveness of investments and businesses, being the only logical way to do so [1].\n\nRegarding the margin of safety, Buffett mentions it in relation to acquisitions and capital allocation decisions. He states that managers must act in ways that increase per-share intrinsic value and avoid actions that decrease it [6]. This implies that there is a buffer or cushion (margin of safety) that exists between the purchase price and the intrinsic value of a business, ensuring that even if the intrinsic value is underestimated, the purchase remains profitable. \n\nFurthermore, in the context of acquisitions, Buffett warns against deals where the intrinsic value of the acquired company is undervalued compared to the offered price. For instance, in a scenario where Company B is worth $100 per share but is being sold for $125 per share, the intrinsic value of the shares being purchased is lower than the intrinsic value of the shares being sold, indicating a lack of margin of safety [7].\n\nIn summary, Buffett means intrinsic value as the discounted value of future cash flows, and the margin of safety as the buffer between the purchase price and the intrinsic value of the business, ensuring that even if the intrinsic value is underestimated, the purchase remains profitable.",
+    "citations": [
+      {
+        "marker": "[1]",
+        "passage_indices": [
+          0
+        ],
+        "raw_numbers": [
+          1
+        ],
+        "years": [
+          1994
+        ],
+        "sources": [
+          "buffet_1994.txt"
+        ]
+      },
+      {
+        "marker": "[1]",
+        "passage_indices": [
+          0
+        ],
+        "raw_numbers": [
+          1
+        ],
+        "years": [
+          1994
+        ],
+        "sources": [
+          "buffet_1994.txt"
+        ]
+      },
+      {
+        "marker": "[1]",
+        "passage_indices": [
+          0
+        ],
+        "raw_numbers": [
+          1
+        ],
+        "years": [
+          1994
+        ],
+        "sources": [
+          "buffet_1994.txt"
+        ]
+      },
+      {
+        "marker": "[6]",
+        "passage_indices": [
+          5
+        ],
+        "raw_numbers": [
+          6
+        ],
+        "years": [
+          1994
+        ],
+        "sources": [
+          "buffet_1994.txt"
+        ]
+      },
+      {
+        "marker": "[7]",
+        "passage_indices": [
+          6
+        ],
+        "raw_numbers": [
+          7
+        ],
+        "years": [
+          2009
+        ],
+        "sources": [
+          "buffet_2009.pdf"
+        ]
+      }
+    ],
+    "answer_keyword_hit_rate": 1.0,
+    "faithfulness": {
+      "n_sentences": 9,
+      "citation_coverage": 0.5555555555555556,
+      "invalid_citation_rate": 0.0,
+      "mean_support": 0.44950744907266643
+    }
+  },
+  {
+    "qid": "g11",
+    "query": "Buffett's advice to individual investors about index funds",
+    "answer": "Buffett advises individual investors to follow a low-cost strategy, specifically recommending an S&P 500 index fund [1,2,4,8]. He suggests that most investors, whether institutional or individual, will achieve superior long-term results by investing in such funds, as opposed to employing high-fee managers [1,2,4,8]. Buffett emphasizes the importance of simplicity in investment decisions, advocating for a straightforward approach to managing investments [1,2,4,8]. He also notes that many investors, particularly those with substantial wealth, do not heed his advice, instead opting for high-fee managers or consultants [3,7]. Buffett's consistent recommendation is that individual investors should avoid the temptation of high fees and instead opt for low-cost index funds [1,2,4,8].",
+    "citations": [
+      {
+        "marker": "[1,2,4,8]",
+        "passage_indices": [
+          0,
+          1,
+          3,
+          7
+        ],
+        "raw_numbers": [
+          1,
+          2,
+          4,
+          8
+        ],
+        "years": [
+          2013,
+          1996,
+          2016,
+          2016
+        ],
+        "sources": [
+          "buffet_2013.pdf",
+          "buffet_1996.txt",
+          "buffet_2016.pdf",
+          "buffet_2016.pdf"
+        ]
+      },
+      {
+        "marker": "[1,2,4,8]",
+        "passage_indices": [
+          0,
+          1,
+          3,
+          7
+        ],
+        "raw_numbers": [
+          1,
+          2,
+          4,
+          8
+        ],
+        "years": [
+          2013,
+          1996,
+          2016,
+          2016
+        ],
+        "sources": [
+          "buffet_2013.pdf",
+          "buffet_1996.txt",
+          "buffet_2016.pdf",
+          "buffet_2016.pdf"
+        ]
+      },
+      {
+        "marker": "[1,2,4,8]",
+        "passage_indices": [
+          0,
+          1,
+          3,
+          7
+        ],
+        "raw_numbers": [
+          1,
+          2,
+          4,
+          8
+        ],
+        "years": [
+          2013,
+          1996,
+          2016,
+          2016
+        ],
+        "sources": [
+          "buffet_2013.pdf",
+          "buffet_1996.txt",
+          "buffet_2016.pdf",
+          "buffet_2016.pdf"
+        ]
+      },
+      {
+        "marker": "[3,7]",
+        "passage_indices": [
+          2,
+          6
+        ],
+        "raw_numbers": [
+          3,
+          7
+        ],
+        "years": [
+          2016,
+          2022
+        ],
+        "sources": [
+          "buffet_2016.pdf",
+          "buffet_2022.pdf"
+        ]
+      },
+      {
+        "marker": "[1,2,4,8]",
+        "passage_indices": [
+          0,
+          1,
+          3,
+          7
+        ],
+        "raw_numbers": [
+          1,
+          2,
+          4,
+          8
+        ],
+        "years": [
+          2013,
+          1996,
+          2016,
+          2016
+        ],
+        "sources": [
+          "buffet_2013.pdf",
+          "buffet_1996.txt",
+          "buffet_2016.pdf",
+          "buffet_2016.pdf"
+        ]
+      }
+    ],
+    "answer_keyword_hit_rate": 1.0,
+    "faithfulness": {
+      "n_sentences": 5,
+      "citation_coverage": 1.0,
+      "invalid_citation_rate": 0.0,
+      "mean_support": 0.11314285714285714
+    }
+  },
+  {
+    "qid": "g12",
+    "query": "What did Buffett write about the BNSF railroad acquisition?",
+    "answer": "Buffett wrote extensively about the BNSF railroad acquisition in [1,2,4,6,8]. He mentioned that Berkshire acquired BNSF early in 2010 and that the company has invested $41 billion in fixed assets since the acquisition, exceeding its depreciation charges by $20 billion. Buffett predicted that BNSF will be a key asset for Berkshire and the country a century from now. He highlighted the challenges of operating a railroad, including the need for reliability in extreme weather conditions and terrain. Buffett expressed pride in BNSF's contributions to the country, especially in maintaining the commercial arteries during winter operations in North Dakota and Montana. He noted that despite the high maintenance costs, BNSF has paid substantial dividends to Berkshire, with $41.8 billion in total dividends received. Buffett also mentioned that Carl Ice, the CEO, and Katie Farmer, the number two executive, managed expenses effectively during a downturn, increasing the profit margin by 2.9 percentage points.",
+    "citations": [
+      {
+        "marker": "[1,2,4,6,8]",
+        "passage_indices": [
+          0,
+          1,
+          3,
+          5,
+          7
+        ],
+        "raw_numbers": [
+          1,
+          2,
+          4,
+          6,
+          8
+        ],
+        "years": [
+          2020,
+          2021,
+          2023,
+          2013,
+          2020
+        ],
+        "sources": [
+          "buffet_2020.pdf",
+          "buffet_2021.pdf",
+          "buffet_2023.pdf",
+          "buffet_2013.pdf",
+          "buffet_2020.pdf"
+        ]
+      }
+    ],
+    "answer_keyword_hit_rate": 0.5,
+    "faithfulness": {
+      "n_sentences": 7,
+      "citation_coverage": 0.14285714285714285,
+      "invalid_citation_rate": 0.0,
+      "mean_support": 0.07692307692307693
+    }
+  }
+]

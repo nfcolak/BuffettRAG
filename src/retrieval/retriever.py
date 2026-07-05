@@ -1,19 +1,26 @@
-"""Retriever with four strategies.
+"""Retriever with four strategies plus multi-subquery decomposition.
 
 Strategies (selectable per-call via the `strategy` argument or per-instance
 via the constructor):
 
-    'naive'    -- vector search, no metadata filter, no rerank.
-                  Baseline from the task list.
+    'naive'        -- vector search, no metadata filter, no rerank.
+                      Baseline from the task list.
 
-    'metadata' -- vector search + metadata filtering (year / decade / topic).
-                  Year filters are auto-detected from the query.
+    'metadata'     -- vector search + metadata filtering (year / decade / topic).
+                      Year filters are auto-detected from the query.
 
-    'vector'   -- pure vector search with optional metadata filter and
-                  optional reranking.
+    'vector'       -- pure vector search with optional metadata filter and
+                      optional reranking.
 
-    'hybrid'   -- vector + BM25, fused with Reciprocal Rank Fusion.
-                  Optional metadata filter and optional reranking.
+    'hybrid'       -- vector + BM25, fused with Reciprocal Rank Fusion.
+                      Optional metadata filter and optional reranking.
+                      Automatically uses multi-subquery decomposition when a
+                      temporal comparison pattern is detected (e.g. "changed
+                      from the 1990s to the 2020s").
+
+    'hybrid_multi' -- hybrid search run separately per detected time period,
+                      results merged with RRF. Set automatically; can also be
+                      forced by passing strategy='hybrid_multi'.
 
 The design pulls all candidate sets through a uniform `SearchHit` shape so the
 downstream reranker and generator don't care which path produced them.
@@ -62,6 +69,59 @@ _DECADE_RANGE_RE = re.compile(
     r"(1970s|1980s|1990s|2000s|2010s|2020s|seventies|eighties|nineties)\b",
     re.IGNORECASE,
 )
+
+
+_TEMPORAL_COMPARISON_RE = re.compile(
+    r"\b(changed?|evolved?|shifted?|developed?|differed?|grown?|"
+    r"compared?|contrasted?|over time|over the years|across (?:the )?decades?|"
+    r"throughout|historically|then (?:vs|versus)|now (?:vs|versus))\b",
+    re.IGNORECASE,
+)
+
+
+def detect_temporal_comparison(query: str) -> Optional[List[Dict[str, Any]]]:
+    """Detect whether a query compares two distinct time periods.
+
+    Returns a list of two year-filter dicts (one per period) when a temporal
+    comparison pattern is found, or None otherwise.
+
+    Examples that trigger this:
+        "How has Buffett's view on technology changed from the 1990s to the 2020s?"
+        "Compare Buffett's inflation views in the 1970s vs the 2000s"
+        "How did Berkshire evolve from 1980 to 2010?"
+    """
+    q = query.strip()
+
+    if not _TEMPORAL_COMPARISON_RE.search(q):
+        return None
+
+    decades_found = _DECADE_WORD_RE.findall(q)
+    if len(decades_found) >= 2:
+        seen: List[str] = []
+        for d in decades_found:
+            key = d.lower()
+            if key not in seen:
+                seen.append(key)
+            if len(seen) == 2:
+                break
+        a1, b1 = _DECADE_WORD_TO_RANGE[seen[0]]
+        a2, b2 = _DECADE_WORD_TO_RANGE[seen[1]]
+        return [
+            {"year": {"$gte": a1, "$lte": b1}},
+            {"year": {"$gte": a2, "$lte": b2}},
+        ]
+
+    m = re.search(r"(?:from|between)\s+(\d{4})\s+(?:to|and)\s+(\d{4})", q, re.IGNORECASE)
+    if m:
+        y1, y2 = sorted([int(m.group(1)), int(m.group(2))])
+        if y2 - y1 >= 10:
+            mid = (y1 + y2) // 2
+            return [
+                {"year": {"$gte": y1, "$lte": mid}},
+                {"year": {"$gte": mid + 1, "$lte": y2}},
+            ]
+
+    return None
 
 
 def detect_year_filter(query: str) -> Optional[Dict[str, Any]]:
@@ -149,6 +209,55 @@ class Retriever:
     ) -> List[SearchHit]:
         return self.bm25.search(query, top_k=top_k, where=where)
 
+    def _hybrid_for_filter(
+        self,
+        query: str,
+        fetch_k: int,
+        where: Optional[Dict[str, Any]],
+    ) -> List[SearchHit]:
+        """Single hybrid (vector + BM25 → RRF) pass with a specific filter."""
+        vec = self._vector_search(query, top_k=fetch_k, where=where)
+        bm = self._bm25_search(query, top_k=fetch_k, where=where)
+        return reciprocal_rank_fusion([vec, bm], top_k=fetch_k)
+
+    def _multi_subquery_search(
+        self,
+        query: str,
+        subquery_filters: List[Dict[str, Any]],
+        top_k: int,
+        fetch_k: int,
+        rerank: bool,
+    ) -> "RetrievalResult":
+        """Run hybrid search once per time-period filter, then merge with RRF.
+
+        Each sub-search uses the full original query so the embedding stays
+        semantically grounded; only the year filter changes per period.
+        Results from all periods are fused together so the final ranking
+        represents the whole temporal span of the question.
+        """
+        sub_rankings: List[List[SearchHit]] = []
+        for filt in subquery_filters:
+            hits = self._hybrid_for_filter(query, fetch_k, filt)
+            sub_rankings.append(hits)
+
+        candidates = reciprocal_rank_fusion(sub_rankings, top_k=fetch_k)
+
+        reranked = False
+        if rerank and self.reranker is not None and candidates:
+            candidates = self.reranker.rerank(query, candidates, top_k=top_k)
+            reranked = True
+        else:
+            candidates = candidates[:top_k]
+
+        filter_summary = {"multi_subquery": subquery_filters}
+        return RetrievalResult(
+            query=query,
+            strategy="hybrid_multi",
+            hits=candidates,
+            used_filter=filter_summary,
+            reranked=reranked,
+        )
+
     def search(
         self,
         query: str,
@@ -158,8 +267,18 @@ class Retriever:
         rerank: bool = False,
         where: Optional[Dict[str, Any]] = None,
         auto_year_filter: bool = True,
-    ) -> RetrievalResult:
+    ) -> "RetrievalResult":
         applied_filter: Optional[Dict[str, Any]] = dict(where) if where else None
+
+        # Temporal comparison detection: "changed from 1990s to 2020s" type queries.
+        # Only applies to hybrid (the strategy that benefits from period isolation)
+        # and only when the caller hasn't pinned a specific year filter via `where`.
+        if strategy in ("hybrid", "hybrid_multi") and auto_year_filter and not where:
+            subquery_filters = detect_temporal_comparison(query)
+            if subquery_filters:
+                return self._multi_subquery_search(
+                    query, subquery_filters, top_k, fetch_k, rerank
+                )
 
         if strategy in ("metadata", "hybrid", "vector") and auto_year_filter:
             auto = detect_year_filter(query)
@@ -172,7 +291,7 @@ class Retriever:
             candidates = self._vector_search(query, top_k=fetch_k, where=applied_filter)
         elif strategy == "metadata":
             candidates = self._vector_search(query, top_k=fetch_k, where=applied_filter)
-        elif strategy == "hybrid":
+        elif strategy in ("hybrid", "hybrid_multi"):
             vec = self._vector_search(query, top_k=fetch_k, where=applied_filter)
             bm = self._bm25_search(query, top_k=fetch_k, where=applied_filter)
             candidates = reciprocal_rank_fusion([vec, bm], top_k=fetch_k)

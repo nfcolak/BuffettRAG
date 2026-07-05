@@ -19,21 +19,24 @@ from typing import Any, Dict, List, Optional
 from config import (
     CHUNKS_FILE,
     CHUNKS_V2_FILE,
+    DEFAULT_LLM_PROVIDER,
     DEFAULT_TOP_K,
     EMBEDDING_DEVICE,
     EMBEDDING_MODEL_PRIMARY,
-    LLM_MODEL_PRIMARY,
     RETRIEVAL_FETCH_K,
+    ANSWER_CONTEXT_MAX_CHARS,
+    ANSWER_CONTEXT_NEIGHBORS,
     VECTOR_BACKEND,
 )
 from src.embeddings import BGEEmbedder
-from src.generation.llm import LocalLLM
 from src.generation.prompt import (
     build_cited_prompt,
     parse_citations,
     strip_chat_artifacts,
 )
+from src.generation.providers import LLMProvider, create_llm_provider
 from src.retrieval import CrossEncoderReranker, Retriever
+from src.retrieval.context import build_doc_lookup, expand_hits_with_neighbors
 from src.vector_store import (
     SearchHit,
     StoredDoc,
@@ -50,16 +53,18 @@ class PipelineConfig:
     device: str = EMBEDDING_DEVICE
     use_reranker: bool = True
     use_llm: bool = True
-    llm_model: str = LLM_MODEL_PRIMARY
+    llm_provider: str = DEFAULT_LLM_PROVIDER
 
 
 class BuffettRAGPipeline:
     def __init__(
         self,
         retriever: Retriever,
-        llm: Optional[LocalLLM] = None,
+        docs_by_id: Optional[Dict[str, StoredDoc]] = None,
+        llm: Optional[LLMProvider] = None,
     ) -> None:
         self.retriever = retriever
+        self.docs_by_id = docs_by_id or {}
         self.llm = llm
 
     # --------------------------------------------------------------- factory
@@ -98,8 +103,8 @@ class BuffettRAGPipeline:
             reranker=reranker,
         )
 
-        llm = LocalLLM(model_name=cfg.llm_model, device=cfg.device) if cfg.use_llm else None
-        return cls(retriever=retriever, llm=llm)
+        llm = create_llm_provider(provider=cfg.llm_provider) if cfg.use_llm else None
+        return cls(retriever=retriever, docs_by_id=build_doc_lookup(docs), llm=llm)
 
     # --------------------------------------------------------------- query API
 
@@ -111,7 +116,6 @@ class BuffettRAGPipeline:
         fetch_k: int = RETRIEVAL_FETCH_K,
         rerank: bool = True,
         where: Optional[Dict[str, Any]] = None,
-        prompt_style: str = "qwen",
     ) -> Dict[str, Any]:
         """Run a single query end-to-end."""
         result = self.retriever.search(
@@ -134,10 +138,16 @@ class BuffettRAGPipeline:
                 "reranked": result.reranked,
             }
 
-        prompt = build_cited_prompt(query, result.hits, style=prompt_style)
+        context_hits = expand_hits_with_neighbors(
+            result.hits,
+            self.docs_by_id,
+            neighbors=ANSWER_CONTEXT_NEIGHBORS,
+            max_chars=ANSWER_CONTEXT_MAX_CHARS,
+        )
+        prompt = build_cited_prompt(query, context_hits)
         raw_answer = self.llm.generate(prompt)
         answer = strip_chat_artifacts(raw_answer)
-        citations = parse_citations(answer, result.hits)
+        citations = parse_citations(answer, context_hits)
 
         return {
             "query": query,

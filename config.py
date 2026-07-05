@@ -10,23 +10,40 @@ from __future__ import annotations
 import os
 from pathlib import Path
 
+try:
+    from dotenv import load_dotenv
+except ImportError:
+    load_dotenv = None
+
+
+if load_dotenv is not None:
+    load_dotenv()
+
+
+def _csv_env(name: str, default: str = "") -> tuple[str, ...]:
+    raw = os.getenv(name, default)
+    return tuple(item.strip() for item in raw.split(",") if item.strip())
+
 # -----------------------------------------------------------------------------
 # Paths
 # -----------------------------------------------------------------------------
 BASE_DIR = Path(__file__).parent
-RAW_DATA_DIR = BASE_DIR / "raw_data"
-OUTPUT_DIR = BASE_DIR / "processed_data"
+DATA_DIR = BASE_DIR / "data"
+RAW_DATA_DIR = DATA_DIR / "raw"
+OUTPUT_DIR = DATA_DIR / "processed"
 CHUNKS_FILE = OUTPUT_DIR / "chunks.jsonl"
 CHUNKS_V2_FILE = OUTPUT_DIR / "chunks_v2.jsonl"  # output of improved pipeline
 METADATA_FILE = OUTPUT_DIR / "metadata.json"
 METADATA_V2_FILE = OUTPUT_DIR / "metadata_v2.json"
 
-INDEX_DIR = BASE_DIR / "indices"
+INDEX_DIR = DATA_DIR / "indices"
 CHROMA_DIR = INDEX_DIR / "chroma"
 FAISS_DIR = INDEX_DIR / "faiss"
 
-EVAL_DIR = BASE_DIR / "eval_results"
+EVAL_DIR = DATA_DIR / "evaluation"
 
+DATA_DIR.mkdir(parents=True, exist_ok=True)
+RAW_DATA_DIR.mkdir(parents=True, exist_ok=True)
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 INDEX_DIR.mkdir(parents=True, exist_ok=True)
 CHROMA_DIR.mkdir(parents=True, exist_ok=True)
@@ -43,6 +60,7 @@ CHUNK_OVERLAP = 50
 # and Buffett's letters are paragraph-heavy.
 CHUNK_SIZE_V2 = 800
 CHUNK_OVERLAP_V2 = 120
+CHUNK_MIN_CHARS_V2 = 160
 
 START_YEAR = 1977
 END_YEAR = 2024
@@ -68,7 +86,14 @@ BGE_QUERY_INSTRUCTION = (
 )
 
 EMBEDDING_BATCH_SIZE = 64
-EMBEDDING_DEVICE = os.getenv("EMBEDDING_DEVICE", "cpu")  # 'cuda' on Nuvolos
+def _default_device() -> str:
+    try:
+        import torch
+        return "cuda" if torch.cuda.is_available() else "cpu"
+    except ImportError:
+        return "cpu"
+
+EMBEDDING_DEVICE = os.getenv("EMBEDDING_DEVICE", _default_device())
 
 # -----------------------------------------------------------------------------
 # Vector store
@@ -96,19 +121,27 @@ DEFAULT_TOP_K = 8           # final passages returned to the LLM
 RETRIEVAL_FETCH_K = 30      # candidates fetched before reranking / fusion
 HYBRID_ALPHA = 0.6          # weight for vector score; (1 - alpha) for BM25
 RRF_K = 60                  # reciprocal rank fusion constant
+ANSWER_CONTEXT_NEIGHBORS = int(os.getenv("ANSWER_CONTEXT_NEIGHBORS", "1"))
+ANSWER_CONTEXT_MAX_CHARS = int(os.getenv("ANSWER_CONTEXT_MAX_CHARS", "2600"))
 
 # Reranker
-RERANKER_MODEL = "BAAI/bge-reranker-base"
+RERANKER_MODEL = "BAAI/bge-reranker-v2-m3"
 RERANK_TOP_K = 8
 
 # -----------------------------------------------------------------------------
 # Generation
 # -----------------------------------------------------------------------------
-LLM_MODEL_PRIMARY = "Qwen/Qwen2.5-3B-Instruct"
-LLM_MODEL_ALT = "mistralai/Mistral-7B-Instruct-v0.3"
-LLM_MAX_NEW_TOKENS = 400
-LLM_TEMPERATURE = 0.2
-LLM_TOP_P = 0.9
+LLM_MAX_NEW_TOKENS = 600
+DEFAULT_LLM_PROVIDER = os.getenv("DEFAULT_LLM_PROVIDER", "openai").strip().lower()
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
+OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-4.1-mini")
+ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "")
+ANTHROPIC_MODEL = os.getenv("ANTHROPIC_MODEL", "claude-haiku-4-5-20251001")
+OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY", "")
+OPENROUTER_MODEL = os.getenv("OPENROUTER_MODEL", "openrouter/free")
+OPENROUTER_BASE_URL = os.getenv("OPENROUTER_BASE_URL", "https://openrouter.ai/api/v1")
+OPENROUTER_SITE_URL = os.getenv("OPENROUTER_SITE_URL", "")
+OPENROUTER_APP_NAME = os.getenv("OPENROUTER_APP_NAME", "BuffettRAG")
 
 # -----------------------------------------------------------------------------
 # Service URLs (3-tier deployment on Nuvolos)
@@ -116,8 +149,21 @@ LLM_TOP_P = 0.9
 # Backend FastAPI URL -- Frontend uses this to reach the RAG service.
 # On Nuvolos, the Backend app gets a fixed hostname inside the instance.
 BACKEND_URL = os.getenv("BACKEND_URL", "http://localhost:8000")
-# Trainer LLM service URL -- Backend forwards generation requests here.
-LLM_SERVICE_URL = os.getenv("LLM_SERVICE_URL", "http://localhost:8001")
+# -----------------------------------------------------------------------------
+# API security
+# -----------------------------------------------------------------------------
+# Leave API_KEYS empty for local-only development. In shared or public
+# deployments, set comma-separated keys and send one as X-API-Key.
+API_KEYS = _csv_env("API_KEYS")
+
+CORS_ORIGINS = _csv_env(
+    "CORS_ORIGINS",
+    "http://localhost:3000,http://127.0.0.1:3000,"
+    "http://localhost:5173,http://127.0.0.1:5173",
+)
+RATE_LIMIT_REQUESTS = int(os.getenv("RATE_LIMIT_REQUESTS", "60"))
+RATE_LIMIT_WINDOW_SECONDS = int(os.getenv("RATE_LIMIT_WINDOW_SECONDS", "60"))
+EXPOSE_DEBUG_STATUS = os.getenv("EXPOSE_DEBUG_STATUS", "0") == "1"
 
 # -----------------------------------------------------------------------------
 # Evaluation

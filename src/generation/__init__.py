@@ -1,18 +1,32 @@
-"""LLM loading and cited answer generation.
-
-Lazy imports so that callers using only `prompt.py` (e.g. tests of citation
-parsing) don't pull in `transformers` and `torch`.
-"""
+"""LLM loading and cited answer generation."""
 
 from importlib import import_module
 from typing import Any
 
-__all__ = ["LocalLLM", "build_cited_prompt", "parse_citations", "strip_chat_artifacts"]
+__all__ = [
+    "AnthropicProvider",
+    "LLMProvider",
+    "OpenAILLM",
+    "OpenAIProvider",
+    "OpenRouterProvider",
+    "build_cited_prompt",
+    "create_llm_provider",
+    "parse_citations",
+    "strip_chat_artifacts",
+]
 
 
 def __getattr__(name: str) -> Any:
-    if name == "LocalLLM":
-        return getattr(import_module(".llm", __name__), name)
+    if name in (
+        "AnthropicProvider",
+        "LLMProvider",
+        "OpenAIProvider",
+        "OpenRouterProvider",
+        "create_llm_provider",
+    ):
+        return getattr(import_module(".providers", __name__), name)
+    if name == "OpenAILLM":
+        return getattr(import_module(".openai_llm", __name__), name)
     if name in ("build_cited_prompt", "parse_citations", "strip_chat_artifacts"):
         return getattr(import_module(".prompt", __name__), name)
     raise AttributeError(f"module {__name__!r} has no attribute {name!r}")

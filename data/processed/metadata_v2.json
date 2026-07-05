@@ -1,0 +1,257 @@
+{
+  "total_letters": 48,
+  "total_chunks": 5833,
+  "year_range": [
+    1977,
+    2024
+  ],
+  "avg_chunks_per_letter": 121.52083333333333,
+  "chunk_config": {
+    "size": 800,
+    "overlap": 120,
+    "min_chunk_chars": 160
+  },
+  "year_statistics": {
+    "1977": {
+      "file": "buffet_1977.txt",
+      "type": "text",
+      "chunks": 35
+    },
+    "1978": {
+      "file": "buffet_1978.txt",
+      "type": "text",
+      "chunks": 49
+    },
+    "1979": {
+      "file": "buffet_1979.txt",
+      "type": "text",
+      "chunks": 72
+    },
+    "1980": {
+      "file": "buffet_1980.txt",
+      "type": "text",
+      "chunks": 84
+    },
+    "1981": {
+      "file": "buffet_1981.txt",
+      "type": "text",
+      "chunks": 77
+    },
+    "1982": {
+      "file": "buffet_1982.txt",
+      "type": "text",
+      "chunks": 89
+    },
+    "1983": {
+      "file": "buffet_1983.txt",
+      "type": "text",
+      "chunks": 131
+    },
+    "1984": {
+      "file": "buffet_1984.txt",
+      "type": "text",
+      "chunks": 143
+    },
+    "1985": {
+      "file": "buffet_1985.txt",
+      "type": "text",
+      "chunks": 150
+    },
+    "1986": {
+      "file": "buffet_1986.txt",
+      "type": "text",
+      "chunks": 151
+    },
+    "1987": {
+      "file": "buffet_1987.txt",
+      "type": "text",
+      "chunks": 135
+    },
+    "1988": {
+      "file": "buffet_1988.txt",
+      "type": "text",
+      "chunks": 126
+    },
+    "1989": {
+      "file": "buffet_1989.txt",
+      "type": "text",
+      "chunks": 153
+    },
+    "1990": {
+      "file": "buffet_1990.txt",
+      "type": "text",
+      "chunks": 164
+    },
+    "1991": {
+      "file": "buffet_1991.txt",
+      "type": "text",
+      "chunks": 100
+    },
+    "1992": {
+      "file": "buffet_1992.txt",
+      "type": "text",
+      "chunks": 125
+    },
+    "1993": {
+      "file": "buffet_1993.txt",
+      "type": "text",
+      "chunks": 117
+    },
+    "1994": {
+      "file": "buffet_1994.txt",
+      "type": "text",
+      "chunks": 105
+    },
+    "1995": {
+      "file": "buffet_1995.txt",
+      "type": "text",
+      "chunks": 127
+    },
+    "1996": {
+      "file": "buffet_1996.txt",
+      "type": "text",
+      "chunks": 128
+    },
+    "1997": {
+      "file": "buffet_1997.txt",
+      "type": "text",
+      "chunks": 124
+    },
+    "1998": {
+      "file": "buffet_1998.pdf",
+      "type": "pdf",
+      "chunks": 110
+    },
+    "1999": {
+      "file": "buffet_1999.pdf",
+      "type": "pdf",
+      "chunks": 123
+    },
+    "2000": {
+      "file": "buffet_2000.pdf",
+      "type": "pdf",
+      "chunks": 130
+    },
+    "2001": {
+      "file": "buffet_2001.pdf",
+      "type": "pdf",
+      "chunks": 123
+    },
+    "2002": {
+      "file": "buffet_2002.pdf",
+      "type": "pdf",
+      "chunks": 146
+    },
+    "2003": {
+      "file": "buffet_2003.pdf",
+      "type": "pdf",
+      "chunks": 138
+    },
+    "2004": {
+      "file": "buffet_2004.pdf",
+      "type": "pdf",
+      "chunks": 174
+    },
+    "2005": {
+      "file": "buffet_2005.pdf",
+      "type": "pdf",
+      "chunks": 150
+    },
+    "2006": {
+      "file": "buffet_2006.pdf",
+      "type": "pdf",
+      "chunks": 166
+    },
+    "2007": {
+      "file": "buffet_2007.pdf",
+      "type": "pdf",
+      "chunks": 135
+    },
+    "2008": {
+      "file": "buffet_2008.pdf",
+      "type": "pdf",
+      "chunks": 140
+    },
+    "2009": {
+      "file": "buffet_2009.pdf",
+      "type": "pdf",
+      "chunks": 120
+    },
+    "2010": {
+      "file": "buffet_2010.pdf",
+      "type": "pdf",
+      "chunks": 164
+    },
+    "2011": {
+      "file": "buffet_2011.pdf",
+      "type": "pdf",
+      "chunks": 146
+    },
+    "2012": {
+      "file": "buffet_2012.pdf",
+      "type": "pdf",
+      "chunks": 150
+    },
+    "2013": {
+      "file": "buffet_2013.pdf",
+      "type": "pdf",
+      "chunks": 140
+    },
+    "2014": {
+      "file": "buffet_2014.pdf",
+      "type": "pdf",
+      "chunks": 246
+    },
+    "2015": {
+      "file": "buffet_2015.pdf",
+      "type": "pdf",
+      "chunks": 178
+    },
+    "2016": {
+      "file": "buffet_2016.pdf",
+      "type": "pdf",
+      "chunks": 167
+    },
+    "2017": {
+      "file": "buffet_2017.pdf",
+      "type": "pdf",
+      "chunks": 98
+    },
+    "2018": {
+      "file": "buffet_2018.pdf",
+      "type": "pdf",
+      "chunks": 84
+    },
+    "2019": {
+      "file": "buffet_2019.pdf",
+      "type": "pdf",
+      "chunks": 82
+    },
+    "2020": {
+      "file": "buffet_2020.pdf",
+      "type": "pdf",
+      "chunks": 85
+    },
+    "2021": {
+      "file": "buffet_2021.pdf",
+      "type": "pdf",
+      "chunks": 64
+    },
+    "2022": {
+      "file": "buffet_2022.pdf",
+      "type": "pdf",
+      "chunks": 48
+    },
+    "2023": {
+      "file": "buffet_2023.pdf",
+      "type": "pdf",
+      "chunks": 76
+    },
+    "2024": {
+      "file": "buffet_2024.pdf",
+      "type": "pdf",
+      "chunks": 65
+    }
+  },
+  "version": "v2"
+}

@@ -3,7 +3,9 @@
 from __future__ import annotations
 
 import json
+import os
 import pickle
+import re
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Sequence
@@ -136,7 +138,8 @@ def _sanitize_metadata(meta: Dict[str, Any]) -> Dict[str, Any]:
 
 class FaissStore:
     INDEX_FILE = "index.faiss"
-    META_FILE = "meta.pkl"
+    META_JSON_FILE = "meta.json"
+    LEGACY_META_PICKLE_FILE = "meta.pkl"
 
     def __init__(self, persist_dir: Path = FAISS_DIR, dim: Optional[int] = None) -> None:
         try:
@@ -149,12 +152,23 @@ class FaissStore:
         self.persist_dir.mkdir(parents=True, exist_ok=True)
 
         idx_path = self.persist_dir / self.INDEX_FILE
-        meta_path = self.persist_dir / self.META_FILE
+        meta_json_path = self.persist_dir / self.META_JSON_FILE
+        legacy_meta_path = self.persist_dir / self.LEGACY_META_PICKLE_FILE
 
-        if idx_path.exists() and meta_path.exists():
+        if idx_path.exists() and meta_json_path.exists():
             self._index = faiss.read_index(str(idx_path))
-            with open(meta_path, "rb") as f:
-                self._docs: List[StoredDoc] = pickle.load(f)
+            self._docs = _load_faiss_docs_json(meta_json_path)
+        elif idx_path.exists() and legacy_meta_path.exists():
+            if os.getenv("ALLOW_UNSAFE_FAISS_PICKLE") != "1":
+                raise RuntimeError(
+                    "Refusing to load legacy FAISS pickle metadata. Rebuild the FAISS "
+                    "index to create meta.json, or set ALLOW_UNSAFE_FAISS_PICKLE=1 "
+                    "only for a trusted local migration."
+                )
+            self._index = faiss.read_index(str(idx_path))
+            with open(legacy_meta_path, "rb") as f:
+                self._docs = pickle.load(f)
+            self._persist()
         else:
             if dim is None:
                 raise ValueError("dim must be provided when creating a fresh FAISS index")
@@ -222,8 +236,32 @@ class FaissStore:
 
     def _persist(self) -> None:
         self._faiss.write_index(self._index, str(self.persist_dir / self.INDEX_FILE))
-        with open(self.persist_dir / self.META_FILE, "wb") as f:
-            pickle.dump(self._docs, f)
+        _save_faiss_docs_json(self.persist_dir / self.META_JSON_FILE, self._docs)
+
+
+def _load_faiss_docs_json(path: Path) -> List[StoredDoc]:
+    with open(path, "r", encoding="utf-8") as f:
+        raw_docs = json.load(f)
+
+    docs: List[StoredDoc] = []
+    for obj in raw_docs:
+        docs.append(
+            StoredDoc(
+                id=str(obj["id"]),
+                text=str(obj["text"]),
+                metadata=dict(obj.get("metadata") or {}),
+            )
+        )
+    return docs
+
+
+def _save_faiss_docs_json(path: Path, docs: Sequence[StoredDoc]) -> None:
+    payload = [
+        {"id": doc.id, "text": doc.text, "metadata": doc.metadata}
+        for doc in docs
+    ]
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump(payload, f, ensure_ascii=False)
 
 
 def validate_where_filter(where: Optional[Dict[str, Any]]) -> None:
@@ -283,6 +321,7 @@ class PgVectorStore:
     ) -> None:
         try:
             import psycopg2
+            from psycopg2 import sql
             from psycopg2.extras import execute_values
             from pgvector.psycopg2 import register_vector
         except ImportError as e:
@@ -291,6 +330,7 @@ class PgVectorStore:
             ) from e
 
         self._psycopg2 = psycopg2
+        self._sql = sql
         self._execute_values = execute_values
         self._register_vector = register_vector
 
@@ -309,7 +349,7 @@ class PgVectorStore:
         self.user = user or PG_USER
         self.password = password or PG_PASSWORD
         self.database = database or PG_DATABASE
-        self.table = table or PG_TABLE
+        self.table = _validate_pg_identifier(table or PG_TABLE, "PG_TABLE")
         self.ivfflat_lists = ivfflat_lists or PG_IVFFLAT_LISTS
         self.dim = dim
 
@@ -336,10 +376,14 @@ class PgVectorStore:
             cur.execute("CREATE EXTENSION IF NOT EXISTS vector;")
 
     def _ensure_schema(self, dim: int) -> None:
+        if dim <= 0:
+            raise ValueError("Embedding dimension must be positive")
+
         with self._conn.cursor() as cur:
             cur.execute(
-                f"""
-                CREATE TABLE IF NOT EXISTS {self.table} (
+                self._sql.SQL(
+                    """
+                CREATE TABLE IF NOT EXISTS {} (
                     id           TEXT PRIMARY KEY,
                     text         TEXT NOT NULL,
                     year         INT,
@@ -347,33 +391,50 @@ class PgVectorStore:
                     source_file  TEXT,
                     chunk_index  INT,
                     topics       TEXT,
-                    embedding    vector({dim})
+                    embedding    vector({})
                 );
                 """
+                ).format(self._sql.Identifier(self.table), self._sql.SQL(str(int(dim))))
             )
             cur.execute(
-                f"CREATE INDEX IF NOT EXISTS {self.table}_year_idx "
-                f"ON {self.table} (year);"
+                self._sql.SQL("CREATE INDEX IF NOT EXISTS {} ON {} (year);").format(
+                    self._sql.Identifier(_pg_index_name(self.table, "year_idx")),
+                    self._sql.Identifier(self.table),
+                )
             )
             cur.execute(
-                f"CREATE INDEX IF NOT EXISTS {self.table}_decade_idx "
-                f"ON {self.table} (decade);"
+                self._sql.SQL("CREATE INDEX IF NOT EXISTS {} ON {} (decade);").format(
+                    self._sql.Identifier(_pg_index_name(self.table, "decade_idx")),
+                    self._sql.Identifier(self.table),
+                )
             )
 
     def _ensure_ann_index(self) -> None:
         with self._conn.cursor() as cur:
             cur.execute(
-                f"""
-                CREATE INDEX IF NOT EXISTS {self.table}_embedding_idx
-                ON {self.table} USING ivfflat (embedding vector_cosine_ops)
-                WITH (lists = {self.ivfflat_lists});
+                self._sql.SQL(
+                    """
+                CREATE INDEX IF NOT EXISTS {}
+                ON {} USING ivfflat (embedding vector_cosine_ops)
+                WITH (lists = {});
                 """
+                ).format(
+                    self._sql.Identifier(_pg_index_name(self.table, "embedding_idx")),
+                    self._sql.Identifier(self.table),
+                    self._sql.SQL(str(int(self.ivfflat_lists))),
+                )
             )
-            cur.execute(f"ANALYZE {self.table};")
+            cur.execute(
+                self._sql.SQL("ANALYZE {};").format(self._sql.Identifier(self.table))
+            )
 
     def __len__(self) -> int:
         with self._conn.cursor() as cur:
-            cur.execute(f"SELECT COUNT(*) FROM {self.table};")
+            cur.execute(
+                self._sql.SQL("SELECT COUNT(*) FROM {};").format(
+                    self._sql.Identifier(self.table)
+                )
+            )
             return int(cur.fetchone()[0])
 
     def add(
@@ -412,23 +473,26 @@ class PgVectorStore:
                 )
             )
 
-        sql = (
-            f"INSERT INTO {self.table} "
-            f"(id, text, year, decade, source_file, chunk_index, topics, embedding) "
-            f"VALUES %s "
-            f"ON CONFLICT (id) DO UPDATE SET "
-            f"text = EXCLUDED.text, "
-            f"year = EXCLUDED.year, "
-            f"decade = EXCLUDED.decade, "
-            f"source_file = EXCLUDED.source_file, "
-            f"chunk_index = EXCLUDED.chunk_index, "
-            f"topics = EXCLUDED.topics, "
-            f"embedding = EXCLUDED.embedding;"
-        )
+        sql = self._sql.SQL(
+            """
+            INSERT INTO {}
+            (id, text, year, decade, source_file, chunk_index, topics, embedding)
+            VALUES %s
+            ON CONFLICT (id) DO UPDATE SET
+            text = EXCLUDED.text,
+            year = EXCLUDED.year,
+            decade = EXCLUDED.decade,
+            source_file = EXCLUDED.source_file,
+            chunk_index = EXCLUDED.chunk_index,
+            topics = EXCLUDED.topics,
+            embedding = EXCLUDED.embedding;
+            """
+        ).format(self._sql.Identifier(self.table))
 
         with self._conn.cursor() as cur:
+            sql_text = sql.as_string(cur)
             for start in tqdm(range(0, len(rows), batch_size), desc="pgvector upsert"):
-                self._execute_values(cur, sql, rows[start : start + batch_size])
+                self._execute_values(cur, sql_text, rows[start : start + batch_size])
 
         self._ensure_ann_index()
 
@@ -439,14 +503,16 @@ class PgVectorStore:
         where: Optional[Dict[str, Any]] = None,
     ) -> List[SearchHit]:
         where_sql, params = _pg_build_where_clause(where)
-        sql = (
-            f"SELECT id, text, year, decade, source_file, chunk_index, topics, "
-            f"       1 - (embedding <=> %s::vector) AS similarity "
-            f"FROM {self.table} "
-            f"{where_sql} "
-            f"ORDER BY embedding <=> %s::vector "
-            f"LIMIT %s;"
-        )
+        sql = self._sql.SQL(
+            """
+            SELECT id, text, year, decade, source_file, chunk_index, topics,
+                   1 - (embedding <=> %s::vector) AS similarity
+            FROM {}
+            {}
+            ORDER BY embedding <=> %s::vector
+            LIMIT %s;
+            """
+        ).format(self._sql.Identifier(self.table), self._sql.SQL(where_sql))
 
         q = list(map(float, query_embedding))
         with self._conn.cursor() as cur:
@@ -519,6 +585,22 @@ def _pg_build_where_clause(where: Optional[Dict[str, Any]]) -> tuple:
             params.append(cond)
 
     return "WHERE " + " AND ".join(clauses), params
+
+
+_PG_IDENTIFIER_RE = re.compile(r"^[A-Za-z_][A-Za-z0-9_]{0,62}$")
+
+
+def _validate_pg_identifier(value: str, label: str) -> str:
+    if not _PG_IDENTIFIER_RE.match(value):
+        raise ValueError(
+            f"{label} must be a simple PostgreSQL identifier: letters, numbers, "
+            "and underscores only; it must not start with a number."
+        )
+    return value
+
+
+def _pg_index_name(table: str, suffix: str) -> str:
+    return f"{table}_{suffix}"[:63]
 
 
 def get_vector_store(backend: str = "pgvector", dim: Optional[int] = None):
