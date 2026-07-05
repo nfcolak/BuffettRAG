@@ -1,6 +1,6 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
-import { BookOpen, ChevronRight, Paperclip, Send, Settings, Trash2 } from "lucide-react";
+import { AlertTriangle, BookOpen, Check, ChevronRight, Cloud, Gift, Paperclip, Send, Settings, Trash2 } from "lucide-react";
 
 import "./styles.css";
 
@@ -8,11 +8,39 @@ const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "/api";
 const BACKEND_API_KEY = import.meta.env.VITE_BACKEND_API_KEY || "";
 const HISTORY_KEY = "buffettrag.messages.v1";
 const LLM_SETTINGS_KEY = "buffettrag.llmSettings.v1";
+const SETUP_KEY = "buffettrag.setup.v1";
 
 const LLM_PROVIDERS = [
   { value: "openai", label: "OpenAI", defaultModel: "gpt-4.1-mini" },
   { value: "anthropic", label: "Anthropic", defaultModel: "claude-haiku-4-5-20251001" },
-  { value: "openrouter", label: "OpenRouter", defaultModel: "openrouter/free" },
+  { value: "openrouter", label: "Free Model", defaultModel: "nvidia/nemotron-3-ultra-550b-a55b:free" },
+];
+
+const SETUP_OPTIONS = [
+  {
+    value: "openai",
+    title: "OpenAI",
+    icon: Cloud,
+    description:
+      "Cloud-hosted GPT models with strong reasoning and high-quality grounded answers. Requires an OpenAI API key configured on the backend or added later in Settings.",
+  },
+  {
+    value: "anthropic",
+    title: "Anthropic",
+    icon: Cloud,
+    description:
+      "Cloud-hosted Claude models with careful, well-cited answers. Requires an Anthropic API key configured on the backend or added later in Settings.",
+  },
+  {
+    value: "openrouter",
+    title: "Free Model",
+    icon: Gift,
+    badge: "Default",
+    description:
+      "A free cloud model served through the OpenRouter API (currently nvidia/nemotron-3-ultra-550b-a55b:free). Costs nothing — uses the OpenRouter key configured on the backend, or one you add later in Settings.",
+    warning:
+      "Free-tier models are rate-limited and may respond slower or be temporarily unavailable under heavy load. Answer quality may be lower than paid cloud LLMs such as OpenAI or Anthropic.",
+  },
 ];
 
 const EXAMPLE_QUERIES = [
@@ -69,7 +97,7 @@ function readLlmSettings() {
   try {
     const raw = localStorage.getItem(LLM_SETTINGS_KEY);
     const parsed = raw ? JSON.parse(raw) : {};
-    const provider = parsed.provider || "openai";
+    const provider = parsed.provider || "openrouter";
     return {
       llmProvider: provider,
       llmModel: parsed.model || defaultModelForProvider(provider),
@@ -78,12 +106,27 @@ function readLlmSettings() {
     };
   } catch {
     return {
-      llmProvider: "openai",
-      llmModel: defaultModelForProvider("openai"),
+      llmProvider: "openrouter",
+      llmModel: defaultModelForProvider("openrouter"),
       llmApiKey: "",
       rememberLlmSettings: false,
     };
   }
+}
+
+function isSetupComplete() {
+  try {
+    return Boolean(localStorage.getItem(SETUP_KEY));
+  } catch {
+    return false;
+  }
+}
+
+function persistSetupComplete(provider) {
+  localStorage.setItem(
+    SETUP_KEY,
+    JSON.stringify({ provider, completedAt: new Date().toISOString() })
+  );
 }
 
 function persistLlmSettings(settings) {
@@ -141,6 +184,68 @@ async function getBackendHealth() {
   } catch {
     return null;
   }
+}
+
+function FirstRunSetup({ onConfirm }) {
+  const [selected, setSelected] = React.useState(null);
+
+  return (
+    <div className="setup-screen">
+      <div className="setup-panel">
+        <div className="setup-kicker">First-run setup</div>
+        <h1 className="setup-title">Choose Your LLM Provider</h1>
+        <p className="setup-sub">
+          Select the language model backend you want to use for the RAG system.
+          You can change this later in Settings.
+        </p>
+
+        <div className="setup-options">
+          {SETUP_OPTIONS.map((option) => {
+            const Icon = option.icon;
+            const isSelected = selected === option.value;
+            return (
+              <button
+                key={option.value}
+                className={`setup-card ${isSelected ? "selected" : ""}`}
+                onClick={() => setSelected(option.value)}
+                aria-pressed={isSelected}
+              >
+                <span className="setup-card-icon"><Icon /></span>
+                <span className="setup-card-body">
+                  <span className="setup-card-head">
+                    <span className="setup-card-title">{option.title}</span>
+                    {option.badge && <span className="setup-badge">{option.badge}</span>}
+                  </span>
+                  <span className="setup-card-desc">{option.description}</span>
+                  {option.warning && (
+                    <span className="setup-warning">
+                      <AlertTriangle />
+                      <span>{option.warning}</span>
+                    </span>
+                  )}
+                </span>
+                <span className="setup-card-check"><Check /></span>
+              </button>
+            );
+          })}
+        </div>
+
+        <div className="setup-actions">
+          <span className="setup-note">
+            API keys are never stored in the frontend code. Cloud providers use the
+            backend configuration, or a key you add later in Settings.
+          </span>
+          <button
+            className="setup-continue"
+            disabled={!selected}
+            onClick={() => selected && onConfirm(selected)}
+          >
+            Continue to RAG
+          </button>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 function TopBar({ health, provider, onOpenSettings }) {
@@ -399,7 +504,7 @@ function LlmSettingsModal({ open, config, setConfig, onClose }) {
             className="settings-input"
             type="password"
             value={draft.llmApiKey}
-            placeholder={`${labelForProvider(draft.llmProvider)} API key`}
+            placeholder={`${labelForProvider(draft.llmProvider)} API key (optional if set on backend)`}
             onChange={(event) => setDraftKey("llmApiKey", event.target.value)}
           />
         </div>
@@ -460,6 +565,7 @@ function Message({ msg, isSelected, onSelectSources }) {
   const isUser = msg.role === "user";
   const avatar = isUser ? `${import.meta.env.BASE_URL}assets/user_avatar.png` : `${import.meta.env.BASE_URL}assets/assistant_avatar.png`;
   const blocks = String(msg.content || "").split(/\n{2,}/).filter(Boolean);
+  const isLlmError = !isUser && String(msg.content || "").startsWith("[LLM unavailable");
 
   return (
     <div className={`msg ${isUser ? "user" : "assistant"}`}>
@@ -471,7 +577,7 @@ function Message({ msg, isSelected, onSelectSources }) {
           </span>
           <span className="msg-time">{msg.created_at}</span>
         </div>
-        <div className="msg-bubble">
+        <div className={`msg-bubble${isLlmError ? " llm-error" : ""}`}>
           {blocks.length ? blocks.map((block, index) => renderBlock(block, index)) : <p />}
         </div>
 
@@ -749,6 +855,7 @@ function App() {
   const [error, setError] = React.useState("");
   const [health, setHealth] = React.useState(null);
   const [settingsOpen, setSettingsOpen] = React.useState(false);
+  const [setupDone, setSetupDone] = React.useState(isSetupComplete);
   const inputRef = React.useRef(null);
 
   const [config, setConfig] = React.useState({
@@ -834,6 +941,19 @@ function App() {
     setDraft(query);
     inputRef.current?.focus();
   };
+
+  const completeSetup = (provider) => {
+    const llmModel = defaultModelForProvider(provider);
+    const stored = readLlmSettings();
+    persistLlmSettings({ ...stored, llmProvider: provider, llmModel });
+    persistSetupComplete(provider);
+    setConfig((current) => ({ ...current, llmProvider: provider, llmModel }));
+    setSetupDone(true);
+  };
+
+  if (!setupDone) {
+    return <FirstRunSetup onConfirm={completeSetup} />;
+  }
 
   return (
     <>
