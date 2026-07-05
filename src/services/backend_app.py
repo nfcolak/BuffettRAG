@@ -75,7 +75,7 @@ class SearchRequest(BaseModel):
 
 class AskRequest(SearchRequest):
     max_new_tokens: int = Field(default=600, ge=1, le=1200)
-    llm_provider: Optional[Literal["openai", "openrouter", "anthropic"]] = None
+    llm_provider: Optional[Literal["openai", "openrouter", "anthropic", "local"]] = None
     llm_api_key: Optional[str] = Field(default=None, max_length=4096)
     llm_model: Optional[str] = Field(default=None, max_length=200)
 
@@ -195,6 +195,8 @@ def _llm_error_message(exc: Exception) -> str:
         return "[LLM unavailable: provider API key is missing]"
     if "model_not_found" in raw or "does not exist" in raw:
         return "[LLM unavailable: selected provider model is not available]"
+    if any(m in raw for m in ("429", "rate-limit", "rate limit", "resourceexhausted", "resource exhausted", "limit reached", "502", "503", "overloaded")):
+        return "[LLM unavailable: the free model is busy or rate-limited right now — please retry in a moment]"
     return "[LLM unavailable]"
 
 
