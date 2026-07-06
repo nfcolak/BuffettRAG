@@ -122,7 +122,9 @@ RETRIEVAL_FETCH_K = 30      # candidates fetched before reranking / fusion
 HYBRID_ALPHA = 0.6          # weight for vector score; (1 - alpha) for BM25
 RRF_K = 60                  # reciprocal rank fusion constant
 ANSWER_CONTEXT_NEIGHBORS = int(os.getenv("ANSWER_CONTEXT_NEIGHBORS", "1"))
-ANSWER_CONTEXT_MAX_CHARS = int(os.getenv("ANSWER_CONTEXT_MAX_CHARS", "2600"))
+# Per-passage context budget. Modern cloud models handle 100k+ token windows;
+# 9000 chars (~2250 tokens) per passage keeps neighbor expansion from truncating.
+ANSWER_CONTEXT_MAX_CHARS = int(os.getenv("ANSWER_CONTEXT_MAX_CHARS", "9000"))
 
 # Reranker
 RERANKER_MODEL = "BAAI/bge-reranker-v2-m3"

@@ -55,15 +55,27 @@ class OpenRouterProvider:
             raise
 
     def _complete(self, model: str, prompt: str, max_new_tokens: Optional[int]) -> str:
-        response = self._client.chat.completions.create(
-            model=model,
-            messages=[{"role": "user", "content": prompt}],
-            max_tokens=max_new_tokens,
-            # Reasoning models narrate their thinking into the answer otherwise
-            # (exclude:true only hides the reasoning field, not the narration);
-            # non-reasoning models ignore this OpenRouter extension.
-            extra_body={"reasoning": {"enabled": False}},
-        )
+        # Reasoning models narrate their thinking into the answer unless
+        # reasoning is disabled — but some upstream providers refuse to
+        # disable it, so fall back to excluding it from the response.
+        # Non-reasoning models ignore this OpenRouter extension entirely.
+        response = None
+        for reasoning in ({"enabled": False}, {"exclude": True}):
+            try:
+                response = self._client.chat.completions.create(
+                    model=model,
+                    messages=[{"role": "user", "content": prompt}],
+                    max_tokens=max_new_tokens,
+                    extra_body={"reasoning": reasoning},
+                )
+                break
+            except Exception as exc:
+                raw = str(exc).lower()
+                if "reasoning" in raw and ("mandatory" in raw or "cannot be disabled" in raw):
+                    continue
+                raise
+        if response is None:
+            raise RuntimeError(f"{model} rejected both reasoning configurations")
         choices = getattr(response, "choices", None)
         if not choices:
             # OpenRouter reports upstream failures as {choices: null, error: {...}}
