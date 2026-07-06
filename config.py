@@ -73,7 +73,7 @@ PDF_FILES_PATTERN = "buffet_*.pdf"
 # Embeddings
 # -----------------------------------------------------------------------------
 # Primary -- ~130MB, fast, MIT
-EMBEDDING_MODEL_PRIMARY = "BAAI/bge-small-en-v1.5"
+EMBEDDING_MODEL_PRIMARY = os.getenv("EMBEDDING_MODEL", "BAAI/bge-base-en-v1.5")
 EMBEDDING_DIM_PRIMARY = 384
 
 # Higher-quality alternative

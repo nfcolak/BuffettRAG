@@ -43,17 +43,25 @@ class CrossEncoderReranker:
         if not candidates:
             return []
         pairs = [(query, c.text) for c in candidates]
-        scores = self.model.predict(pairs, batch_size=self.batch_size, show_progress_bar=False)
-        order = np.argsort(-np.asarray(scores))
+        raw = np.asarray(
+            self.model.predict(pairs, batch_size=self.batch_size, show_progress_bar=False),
+            dtype=float,
+        )
+        # Cross-encoder outputs are uncalibrated (often clustered near 0):
+        # min-max normalize within the candidate set so downstream consumers
+        # (UI score bars, thresholds) see a meaningful 0..1 spread.
+        spread = float(raw.max() - raw.min())
+        normalized = (raw - raw.min()) / spread if spread > 0 else np.ones_like(raw)
+        order = np.argsort(-raw)
         reranked: List[SearchHit] = []
-        for rank, idx in enumerate(order[:top_k]):
+        for idx in order[:top_k]:
             c = candidates[int(idx)]
             reranked.append(
                 SearchHit(
                     id=c.id,
                     text=c.text,
                     metadata=c.metadata,
-                    score=float(scores[int(idx)]),
+                    score=float(normalized[int(idx)]),
                 )
             )
         return reranked

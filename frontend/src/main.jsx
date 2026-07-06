@@ -161,19 +161,87 @@ async function postBackend(path, payload) {
   return response.json();
 }
 
-async function askBackend(query, config) {
-  const payload = {
+function buildAskPayload(query, config, history) {
+  return {
     query,
     strategy: config.strategy,
     top_k: config.topK,
     rerank: config.rerank,
     where: buildWhere(config),
     auto_year_filter: true,
-    ...(config.useLlm ? { llm_provider: config.llmProvider } : {}),
+    ...(config.useLlm ? { llm_provider: config.llmProvider, history } : {}),
     ...(config.useLlm && config.llmApiKey ? { llm_api_key: config.llmApiKey } : {}),
     ...(config.useLlm && config.llmModel ? { llm_model: config.llmModel } : {}),
   };
-  return postBackend(config.useLlm ? "/ask" : "/search", payload);
+}
+
+async function askBackend(query, config, history = []) {
+  return postBackend(
+    config.useLlm ? "/ask" : "/search",
+    buildAskPayload(query, config, history)
+  );
+}
+
+function buildHistory(messages, maxTurns = 6) {
+  return messages
+    .slice(-maxTurns)
+    .map((msg) => ({
+      role: msg.role === "user" ? "user" : "assistant",
+      content: String(msg.content || "").slice(0, 1500),
+    }))
+    .filter((turn) => turn.content && !turn.content.startsWith("[LLM unavailable"));
+}
+
+async function askBackendStream(query, config, history, handlers) {
+  const response = await fetch(`${BACKEND_URL}/ask/stream`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...(BACKEND_API_KEY ? { "X-API-Key": BACKEND_API_KEY } : {}),
+    },
+    body: JSON.stringify(buildAskPayload(query, config, history)),
+  });
+  if (!response.ok || !response.body) {
+    const detail = await response.text().catch(() => "");
+    throw new Error(detail || `Backend returned ${response.status}`);
+  }
+
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder();
+  let buffer = "";
+  const result = { meta: null, done: null };
+
+  const handleEvent = (rawEvent) => {
+    let event = "message";
+    let data = "";
+    for (const line of rawEvent.split("\n")) {
+      if (line.startsWith("event: ")) event = line.slice(7).trim();
+      else if (line.startsWith("data: ")) data += line.slice(6);
+    }
+    if (!data) return;
+    const parsed = JSON.parse(data);
+    if (event === "meta") {
+      result.meta = parsed;
+      handlers.onMeta?.(parsed);
+    } else if (event === "delta") {
+      handlers.onDelta?.(parsed.text || "");
+    } else if (event === "done") {
+      result.done = parsed;
+    }
+  };
+
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    buffer += decoder.decode(value, { stream: true });
+    let idx;
+    while ((idx = buffer.indexOf("\n\n")) !== -1) {
+      handleEvent(buffer.slice(0, idx));
+      buffer = buffer.slice(idx + 2);
+    }
+  }
+  if (!result.meta) throw new Error("stream ended without metadata");
+  return result;
 }
 
 async function getBackendHealth() {
@@ -284,7 +352,7 @@ function TopBar({ health, provider, onOpenSettings }) {
         </span>
         <span className="status-chip">
           <span>embed</span>
-          <strong>bge-small</strong>
+          <strong>bge-base</strong>
         </span>
         <span className="status-chip">
           <span>llm</span>
@@ -338,7 +406,7 @@ function LeftRail({ config, setConfig, onPickExample, onClear }) {
 
         <Toggle
           label="Rerank (cross-encoder)"
-          hint="bge-reranker-base"
+          hint="bge-reranker-v2-m3"
           on={config.rerank}
           onChange={(value) => setKey("rerank", value)}
         />
@@ -895,6 +963,7 @@ function App() {
     if (!query || isTyping) return;
 
     setError("");
+    const history = buildHistory(messages);
     const userMessage = {
       id: makeId("u"),
       role: "user",
@@ -905,8 +974,7 @@ function App() {
     setDraft("");
     setIsTyping(true);
 
-    try {
-      const response = await askBackend(query, config);
+    const appendFromResponse = (response) => {
       const assistantMessage = {
         id: makeId("a"),
         role: "assistant",
@@ -923,6 +991,73 @@ function App() {
       };
       setMessages((current) => [...current, assistantMessage]);
       setSelectedId(assistantMessage.id);
+    };
+
+    // Streamed answers: sources render as soon as retrieval finishes, the
+    // answer text grows token by token.
+    if (config.useLlm) {
+      const assistantId = makeId("a");
+      let started = false;
+      try {
+        const { meta, done } = await askBackendStream(query, config, history, {
+          onMeta: (m) => {
+            started = true;
+            setIsTyping(false);
+            setMessages((current) => [
+              ...current,
+              {
+                id: assistantId,
+                role: "assistant",
+                created_at: nowLabel(),
+                content: "",
+                sources: m.hits || [],
+                citations: [],
+                meta: {
+                  strategy: m.strategy ?? config.strategy,
+                  reranked: m.reranked ?? config.rerank,
+                  used_filter: m.used_filter ?? buildWhere(config),
+                  provider: config.llmProvider,
+                },
+              },
+            ]);
+            setSelectedId(assistantId);
+          },
+          onDelta: (text) => {
+            setMessages((current) =>
+              current.map((msg) =>
+                msg.id === assistantId ? { ...msg, content: msg.content + text } : msg
+              )
+            );
+          },
+        });
+        const finalAnswer =
+          done?.answer ||
+          "I found the most relevant passages for this query. Review the source panel for the supporting excerpts.";
+        setMessages((current) =>
+          current.map((msg) =>
+            msg.id === assistantId
+              ? { ...msg, content: finalAnswer, citations: done?.citations || [] }
+              : msg
+          )
+        );
+        return;
+      } catch (err) {
+        if (started) {
+          const message = err instanceof Error ? err.message : String(err);
+          setError(`Backend did not respond: ${message}`);
+          setIsTyping(false);
+          return;
+        }
+        // Streaming endpoint unavailable — fall through to the regular path.
+        setIsTyping(true);
+      } finally {
+        setIsTyping(false);
+      }
+    }
+
+    try {
+      const response = await askBackend(query, config, history);
+      appendFromResponse(response);
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
       setError(`Backend did not respond: ${message}`);

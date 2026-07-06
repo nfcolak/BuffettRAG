@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Optional
+from typing import Iterator, Optional
 
 from config import (
     OPENROUTER_API_KEY,
@@ -53,6 +53,37 @@ class OpenRouterProvider:
             if fallback and fallback != self.model and _is_retryable(exc):
                 return self._complete(fallback, prompt, max_new_tokens)
             raise
+
+    def generate_stream(self, prompt: str, max_new_tokens: Optional[int] = None) -> Iterator[str]:
+        """Yield answer text deltas. Raises on setup failure so the caller
+        can fall back to the non-streaming path (which carries the full
+        model-fallback retry logic)."""
+        stream = None
+        for reasoning in ({"enabled": False}, {"exclude": True}):
+            try:
+                stream = self._client.chat.completions.create(
+                    model=self.model,
+                    messages=[{"role": "user", "content": prompt}],
+                    max_tokens=max_new_tokens,
+                    stream=True,
+                    extra_body={"reasoning": reasoning},
+                )
+                break
+            except Exception as exc:
+                raw = str(exc).lower()
+                if "reasoning" in raw and ("mandatory" in raw or "cannot be disabled" in raw):
+                    continue
+                raise
+        if stream is None:
+            raise RuntimeError(f"{self.model} rejected both reasoning configurations")
+        for chunk in stream:
+            choices = getattr(chunk, "choices", None)
+            if not choices:
+                continue
+            delta = getattr(choices[0], "delta", None)
+            text = getattr(delta, "content", None) if delta is not None else None
+            if text:
+                yield text
 
     def _complete(self, model: str, prompt: str, max_new_tokens: Optional[int]) -> str:
         # Reasoning models narrate their thinking into the answer unless

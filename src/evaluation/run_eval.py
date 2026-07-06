@@ -82,9 +82,18 @@ def evaluate_answers(
     gold = get_gold_queries()
     out: List[Dict] = []
     for g in gold:
-        result = pipeline.ask(
-            g.query, strategy=strategy, top_k=top_k, rerank=rerank
-        )
+        # Free-tier providers rate-limit under sustained load: never let a
+        # single failed query kill the whole run, and pace the calls.
+        try:
+            result = pipeline.ask(
+                g.query, strategy=strategy, top_k=top_k, rerank=rerank
+            )
+        except Exception as exc:
+            print(f"    !! {g.qid} failed: {exc}")
+            out.append({"qid": g.qid, "query": g.query, "error": str(exc)[:300]})
+            time.sleep(10)
+            continue
+        time.sleep(3)
         report = evaluate_faithfulness(result["answer"] or "", _hits_from_passages(result["passages"]))
         # Crude answer-correctness signal: do gold answer keywords appear?
         ak = [k.lower() for k in g.answer_keywords]
@@ -133,14 +142,14 @@ def write_outputs(
     out_dir.mkdir(parents=True, exist_ok=True)
     ts = time.strftime("%Y%m%d_%H%M%S")
 
-    # JSON
-    json_path = out_dir / f"retrieval_{ts}.json"
-    with open(json_path, "w", encoding="utf-8") as f:
-        json.dump(rows, f, indent=2, ensure_ascii=False)
-
-    # CSV summary -- one row per (strategy, rerank)
-    csv_path = out_dir / f"retrieval_{ts}.csv"
     if rows:
+        json_path = out_dir / f"retrieval_{ts}.json"
+        with open(json_path, "w", encoding="utf-8") as f:
+            json.dump(rows, f, indent=2, ensure_ascii=False)
+        print(f"Wrote {json_path}")
+
+        # CSV summary -- one row per (strategy, rerank)
+        csv_path = out_dir / f"retrieval_{ts}.csv"
         keys = sorted(set().union(*[r["means"].keys() for r in rows]))
         with open(csv_path, "w", encoding="utf-8", newline="") as f:
             w = csv.writer(f)
@@ -150,15 +159,13 @@ def write_outputs(
                     [r["strategy"], r["rerank"], r["n_queries"]]
                     + [round(r["means"].get(k, 0.0), 4) for k in keys]
                 )
+        print(f"Wrote {csv_path}")
 
     if answer_rows is not None:
         ans_path = out_dir / f"faithfulness_{ts}.json"
         with open(ans_path, "w", encoding="utf-8") as f:
             json.dump(answer_rows, f, indent=2, ensure_ascii=False)
         print(f"Wrote {ans_path}")
-
-    print(f"Wrote {json_path}")
-    print(f"Wrote {csv_path}")
 
 
 def parse_args() -> argparse.Namespace:
@@ -173,29 +180,33 @@ def parse_args() -> argparse.Namespace:
                    help="Skip the rerank=True configurations")
     p.add_argument("--with-llm", action="store_true",
                    help="Also run end-to-end answer generation + faithfulness")
+    p.add_argument("--answers-only", action="store_true",
+                   help="Skip the retrieval matrix; only run answer faithfulness (implies --with-llm)")
     p.add_argument("--top-k", type=int, default=10)
     return p.parse_args()
 
 
 def main() -> None:
     args = parse_args()
-    cfg = PipelineConfig(use_llm=args.with_llm, use_reranker=True)
+    with_llm = args.with_llm or args.answers_only
+    cfg = PipelineConfig(use_llm=with_llm, use_reranker=True)
     pipeline = BuffettRAGPipeline.build(cfg)
 
     rerank_options = [False] if args.no_rerank else [False, True]
 
     rows: List[Dict] = []
-    print("\n=== Retrieval evaluation ===")
-    for strategy in args.strategies:
-        for rerank in rerank_options:
-            print(f"  -> strategy={strategy:<10s}  rerank={rerank}")
-            row = evaluate_config(pipeline, strategy, rerank, top_k=args.top_k)
-            rows.append(row)
-            for k, v in row["means"].items():
-                print(f"        {k:<22s}: {v:.4f}")
+    if not args.answers_only:
+        print("\n=== Retrieval evaluation ===")
+        for strategy in args.strategies:
+            for rerank in rerank_options:
+                print(f"  -> strategy={strategy:<10s}  rerank={rerank}")
+                row = evaluate_config(pipeline, strategy, rerank, top_k=args.top_k)
+                rows.append(row)
+                for k, v in row["means"].items():
+                    print(f"        {k:<22s}: {v:.4f}")
 
     answer_rows: List[Dict] | None = None
-    if args.with_llm:
+    if with_llm:
         print("\n=== Answer faithfulness (hybrid + rerank) ===")
         answer_rows = evaluate_answers(pipeline, strategy="hybrid", rerank=True)
 
