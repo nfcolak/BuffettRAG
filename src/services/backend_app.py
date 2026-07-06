@@ -53,6 +53,7 @@ from src.embeddings import BGEEmbedder
 from src.generation.prompt import build_cited_prompt, format_answer_markdown, parse_citations, strip_chat_artifacts
 from src.generation.providers import create_llm_provider
 from src.retrieval.context import build_doc_lookup, expand_hits_with_neighbors
+from src.retrieval.query_expansion import expand_query
 from src.retrieval.reranker import CrossEncoderReranker
 from src.retrieval.retriever import Retriever
 from src.services.security import FixedWindowRateLimiter, client_key, is_authorized
@@ -74,10 +75,11 @@ class SearchRequest(BaseModel):
 
 
 class AskRequest(SearchRequest):
-    max_new_tokens: int = Field(default=600, ge=1, le=1200)
+    max_new_tokens: int = Field(default=900, ge=1, le=2000)
     llm_provider: Optional[Literal["openai", "openrouter", "anthropic", "local"]] = None
     llm_api_key: Optional[str] = Field(default=None, max_length=4096)
     llm_model: Optional[str] = Field(default=None, max_length=200)
+    expand_query: bool = True
 
 
 class HitOut(BaseModel):
@@ -278,8 +280,18 @@ def ask(req: AskRequest) -> AskResponse:
     if not _state:
         raise HTTPException(status_code=503, detail="Service not ready")
 
+    llm = _llm_for_request(req)
+
+    search_req = req
+    if req.expand_query:
+        expanded = expand_query(req.query, llm)
+        if expanded:
+            search_req = req.model_copy(update={"query": expanded})
+            if EXPOSE_DEBUG_STATUS:
+                print(f"[backend] expanded query: {expanded!r}", flush=True)
+
     try:
-        hits, used_filter, reranked = _do_search(req)
+        hits, used_filter, reranked = _do_search(search_req)
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
 
@@ -295,7 +307,7 @@ def ask(req: AskRequest) -> AskResponse:
         )
         prompt = build_cited_prompt(query=req.query, hits=context_hits)
         try:
-            raw_answer = _llm_for_request(req).generate(prompt, max_new_tokens=req.max_new_tokens)
+            raw_answer = llm.generate(prompt, max_new_tokens=req.max_new_tokens)
             answer = format_answer_markdown(strip_chat_artifacts(raw_answer))
             citations = parse_citations(answer, context_hits)
         except Exception as exc:

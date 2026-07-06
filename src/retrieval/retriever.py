@@ -179,6 +179,34 @@ def reciprocal_rank_fusion(
     ]
 
 
+_DEDUP_TOKEN_RE = re.compile(r"[a-z0-9']+")
+
+
+def deduplicate_hits(hits: Sequence[SearchHit]) -> List[SearchHit]:
+    """Drop hits whose text near-duplicates an earlier (higher-ranked) hit.
+
+    Overlapping chunk windows and repeated boilerplate produce passages that
+    are identical or mostly contained in one another; keeping both wastes
+    context slots and makes the LLM repeat itself.
+    """
+    kept: List[SearchHit] = []
+    kept_tokens: List[set] = []
+    for hit in hits:
+        tokens = set(_DEDUP_TOKEN_RE.findall(hit.text.lower()))
+        is_dup = False
+        for seen in kept_tokens:
+            overlap = len(tokens & seen)
+            union = len(tokens | seen) or 1
+            smaller = min(len(tokens), len(seen)) or 1
+            if overlap / union >= 0.85 or overlap / smaller >= 0.92:
+                is_dup = True
+                break
+        if not is_dup:
+            kept.append(hit)
+            kept_tokens.append(tokens)
+    return kept
+
+
 class Retriever:
     def __init__(
         self,
@@ -244,10 +272,13 @@ class Retriever:
 
         reranked = False
         if rerank and self.reranker is not None and candidates:
-            candidates = self.reranker.rerank(query, candidates, top_k=top_k)
+            rerank_pool = self.reranker.rerank(
+                query, candidates, top_k=min(len(candidates), max(top_k * 2, top_k + 4))
+            )
+            candidates = deduplicate_hits(rerank_pool)[:top_k]
             reranked = True
         else:
-            candidates = candidates[:top_k]
+            candidates = deduplicate_hits(candidates)[:top_k]
 
         filter_summary = {"multi_subquery": subquery_filters}
         return RetrievalResult(
@@ -280,10 +311,12 @@ class Retriever:
                     query, subquery_filters, top_k, fetch_k, rerank
                 )
 
-        if strategy in ("metadata", "hybrid", "vector") and auto_year_filter:
+        auto_applied = False
+        if strategy in ("metadata", "hybrid", "vector") and auto_year_filter and not where:
             auto = detect_year_filter(query)
             if auto:
                 applied_filter = {**(applied_filter or {}), **auto}
+                auto_applied = True
 
         if strategy == "naive":
             candidates = self._vector_search(query, top_k=fetch_k)
@@ -292,18 +325,27 @@ class Retriever:
         elif strategy == "metadata":
             candidates = self._vector_search(query, top_k=fetch_k, where=applied_filter)
         elif strategy in ("hybrid", "hybrid_multi"):
-            vec = self._vector_search(query, top_k=fetch_k, where=applied_filter)
-            bm = self._bm25_search(query, top_k=fetch_k, where=applied_filter)
-            candidates = reciprocal_rank_fusion([vec, bm], top_k=fetch_k)
+            candidates = self._hybrid_for_filter(query, fetch_k, applied_filter)
+            if auto_applied:
+                # The auto-detected year filter is a guess; treat it as a boost
+                # rather than a hard constraint so a wrong guess cannot zero
+                # out recall. Filtered ranking is weighted double in the merge.
+                unfiltered = self._hybrid_for_filter(query, fetch_k, None)
+                candidates = reciprocal_rank_fusion(
+                    [candidates, candidates, unfiltered], top_k=fetch_k
+                )
         else:
             raise ValueError(f"Unknown strategy: {strategy}")
 
         reranked = False
         if rerank and self.reranker is not None and candidates:
-            candidates = self.reranker.rerank(query, candidates, top_k=top_k)
+            rerank_pool = self.reranker.rerank(
+                query, candidates, top_k=min(len(candidates), max(top_k * 2, top_k + 4))
+            )
+            candidates = deduplicate_hits(rerank_pool)[:top_k]
             reranked = True
         else:
-            candidates = candidates[:top_k]
+            candidates = deduplicate_hits(candidates)[:top_k]
 
         return RetrievalResult(
             query=query,
