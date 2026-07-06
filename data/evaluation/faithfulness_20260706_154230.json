@@ -1,0 +1,3963 @@
+[
+  {
+    "qid": "g01",
+    "query": "How did Buffett react to the 2008 financial crisis in his shareholder letter?",
+    "answer": "Buffett acknowledged that 2008 was the worst year in the 44-year history of Berkshire's book value and the S&P 500, with net worth decreasing by $11.5 billion and per-share book value declining 9.6% [1]. He described the credit crisis as producing paralyzing fear and a freefall in business activity at a pace he had never before witnessed [1]. Despite the turmoil, he maintained focus on four long-term goals: preserving Berkshire's Gibraltar-like financial position with huge excess liquidity, widening competitive moats around operating businesses, acquiring new earnings streams, and expanding the cadre of outstanding operating managers [4]. He noted that most businesses earned below potential due to the economy, particularly retailers and residential construction operations, but the insurance and utility groups delivered outstanding results uncorrelated to the general economy [4]. Buffett also admitted to making at least one major mistake of commission and several lesser ones in investments, along with errors of omission when new facts should have prompted action [5]. He stated that market price declines do not bother him and that he enjoys such declines when funds are available to increase positions [5]. On capital allocation, he took advantage of market disarray to make three large insurance portfolio investments expected to add about $1.5 billion pre-tax to annual earnings and closed on the Marmon acquisition [5]. He also highlighted the dysfunctional credit market and the counterparty risks in derivatives, citing the Bear Stearns collapse as an example [3,8].",
+    "citations": [
+      {
+        "marker": "[1]",
+        "passage_indices": [
+          0
+        ],
+        "raw_numbers": [
+          1
+        ],
+        "years": [
+          2008
+        ],
+        "sources": [
+          "buffet_2008.pdf"
+        ]
+      },
+      {
+        "marker": "[1]",
+        "passage_indices": [
+          0
+        ],
+        "raw_numbers": [
+          1
+        ],
+        "years": [
+          2008
+        ],
+        "sources": [
+          "buffet_2008.pdf"
+        ]
+      },
+      {
+        "marker": "[4]",
+        "passage_indices": [
+          3
+        ],
+        "raw_numbers": [
+          4
+        ],
+        "years": [
+          2008
+        ],
+        "sources": [
+          "buffet_2008.pdf"
+        ]
+      },
+      {
+        "marker": "[4]",
+        "passage_indices": [
+          3
+        ],
+        "raw_numbers": [
+          4
+        ],
+        "years": [
+          2008
+        ],
+        "sources": [
+          "buffet_2008.pdf"
+        ]
+      },
+      {
+        "marker": "[5]",
+        "passage_indices": [
+          4
+        ],
+        "raw_numbers": [
+          5
+        ],
+        "years": [
+          2008
+        ],
+        "sources": [
+          "buffet_2008.pdf"
+        ]
+      },
+      {
+        "marker": "[5]",
+        "passage_indices": [
+          4
+        ],
+        "raw_numbers": [
+          5
+        ],
+        "years": [
+          2008
+        ],
+        "sources": [
+          "buffet_2008.pdf"
+        ]
+      },
+      {
+        "marker": "[5]",
+        "passage_indices": [
+          4
+        ],
+        "raw_numbers": [
+          5
+        ],
+        "years": [
+          2008
+        ],
+        "sources": [
+          "buffet_2008.pdf"
+        ]
+      },
+      {
+        "marker": "[3,8]",
+        "passage_indices": [
+          2,
+          7
+        ],
+        "raw_numbers": [
+          3,
+          8
+        ],
+        "years": [
+          2008,
+          2008
+        ],
+        "sources": [
+          "buffet_2008.pdf",
+          "buffet_2008.pdf"
+        ]
+      }
+    ],
+    "answer_keyword_hit_rate": 0.5,
+    "faithfulness": {
+      "n_sentences": 8,
+      "citation_coverage": 1.0,
+      "invalid_citation_rate": 0.0,
+      "mean_support": 0.21762210503444723
+    }
+  },
+  {
+    "qid": "g02",
+    "query": "What did Buffett say about derivatives being weapons of mass destruction?",
+    "answer": "Buffett stated that derivatives are financial weapons of mass destruction, carrying dangers that are potentially lethal even though they are currently latent [1,2]. He said Berkshire should be a fortress of financial strength and that the growing quantities of long-term derivatives contracts and massive uncollateralized receivables make them apprehensive about megacatastrophe risk [1,2].",
+    "citations": [
+      {
+        "marker": "[1,2]",
+        "passage_indices": [
+          0,
+          1
+        ],
+        "raw_numbers": [
+          1,
+          2
+        ],
+        "years": [
+          2002,
+          2002
+        ],
+        "sources": [
+          "buffet_2002.pdf",
+          "buffet_2002.pdf"
+        ]
+      },
+      {
+        "marker": "[1,2]",
+        "passage_indices": [
+          0,
+          1
+        ],
+        "raw_numbers": [
+          1,
+          2
+        ],
+        "years": [
+          2002,
+          2002
+        ],
+        "sources": [
+          "buffet_2002.pdf",
+          "buffet_2002.pdf"
+        ]
+      }
+    ],
+    "answer_keyword_hit_rate": 1.0,
+    "faithfulness": {
+      "n_sentences": 2,
+      "citation_coverage": 1.0,
+      "invalid_citation_rate": 0.0,
+      "mean_support": 0.5350631136044881
+    }
+  },
+  {
+    "qid": "g03",
+    "query": "What is Buffett's view on share repurchases and buybacks?",
+    "answer": "Buffett views share repurchases as beneficial only when shares are bought below intrinsic value, which increases the intrinsic value of remaining shares [1]. He emphasizes that repurchases must be price-dependent and warns that buying above intrinsic value destroys value for continuing shareholders [1,3]. Berkshire will repurchase shares aggressively at or below its price limit — historically 110% of book value — but only when cash-equivalent holdings exceed $20 billion and financial strength remains unquestionable [4]. Buffett states Berkshire has no interest in supporting the stock price through repurchases and will not buy in weak markets [4]. He prefers that the stock underperforms so Berkshire can buy more shares at lower prices, benefiting long-term shareholders [4]. Repurchases should never be used to \"show confidence\" or follow fashion, but only to enhance per-share value [3]. Buffett also notes that repurchases automatically increase insurance float per share, adding further value [7]. Ultimately, he believes patience and price discipline are essential, and that buying a wonderful business at a discount is the only sensible approach [8].",
+    "citations": [
+      {
+        "marker": "[1]",
+        "passage_indices": [
+          0
+        ],
+        "raw_numbers": [
+          1
+        ],
+        "years": [
+          2016
+        ],
+        "sources": [
+          "buffet_2016.pdf"
+        ]
+      },
+      {
+        "marker": "[1,3]",
+        "passage_indices": [
+          0,
+          2
+        ],
+        "raw_numbers": [
+          1,
+          3
+        ],
+        "years": [
+          2016,
+          1999
+        ],
+        "sources": [
+          "buffet_2016.pdf",
+          "buffet_1999.pdf"
+        ]
+      },
+      {
+        "marker": "[4]",
+        "passage_indices": [
+          3
+        ],
+        "raw_numbers": [
+          4
+        ],
+        "years": [
+          2011
+        ],
+        "sources": [
+          "buffet_2011.pdf"
+        ]
+      },
+      {
+        "marker": "[4]",
+        "passage_indices": [
+          3
+        ],
+        "raw_numbers": [
+          4
+        ],
+        "years": [
+          2011
+        ],
+        "sources": [
+          "buffet_2011.pdf"
+        ]
+      },
+      {
+        "marker": "[4]",
+        "passage_indices": [
+          3
+        ],
+        "raw_numbers": [
+          4
+        ],
+        "years": [
+          2011
+        ],
+        "sources": [
+          "buffet_2011.pdf"
+        ]
+      },
+      {
+        "marker": "[3]",
+        "passage_indices": [
+          2
+        ],
+        "raw_numbers": [
+          3
+        ],
+        "years": [
+          1999
+        ],
+        "sources": [
+          "buffet_1999.pdf"
+        ]
+      },
+      {
+        "marker": "[7]",
+        "passage_indices": [
+          6
+        ],
+        "raw_numbers": [
+          7
+        ],
+        "years": [
+          2021
+        ],
+        "sources": [
+          "buffet_2021.pdf"
+        ]
+      },
+      {
+        "marker": "[8]",
+        "passage_indices": [
+          7
+        ],
+        "raw_numbers": [
+          8
+        ],
+        "years": [
+          2023
+        ],
+        "sources": [
+          "buffet_2023.pdf"
+        ]
+      }
+    ],
+    "answer_keyword_hit_rate": 0.5,
+    "faithfulness": {
+      "n_sentences": 8,
+      "citation_coverage": 1.0,
+      "invalid_citation_rate": 0.0,
+      "mean_support": 0.15145472376593658
+    }
+  },
+  {
+    "qid": "g04",
+    "query": "What did Buffett write about See's Candies as an investment?",
+    "answer": "Buffett described See's Candies as a business with a broad and durable competitive advantage that gave it significant pricing power, which was virtually certain to produce major earnings gains over time with only minor incremental investment [3]. He noted that from 1972 to 1977, pre-tax operating earnings grew from $4.2 million to $12.6 million with little additional capital investment, even though the industry had practically no unit growth [1]. By 2014, See's had earned $1.9 billion pre-tax while requiring only $40 million of added investment, allowing it to distribute huge sums that helped Berkshire buy other businesses [3,8]. Buffett also credited See's with teaching him the value of powerful brands, which opened his eyes to many other profitable investments [8]. In 2022, he highlighted that See's products had not been materially altered in 101 years and still generated strong sales, ringing up about 10 sales per minute during the annual meeting weekend [5].",
+    "citations": [
+      {
+        "marker": "[3]",
+        "passage_indices": [
+          2
+        ],
+        "raw_numbers": [
+          3
+        ],
+        "years": [
+          2014
+        ],
+        "sources": [
+          "buffet_2014.pdf"
+        ]
+      },
+      {
+        "marker": "[1]",
+        "passage_indices": [
+          0
+        ],
+        "raw_numbers": [
+          1
+        ],
+        "years": [
+          1977
+        ],
+        "sources": [
+          "buffet_1977.txt"
+        ]
+      },
+      {
+        "marker": "[3,8]",
+        "passage_indices": [
+          2,
+          7
+        ],
+        "raw_numbers": [
+          3,
+          8
+        ],
+        "years": [
+          2014,
+          2014
+        ],
+        "sources": [
+          "buffet_2014.pdf",
+          "buffet_2014.pdf"
+        ]
+      },
+      {
+        "marker": "[8]",
+        "passage_indices": [
+          7
+        ],
+        "raw_numbers": [
+          8
+        ],
+        "years": [
+          2014
+        ],
+        "sources": [
+          "buffet_2014.pdf"
+        ]
+      },
+      {
+        "marker": "[5]",
+        "passage_indices": [
+          4
+        ],
+        "raw_numbers": [
+          5
+        ],
+        "years": [
+          2022
+        ],
+        "sources": [
+          "buffet_2022.pdf"
+        ]
+      }
+    ],
+    "answer_keyword_hit_rate": 1.0,
+    "faithfulness": {
+      "n_sentences": 5,
+      "citation_coverage": 1.0,
+      "invalid_citation_rate": 0.0,
+      "mean_support": 0.43021671034004993
+    }
+  },
+  {
+    "qid": "g05",
+    "query": "What does Buffett look for when acquiring a company?",
+    "answer": "The shareholder letters do not contain information specifically about this topic.",
+    "citations": [],
+    "answer_keyword_hit_rate": 0.0,
+    "faithfulness": {
+      "n_sentences": 1,
+      "citation_coverage": 0.0,
+      "invalid_citation_rate": 0.0,
+      "mean_support": 0.0
+    }
+  },
+  {
+    "qid": "g06",
+    "query": "Buffett's discussion of inflation in the late 1970s and early 1980s",
+    "answer": "Buffett describes a \"investor's misery index\" combining the inflation rate and the tax rate on investment earnings, noting that when this index exceeds a business's return on equity, the investor's real capital shrinks even without consumption [1,7]. He illustrates this with a 20% nominal return on equity and a 14% inflation rate, explaining that after-tax purchasing power gain would be near zero because most of the remaining six percentage points go to income tax upon converting gains to cash [1,7]. He observes that high inflation rates will not help Berkshire earn higher returns on equity [1,7]. He also notes that a business earning 20% on capital can produce a negative real return for owners under inflationary conditions not much more severe than those prevailing at the time [7]. Buffett states that inflation is man-made and perhaps can be man-mastered, and that legislators and other powerful groups might be prompted to respond [2]. He points out that present interest rates incorporate higher inflation projections than in prior years, which may prove adequate to protect bond buyers [2]. However, he expresses unwillingness to fix a price on money for use in distant years, just as he would not fix a price for See's candy or Berkshire cloth for delivery in 2010 or 2020, and opts to be neither a short-term borrower nor a long-term lender [2]. He highlights that the insurance industry lost an extraordinary amount in bonds, partly because accounting conventions allowed carrying bonds at amortized cost regardless of impaired market value, which may have delayed recognition of the dangers of very long-term bond contracts [8]. He contrasts the industry's shift to six-month auto policies due to inflation with its simultaneous purchase of long-term bonds that fix the price of money for thirty or forty years [8]. He notes that virtually all other areas of commerce now either index prices or insist on annual review rights for long-term contracts, making the very long-term bond contract the last major fixed-price contract of extended duration still regularly initiated in an inflation-ridden world [8].",
+    "citations": [
+      {
+        "marker": "[1,7]",
+        "passage_indices": [
+          0,
+          6
+        ],
+        "raw_numbers": [
+          1,
+          7
+        ],
+        "years": [
+          1979,
+          1979
+        ],
+        "sources": [
+          "buffet_1979.txt",
+          "buffet_1979.txt"
+        ]
+      },
+      {
+        "marker": "[1,7]",
+        "passage_indices": [
+          0,
+          6
+        ],
+        "raw_numbers": [
+          1,
+          7
+        ],
+        "years": [
+          1979,
+          1979
+        ],
+        "sources": [
+          "buffet_1979.txt",
+          "buffet_1979.txt"
+        ]
+      },
+      {
+        "marker": "[1,7]",
+        "passage_indices": [
+          0,
+          6
+        ],
+        "raw_numbers": [
+          1,
+          7
+        ],
+        "years": [
+          1979,
+          1979
+        ],
+        "sources": [
+          "buffet_1979.txt",
+          "buffet_1979.txt"
+        ]
+      },
+      {
+        "marker": "[7]",
+        "passage_indices": [
+          6
+        ],
+        "raw_numbers": [
+          7
+        ],
+        "years": [
+          1979
+        ],
+        "sources": [
+          "buffet_1979.txt"
+        ]
+      },
+      {
+        "marker": "[2]",
+        "passage_indices": [
+          1
+        ],
+        "raw_numbers": [
+          2
+        ],
+        "years": [
+          1979
+        ],
+        "sources": [
+          "buffet_1979.txt"
+        ]
+      },
+      {
+        "marker": "[2]",
+        "passage_indices": [
+          1
+        ],
+        "raw_numbers": [
+          2
+        ],
+        "years": [
+          1979
+        ],
+        "sources": [
+          "buffet_1979.txt"
+        ]
+      },
+      {
+        "marker": "[2]",
+        "passage_indices": [
+          1
+        ],
+        "raw_numbers": [
+          2
+        ],
+        "years": [
+          1979
+        ],
+        "sources": [
+          "buffet_1979.txt"
+        ]
+      },
+      {
+        "marker": "[8]",
+        "passage_indices": [
+          7
+        ],
+        "raw_numbers": [
+          8
+        ],
+        "years": [
+          1979
+        ],
+        "sources": [
+          "buffet_1979.txt"
+        ]
+      },
+      {
+        "marker": "[8]",
+        "passage_indices": [
+          7
+        ],
+        "raw_numbers": [
+          8
+        ],
+        "years": [
+          1979
+        ],
+        "sources": [
+          "buffet_1979.txt"
+        ]
+      },
+      {
+        "marker": "[8]",
+        "passage_indices": [
+          7
+        ],
+        "raw_numbers": [
+          8
+        ],
+        "years": [
+          1979
+        ],
+        "sources": [
+          "buffet_1979.txt"
+        ]
+      }
+    ],
+    "answer_keyword_hit_rate": 1.0,
+    "faithfulness": {
+      "n_sentences": 10,
+      "citation_coverage": 1.0,
+      "invalid_citation_rate": 0.0,
+      "mean_support": 0.17242151368808314
+    }
+  },
+  {
+    "qid": "g07",
+    "query": "What did Buffett say about GEICO and the insurance float?",
+    "answer": "GEICO has been a major source of low-cost float for Berkshire. In 1995, GEICO's float was $2.7 billion and by 2009 it had grown to $9.6 billion [3]. When Berkshire acquired full control of GEICO in 1996, the company's float was $2.5 billion; by 2018 it had grown to $22.1 billion [7]. GEICO has operated at an underwriting profit in most years, meaning Berkshire has been paid to hold its float. For example, in 2001 GEICO achieved an underwriting profit of $221 million, meaning Berkshire was paid that amount to hold $4.25 billion in float [5]. In 2004, Berkshire's overall float cost less than nothing, and despite $3.4 billion in hurricane losses in 2005, float remained costless because of superb results at GEICO [4]. By 2012, Berkshire's total insurance float reached $73.125 billion, with GEICO's float expected to continue growing [2]. Ajit Jain's reinsurance operation also created a huge float with large underwriting gains, and GEICO's market share quadrupled after Berkshire's acquisition [1].",
+    "citations": [
+      {
+        "marker": "[3]",
+        "passage_indices": [
+          2
+        ],
+        "raw_numbers": [
+          3
+        ],
+        "years": [
+          2009
+        ],
+        "sources": [
+          "buffet_2009.pdf"
+        ]
+      },
+      {
+        "marker": "[7]",
+        "passage_indices": [
+          6
+        ],
+        "raw_numbers": [
+          7
+        ],
+        "years": [
+          2018
+        ],
+        "sources": [
+          "buffet_2018.pdf"
+        ]
+      },
+      {
+        "marker": "[5]",
+        "passage_indices": [
+          4
+        ],
+        "raw_numbers": [
+          5
+        ],
+        "years": [
+          2001
+        ],
+        "sources": [
+          "buffet_2001.pdf"
+        ]
+      },
+      {
+        "marker": "[4]",
+        "passage_indices": [
+          3
+        ],
+        "raw_numbers": [
+          4
+        ],
+        "years": [
+          2005
+        ],
+        "sources": [
+          "buffet_2005.pdf"
+        ]
+      },
+      {
+        "marker": "[2]",
+        "passage_indices": [
+          1
+        ],
+        "raw_numbers": [
+          2
+        ],
+        "years": [
+          2012
+        ],
+        "sources": [
+          "buffet_2012.pdf"
+        ]
+      },
+      {
+        "marker": "[1]",
+        "passage_indices": [
+          0
+        ],
+        "raw_numbers": [
+          1
+        ],
+        "years": [
+          2014
+        ],
+        "sources": [
+          "buffet_2014.pdf"
+        ]
+      }
+    ],
+    "answer_keyword_hit_rate": 1.0,
+    "faithfulness": {
+      "n_sentences": 8,
+      "citation_coverage": 0.75,
+      "invalid_citation_rate": 0.0,
+      "mean_support": 0.24781979458450046
+    }
+  },
+  {
+    "qid": "g08",
+    "query": "How has Buffett's view on technology stocks changed from the 1990s to the 2020s?",
+    "answer": "Based on the provided passages, there is no information about Buffett's view on technology stocks in the 2020s. The only relevant passage discusses his position in 1999.\n\nIn 1999, Buffett stated that he and Charlie Munger did not own stocks of tech companies because they had no insights into which participants possessed a truly durable competitive advantage, adding that this lack of tech insights did not distress them [1].\n\nThe shareholder letters do not contain information specifically about this topic.",
+    "citations": [
+      {
+        "marker": "[1]",
+        "passage_indices": [
+          0
+        ],
+        "raw_numbers": [
+          1
+        ],
+        "years": [
+          1999
+        ],
+        "sources": [
+          "buffet_1999.pdf"
+        ]
+      }
+    ],
+    "answer_keyword_hit_rate": 0.5,
+    "faithfulness": {
+      "n_sentences": 4,
+      "citation_coverage": 0.25,
+      "invalid_citation_rate": 0.0,
+      "mean_support": 0.1282051282051282
+    }
+  },
+  {
+    "qid": "g09",
+    "query": "Buffett on succession planning at Berkshire",
+    "answer": "Berkshire has long been prepared for CEO succession with internal candidates the board knows well. The board knows exactly whom it would pick if Buffett became unavailable due to death or diminishing abilities, and that would still leave the board with two backups [4,5]. Directors believe future CEOs should come from internal candidates the board has grown to know well, should be relatively young to have a long run in the job, and are not likely to retire at 65 [6]. The board and Buffett believe they now have the right person to succeed him as CEO — a successor ready to assume the job the day after Buffett dies or steps down, who in certain important respects will do a better job than Buffett [6]. In 2018, Berkshire's board elected Ajit Jain and Greg Abel as directors and designated each as Vice Chairman; Ajit is responsible for insurance operations and Greg oversees the rest of the businesses, while Buffett and Charlie Munger focus on investments and capital allocation [8].\n\nBuffett has also established a succession plan for the investment job, identifying four candidates who manage substantial sums currently and have indicated strong interest in coming to Berkshire if called; the board knows their strengths and would expect to hire one or more if the need arises [4,5]. Todd Combs and Ted Weschler, each of whom has spent several years on Berkshire's investment team, are first-rate in all respects and can be of particular help to the CEO in evaluating acquisitions [6].\n\nBuffett notes that Berkshire's business momentum, durable competitive advantages, railroad and utility subsidiaries, and bolt-on acquisitions mean the company would almost surely remain a better-than-normal company for a very long time even if Buffett left tomorrow, his successors were persons of only moderate ability, and Berkshire never again purchased a large business [2]. He describes Ajit Jain and Greg Abel as proven performers who would probably be under-described as \"world-class\" and believes neither would leave Berkshire no matter what someone else offered or desire much change in the Berkshire system [2].\n\nThe board's most important job is likely to be the selection of successors to Buffett and Munger, and it will focus on that matter [3]. Buffett emphasizes substance over form in board meetings and aims to obtain new directors equally devoted to shareholder-oriented principles [3].",
+    "citations": [
+      {
+        "marker": "[4,5]",
+        "passage_indices": [
+          3,
+          4
+        ],
+        "raw_numbers": [
+          4,
+          5
+        ],
+        "years": [
+          2007,
+          2007
+        ],
+        "sources": [
+          "buffet_2007.pdf",
+          "buffet_2007.pdf"
+        ]
+      },
+      {
+        "marker": "[6]",
+        "passage_indices": [
+          5
+        ],
+        "raw_numbers": [
+          6
+        ],
+        "years": [
+          2014
+        ],
+        "sources": [
+          "buffet_2014.pdf"
+        ]
+      },
+      {
+        "marker": "[6]",
+        "passage_indices": [
+          5
+        ],
+        "raw_numbers": [
+          6
+        ],
+        "years": [
+          2014
+        ],
+        "sources": [
+          "buffet_2014.pdf"
+        ]
+      },
+      {
+        "marker": "[8]",
+        "passage_indices": [
+          7
+        ],
+        "raw_numbers": [
+          8
+        ],
+        "years": [
+          2017
+        ],
+        "sources": [
+          "buffet_2017.pdf"
+        ]
+      },
+      {
+        "marker": "[4,5]",
+        "passage_indices": [
+          3,
+          4
+        ],
+        "raw_numbers": [
+          4,
+          5
+        ],
+        "years": [
+          2007,
+          2007
+        ],
+        "sources": [
+          "buffet_2007.pdf",
+          "buffet_2007.pdf"
+        ]
+      },
+      {
+        "marker": "[6]",
+        "passage_indices": [
+          5
+        ],
+        "raw_numbers": [
+          6
+        ],
+        "years": [
+          2014
+        ],
+        "sources": [
+          "buffet_2014.pdf"
+        ]
+      },
+      {
+        "marker": "[2]",
+        "passage_indices": [
+          1
+        ],
+        "raw_numbers": [
+          2
+        ],
+        "years": [
+          2014
+        ],
+        "sources": [
+          "buffet_2014.pdf"
+        ]
+      },
+      {
+        "marker": "[2]",
+        "passage_indices": [
+          1
+        ],
+        "raw_numbers": [
+          2
+        ],
+        "years": [
+          2014
+        ],
+        "sources": [
+          "buffet_2014.pdf"
+        ]
+      },
+      {
+        "marker": "[3]",
+        "passage_indices": [
+          2
+        ],
+        "raw_numbers": [
+          3
+        ],
+        "years": [
+          2002
+        ],
+        "sources": [
+          "buffet_2002.pdf"
+        ]
+      },
+      {
+        "marker": "[3]",
+        "passage_indices": [
+          2
+        ],
+        "raw_numbers": [
+          3
+        ],
+        "years": [
+          2002
+        ],
+        "sources": [
+          "buffet_2002.pdf"
+        ]
+      }
+    ],
+    "answer_keyword_hit_rate": 1.0,
+    "faithfulness": {
+      "n_sentences": 11,
+      "citation_coverage": 0.9090909090909091,
+      "invalid_citation_rate": 0.0,
+      "mean_support": 0.44036330480584923
+    }
+  },
+  {
+    "qid": "g10",
+    "query": "What does Buffett mean by intrinsic value and margin of safety?",
+    "answer": "Buffett defines intrinsic value as the discounted value of the cash that can be taken out of a business during its remaining life [1]. He states that this calculation is necessarily imprecise and often seriously wrong, and that it changes as estimates of future cash flows are revised and as interest rates move [1,6]. Buffett emphasizes that per-share intrinsic value, not book value, is what counts, and that while Berkshire's intrinsic value far exceeds its book value, the exact differential cannot be stated because it is an estimate [4,7]. He also notes that Berkshire's financial characteristics — a wide variety of relatively stable earnings streams, great liquidity, and minimum debt — allow its intrinsic value to be more precisely calculated than most companies [6].\n\nThe supplied passages do not contain a definition or discussion of \"margin of safety\" by Buffett.",
+    "citations": [
+      {
+        "marker": "[1]",
+        "passage_indices": [
+          0
+        ],
+        "raw_numbers": [
+          1
+        ],
+        "years": [
+          1994
+        ],
+        "sources": [
+          "buffet_1994.txt"
+        ]
+      },
+      {
+        "marker": "[1,6]",
+        "passage_indices": [
+          0,
+          5
+        ],
+        "raw_numbers": [
+          1,
+          6
+        ],
+        "years": [
+          1994,
+          2005
+        ],
+        "sources": [
+          "buffet_1994.txt",
+          "buffet_2005.pdf"
+        ]
+      },
+      {
+        "marker": "[4,7]",
+        "passage_indices": [
+          3,
+          6
+        ],
+        "raw_numbers": [
+          4,
+          7
+        ],
+        "years": [
+          1990,
+          1998
+        ],
+        "sources": [
+          "buffet_1990.txt",
+          "buffet_1998.pdf"
+        ]
+      },
+      {
+        "marker": "[6]",
+        "passage_indices": [
+          5
+        ],
+        "raw_numbers": [
+          6
+        ],
+        "years": [
+          2005
+        ],
+        "sources": [
+          "buffet_2005.pdf"
+        ]
+      }
+    ],
+    "answer_keyword_hit_rate": 1.0,
+    "faithfulness": {
+      "n_sentences": 5,
+      "citation_coverage": 0.8,
+      "invalid_citation_rate": 0.0,
+      "mean_support": 0.5016743925831202
+    }
+  },
+  {
+    "qid": "g11",
+    "query": "Buffett's advice to individual investors about index funds",
+    "answer": "Warren Buffett consistently advises individual investors to own common stocks through a low-cost S&P 500 index fund, stating this approach will beat the net results delivered by the great majority of investment professionals [2]. He recommends putting 90% of cash in a very low-cost S&P 500 index fund (suggesting Vanguard's) and 10% in short-term government bonds, a strategy he believes will produce superior long-term results compared to most investors who employ high-fee managers [1]. Buffett emphasizes that intelligent investing is not complex and that investors only need to evaluate businesses within their circle of competence [2]. He argues that passive investors who use index funds will, by definition, achieve average results before costs, and because their costs are far lower than active investors, they will win on an after-cost basis [6]. Buffett notes that his friends with modest means have usually followed this advice, while wealthy individuals and institutions typically ignore it in favor of high-fee managers or consultants [3]. He highlights Jack Bogle as a hero to American investors for pioneering ultra-low-cost index funds [4,7]. The core principle is that when trillions of dollars are managed by Wall Streeters charging high fees, the managers reap outsized profits, not the clients, so both large and small investors should stick with low-cost index funds [4,7].",
+    "citations": [
+      {
+        "marker": "[2]",
+        "passage_indices": [
+          1
+        ],
+        "raw_numbers": [
+          2
+        ],
+        "years": [
+          1996
+        ],
+        "sources": [
+          "buffet_1996.txt"
+        ]
+      },
+      {
+        "marker": "[1]",
+        "passage_indices": [
+          0
+        ],
+        "raw_numbers": [
+          1
+        ],
+        "years": [
+          2013
+        ],
+        "sources": [
+          "buffet_2013.pdf"
+        ]
+      },
+      {
+        "marker": "[2]",
+        "passage_indices": [
+          1
+        ],
+        "raw_numbers": [
+          2
+        ],
+        "years": [
+          1996
+        ],
+        "sources": [
+          "buffet_1996.txt"
+        ]
+      },
+      {
+        "marker": "[6]",
+        "passage_indices": [
+          5
+        ],
+        "raw_numbers": [
+          6
+        ],
+        "years": [
+          2016
+        ],
+        "sources": [
+          "buffet_2016.pdf"
+        ]
+      },
+      {
+        "marker": "[3]",
+        "passage_indices": [
+          2
+        ],
+        "raw_numbers": [
+          3
+        ],
+        "years": [
+          2016
+        ],
+        "sources": [
+          "buffet_2016.pdf"
+        ]
+      },
+      {
+        "marker": "[4,7]",
+        "passage_indices": [
+          3,
+          6
+        ],
+        "raw_numbers": [
+          4,
+          7
+        ],
+        "years": [
+          2016,
+          2016
+        ],
+        "sources": [
+          "buffet_2016.pdf",
+          "buffet_2016.pdf"
+        ]
+      },
+      {
+        "marker": "[4,7]",
+        "passage_indices": [
+          3,
+          6
+        ],
+        "raw_numbers": [
+          4,
+          7
+        ],
+        "years": [
+          2016,
+          2016
+        ],
+        "sources": [
+          "buffet_2016.pdf",
+          "buffet_2016.pdf"
+        ]
+      }
+    ],
+    "answer_keyword_hit_rate": 1.0,
+    "faithfulness": {
+      "n_sentences": 7,
+      "citation_coverage": 1.0,
+      "invalid_citation_rate": 0.0,
+      "mean_support": 0.28451556653527094
+    }
+  },
+  {
+    "qid": "g12",
+    "query": "What did Buffett write about the BNSF railroad acquisition?",
+    "answer": "Buffett called the BNSF purchase an \"all-in wager on the economic future of the United States\" and said Berkshire has been making similar wagers on ever-rising U.S. prosperity since 1965 [1,2]. He predicted BNSF will be a key asset for Berkshire and the country a century from now [5]. Berkshire acquired BNSF early in 2010 [3]. Since the purchase, the railroad has invested $41 billion in fixed assets, an outlay $20 billion in excess of depreciation charges [3,7]. BNSF owns 23,000 miles of track across 28 states and carries about 15% of all non-local ton-miles of goods moved in the U.S. [3]. The railroad has paid substantial dividends to Berkshire totaling $41.8 billion, paying only what remains after fulfilling business needs and maintaining a $2 billion cash balance [3]. Carl Ice and Katie Farmer increased BNSF's profit margin by 2.9 percentage points despite a 7% volume decline, and Katie Farmer succeeded Ice as CEO [3]. BNSF carries 23,759 miles of main track and other fixed assets at $70 billion on its balance sheet, though replicating those assets would cost at least $500 billion [7]. Outlays exceeding GAAP depreciation since purchase total over $22 billion, meaning dividends will fall short of reported earnings unless debt is increased, which Berkshire does not intend to do [7]. Berkshire receives an acceptable return on purchase price but a pittance on replacement value, explaining why BNSF was bought at a small fraction of replacement value [7].",
+    "citations": [
+      {
+        "marker": "[1,2]",
+        "passage_indices": [
+          0,
+          1
+        ],
+        "raw_numbers": [
+          1,
+          2
+        ],
+        "years": [
+          2014,
+          2013
+        ],
+        "sources": [
+          "buffet_2014.pdf",
+          "buffet_2013.pdf"
+        ]
+      },
+      {
+        "marker": "[5]",
+        "passage_indices": [
+          4
+        ],
+        "raw_numbers": [
+          5
+        ],
+        "years": [
+          2021
+        ],
+        "sources": [
+          "buffet_2021.pdf"
+        ]
+      },
+      {
+        "marker": "[3]",
+        "passage_indices": [
+          2
+        ],
+        "raw_numbers": [
+          3
+        ],
+        "years": [
+          2020
+        ],
+        "sources": [
+          "buffet_2020.pdf"
+        ]
+      },
+      {
+        "marker": "[3,7]",
+        "passage_indices": [
+          2,
+          6
+        ],
+        "raw_numbers": [
+          3,
+          7
+        ],
+        "years": [
+          2020,
+          2023
+        ],
+        "sources": [
+          "buffet_2020.pdf",
+          "buffet_2023.pdf"
+        ]
+      },
+      {
+        "marker": "[3]",
+        "passage_indices": [
+          2
+        ],
+        "raw_numbers": [
+          3
+        ],
+        "years": [
+          2020
+        ],
+        "sources": [
+          "buffet_2020.pdf"
+        ]
+      },
+      {
+        "marker": "[3]",
+        "passage_indices": [
+          2
+        ],
+        "raw_numbers": [
+          3
+        ],
+        "years": [
+          2020
+        ],
+        "sources": [
+          "buffet_2020.pdf"
+        ]
+      },
+      {
+        "marker": "[3]",
+        "passage_indices": [
+          2
+        ],
+        "raw_numbers": [
+          3
+        ],
+        "years": [
+          2020
+        ],
+        "sources": [
+          "buffet_2020.pdf"
+        ]
+      },
+      {
+        "marker": "[7]",
+        "passage_indices": [
+          6
+        ],
+        "raw_numbers": [
+          7
+        ],
+        "years": [
+          2023
+        ],
+        "sources": [
+          "buffet_2023.pdf"
+        ]
+      },
+      {
+        "marker": "[7]",
+        "passage_indices": [
+          6
+        ],
+        "raw_numbers": [
+          7
+        ],
+        "years": [
+          2023
+        ],
+        "sources": [
+          "buffet_2023.pdf"
+        ]
+      },
+      {
+        "marker": "[7]",
+        "passage_indices": [
+          6
+        ],
+        "raw_numbers": [
+          7
+        ],
+        "years": [
+          2023
+        ],
+        "sources": [
+          "buffet_2023.pdf"
+        ]
+      }
+    ],
+    "answer_keyword_hit_rate": 0.5,
+    "faithfulness": {
+      "n_sentences": 10,
+      "citation_coverage": 1.0,
+      "invalid_citation_rate": 0.0,
+      "mean_support": 0.4021466951649508
+    }
+  },
+  {
+    "qid": "g13",
+    "query": "What is insurance float and why does Buffett love it?",
+    "error": "Error code: 429 - {'error': {'message': 'Provider returned error', 'code': 429, 'metadata': {'raw': 'openai/gpt-oss-120b:free is temporarily rate-limited upstream. Please retry shortly, or add your own key to accumulate your rate limits: https://openrouter.ai/settings/integrations', 'provider_name':"
+  },
+  {
+    "qid": "g14",
+    "query": "What did Buffett write about Ajit Jain and reinsurance?",
+    "answer": "Buffett described Ajit Jain as the manager who built Berkshire Hathaway's reinsurance business from a standing start in 1985 into a massive operation with tens of billions in float and significant cumulative underwriting profit, a feat no other insurance CEO has matched [1,2,3,7]. He credited Jain with extraordinary underwriting discipline, noting he never broke Berkshire's three underwriting rules and possesses a rare combination of intelligence to rate risks, realism to avoid those he cannot evaluate, courage to write large policies when premiums are appropriate, and discipline to reject even small risks when premiums are inadequate [3,6]. Buffett emphasized that Jain's operation insures risks no one else has the desire or capital to take on, combining capacity, speed, decisiveness, and brains in a manner unique in the insurance business, while never exposing Berkshire to risks inappropriate to its resources [2,7,8]. He highlighted that Berkshire's insurance economics exist only because of terrific managers like Jain running extraordinary operations [2,7,8]. In 2018, Berkshire's board elected Jain as a director and designated him Vice Chairman responsible for insurance operations [5].",
+    "citations": [
+      {
+        "marker": "[1,2,3,7]",
+        "passage_indices": [
+          0,
+          1,
+          2,
+          6
+        ],
+        "raw_numbers": [
+          1,
+          2,
+          3,
+          7
+        ],
+        "years": [
+          2014,
+          2012,
+          1999,
+          2011
+        ],
+        "sources": [
+          "buffet_2014.pdf",
+          "buffet_2012.pdf",
+          "buffet_1999.pdf",
+          "buffet_2011.pdf"
+        ]
+      },
+      {
+        "marker": "[3,6]",
+        "passage_indices": [
+          2,
+          5
+        ],
+        "raw_numbers": [
+          3,
+          6
+        ],
+        "years": [
+          1999,
+          2001
+        ],
+        "sources": [
+          "buffet_1999.pdf",
+          "buffet_2001.pdf"
+        ]
+      },
+      {
+        "marker": "[2,7,8]",
+        "passage_indices": [
+          1,
+          6,
+          7
+        ],
+        "raw_numbers": [
+          2,
+          7,
+          8
+        ],
+        "years": [
+          2012,
+          2011,
+          2015
+        ],
+        "sources": [
+          "buffet_2012.pdf",
+          "buffet_2011.pdf",
+          "buffet_2015.pdf"
+        ]
+      },
+      {
+        "marker": "[2,7,8]",
+        "passage_indices": [
+          1,
+          6,
+          7
+        ],
+        "raw_numbers": [
+          2,
+          7,
+          8
+        ],
+        "years": [
+          2012,
+          2011,
+          2015
+        ],
+        "sources": [
+          "buffet_2012.pdf",
+          "buffet_2011.pdf",
+          "buffet_2015.pdf"
+        ]
+      },
+      {
+        "marker": "[5]",
+        "passage_indices": [
+          4
+        ],
+        "raw_numbers": [
+          5
+        ],
+        "years": [
+          2017
+        ],
+        "sources": [
+          "buffet_2017.pdf"
+        ]
+      }
+    ],
+    "answer_keyword_hit_rate": 1.0,
+    "faithfulness": {
+      "n_sentences": 5,
+      "citation_coverage": 1.0,
+      "invalid_citation_rate": 0.0,
+      "mean_support": 0.27639271976733276
+    }
+  },
+  {
+    "qid": "g15",
+    "query": "What did Buffett say about Rose Blumkin and Nebraska Furniture Mart?",
+    "answer": "Buffett describes Rose Blumkin (\"Mrs. B\") as a remarkable manager who started Nebraska Furniture Mart (NFM) with $500 in 1937 after emigrating from Russia with no formal education or English skills [8]. He praises her extraordinary work ethic, noting she worked seven days a week from opening to close well into her 90s, making more decisions in a day than most CEOs make in a year [1,2,4,7]. \n\nBuffett calls her business story unparalleled and says she has made more smart business decisions than any living American [6,7]. Even after a family disagreement led her to leave NFM in 1989 at age 96 and start a competing carpet and furniture business next door, she later sold her building back to NFM and continued running her carpet operation alongside them [6,7]. Buffett expresses delight at her return, stating \"partner is better\" [7].\n\nUnder the Blumkin family, NFM became the largest home furnishings store in the country with exceptionally low-cost operations that deliver the best values to customers [1,4,6]. The business continued thriving under her son Louie and other family members after her departure from the main store [6,7].",
+    "citations": [
+      {
+        "marker": "[8]",
+        "passage_indices": [
+          7
+        ],
+        "raw_numbers": [
+          8
+        ],
+        "years": [
+          1983
+        ],
+        "sources": [
+          "buffet_1983.txt"
+        ]
+      },
+      {
+        "marker": "[1,2,4,7]",
+        "passage_indices": [
+          0,
+          1,
+          3,
+          6
+        ],
+        "raw_numbers": [
+          1,
+          2,
+          4,
+          7
+        ],
+        "years": [
+          1984,
+          1987,
+          1985,
+          1992
+        ],
+        "sources": [
+          "buffet_1984.txt",
+          "buffet_1987.txt",
+          "buffet_1985.txt",
+          "buffet_1992.txt"
+        ]
+      },
+      {
+        "marker": "[6,7]",
+        "passage_indices": [
+          5,
+          6
+        ],
+        "raw_numbers": [
+          6,
+          7
+        ],
+        "years": [
+          1989,
+          1992
+        ],
+        "sources": [
+          "buffet_1989.txt",
+          "buffet_1992.txt"
+        ]
+      },
+      {
+        "marker": "[6,7]",
+        "passage_indices": [
+          5,
+          6
+        ],
+        "raw_numbers": [
+          6,
+          7
+        ],
+        "years": [
+          1989,
+          1992
+        ],
+        "sources": [
+          "buffet_1989.txt",
+          "buffet_1992.txt"
+        ]
+      },
+      {
+        "marker": "[7]",
+        "passage_indices": [
+          6
+        ],
+        "raw_numbers": [
+          7
+        ],
+        "years": [
+          1992
+        ],
+        "sources": [
+          "buffet_1992.txt"
+        ]
+      },
+      {
+        "marker": "[1,4,6]",
+        "passage_indices": [
+          0,
+          3,
+          5
+        ],
+        "raw_numbers": [
+          1,
+          4,
+          6
+        ],
+        "years": [
+          1984,
+          1985,
+          1989
+        ],
+        "sources": [
+          "buffet_1984.txt",
+          "buffet_1985.txt",
+          "buffet_1989.txt"
+        ]
+      },
+      {
+        "marker": "[6,7]",
+        "passage_indices": [
+          5,
+          6
+        ],
+        "raw_numbers": [
+          6,
+          7
+        ],
+        "years": [
+          1989,
+          1992
+        ],
+        "sources": [
+          "buffet_1989.txt",
+          "buffet_1992.txt"
+        ]
+      }
+    ],
+    "answer_keyword_hit_rate": 1.0,
+    "faithfulness": {
+      "n_sentences": 8,
+      "citation_coverage": 0.875,
+      "invalid_citation_rate": 0.0,
+      "mean_support": 0.20395081109366825
+    }
+  },
+  {
+    "qid": "g16",
+    "query": "Buffett on the Coca-Cola investment",
+    "answer": "Buffett first purchased Coca-Cola stock in the summer of 1988 after decades of observing the business without investing [1]. Berkshire completed its seven-year purchase of 400 million shares in August 1994 at a total cost of $1.3 billion [8]. By year-end 1989, Berkshire held 23,350,000 shares valued at $1.8 billion against a cost of $1.0 billion [1]. The position grew over time through additional purchases and the effect of Coca-Cola's share repurchases, with Berkshire's ownership percentage rising from 8.8% at the end of 2011 to 9.3% by the end of 2015 [6,5]. Buffett views the investment as a fractional ownership in a wonderful business rather than a stock to trade [7]. Coca-Cola's annual cash dividend to Berkshire grew from $75 million in 1994 to $704 million in 2022, increasing every year [8]. Buffett expects those dividend checks to continue growing [8]. He has said that time is the friend of the wonderful business, noting that Berkshire's share of Coke's annual earnings could eventually exceed 100% of the original investment cost [2].",
+    "citations": [
+      {
+        "marker": "[1]",
+        "passage_indices": [
+          0
+        ],
+        "raw_numbers": [
+          1
+        ],
+        "years": [
+          1989
+        ],
+        "sources": [
+          "buffet_1989.txt"
+        ]
+      },
+      {
+        "marker": "[8]",
+        "passage_indices": [
+          7
+        ],
+        "raw_numbers": [
+          8
+        ],
+        "years": [
+          2022
+        ],
+        "sources": [
+          "buffet_2022.pdf"
+        ]
+      },
+      {
+        "marker": "[1]",
+        "passage_indices": [
+          0
+        ],
+        "raw_numbers": [
+          1
+        ],
+        "years": [
+          1989
+        ],
+        "sources": [
+          "buffet_1989.txt"
+        ]
+      },
+      {
+        "marker": "[6,5]",
+        "passage_indices": [
+          5,
+          4
+        ],
+        "raw_numbers": [
+          6,
+          5
+        ],
+        "years": [
+          2012,
+          1993
+        ],
+        "sources": [
+          "buffet_2012.pdf",
+          "buffet_1993.txt"
+        ]
+      },
+      {
+        "marker": "[7]",
+        "passage_indices": [
+          6
+        ],
+        "raw_numbers": [
+          7
+        ],
+        "years": [
+          2004
+        ],
+        "sources": [
+          "buffet_2004.pdf"
+        ]
+      },
+      {
+        "marker": "[8]",
+        "passage_indices": [
+          7
+        ],
+        "raw_numbers": [
+          8
+        ],
+        "years": [
+          2022
+        ],
+        "sources": [
+          "buffet_2022.pdf"
+        ]
+      },
+      {
+        "marker": "[8]",
+        "passage_indices": [
+          7
+        ],
+        "raw_numbers": [
+          8
+        ],
+        "years": [
+          2022
+        ],
+        "sources": [
+          "buffet_2022.pdf"
+        ]
+      },
+      {
+        "marker": "[2]",
+        "passage_indices": [
+          1
+        ],
+        "raw_numbers": [
+          2
+        ],
+        "years": [
+          2010
+        ],
+        "sources": [
+          "buffet_2010.pdf"
+        ]
+      }
+    ],
+    "answer_keyword_hit_rate": 1.0,
+    "faithfulness": {
+      "n_sentences": 8,
+      "citation_coverage": 1.0,
+      "invalid_citation_rate": 0.0,
+      "mean_support": 0.19545407078301816
+    }
+  },
+  {
+    "qid": "g17",
+    "query": "What happened with the Salomon Brothers crisis?",
+    "answer": "In 1991, Warren Buffett stepped in as Interim Chairman of Salomon Inc for ten months to help resolve a severe crisis that nearly caused the firm's demise [5]. The problems involved at least five government authorities, including the SEC, Federal Reserve Bank of New York, U.S. Treasury, U.S. Attorney for the Southern District of New York, and the Antitrust Division of the Department of Justice [8]. The situation was so serious that Buffett later described it as a problem that \"almost caused the demise of a firm with 8,000 employees\" [3].\n\nBuffett credited the combined efforts of Salomon executives Deryck Maughan, Bob Denham, Don Howard, and John Macfarlane for saving the firm, stating that without them \"the firm very probably would not have survived\" [5,8]. He also highlighted the key role of lead lawyer Ron Olson of Munger, Tolles & Olson in navigating the complex government matters [8].\n\nDespite the difficulties, Salomon Brothers reported record pre-tax earnings in 1992 — 34% above the previous high — and ranked second among 311 companies in Fortune's survey for reputation improvement [5,8]. Berkshire's preferred stock in Salomon increased slightly in value during 1991 due to lower interest rates and a higher common stock price [6].\n\nSalomon eventually merged into Travelers Group, a transaction that rewarded its long-suffering shareholders, and Berkshire's results from the investment turned out \"far better than I anticipated two years ago\" [1].",
+    "citations": [
+      {
+        "marker": "[5]",
+        "passage_indices": [
+          4
+        ],
+        "raw_numbers": [
+          5
+        ],
+        "years": [
+          1992
+        ],
+        "sources": [
+          "buffet_1992.txt"
+        ]
+      },
+      {
+        "marker": "[8]",
+        "passage_indices": [
+          7
+        ],
+        "raw_numbers": [
+          8
+        ],
+        "years": [
+          1992
+        ],
+        "sources": [
+          "buffet_1992.txt"
+        ]
+      },
+      {
+        "marker": "[3]",
+        "passage_indices": [
+          2
+        ],
+        "raw_numbers": [
+          3
+        ],
+        "years": [
+          2010
+        ],
+        "sources": [
+          "buffet_2010.pdf"
+        ]
+      },
+      {
+        "marker": "[5,8]",
+        "passage_indices": [
+          4,
+          7
+        ],
+        "raw_numbers": [
+          5,
+          8
+        ],
+        "years": [
+          1992,
+          1992
+        ],
+        "sources": [
+          "buffet_1992.txt",
+          "buffet_1992.txt"
+        ]
+      },
+      {
+        "marker": "[8]",
+        "passage_indices": [
+          7
+        ],
+        "raw_numbers": [
+          8
+        ],
+        "years": [
+          1992
+        ],
+        "sources": [
+          "buffet_1992.txt"
+        ]
+      },
+      {
+        "marker": "[5,8]",
+        "passage_indices": [
+          4,
+          7
+        ],
+        "raw_numbers": [
+          5,
+          8
+        ],
+        "years": [
+          1992,
+          1992
+        ],
+        "sources": [
+          "buffet_1992.txt",
+          "buffet_1992.txt"
+        ]
+      },
+      {
+        "marker": "[6]",
+        "passage_indices": [
+          5
+        ],
+        "raw_numbers": [
+          6
+        ],
+        "years": [
+          1991
+        ],
+        "sources": [
+          "buffet_1991.txt"
+        ]
+      },
+      {
+        "marker": "[1]",
+        "passage_indices": [
+          0
+        ],
+        "raw_numbers": [
+          1
+        ],
+        "years": [
+          1997
+        ],
+        "sources": [
+          "buffet_1997.txt"
+        ]
+      }
+    ],
+    "answer_keyword_hit_rate": 1.0,
+    "faithfulness": {
+      "n_sentences": 10,
+      "citation_coverage": 0.8,
+      "invalid_citation_rate": 0.0,
+      "mean_support": 0.34396514161220043
+    }
+  },
+  {
+    "qid": "g18",
+    "query": "Why did Buffett call the US Air investment a mistake?",
+    "answer": "Buffett called the US Air investment a mistake because he failed to focus on the problems that would inevitably beset a carrier with high costs that were extremely difficult to lower, and he acknowledged the purchase was an unforced error resulting from sloppy analysis possibly caused by buying a senior security or hubris [1,2].",
+    "citations": [
+      {
+        "marker": "[1,2]",
+        "passage_indices": [
+          0,
+          1
+        ],
+        "raw_numbers": [
+          1,
+          2
+        ],
+        "years": [
+          1994,
+          2007
+        ],
+        "sources": [
+          "buffet_1994.txt",
+          "buffet_2007.pdf"
+        ]
+      }
+    ],
+    "answer_keyword_hit_rate": 0.0,
+    "faithfulness": {
+      "n_sentences": 1,
+      "citation_coverage": 1.0,
+      "invalid_citation_rate": 0.0,
+      "mean_support": 0.16666666666666666
+    }
+  },
+  {
+    "qid": "g19",
+    "query": "What did Buffett admit about the Dexter Shoe acquisition?",
+    "answer": "Buffett admitted that the Dexter Shoe acquisition was a major mistake. He stated that he clearly made a mistake in paying what he did for Dexter in 1993 and compounded it hugely by using Berkshire shares for payment [7]. He acknowledged that the competitive strengths he saw in Dexter soon evaporated due to foreign competition, which he did not anticipate [4]. In a later letter, he called Dexter the worst deal he had ever made, noting that using Berkshire stock turned a $433 million cash error into a $3.5 billion cost to shareholders [6]. He also observed that by 2016, the shares given to Dexter's sellers were worth more than $6 billion [2].",
+    "citations": [
+      {
+        "marker": "[7]",
+        "passage_indices": [
+          6
+        ],
+        "raw_numbers": [
+          7
+        ],
+        "years": [
+          2000
+        ],
+        "sources": [
+          "buffet_2000.pdf"
+        ]
+      },
+      {
+        "marker": "[4]",
+        "passage_indices": [
+          3
+        ],
+        "raw_numbers": [
+          4
+        ],
+        "years": [
+          2014
+        ],
+        "sources": [
+          "buffet_2014.pdf"
+        ]
+      },
+      {
+        "marker": "[6]",
+        "passage_indices": [
+          5
+        ],
+        "raw_numbers": [
+          6
+        ],
+        "years": [
+          2007
+        ],
+        "sources": [
+          "buffet_2007.pdf"
+        ]
+      },
+      {
+        "marker": "[2]",
+        "passage_indices": [
+          1
+        ],
+        "raw_numbers": [
+          2
+        ],
+        "years": [
+          2016
+        ],
+        "sources": [
+          "buffet_2016.pdf"
+        ]
+      }
+    ],
+    "answer_keyword_hit_rate": 1.0,
+    "faithfulness": {
+      "n_sentences": 5,
+      "citation_coverage": 0.8,
+      "invalid_citation_rate": 0.0,
+      "mean_support": 0.18500481000481
+    }
+  },
+  {
+    "qid": "g20",
+    "query": "What did Buffett write about the General Re acquisition?",
+    "error": "Error code: 429 - {'error': {'message': 'Provider returned error', 'code': 429, 'metadata': {'raw': 'openai/gpt-oss-120b:free is temporarily rate-limited upstream. Please retry shortly, or add your own key to accumulate your rate limits: https://openrouter.ai/settings/integrations', 'provider_name':"
+  },
+  {
+    "qid": "g21",
+    "query": "Buffett on MidAmerican Energy and the utility business",
+    "answer": "Berkshire holds a majority interest in MidAmerican Energy Holdings (renamed Berkshire Hathaway Energy), which owns a diverse group of regulated utility operations [1,2,3,8]. The largest utility units are Yorkshire Electricity and Northern Electric in the U.K., MidAmerican Energy in Iowa, Pacific Power and Rocky Mountain Power in six western U.S. states, and the Kern River and Northern Natural gas pipelines that carry about 8% of U.S. natural gas consumption [1,2,8]. Berkshire's ownership has ranged from 80.2% to 89.5% across the years shown, with Walter Scott and managers Dave Sokol and Greg Abel as key partners [1,2,8].\n\nBuffett emphasizes that regulated utilities allow Berkshire to deploy very large sums at fair, though not outsized, returns [4]. MidAmerican reinvests all earnings — it has not paid a dividend since Berkshire's initial investment in 2000 — to expand generation and transmission systems [5]. Major capital has been directed to wind generation: MidAmerican spent $1.8 billion on wind in 2008 alone and became the top regulated utility in wind capacity, while also growing wind capacity at PacifiCorp from 33 megawatts to 794 megawatts [5].\n\nMidAmerican also owns HomeServices of America, the second-largest U.S. residential real estate brokerage, which operates through locally branded firms and has grown substantially via acquisitions [1,3,6]. HomeServices participated in $127 billion of transaction \"sides\" in 2017 after acquiring Long & Foster, Houlihan Lawrence, and Gloria Nilson [3].\n\nBuffett contrasts Berkshire's \"buy to keep\" approach with private-equity buyers who plan exit strategies, noting this gives Berkshire an advantage with sellers who care about their businesses' futures [4,5]. The utility partnership with regulators is described as great for all concerned, allowing fair returns on huge invested sums while meeting customer needs [5].",
+    "citations": [
+      {
+        "marker": "[1,2,3,8]",
+        "passage_indices": [
+          0,
+          1,
+          2,
+          7
+        ],
+        "raw_numbers": [
+          1,
+          2,
+          3,
+          8
+        ],
+        "years": [
+          2007,
+          2005,
+          2017,
+          2009
+        ],
+        "sources": [
+          "buffet_2007.pdf",
+          "buffet_2005.pdf",
+          "buffet_2017.pdf",
+          "buffet_2009.pdf"
+        ]
+      },
+      {
+        "marker": "[1,2,8]",
+        "passage_indices": [
+          0,
+          1,
+          7
+        ],
+        "raw_numbers": [
+          1,
+          2,
+          8
+        ],
+        "years": [
+          2007,
+          2005,
+          2009
+        ],
+        "sources": [
+          "buffet_2007.pdf",
+          "buffet_2005.pdf",
+          "buffet_2009.pdf"
+        ]
+      },
+      {
+        "marker": "[1,2,8]",
+        "passage_indices": [
+          0,
+          1,
+          7
+        ],
+        "raw_numbers": [
+          1,
+          2,
+          8
+        ],
+        "years": [
+          2007,
+          2005,
+          2009
+        ],
+        "sources": [
+          "buffet_2007.pdf",
+          "buffet_2005.pdf",
+          "buffet_2009.pdf"
+        ]
+      },
+      {
+        "marker": "[4]",
+        "passage_indices": [
+          3
+        ],
+        "raw_numbers": [
+          4
+        ],
+        "years": [
+          2005
+        ],
+        "sources": [
+          "buffet_2005.pdf"
+        ]
+      },
+      {
+        "marker": "[5]",
+        "passage_indices": [
+          4
+        ],
+        "raw_numbers": [
+          5
+        ],
+        "years": [
+          2008
+        ],
+        "sources": [
+          "buffet_2008.pdf"
+        ]
+      },
+      {
+        "marker": "[5]",
+        "passage_indices": [
+          4
+        ],
+        "raw_numbers": [
+          5
+        ],
+        "years": [
+          2008
+        ],
+        "sources": [
+          "buffet_2008.pdf"
+        ]
+      },
+      {
+        "marker": "[1,3,6]",
+        "passage_indices": [
+          0,
+          2,
+          5
+        ],
+        "raw_numbers": [
+          1,
+          3,
+          6
+        ],
+        "years": [
+          2007,
+          2017,
+          2004
+        ],
+        "sources": [
+          "buffet_2007.pdf",
+          "buffet_2017.pdf",
+          "buffet_2004.pdf"
+        ]
+      },
+      {
+        "marker": "[3]",
+        "passage_indices": [
+          2
+        ],
+        "raw_numbers": [
+          3
+        ],
+        "years": [
+          2017
+        ],
+        "sources": [
+          "buffet_2017.pdf"
+        ]
+      },
+      {
+        "marker": "[4,5]",
+        "passage_indices": [
+          3,
+          4
+        ],
+        "raw_numbers": [
+          4,
+          5
+        ],
+        "years": [
+          2005,
+          2008
+        ],
+        "sources": [
+          "buffet_2005.pdf",
+          "buffet_2008.pdf"
+        ]
+      },
+      {
+        "marker": "[5]",
+        "passage_indices": [
+          4
+        ],
+        "raw_numbers": [
+          5
+        ],
+        "years": [
+          2008
+        ],
+        "sources": [
+          "buffet_2008.pdf"
+        ]
+      }
+    ],
+    "answer_keyword_hit_rate": 1.0,
+    "faithfulness": {
+      "n_sentences": 10,
+      "citation_coverage": 1.0,
+      "invalid_citation_rate": 0.0,
+      "mean_support": 0.2199462593877886
+    }
+  },
+  {
+    "qid": "g22",
+    "query": "What did Buffett write about ISCAR and its Israeli founders?",
+    "answer": "Buffett wrote that ISCAR is an Israeli cutting-tool business founded and run by the Wertheimer family, describing its managers — Eitan Wertheimer, Jacob Harpaz, and Danny Goldman — as extraordinarily talented and trustworthy operators who can be relied on to run the business with energy and dedication after a sale [1,8]. He noted that ISCAR’s products are small, consumable cutting tools that make large machine tools more productive, and that the company succeeds by enabling its customers to make more money [2,4]. After visiting ISCAR in Israel, Buffett said he and his associates had never been more impressed with any operation, praising the ubiquity of brains and energy at the company and throughout Israel [2,4]. He highlighted ISCAR’s resilience during the 2008–2009 downturn, when it remained profitable while its two main competitors operated at a loss, and credited its management for integrating the Tungaloy acquisition successfully [5]. In 2007 and 2011, Buffett reiterated that ISCAR’s performance is unique in its industry, its managers are brilliant strategists and operators, and the company continues to amaze with its growth and operational excellence [3,7,6].",
+    "citations": [
+      {
+        "marker": "[1,8]",
+        "passage_indices": [
+          0,
+          7
+        ],
+        "raw_numbers": [
+          1,
+          8
+        ],
+        "years": [
+          2006,
+          2006
+        ],
+        "sources": [
+          "buffet_2006.pdf",
+          "buffet_2006.pdf"
+        ]
+      },
+      {
+        "marker": "[2,4]",
+        "passage_indices": [
+          1,
+          3
+        ],
+        "raw_numbers": [
+          2,
+          4
+        ],
+        "years": [
+          2006,
+          2006
+        ],
+        "sources": [
+          "buffet_2006.pdf",
+          "buffet_2006.pdf"
+        ]
+      },
+      {
+        "marker": "[2,4]",
+        "passage_indices": [
+          1,
+          3
+        ],
+        "raw_numbers": [
+          2,
+          4
+        ],
+        "years": [
+          2006,
+          2006
+        ],
+        "sources": [
+          "buffet_2006.pdf",
+          "buffet_2006.pdf"
+        ]
+      },
+      {
+        "marker": "[5]",
+        "passage_indices": [
+          4
+        ],
+        "raw_numbers": [
+          5
+        ],
+        "years": [
+          2009
+        ],
+        "sources": [
+          "buffet_2009.pdf"
+        ]
+      },
+      {
+        "marker": "[3,7,6]",
+        "passage_indices": [
+          2,
+          6,
+          5
+        ],
+        "raw_numbers": [
+          3,
+          7,
+          6
+        ],
+        "years": [
+          2007,
+          2007,
+          2011
+        ],
+        "sources": [
+          "buffet_2007.pdf",
+          "buffet_2007.pdf",
+          "buffet_2011.pdf"
+        ]
+      }
+    ],
+    "answer_keyword_hit_rate": 1.0,
+    "faithfulness": {
+      "n_sentences": 5,
+      "citation_coverage": 1.0,
+      "invalid_citation_rate": 0.0,
+      "mean_support": 0.28195959595959597
+    }
+  },
+  {
+    "qid": "g23",
+    "query": "Buffett on the Heinz and Kraft investments",
+    "answer": "Berkshire initially invested about $4.25 billion for a 53% stake in Heinz through a partnership with Jorge Paulo Lemann, Alex Behring and Bernardo Hees [1]. The Heinz partnership later merged with Kraft, more than doubling its size, after which Berkshire owned 325.4 million shares of Kraft Heinz (about 27%) at a cost of $9.8 billion [1]. The combined company has annual sales of $27 billion [1].\n\nGAAP required Berkshire to record a $6.8 billion write-up of the investment upon completion of the merger, even though no shares were sold, leaving the holding carried on the balance sheet at a value many billions above cost and many billions below market value [1]. Berkshire also holds Kraft Heinz preferred shares that pay $720 million annually and are carried at $7.7 billion; these will almost certainly be redeemed for $8.32 billion at the earliest allowed date in June, which Buffett notes will be good news for Kraft Heinz and bad news for Berkshire [1].\n\nIn subsequent years, Berkshire continued to hold 325,442,152 shares of Kraft Heinz but excluded them from its listed common stock investments because it is part of a control group and accounts for the investment on the equity method [2,3,4,5]. The GAAP carrying value on the balance sheet changed over time: $15.3 billion at year-end 2016 with a market value of $28.4 billion [4], $17.6 billion at year-end 2017 with a market value of $25.3 billion [3], $13.8 billion at year-end 2018 after Berkshire's share of a large write-off of intangible assets by Kraft Heinz, with a market value of $14 billion [2], and $13.8 billion at year-end 2019 representing Berkshire's share of Kraft Heinz's audited net worth, while the market value was only $10.5 billion [5]. The cost basis remained $9.8 billion throughout [2,3,4,5].",
+    "citations": [
+      {
+        "marker": "[1]",
+        "passage_indices": [
+          0
+        ],
+        "raw_numbers": [
+          1
+        ],
+        "years": [
+          2015
+        ],
+        "sources": [
+          "buffet_2015.pdf"
+        ]
+      },
+      {
+        "marker": "[1]",
+        "passage_indices": [
+          0
+        ],
+        "raw_numbers": [
+          1
+        ],
+        "years": [
+          2015
+        ],
+        "sources": [
+          "buffet_2015.pdf"
+        ]
+      },
+      {
+        "marker": "[1]",
+        "passage_indices": [
+          0
+        ],
+        "raw_numbers": [
+          1
+        ],
+        "years": [
+          2015
+        ],
+        "sources": [
+          "buffet_2015.pdf"
+        ]
+      },
+      {
+        "marker": "[1]",
+        "passage_indices": [
+          0
+        ],
+        "raw_numbers": [
+          1
+        ],
+        "years": [
+          2015
+        ],
+        "sources": [
+          "buffet_2015.pdf"
+        ]
+      },
+      {
+        "marker": "[1]",
+        "passage_indices": [
+          0
+        ],
+        "raw_numbers": [
+          1
+        ],
+        "years": [
+          2015
+        ],
+        "sources": [
+          "buffet_2015.pdf"
+        ]
+      },
+      {
+        "marker": "[2,3,4,5]",
+        "passage_indices": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "raw_numbers": [
+          2,
+          3,
+          4,
+          5
+        ],
+        "years": [
+          2018,
+          2017,
+          2016,
+          2019
+        ],
+        "sources": [
+          "buffet_2018.pdf",
+          "buffet_2017.pdf",
+          "buffet_2016.pdf",
+          "buffet_2019.pdf"
+        ]
+      },
+      {
+        "marker": "[4]",
+        "passage_indices": [
+          3
+        ],
+        "raw_numbers": [
+          4
+        ],
+        "years": [
+          2016
+        ],
+        "sources": [
+          "buffet_2016.pdf"
+        ]
+      },
+      {
+        "marker": "[3]",
+        "passage_indices": [
+          2
+        ],
+        "raw_numbers": [
+          3
+        ],
+        "years": [
+          2017
+        ],
+        "sources": [
+          "buffet_2017.pdf"
+        ]
+      },
+      {
+        "marker": "[2]",
+        "passage_indices": [
+          1
+        ],
+        "raw_numbers": [
+          2
+        ],
+        "years": [
+          2018
+        ],
+        "sources": [
+          "buffet_2018.pdf"
+        ]
+      },
+      {
+        "marker": "[5]",
+        "passage_indices": [
+          4
+        ],
+        "raw_numbers": [
+          5
+        ],
+        "years": [
+          2019
+        ],
+        "sources": [
+          "buffet_2019.pdf"
+        ]
+      },
+      {
+        "marker": "[2,3,4,5]",
+        "passage_indices": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "raw_numbers": [
+          2,
+          3,
+          4,
+          5
+        ],
+        "years": [
+          2018,
+          2017,
+          2016,
+          2019
+        ],
+        "sources": [
+          "buffet_2018.pdf",
+          "buffet_2017.pdf",
+          "buffet_2016.pdf",
+          "buffet_2019.pdf"
+        ]
+      }
+    ],
+    "answer_keyword_hit_rate": 1.0,
+    "faithfulness": {
+      "n_sentences": 8,
+      "citation_coverage": 1.0,
+      "invalid_citation_rate": 0.0,
+      "mean_support": 0.2887335707274453
+    }
+  },
+  {
+    "qid": "g24",
+    "query": "What did Buffett write about Apple as an investment?",
+    "answer": "Buffett described Apple as a \"runner-up Giant\" measured by year-end market value, noting Berkshire's ownership rose from 5.39% to 5.55% without spending any Berkshire funds because Apple's share repurchases shrank the share count [3]. He pointed out that each 0.1% of Apple's 2021 earnings amounted to $100 million, and while GAAP earnings only reflect the $785 million in dividends received, Berkshire's economic share of Apple's earnings was a \"staggering $5.6 billion\" [3]. Buffett applauded Apple's use of retained earnings for share repurchases and praised Tim Cook's managerial touch, saying all constituencies benefit from it [3].\n\nIn the 2020 letter, Buffett detailed the original Apple investment: Berkshire began buying in late 2016 and by mid-2018 owned 5.2% of Apple at a cost of $36 billion [1]. The stake generated regular dividends averaging about $775 million annually, and in 2020 Berkshire sold a small portion for $11 billion yet saw its ownership percentage rise to 5.4% due to Apple's continued repurchases [1]. Buffett used Apple as a vivid illustration of the power of value-accretive share repurchases [1].\n\nBy 2022, Buffett noted that Apple's repurchases — along with Berkshire's own and American Express's — provided a \"very minor gain in per-share intrinsic value\" by increasing Berkshire's ownership percentage without any cost [5].",
+    "citations": [
+      {
+        "marker": "[3]",
+        "passage_indices": [
+          2
+        ],
+        "raw_numbers": [
+          3
+        ],
+        "years": [
+          2021
+        ],
+        "sources": [
+          "buffet_2021.pdf"
+        ]
+      },
+      {
+        "marker": "[3]",
+        "passage_indices": [
+          2
+        ],
+        "raw_numbers": [
+          3
+        ],
+        "years": [
+          2021
+        ],
+        "sources": [
+          "buffet_2021.pdf"
+        ]
+      },
+      {
+        "marker": "[3]",
+        "passage_indices": [
+          2
+        ],
+        "raw_numbers": [
+          3
+        ],
+        "years": [
+          2021
+        ],
+        "sources": [
+          "buffet_2021.pdf"
+        ]
+      },
+      {
+        "marker": "[1]",
+        "passage_indices": [
+          0
+        ],
+        "raw_numbers": [
+          1
+        ],
+        "years": [
+          2020
+        ],
+        "sources": [
+          "buffet_2020.pdf"
+        ]
+      },
+      {
+        "marker": "[1]",
+        "passage_indices": [
+          0
+        ],
+        "raw_numbers": [
+          1
+        ],
+        "years": [
+          2020
+        ],
+        "sources": [
+          "buffet_2020.pdf"
+        ]
+      },
+      {
+        "marker": "[1]",
+        "passage_indices": [
+          0
+        ],
+        "raw_numbers": [
+          1
+        ],
+        "years": [
+          2020
+        ],
+        "sources": [
+          "buffet_2020.pdf"
+        ]
+      },
+      {
+        "marker": "[5]",
+        "passage_indices": [
+          4
+        ],
+        "raw_numbers": [
+          5
+        ],
+        "years": [
+          2022
+        ],
+        "sources": [
+          "buffet_2022.pdf"
+        ]
+      }
+    ],
+    "answer_keyword_hit_rate": 1.0,
+    "faithfulness": {
+      "n_sentences": 7,
+      "citation_coverage": 1.0,
+      "invalid_citation_rate": 0.0,
+      "mean_support": 0.16988774792255268
+    }
+  },
+  {
+    "qid": "g25",
+    "query": "Why did Buffett hire Todd Combs and Ted Weschler?",
+    "answer": "Buffett hired Todd Combs and Ted Weschler because they have outstanding investment skills and a deep commitment to Berkshire, with the brains, judgment, and character to manage the entire portfolio when Buffett and Munger are no longer running the company [3]. They proved to be smart, models of integrity, helpful to Berkshire in many ways beyond portfolio management, and a perfect cultural fit [2]. In 2012, each outperformed the S&P 500 by double-digit margins, leaving Buffett \"in the dust\" [2]. They also possess excellent \"business minds\" that grasp the economic forces determining the future of a wide variety of businesses, and they are aided by an understanding of what is predictable and what is unknowable [8]. Additionally, they are of particular help to the CEO in evaluating acquisitions [5]. Hiring these two was described by Buffett as one of his best moves [1].",
+    "citations": [
+      {
+        "marker": "[3]",
+        "passage_indices": [
+          2
+        ],
+        "raw_numbers": [
+          3
+        ],
+        "years": [
+          2011
+        ],
+        "sources": [
+          "buffet_2011.pdf"
+        ]
+      },
+      {
+        "marker": "[2]",
+        "passage_indices": [
+          1
+        ],
+        "raw_numbers": [
+          2
+        ],
+        "years": [
+          2012
+        ],
+        "sources": [
+          "buffet_2012.pdf"
+        ]
+      },
+      {
+        "marker": "[2]",
+        "passage_indices": [
+          1
+        ],
+        "raw_numbers": [
+          2
+        ],
+        "years": [
+          2012
+        ],
+        "sources": [
+          "buffet_2012.pdf"
+        ]
+      },
+      {
+        "marker": "[8]",
+        "passage_indices": [
+          7
+        ],
+        "raw_numbers": [
+          8
+        ],
+        "years": [
+          2011
+        ],
+        "sources": [
+          "buffet_2011.pdf"
+        ]
+      },
+      {
+        "marker": "[5]",
+        "passage_indices": [
+          4
+        ],
+        "raw_numbers": [
+          5
+        ],
+        "years": [
+          2014
+        ],
+        "sources": [
+          "buffet_2014.pdf"
+        ]
+      },
+      {
+        "marker": "[1]",
+        "passage_indices": [
+          0
+        ],
+        "raw_numbers": [
+          1
+        ],
+        "years": [
+          2015
+        ],
+        "sources": [
+          "buffet_2015.pdf"
+        ]
+      }
+    ],
+    "answer_keyword_hit_rate": 1.0,
+    "faithfulness": {
+      "n_sentences": 6,
+      "citation_coverage": 1.0,
+      "invalid_citation_rate": 0.0,
+      "mean_support": 0.6725621600621601
+    }
+  },
+  {
+    "qid": "g26",
+    "query": "What is Buffett's argument against gold as an investment?",
+    "answer": "Buffett argues that gold is an unproductive asset that will never generate anything, so owners profit only if an expanding pool of buyers pays more for it later [1,2]. He notes gold has two significant shortcomings: it is neither of much use nor procreative, and if you own one ounce for an eternity you will still own only one ounce [1]. \n\nHe illustrates the opportunity cost by comparing the world's gold stock (about 170,000 metric tons valued at $9.6 trillion at $1,750 per ounce) to a productive alternative: all U.S. cropland (400 million acres producing about $200 billion annually) plus 16 Exxon Mobils (each earning more than $40 billion annually), with about $1 trillion left over [3]. Over a century, the farmland will keep producing crops and Exxon will deliver trillions in dividends, while the gold will remain unchanged in size and incapable of producing anything [5]. \n\nBuffett adds that gold's valuation depends on fear — buyers believe the ranks of the fearful will grow, and rising prices attract bandwagon investors who see the rise as validating their thesis [1,2]. He contrasts this with productive assets like farms, real estate, and businesses such as Coca-Cola and See's Candy, which can retain purchasing-power value in inflationary times while requiring minimal new capital investment [5]. \n\nHistorical data reinforces the point: $114.75 invested in gold in 1942 would be worth about $4,200 today, while the same amount in an unmanaged S&P 500 investment would have grown to far more, showing the \"magical metal was no match for the American mettle\" [7].",
+    "citations": [
+      {
+        "marker": "[1,2]",
+        "passage_indices": [
+          0,
+          1
+        ],
+        "raw_numbers": [
+          1,
+          2
+        ],
+        "years": [
+          2011,
+          2011
+        ],
+        "sources": [
+          "buffet_2011.pdf",
+          "buffet_2011.pdf"
+        ]
+      },
+      {
+        "marker": "[1]",
+        "passage_indices": [
+          0
+        ],
+        "raw_numbers": [
+          1
+        ],
+        "years": [
+          2011
+        ],
+        "sources": [
+          "buffet_2011.pdf"
+        ]
+      },
+      {
+        "marker": "[3]",
+        "passage_indices": [
+          2
+        ],
+        "raw_numbers": [
+          3
+        ],
+        "years": [
+          2011
+        ],
+        "sources": [
+          "buffet_2011.pdf"
+        ]
+      },
+      {
+        "marker": "[5]",
+        "passage_indices": [
+          4
+        ],
+        "raw_numbers": [
+          5
+        ],
+        "years": [
+          2011
+        ],
+        "sources": [
+          "buffet_2011.pdf"
+        ]
+      },
+      {
+        "marker": "[1,2]",
+        "passage_indices": [
+          0,
+          1
+        ],
+        "raw_numbers": [
+          1,
+          2
+        ],
+        "years": [
+          2011,
+          2011
+        ],
+        "sources": [
+          "buffet_2011.pdf",
+          "buffet_2011.pdf"
+        ]
+      },
+      {
+        "marker": "[5]",
+        "passage_indices": [
+          4
+        ],
+        "raw_numbers": [
+          5
+        ],
+        "years": [
+          2011
+        ],
+        "sources": [
+          "buffet_2011.pdf"
+        ]
+      },
+      {
+        "marker": "[7]",
+        "passage_indices": [
+          6
+        ],
+        "raw_numbers": [
+          7
+        ],
+        "years": [
+          2018
+        ],
+        "sources": [
+          "buffet_2018.pdf"
+        ]
+      }
+    ],
+    "answer_keyword_hit_rate": 1.0,
+    "faithfulness": {
+      "n_sentences": 7,
+      "citation_coverage": 1.0,
+      "invalid_citation_rate": 0.0,
+      "mean_support": 0.2287220555867248
+    }
+  },
+  {
+    "qid": "g27",
+    "query": "What did Buffett say about the airline business?",
+    "answer": "Buffett described the airline industry as the worst sort of business because it grows rapidly, requires significant capital, and earns little or no money, and he noted that a durable competitive advantage has proven elusive since the Wright Brothers. [6]\n\nHe said investors have poured money into a bottomless pit, attracted by growth when they should have been repelled by it. [6]\n\nHe confessed that Berkshire's purchase of U.S. Air preferred stock in 1989 was a mistake, as the company soon went into a tailspin and stopped paying the preferred dividend, though Berkshire later sold the shares in 1998 for a hefty gain before the company went bankrupt twice. [6]\n\nIn 1992, Buffett acknowledged he did not expect airline leaders to engage in prolonged \"kamikaze behavior,\" with companies acting as if they were in a competitive tontine trying to bring it to a rapid conclusion. [2]\n\nHe also wrote that a competitively beset business like USAir requires far more managerial skill than a business with fine economics, but the near-term reward for skill in the airline business is simply survival, not prosperity. [5]",
+    "citations": [
+      {
+        "marker": "[6]",
+        "passage_indices": [
+          5
+        ],
+        "raw_numbers": [
+          6
+        ],
+        "years": [
+          2007
+        ],
+        "sources": [
+          "buffet_2007.pdf"
+        ]
+      },
+      {
+        "marker": "[6]",
+        "passage_indices": [
+          5
+        ],
+        "raw_numbers": [
+          6
+        ],
+        "years": [
+          2007
+        ],
+        "sources": [
+          "buffet_2007.pdf"
+        ]
+      },
+      {
+        "marker": "[6]",
+        "passage_indices": [
+          5
+        ],
+        "raw_numbers": [
+          6
+        ],
+        "years": [
+          2007
+        ],
+        "sources": [
+          "buffet_2007.pdf"
+        ]
+      },
+      {
+        "marker": "[2]",
+        "passage_indices": [
+          1
+        ],
+        "raw_numbers": [
+          2
+        ],
+        "years": [
+          1992
+        ],
+        "sources": [
+          "buffet_1992.txt"
+        ]
+      },
+      {
+        "marker": "[5]",
+        "passage_indices": [
+          4
+        ],
+        "raw_numbers": [
+          5
+        ],
+        "years": [
+          1992
+        ],
+        "sources": [
+          "buffet_1992.txt"
+        ]
+      }
+    ],
+    "answer_keyword_hit_rate": 1.0,
+    "faithfulness": {
+      "n_sentences": 2,
+      "citation_coverage": 1.0,
+      "invalid_citation_rate": 0.0,
+      "mean_support": 0.2812337324310255
+    }
+  },
+  {
+    "qid": "g28",
+    "query": "Where does Buffett say his favorite holding period is forever?",
+    "error": "Error code: 429 - {'error': {'message': 'Provider returned error', 'code': 429, 'metadata': {'raw': 'openai/gpt-oss-120b:free is temporarily rate-limited upstream. Please retry shortly, or add your own key to accumulate your rate limits: https://openrouter.ai/settings/integrations', 'provider_name':"
+  },
+  {
+    "qid": "g29",
+    "query": "What is the context of being fearful when others are greedy?",
+    "answer": "The letters use the phrase to describe a core investing mindset: be cautious and buy when the market is overly optimistic (“greedy”) and be willing to take risks when the market is fearful. This guideline appears as a repeated piece of advice contrasting one’s own actions with prevailing market emotions[1], and it is reiterated as a parallel to the company’s insurance‑risk approach[2] and as a reminder to individual investors about timing the market[3].",
+    "citations": [
+      {
+        "marker": "[1]",
+        "passage_indices": [
+          0
+        ],
+        "raw_numbers": [
+          1
+        ],
+        "years": [
+          1986
+        ],
+        "sources": [
+          "buffet_1986.txt"
+        ]
+      },
+      {
+        "marker": "[2]",
+        "passage_indices": [
+          1
+        ],
+        "raw_numbers": [
+          2
+        ],
+        "years": [
+          2006
+        ],
+        "sources": [
+          "buffet_2006.pdf"
+        ]
+      },
+      {
+        "marker": "[3]",
+        "passage_indices": [
+          2
+        ],
+        "raw_numbers": [
+          3
+        ],
+        "years": [
+          2004
+        ],
+        "sources": [
+          "buffet_2004.pdf"
+        ]
+      }
+    ],
+    "answer_keyword_hit_rate": 1.0,
+    "faithfulness": {
+      "n_sentences": 2,
+      "citation_coverage": 0.5,
+      "invalid_citation_rate": 0.0,
+      "mean_support": 0.046511627906976744
+    }
+  },
+  {
+    "qid": "g30",
+    "query": "What are look-through earnings?",
+    "answer": "Look‑through earnings are calculated by taking the operating earnings reported, adding the retained operating earnings of major investees that GAAP accounting does not show in Berkshire’s profits, and then subtracting an allowance for the tax Berkshire would have paid if those retained earnings had been distributed as dividends[1,2,3,4,5,6,7].",
+    "citations": [
+      {
+        "marker": "[1,2,3,4,5,6,7]",
+        "passage_indices": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "raw_numbers": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "years": [
+          1993,
+          1992,
+          1991,
+          1997,
+          1992,
+          1990,
+          2000
+        ],
+        "sources": [
+          "buffet_1993.txt",
+          "buffet_1992.txt",
+          "buffet_1991.txt",
+          "buffet_1997.txt",
+          "buffet_1992.txt",
+          "buffet_1990.txt",
+          "buffet_2000.pdf"
+        ]
+      }
+    ],
+    "answer_keyword_hit_rate": 0.0,
+    "faithfulness": {
+      "n_sentences": 1,
+      "citation_coverage": 1.0,
+      "invalid_citation_rate": 0.0,
+      "mean_support": 0.32727272727272727
+    }
+  },
+  {
+    "qid": "g31",
+    "query": "Who is Mr. Market in Buffett's letters?",
+    "error": "Error code: 429 - {'error': {'message': 'Provider returned error', 'code': 429, 'metadata': {'raw': 'openai/gpt-oss-120b:free is temporarily rate-limited upstream. Please retry shortly, or add your own key to accumulate your rate limits: https://openrouter.ai/settings/integrations', 'provider_name':"
+  },
+  {
+    "qid": "g32",
+    "query": "What does Buffett mean by an economic moat?",
+    "answer": "An economic moat is a metaphor for the superiorities a business possesses that make life difficult for its competitors, protecting excellent returns on invested capital [1]. Buffett describes it as a formidable barrier — such as being the low-cost producer (GEICO, Costco) or possessing a powerful worldwide brand (Coca-Cola, Gillette, American Express) — that defends the economic castle from competitors who repeatedly assault any business earning high returns [4]. The moat must be enduring; a moat that must be continuously rebuilt will eventually be no moat at all [4]. GEICO's rock-bottom operating costs, which virtually no competitor can match, are given as a concrete example of a moat [3,6]. The might of brand names, product attributes, and distribution systems give companies like Coke and Gillette an enormous competitive advantage, setting up a protective moat around their economic castles [2].",
+    "citations": [
+      {
+        "marker": "[1]",
+        "passage_indices": [
+          0
+        ],
+        "raw_numbers": [
+          1
+        ],
+        "years": [
+          2007
+        ],
+        "sources": [
+          "buffet_2007.pdf"
+        ]
+      },
+      {
+        "marker": "[4]",
+        "passage_indices": [
+          3
+        ],
+        "raw_numbers": [
+          4
+        ],
+        "years": [
+          2007
+        ],
+        "sources": [
+          "buffet_2007.pdf"
+        ]
+      },
+      {
+        "marker": "[4]",
+        "passage_indices": [
+          3
+        ],
+        "raw_numbers": [
+          4
+        ],
+        "years": [
+          2007
+        ],
+        "sources": [
+          "buffet_2007.pdf"
+        ]
+      },
+      {
+        "marker": "[3,6]",
+        "passage_indices": [
+          2,
+          5
+        ],
+        "raw_numbers": [
+          3,
+          6
+        ],
+        "years": [
+          1995,
+          1986
+        ],
+        "sources": [
+          "buffet_1995.txt",
+          "buffet_1986.txt"
+        ]
+      },
+      {
+        "marker": "[2]",
+        "passage_indices": [
+          1
+        ],
+        "raw_numbers": [
+          2
+        ],
+        "years": [
+          1993
+        ],
+        "sources": [
+          "buffet_1993.txt"
+        ]
+      }
+    ],
+    "answer_keyword_hit_rate": 1.0,
+    "faithfulness": {
+      "n_sentences": 5,
+      "citation_coverage": 1.0,
+      "invalid_citation_rate": 0.0,
+      "mean_support": 0.39662178434592227
+    }
+  },
+  {
+    "qid": "g33",
+    "query": "What did Buffett write about the newspaper business?",
+    "answer": "Buffett said that when an industry’s underlying economics are crumbling, even talented management can only slow the decline and eventually “eroding fundamentals will overwhelm managerial brilliance” in the newspaper business, leading to a continuing skid in profits[2].  \nHe also noted that they had “loved the newspaper business since we were youngsters” and enjoyed it for many years after purchasing it[5].",
+    "citations": [
+      {
+        "marker": "[2]",
+        "passage_indices": [
+          1
+        ],
+        "raw_numbers": [
+          2
+        ],
+        "years": [
+          2006
+        ],
+        "sources": [
+          "buffet_2006.pdf"
+        ]
+      },
+      {
+        "marker": "[5]",
+        "passage_indices": [
+          4
+        ],
+        "raw_numbers": [
+          5
+        ],
+        "years": [
+          1988
+        ],
+        "sources": [
+          "buffet_1988.txt"
+        ]
+      }
+    ],
+    "answer_keyword_hit_rate": 1.0,
+    "faithfulness": {
+      "n_sentences": 2,
+      "citation_coverage": 1.0,
+      "invalid_citation_rate": 0.0,
+      "mean_support": 0.2133867276887872
+    }
+  },
+  {
+    "qid": "g34",
+    "query": "Buffett on Clayton Homes and manufactured housing",
+    "error": "Error code: 429 - {'error': {'message': 'Provider returned error', 'code': 429, 'metadata': {'raw': 'openai/gpt-oss-120b:free is temporarily rate-limited upstream. Please retry shortly, or add your own key to accumulate your rate limits: https://openrouter.ai/settings/integrations', 'provider_name':"
+  },
+  {
+    "qid": "g35",
+    "query": "What did Buffett say about his bet with Protege Partners on index funds versus hedge funds?",
+    "answer": "Buffett publicly offered a $500,000 wager that no investment professional could select at least five hedge funds that would match an unmanaged S&P 500 index fund over ten years [3]. Only Ted Seides of Protégé Partners accepted the challenge [1,3]. Protégé chose five funds-of-funds investing in more than 100 hedge funds, whose averaged results were compared to a Vanguard S&P 500 index fund [1,3]. The funds-of-funds carried two layers of fees: roughly 2% and 20% at the hedge-fund level plus an additional 1% at the fund-of-funds level [1,8]. Through 2016 the five funds-of-funds averaged a 2.2% compound annual gain versus 7.1% for the index fund; $1 million in the hedge-fund selection would have gained $220,000 while the index fund would have gained $854,000 [2]. By the bet’s conclusion in 2017 the S&P 500 index fund had delivered a 125.8% total return (8.5% annualized) compared with an average 36.7% total return (3.0% annualized) for the five funds-of-funds [5,6]. Every fund-of-funds beat the index in 2008, then trailed in each of the following nine years [5,6]. Buffett estimated that about 60% of the funds-of-funds’ gains were diverted to the two layers of managers [8]. He emphasized that the market environment was normal — not unusually favorable to indexing — and that “Performance comes, performance goes. Fees never falter” [6].",
+    "citations": [
+      {
+        "marker": "[3]",
+        "passage_indices": [
+          2
+        ],
+        "raw_numbers": [
+          3
+        ],
+        "years": [
+          2016
+        ],
+        "sources": [
+          "buffet_2016.pdf"
+        ]
+      },
+      {
+        "marker": "[1,3]",
+        "passage_indices": [
+          0,
+          2
+        ],
+        "raw_numbers": [
+          1,
+          3
+        ],
+        "years": [
+          2016,
+          2016
+        ],
+        "sources": [
+          "buffet_2016.pdf",
+          "buffet_2016.pdf"
+        ]
+      },
+      {
+        "marker": "[1,3]",
+        "passage_indices": [
+          0,
+          2
+        ],
+        "raw_numbers": [
+          1,
+          3
+        ],
+        "years": [
+          2016,
+          2016
+        ],
+        "sources": [
+          "buffet_2016.pdf",
+          "buffet_2016.pdf"
+        ]
+      },
+      {
+        "marker": "[1,8]",
+        "passage_indices": [
+          0,
+          7
+        ],
+        "raw_numbers": [
+          1,
+          8
+        ],
+        "years": [
+          2016,
+          2016
+        ],
+        "sources": [
+          "buffet_2016.pdf",
+          "buffet_2016.pdf"
+        ]
+      },
+      {
+        "marker": "[2]",
+        "passage_indices": [
+          1
+        ],
+        "raw_numbers": [
+          2
+        ],
+        "years": [
+          2016
+        ],
+        "sources": [
+          "buffet_2016.pdf"
+        ]
+      },
+      {
+        "marker": "[5,6]",
+        "passage_indices": [
+          4,
+          5
+        ],
+        "raw_numbers": [
+          5,
+          6
+        ],
+        "years": [
+          2017,
+          2017
+        ],
+        "sources": [
+          "buffet_2017.pdf",
+          "buffet_2017.pdf"
+        ]
+      },
+      {
+        "marker": "[5,6]",
+        "passage_indices": [
+          4,
+          5
+        ],
+        "raw_numbers": [
+          5,
+          6
+        ],
+        "years": [
+          2017,
+          2017
+        ],
+        "sources": [
+          "buffet_2017.pdf",
+          "buffet_2017.pdf"
+        ]
+      },
+      {
+        "marker": "[8]",
+        "passage_indices": [
+          7
+        ],
+        "raw_numbers": [
+          8
+        ],
+        "years": [
+          2016
+        ],
+        "sources": [
+          "buffet_2016.pdf"
+        ]
+      },
+      {
+        "marker": "[6]",
+        "passage_indices": [
+          5
+        ],
+        "raw_numbers": [
+          6
+        ],
+        "years": [
+          2017
+        ],
+        "sources": [
+          "buffet_2017.pdf"
+        ]
+      }
+    ],
+    "answer_keyword_hit_rate": 1.0,
+    "faithfulness": {
+      "n_sentences": 10,
+      "citation_coverage": 0.9,
+      "invalid_citation_rate": 0.0,
+      "mean_support": 0.22897852320602746
+    }
+  },
+  {
+    "qid": "g36",
+    "query": "Buffett reflecting on 50 years of Berkshire in the anniversary letter",
+    "answer": "In the 50th anniversary letter, Buffett noted that Berkshire's per-share book value had grown from $19 to $146,186 over the 50 years since present management took over, a compounded annual rate of 19.4% [8]. He stated that book value had been a crude but useful tracking device for intrinsic business value, though the relationship between the two was much closer in the early decades than it is now [8]. Buffett also wrote a separate commentary for the Golden Anniversary reviewing what had happened during the past 50 years and what he expected during the next 50, and noted that neither he nor Charlie Munger changed a word after reading the other's commentary [8].",
+    "citations": [
+      {
+        "marker": "[8]",
+        "passage_indices": [
+          7
+        ],
+        "raw_numbers": [
+          8
+        ],
+        "years": [
+          2014
+        ],
+        "sources": [
+          "buffet_2014.pdf"
+        ]
+      },
+      {
+        "marker": "[8]",
+        "passage_indices": [
+          7
+        ],
+        "raw_numbers": [
+          8
+        ],
+        "years": [
+          2014
+        ],
+        "sources": [
+          "buffet_2014.pdf"
+        ]
+      },
+      {
+        "marker": "[8]",
+        "passage_indices": [
+          7
+        ],
+        "raw_numbers": [
+          8
+        ],
+        "years": [
+          2014
+        ],
+        "sources": [
+          "buffet_2014.pdf"
+        ]
+      }
+    ],
+    "answer_keyword_hit_rate": 1.0,
+    "faithfulness": {
+      "n_sentences": 3,
+      "citation_coverage": 1.0,
+      "invalid_citation_rate": 0.0,
+      "mean_support": 0.16721132897603486
+    }
+  },
+  {
+    "qid": "g37",
+    "query": "What did Buffett write about Charlie Munger's contribution to Berkshire?",
+    "answer": "Buffett wrote that the designated-contributions idea, along with many other successful ideas, was conceived by Charlie Munger [1]. He described Munger as his partner in managing all controlled companies and noted they enjoy their work as managing partners [1]. Buffett stated that Munger correctly told him in 1965 that buying control of Berkshire was a dumb decision, then advised him to abandon the Ben Graham approach of buying fair businesses at wonderful prices and instead add wonderful businesses at fair prices [8]. Buffett followed this advice with some back-sliding [8]. Munger became Buffett's partner in running Berkshire and repeatedly jerked him back to sanity when old habits surfaced [8]. Buffett and Munger allocate savings at Berkshire between two related forms of ownership [3].",
+    "citations": [
+      {
+        "marker": "[1]",
+        "passage_indices": [
+          0
+        ],
+        "raw_numbers": [
+          1
+        ],
+        "years": [
+          1981
+        ],
+        "sources": [
+          "buffet_1981.txt"
+        ]
+      },
+      {
+        "marker": "[1]",
+        "passage_indices": [
+          0
+        ],
+        "raw_numbers": [
+          1
+        ],
+        "years": [
+          1981
+        ],
+        "sources": [
+          "buffet_1981.txt"
+        ]
+      },
+      {
+        "marker": "[8]",
+        "passage_indices": [
+          7
+        ],
+        "raw_numbers": [
+          8
+        ],
+        "years": [
+          2023
+        ],
+        "sources": [
+          "buffet_2023.pdf"
+        ]
+      },
+      {
+        "marker": "[8]",
+        "passage_indices": [
+          7
+        ],
+        "raw_numbers": [
+          8
+        ],
+        "years": [
+          2023
+        ],
+        "sources": [
+          "buffet_2023.pdf"
+        ]
+      },
+      {
+        "marker": "[8]",
+        "passage_indices": [
+          7
+        ],
+        "raw_numbers": [
+          8
+        ],
+        "years": [
+          2023
+        ],
+        "sources": [
+          "buffet_2023.pdf"
+        ]
+      },
+      {
+        "marker": "[3]",
+        "passage_indices": [
+          2
+        ],
+        "raw_numbers": [
+          3
+        ],
+        "years": [
+          2022
+        ],
+        "sources": [
+          "buffet_2022.pdf"
+        ]
+      }
+    ],
+    "answer_keyword_hit_rate": 1.0,
+    "faithfulness": {
+      "n_sentences": 6,
+      "citation_coverage": 1.0,
+      "invalid_citation_rate": 0.0,
+      "mean_support": 0.18457542908762423
+    }
+  },
+  {
+    "qid": "g38",
+    "query": "What is Buffett's criticism of EBITDA as a metric?",
+    "answer": "Buffett criticizes EBITDA as a seriously flawed measure because it excludes depreciation and amortization, implying these are not real expenses [1]. He argues depreciation is actually a particularly unattractive expense since the cash outlay occurs upfront before the asset delivers any benefits [5]. Buffett states that referencing EBITDA makes him shudder, asking whether management thinks the tooth fairy pays for capital expenditures [8]. He notes that Wall Street frequently touts \"adjusted EBITDA\" to exclude a variety of all-too-real costs such as stock-based compensation and restructuring expenses [3]. Berkshire bans EBITDA as a measurement and instead focuses on earnings after depreciation, amortization, and income tax [2, 6].",
+    "citations": [
+      {
+        "marker": "[1]",
+        "passage_indices": [
+          0
+        ],
+        "raw_numbers": [
+          1
+        ],
+        "years": [
+          2015
+        ],
+        "sources": [
+          "buffet_2015.pdf"
+        ]
+      },
+      {
+        "marker": "[5]",
+        "passage_indices": [
+          4
+        ],
+        "raw_numbers": [
+          5
+        ],
+        "years": [
+          2002
+        ],
+        "sources": [
+          "buffet_2002.pdf"
+        ]
+      },
+      {
+        "marker": "[8]",
+        "passage_indices": [
+          7
+        ],
+        "raw_numbers": [
+          8
+        ],
+        "years": [
+          2000
+        ],
+        "sources": [
+          "buffet_2000.pdf"
+        ]
+      },
+      {
+        "marker": "[3]",
+        "passage_indices": [
+          2
+        ],
+        "raw_numbers": [
+          3
+        ],
+        "years": [
+          2018
+        ],
+        "sources": [
+          "buffet_2018.pdf"
+        ]
+      },
+      {
+        "marker": "[2, 6]",
+        "passage_indices": [
+          1,
+          5
+        ],
+        "raw_numbers": [
+          2,
+          6
+        ],
+        "years": [
+          2023,
+          2024
+        ],
+        "sources": [
+          "buffet_2023.pdf",
+          "buffet_2024.pdf"
+        ]
+      }
+    ],
+    "answer_keyword_hit_rate": 1.0,
+    "faithfulness": {
+      "n_sentences": 5,
+      "citation_coverage": 1.0,
+      "invalid_citation_rate": 0.0,
+      "mean_support": 0.30673542831437567
+    }
+  },
+  {
+    "qid": "g39",
+    "query": "Buffett on expensing stock options",
+    "answer": "Buffett argues that expensing stock options would change CEO compensation and could lower stock prices, so many CEOs fight the rule [1]. He says options are a valuable way to motivate managers and that recording their cost should not reduce their use [1,3]. He criticizes current accounting that lets companies ignore the expense of options, calling the treatment “outrageous” and noting it gives managers a choice to pay employees in a form that is not counted as a cost [4,5]. He points out that the non‑expensing of options inflates earnings, leading him to adjust reported figures downward, sometimes by 5‑10%, which can affect investment decisions [8].",
+    "citations": [
+      {
+        "marker": "[1]",
+        "passage_indices": [
+          0
+        ],
+        "raw_numbers": [
+          1
+        ],
+        "years": [
+          2004
+        ],
+        "sources": [
+          "buffet_2004.pdf"
+        ]
+      },
+      {
+        "marker": "[1,3]",
+        "passage_indices": [
+          0,
+          2
+        ],
+        "raw_numbers": [
+          1,
+          3
+        ],
+        "years": [
+          2004,
+          2004
+        ],
+        "sources": [
+          "buffet_2004.pdf",
+          "buffet_2004.pdf"
+        ]
+      },
+      {
+        "marker": "[4,5]",
+        "passage_indices": [
+          3,
+          4
+        ],
+        "raw_numbers": [
+          4,
+          5
+        ],
+        "years": [
+          1998,
+          1998
+        ],
+        "sources": [
+          "buffet_1998.pdf",
+          "buffet_1998.pdf"
+        ]
+      },
+      {
+        "marker": "[8]",
+        "passage_indices": [
+          7
+        ],
+        "raw_numbers": [
+          8
+        ],
+        "years": [
+          1998
+        ],
+        "sources": [
+          "buffet_1998.pdf"
+        ]
+      }
+    ],
+    "answer_keyword_hit_rate": 1.0,
+    "faithfulness": {
+      "n_sentences": 4,
+      "citation_coverage": 1.0,
+      "invalid_citation_rate": 0.0,
+      "mean_support": 0.10256685256685256
+    }
+  },
+  {
+    "qid": "g40",
+    "query": "Why did Berkshire close its textile operation?",
+    "error": "Error code: 429 - {'error': {'message': 'Provider returned error', 'code': 429, 'metadata': {'raw': 'openai/gpt-oss-120b:free is temporarily rate-limited upstream. Please retry shortly, or add your own key to accumulate your rate limits: https://openrouter.ai/settings/integrations', 'provider_name':"
+  },
+  {
+    "qid": "g41",
+    "query": "What is cigar-butt investing according to Buffett?",
+    "answer": "Cigar‑butt investing is the practice of buying a business at a very low price that looks like a “discarded cigar butt” with only one puff of value left, hoping to capture a small, quick profit from the bargain rather than building a lasting, high‑return enterprise[1].",
+    "citations": [
+      {
+        "marker": "[1]",
+        "passage_indices": [
+          0
+        ],
+        "raw_numbers": [
+          1
+        ],
+        "years": [
+          1989
+        ],
+        "sources": [
+          "buffet_1989.txt"
+        ]
+      }
+    ],
+    "answer_keyword_hit_rate": 1.0,
+    "faithfulness": {
+      "n_sentences": 1,
+      "citation_coverage": 1.0,
+      "invalid_citation_rate": 0.0,
+      "mean_support": 0.13043478260869565
+    }
+  },
+  {
+    "qid": "g42",
+    "query": "Buffett on super-cat insurance and catastrophe risk",
+    "error": "Error code: 429 - {'error': {'message': 'Provider returned error', 'code': 429, 'metadata': {'raw': 'openai/gpt-oss-120b:free is temporarily rate-limited upstream. Please retry shortly, or add your own key to accumulate your rate limits: https://openrouter.ai/settings/integrations', 'provider_name':"
+  },
+  {
+    "qid": "g43",
+    "query": "How did September 11 affect Berkshire's insurance business?",
+    "error": "Error code: 429 - {'error': {'message': 'Provider returned error', 'code': 429, 'metadata': {'raw': 'openai/gpt-oss-120b:free is temporarily rate-limited upstream. Please retry shortly, or add your own key to accumulate your rate limits: https://openrouter.ai/settings/integrations', 'provider_name':"
+  },
+  {
+    "qid": "g44",
+    "query": "Why does Berkshire not pay dividends to its shareholders?",
+    "answer": "Berkshire chooses not to pay dividends because it believes that as long as each retained dollar creates more than one dollar of market value for shareholders, distributing cash would be against shareholders’ financial interest[1]. Historically, the company has earned well above market rates on retained earnings, so paying out would have reduced future earnings and capital, which would have harmed shareholders[6].",
+    "citations": [
+      {
+        "marker": "[1]",
+        "passage_indices": [
+          0
+        ],
+        "raw_numbers": [
+          1
+        ],
+        "years": [
+          2014
+        ],
+        "sources": [
+          "buffet_2014.pdf"
+        ]
+      },
+      {
+        "marker": "[6]",
+        "passage_indices": [
+          5
+        ],
+        "raw_numbers": [
+          6
+        ],
+        "years": [
+          1984
+        ],
+        "sources": [
+          "buffet_1984.txt"
+        ]
+      }
+    ],
+    "answer_keyword_hit_rate": 1.0,
+    "faithfulness": {
+      "n_sentences": 2,
+      "citation_coverage": 1.0,
+      "invalid_citation_rate": 0.0,
+      "mean_support": 0.29638009049773756
+    }
+  },
+  {
+    "qid": "g45",
+    "query": "What does Buffett think about issuing Berkshire shares to make acquisitions?",
+    "error": "Error code: 429 - {'error': {'message': 'Provider returned error', 'code': 429, 'metadata': {'raw': 'openai/gpt-oss-120b:free is temporarily rate-limited upstream. Please retry shortly, or add your own key to accumulate your rate limits: https://openrouter.ai/settings/integrations', 'provider_name':"
+  },
+  {
+    "qid": "g46",
+    "query": "What did Buffett say about winding down the General Re derivatives book?",
+    "answer": "Buffett said that after beginning to wind down the General Re derivatives business in early 2002, the unit went from 23,218 contracts to just 197, and the process took about five years and cost more than $400 million in losses before it was largely completed[2].",
+    "citations": [
+      {
+        "marker": "[2]",
+        "passage_indices": [
+          1
+        ],
+        "raw_numbers": [
+          2
+        ],
+        "years": [
+          2006
+        ],
+        "sources": [
+          "buffet_2006.pdf"
+        ]
+      }
+    ],
+    "answer_keyword_hit_rate": 0.5,
+    "faithfulness": {
+      "n_sentences": 1,
+      "citation_coverage": 1.0,
+      "invalid_citation_rate": 0.0,
+      "mean_support": 0.06521739130434782
+    }
+  },
+  {
+    "qid": "g47",
+    "query": "Buffett on the housing bubble and mortgage lending",
+    "error": "Error code: 429 - {'error': {'message': 'Provider returned error', 'code': 429, 'metadata': {'raw': 'openai/gpt-oss-120b:free is temporarily rate-limited upstream. Please retry shortly, or add your own key to accumulate your rate limits: https://openrouter.ai/settings/integrations', 'provider_name':"
+  },
+  {
+    "qid": "g48",
+    "query": "What did Buffett write about retained earnings and Edgar Lawrence Smith?",
+    "answer": "Buffett explained that Edgar Lawrence Smith’s 1924 book *Common Stocks as Long Term Investments* changed the investment world and forced Smith to rethink stock valuation; he noted that, as John Maynard Keynes observed, well‑managed industrial firms usually retain a portion of their profits and reinvest them, creating an element of compound interest that benefits shareholders[1].",
+    "citations": [
+      {
+        "marker": "[1]",
+        "passage_indices": [
+          0
+        ],
+        "raw_numbers": [
+          1
+        ],
+        "years": [
+          2019
+        ],
+        "sources": [
+          "buffet_2019.pdf"
+        ]
+      }
+    ],
+    "answer_keyword_hit_rate": 0.0,
+    "faithfulness": {
+      "n_sentences": 1,
+      "citation_coverage": 1.0,
+      "invalid_citation_rate": 0.0,
+      "mean_support": 0.17543859649122806
+    }
+  },
+  {
+    "qid": "g49",
+    "query": "What did Buffett write about the Precision Castparts acquisition?",
+    "error": "Error code: 429 - {'error': {'message': 'Provider returned error', 'code': 429, 'metadata': {'raw': 'openai/gpt-oss-120b:free is temporarily rate-limited upstream. Please retry shortly, or add your own key to accumulate your rate limits: https://openrouter.ai/settings/integrations', 'provider_name':"
+  },
+  {
+    "qid": "g50",
+    "query": "What did Buffett write about Japanese trading companies?",
+    "answer": "Buffett wrote that Berkshire’s stake in the five large Japanese trading companies is a long‑term, passive investment of about 9 % of each firm, with a pledge not to exceed 9.9 % ownership [1]. He noted that the yen’s recent weakness created a large unrealized dollar gain on the position (about $8 billion) and that Berkshire has financed most of the holdings with yen‑denominated bonds [1,3].  \n\nHe praised the companies’ shareholder‑friendly policies, saying they are “much superior to those customarily practiced in the U.S.” and that each has reduced its outstanding shares at attractive prices [3,6]. He observed that their managements are far less aggressive about compensation than typical U.S. firms, that they pay roughly one‑third of earnings as dividends while retaining the rest for business growth, and that they are reluctant to issue new shares [3,4,6].  \n\nFinally, he highlighted the strategic benefit of the partnership, noting that the Japanese CEOs can rely on Berkshire’s huge liquid resources for future collaborations worldwide [4,6].",
+    "citations": [
+      {
+        "marker": "[1]",
+        "passage_indices": [
+          0
+        ],
+        "raw_numbers": [
+          1
+        ],
+        "years": [
+          2023
+        ],
+        "sources": [
+          "buffet_2023.pdf"
+        ]
+      },
+      {
+        "marker": "[1,3]",
+        "passage_indices": [
+          0,
+          2
+        ],
+        "raw_numbers": [
+          1,
+          3
+        ],
+        "years": [
+          2023,
+          2023
+        ],
+        "sources": [
+          "buffet_2023.pdf",
+          "buffet_2023.pdf"
+        ]
+      },
+      {
+        "marker": "[3,6]",
+        "passage_indices": [
+          2,
+          5
+        ],
+        "raw_numbers": [
+          3,
+          6
+        ],
+        "years": [
+          2023,
+          2023
+        ],
+        "sources": [
+          "buffet_2023.pdf",
+          "buffet_2023.pdf"
+        ]
+      },
+      {
+        "marker": "[3,4,6]",
+        "passage_indices": [
+          2,
+          3,
+          5
+        ],
+        "raw_numbers": [
+          3,
+          4,
+          6
+        ],
+        "years": [
+          2023,
+          2023,
+          2023
+        ],
+        "sources": [
+          "buffet_2023.pdf",
+          "buffet_2023.pdf",
+          "buffet_2023.pdf"
+        ]
+      },
+      {
+        "marker": "[4,6]",
+        "passage_indices": [
+          3,
+          5
+        ],
+        "raw_numbers": [
+          4,
+          6
+        ],
+        "years": [
+          2023,
+          2023
+        ],
+        "sources": [
+          "buffet_2023.pdf",
+          "buffet_2023.pdf"
+        ]
+      }
+    ],
+    "answer_keyword_hit_rate": 1.0,
+    "faithfulness": {
+      "n_sentences": 5,
+      "citation_coverage": 1.0,
+      "invalid_citation_rate": 0.0,
+      "mean_support": 0.2514522217155596
+    }
+  }
+]

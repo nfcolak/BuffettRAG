@@ -16,8 +16,10 @@ _EXPANSION_PROMPT = """\
 You expand search queries over Warren Buffett's Berkshire Hathaway shareholder \
 letters (1977-2024). Given the question below, list 3 to 8 extra search keywords \
 — synonyms, related people, companies, events or financial terms likely to appear \
-in the letters. Reply with comma-separated keywords only, no explanations.
-
+in the letters. If the question refers back to the earlier conversation (e.g. \
+"what about GEICO?"), use that context to pick keywords for what is actually \
+being asked. Reply with comma-separated keywords only, no explanations.
+{history_block}
 Question: {query}
 
 Keywords:"""
@@ -44,7 +46,7 @@ def parse_expansion_keywords(raw: str) -> List[str]:
     return keywords
 
 
-def expand_query(query: str, llm) -> Optional[str]:
+def expand_query(query: str, llm, history_text: str = "") -> Optional[str]:
     """Return ``query + keywords`` for retrieval, or None when unavailable.
 
     Never raises: any provider failure just means retrieval runs on the
@@ -53,8 +55,12 @@ def expand_query(query: str, llm) -> Optional[str]:
     """
     if llm is None or getattr(llm, "provider_name", "") == "local":
         return None
+    history_block = f"\nRecent conversation:\n{history_text}\n" if history_text else ""
     try:
-        raw = llm.generate(_EXPANSION_PROMPT.format(query=query), max_new_tokens=60)
+        raw = llm.generate(
+            _EXPANSION_PROMPT.format(query=query, history_block=history_block),
+            max_new_tokens=60,
+        )
     except Exception:
         return None
     keywords = parse_expansion_keywords(raw or "")

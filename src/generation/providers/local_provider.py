@@ -12,7 +12,7 @@ from __future__ import annotations
 import re
 from typing import List, Optional, Tuple
 
-REFUSAL_LINE = "The shareholder letters do not contain information specifically about this topic."
+from src.generation.prompt import REFUSAL_LINE
 
 _PASSAGE_RE = re.compile(
     r"\[(\d+)\]\s*\(year=[^)]*\)\n(.*?)(?=\n\n\[\d+\]\s*\(year=|\n+END UNTRUSTED PASSAGES)",

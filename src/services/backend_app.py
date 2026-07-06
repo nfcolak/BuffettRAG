@@ -24,9 +24,11 @@ import sys
 from pathlib import Path
 from typing import Any, Dict, List, Literal, Optional
 
+import json
+
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
-from starlette.responses import JSONResponse
+from starlette.responses import JSONResponse, StreamingResponse
 from pydantic import BaseModel, Field
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
@@ -50,7 +52,14 @@ from config import (
     VECTOR_BACKEND,
 )
 from src.embeddings import BGEEmbedder
-from src.generation.prompt import build_cited_prompt, format_answer_markdown, parse_citations, strip_chat_artifacts
+from src.generation.prompt import (
+    REFUSAL_LINE,
+    build_cited_prompt,
+    format_answer_markdown,
+    format_history_block,
+    parse_citations,
+    strip_chat_artifacts,
+)
 from src.generation.providers import create_llm_provider
 from src.retrieval.context import build_doc_lookup, expand_hits_with_neighbors
 from src.retrieval.query_expansion import expand_query
@@ -74,12 +83,18 @@ class SearchRequest(BaseModel):
     auto_year_filter: bool = True
 
 
+class HistoryTurn(BaseModel):
+    role: Literal["user", "assistant"]
+    content: str = Field(min_length=1, max_length=2000)
+
+
 class AskRequest(SearchRequest):
     max_new_tokens: int = Field(default=900, ge=1, le=2000)
     llm_provider: Optional[Literal["openai", "openrouter", "anthropic", "local"]] = None
     llm_api_key: Optional[str] = Field(default=None, max_length=4096)
     llm_model: Optional[str] = Field(default=None, max_length=200)
     expand_query: bool = True
+    history: List[HistoryTurn] = Field(default_factory=list, max_length=12)
 
 
 class HitOut(BaseModel):
@@ -280,40 +295,15 @@ def ask(req: AskRequest) -> AskResponse:
     if not _state:
         raise HTTPException(status_code=503, detail="Service not ready")
 
-    llm = _llm_for_request(req)
-
-    search_req = req
-    if req.expand_query:
-        expanded = expand_query(req.query, llm)
-        if expanded:
-            search_req = req.model_copy(update={"query": expanded})
-            if EXPOSE_DEBUG_STATUS:
-                print(f"[backend] expanded query: {expanded!r}", flush=True)
-
     try:
-        hits, used_filter, reranked = _do_search(search_req)
+        llm, hits, used_filter, reranked, context_hits, prompt = _prepare_ask(req)
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
 
     answer: Optional[str] = None
     citations: List[Dict[str, Any]] = []
-
     if hits:
-        context_hits = expand_hits_with_neighbors(
-            hits,
-            _state.get("docs_by_id", {}),
-            neighbors=ANSWER_CONTEXT_NEIGHBORS,
-            max_chars=ANSWER_CONTEXT_MAX_CHARS,
-        )
-        prompt = build_cited_prompt(query=req.query, hits=context_hits)
-        try:
-            raw_answer = llm.generate(prompt, max_new_tokens=req.max_new_tokens)
-            answer = format_answer_markdown(strip_chat_artifacts(raw_answer))
-            citations = parse_citations(answer, context_hits)
-        except Exception as exc:
-            if EXPOSE_DEBUG_STATUS:
-                print(f"[backend] LLM provider unavailable: {exc}", flush=True)
-            answer = _llm_error_message(exc)
+        answer, citations = _generate_answer(llm, prompt, context_hits, req.max_new_tokens)
 
     return AskResponse(
         query=req.query,
@@ -323,4 +313,118 @@ def ask(req: AskRequest) -> AskResponse:
         hits=_hits_to_out(hits),
         answer=answer,
         citations=citations,
+    )
+
+
+def _prepare_ask(req: AskRequest):
+    """Shared /ask preparation: expansion, retrieval, context and prompt."""
+    llm = _llm_for_request(req)
+    history_dicts = [turn.model_dump() for turn in req.history]
+
+    search_req = req
+    if req.expand_query:
+        expanded = expand_query(
+            req.query, llm, history_text=format_history_block(history_dicts)
+        )
+        if expanded:
+            search_req = req.model_copy(update={"query": expanded})
+            if EXPOSE_DEBUG_STATUS:
+                print(f"[backend] expanded query: {expanded!r}", flush=True)
+
+    hits, used_filter, reranked = _do_search(search_req)
+
+    context_hits: List[Any] = []
+    prompt = ""
+    if hits:
+        context_hits = expand_hits_with_neighbors(
+            hits,
+            _state.get("docs_by_id", {}),
+            neighbors=ANSWER_CONTEXT_NEIGHBORS,
+            max_chars=ANSWER_CONTEXT_MAX_CHARS,
+        )
+        prompt = build_cited_prompt(query=req.query, hits=context_hits, history=history_dicts)
+
+    return llm, hits, used_filter, reranked, context_hits, prompt
+
+
+def _finalize_answer(llm, prompt: str, context_hits, raw_answer: str, max_new_tokens: int):
+    """Format a raw completion, apply the refusal-retry safety net, parse citations."""
+    answer = format_answer_markdown(strip_chat_artifacts(raw_answer))
+    # Free-tier models occasionally refuse borderline questions the
+    # passages can answer; one retry is a cheap safety net.
+    if answer.strip().startswith(REFUSAL_LINE):
+        try:
+            retry_raw = llm.generate(prompt, max_new_tokens=max_new_tokens)
+            retry_answer = format_answer_markdown(strip_chat_artifacts(retry_raw))
+            if retry_answer.strip() and not retry_answer.strip().startswith(REFUSAL_LINE):
+                answer = retry_answer
+        except Exception:
+            pass
+    return answer, parse_citations(answer, context_hits)
+
+
+def _generate_answer(llm, prompt: str, context_hits, max_new_tokens: int):
+    try:
+        raw_answer = llm.generate(prompt, max_new_tokens=max_new_tokens)
+    except Exception as exc:
+        if EXPOSE_DEBUG_STATUS:
+            print(f"[backend] LLM provider unavailable: {exc}", flush=True)
+        return _llm_error_message(exc), []
+    return _finalize_answer(llm, prompt, context_hits, raw_answer, max_new_tokens)
+
+
+def _sse(event: str, data: Dict[str, Any]) -> str:
+    return f"event: {event}\ndata: {json.dumps(data, ensure_ascii=False)}\n\n"
+
+
+@app.post("/ask/stream")
+def ask_stream(req: AskRequest) -> StreamingResponse:
+    """Streaming variant of /ask: SSE with meta, delta and done events."""
+    if not _state:
+        raise HTTPException(status_code=503, detail="Service not ready")
+
+    try:
+        llm, hits, used_filter, reranked, context_hits, prompt = _prepare_ask(req)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    def event_source():
+        yield _sse(
+            "meta",
+            {
+                "query": req.query,
+                "strategy": req.strategy,
+                "reranked": reranked,
+                "used_filter": used_filter,
+                "hits": [h.model_dump() for h in _hits_to_out(hits)],
+            },
+        )
+        if not hits:
+            yield _sse("done", {"answer": None, "citations": []})
+            return
+
+        raw_answer = ""
+        try:
+            if hasattr(llm, "generate_stream"):
+                for delta in llm.generate_stream(prompt, max_new_tokens=req.max_new_tokens):
+                    raw_answer += delta
+                    yield _sse("delta", {"text": delta})
+            else:
+                raw_answer = llm.generate(prompt, max_new_tokens=req.max_new_tokens)
+                yield _sse("delta", {"text": raw_answer})
+        except Exception as exc:
+            if EXPOSE_DEBUG_STATUS:
+                print(f"[backend] stream failed, falling back: {exc}", flush=True)
+            # The non-streaming path carries the full retry/fallback logic.
+            answer, citations = _generate_answer(llm, prompt, context_hits, req.max_new_tokens)
+            yield _sse("done", {"answer": answer, "citations": citations})
+            return
+
+        answer, citations = _finalize_answer(llm, prompt, context_hits, raw_answer, req.max_new_tokens)
+        yield _sse("done", {"answer": answer, "citations": citations})
+
+    return StreamingResponse(
+        event_source(),
+        media_type="text/event-stream",
+        headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
     )
