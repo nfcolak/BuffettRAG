@@ -4,7 +4,8 @@ Deployment: runs on the Nuvolos **Backend app**.
 Responsibilities:
     - Loads chunks once at startup
     - Connects to pgvector (Database app) for vector storage
-    - Hosts the embedding model (bge-small) and reranker (bge-reranker-base)
+    - Hosts the configured embedding model and cross-encoder reranker
+      (see EMBEDDING_MODEL_PRIMARY and RERANKER_MODEL in config.py)
     - Runs retrieval (vector / metadata / hybrid) and reranking
     - For answer generation, sends grounded prompts to the configured LLM provider.
 
@@ -49,6 +50,7 @@ from config import (
     RATE_LIMIT_REQUESTS,
     RATE_LIMIT_WINDOW_SECONDS,
     RETRIEVAL_FETCH_K,
+    TRUST_PROXY_HEADERS,
     VECTOR_BACKEND,
 )
 from src.embeddings import BGEEmbedder
@@ -149,7 +151,7 @@ async def security_middleware(request: Request, call_next):
         return JSONResponse({"detail": "Unauthorized"}, status_code=401)
 
     if request.method in {"POST", "PUT", "PATCH", "DELETE"}:
-        key = f"{client_key(request)}:{path}"
+        key = f"{client_key(request, TRUST_PROXY_HEADERS)}:{path}"
         if not _rate_limiter.allow(key):
             return JSONResponse({"detail": "Rate limit exceeded"}, status_code=429)
 
@@ -171,6 +173,14 @@ async def startup() -> None:
     if len(vs) == 0:
         embeddings = embedder.embed_documents([d.text for d in docs])
         vs.add(docs, embeddings)
+    elif len(vs) != len(docs):
+        # A partially populated store (interrupted indexing, stale chunks file)
+        # would otherwise serve incomplete results silently.
+        print(
+            f"[backend] warning: vector store holds {len(vs)} rows but the chunks "
+            f"file has {len(docs)}; re-run indexing if these should match",
+            flush=True,
+        )
 
     reranker = CrossEncoderReranker()
     retriever = Retriever(vector_store=vs, embedder=embedder, docs=docs, reranker=reranker)
