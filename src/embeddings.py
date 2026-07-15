@@ -33,7 +33,7 @@ class BGEEmbedder:
     Parameters
     ----------
     model_name : str
-        HF model ID. Defaults to bge-small-en-v1.5.
+        HF model ID. Defaults to EMBEDDING_MODEL_PRIMARY (bge-base-en-v1.5).
     device : str
         'cpu' or 'cuda'.
     normalize : bool
@@ -83,7 +83,9 @@ class BGEEmbedder:
 
 
 def get_embedder(size: str = "small", device: str = EMBEDDING_DEVICE) -> BGEEmbedder:
-    """Factory: 'small' -> bge-small, 'base' / 'large' -> bge-base."""
+    """Factory kept for CLI compatibility: every size currently resolves to
+    the configured bge-base model ('small' -> EMBEDDING_MODEL_PRIMARY,
+    'base' / 'large' -> EMBEDDING_MODEL_LARGE, both bge-base-en-v1.5)."""
     if size == "small":
         return BGEEmbedder(EMBEDDING_MODEL_PRIMARY, device=device)
     if size in ("base", "large"):
