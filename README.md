@@ -1,7 +1,7 @@
 # BuffettRAG
 
 BuffettRAG is a retrieval-augmented research workspace for Warren Buffett shareholder letters.
-It includes a Python retrieval backend with OpenAI answer generation, a Streamlit fallback UI, and a React/Vite frontend.
+It includes a Python retrieval backend with multi-provider answer generation (OpenAI, Anthropic, OpenRouter, or an offline extractive fallback), a Streamlit fallback UI, and a React/Vite frontend.
 
 ## Project Layout
 
@@ -22,7 +22,7 @@ It includes a Python retrieval backend with OpenAI answer generation, a Streamli
 ├── src/
 │   ├── evaluation/         # Evaluation pipeline
 │   ├── frontend/           # Streamlit frontend helpers
-│   ├── generation/         # Prompting and OpenAI generation wrapper
+│   ├── generation/         # Prompting and LLM provider wrappers
 │   ├── ingestion/          # Parsing, chunking, and tagging
 │   ├── retrieval/          # BM25, vector retrieval, reranking
 │   └── services/           # FastAPI backend service
@@ -102,6 +102,9 @@ Optional hardening knobs:
 export RATE_LIMIT_REQUESTS=60
 export RATE_LIMIT_WINDOW_SECONDS=60
 export EXPOSE_DEBUG_STATUS=0
+# Set only when the backend runs behind a reverse proxy that sets
+# X-Forwarded-For; otherwise clients could spoof their rate-limit identity.
+export TRUST_PROXY_HEADERS=1
 ```
 
 Local development can leave keys empty, but production should not.

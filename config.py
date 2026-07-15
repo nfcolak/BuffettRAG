@@ -72,11 +72,11 @@ PDF_FILES_PATTERN = "buffet_*.pdf"
 # -----------------------------------------------------------------------------
 # Embeddings
 # -----------------------------------------------------------------------------
-# Primary -- ~130MB, fast, MIT
+# Primary -- ~440MB, 768-dim, MIT
 EMBEDDING_MODEL_PRIMARY = os.getenv("EMBEDDING_MODEL", "BAAI/bge-base-en-v1.5")
-EMBEDDING_DIM_PRIMARY = 384
+EMBEDDING_DIM_PRIMARY = 768
 
-# Higher-quality alternative
+# Alias kept for get_embedder('base'/'large') compatibility; same model as primary.
 EMBEDDING_MODEL_LARGE = "BAAI/bge-base-en-v1.5"
 EMBEDDING_DIM_LARGE = 768
 
@@ -167,6 +167,10 @@ CORS_ORIGINS = _csv_env(
 )
 RATE_LIMIT_REQUESTS = int(os.getenv("RATE_LIMIT_REQUESTS", "60"))
 RATE_LIMIT_WINDOW_SECONDS = int(os.getenv("RATE_LIMIT_WINDOW_SECONDS", "60"))
+# Only trust X-Forwarded-For for rate-limit client identity when the service
+# actually runs behind a reverse proxy that sets it; otherwise the header is
+# client-controlled and lets callers reset their own rate-limit bucket.
+TRUST_PROXY_HEADERS = os.getenv("TRUST_PROXY_HEADERS", "0") == "1"
 EXPOSE_DEBUG_STATUS = os.getenv("EXPOSE_DEBUG_STATUS", "0") == "1"
 
 # -----------------------------------------------------------------------------
