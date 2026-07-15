@@ -1,15 +1,13 @@
 # BuffettRAG
 
 BuffettRAG is a retrieval-augmented research workspace for Warren Buffett shareholder letters.
-It includes a Python retrieval backend with multi-provider answer generation (OpenAI, Anthropic, OpenRouter, or an offline extractive fallback), a Streamlit fallback UI, and a React/Vite frontend.
+It includes a Python retrieval backend with multi-provider answer generation (OpenAI, Anthropic, OpenRouter, or an offline extractive fallback) and a React/Vite frontend.
 
 ## Project Layout
 
 ```text
 .
-├── app.py                  # Streamlit fallback UI
 ├── config.py               # Central paths and runtime settings
-├── assets/                 # Streamlit static assets
 ├── data/
 │   ├── raw/                # Source shareholder letters
 │   ├── processed/          # Chunk files and metadata
@@ -21,7 +19,6 @@ It includes a Python retrieval backend with multi-provider answer generation (Op
 ├── scripts/                # CLI and maintenance scripts
 ├── src/
 │   ├── evaluation/         # Evaluation pipeline
-│   ├── frontend/           # Streamlit frontend helpers
 │   ├── generation/         # Prompting and LLM provider wrappers
 │   ├── ingestion/          # Parsing, chunking, and tagging
 │   ├── retrieval/          # BM25, vector retrieval, reranking
@@ -60,12 +57,6 @@ VITE_BACKEND_URL=http://localhost:8000 npm run dev
 The frontend Settings button lets you choose OpenAI or OpenRouter per browser.
 If you enter a provider API key there, it is sent only with `/ask` requests.
 Selecting "remember on this device" stores the key in that browser's local storage.
-
-The Streamlit fallback UI is still available:
-
-```bash
-streamlit run app.py
-```
 
 ## Security Configuration
 

@@ -1,9 +1,0 @@
-# -----------------------------------------------------------------------------
-# Frontend app requirements (Frontend instance on Nuvolos -- 4 CU, no GPU)
-# -----------------------------------------------------------------------------
-# Just Streamlit + requests. No models loaded here -- everything goes through
-# Backend over HTTP.
-
-streamlit>=1.32.0
-requests>=2.31.0
-websockets>=14.0,<15.0
