@@ -9,13 +9,11 @@ This project now follows a source-first layout with generated data and historica
 - `src/ingestion/`: Data extraction, cleaning, chunking, and topic tagging.
 - `src/retrieval/`: Search, filtering, hybrid retrieval, and reranking.
 - `src/generation/`: Prompt construction and pluggable LLM provider wrappers.
-- `src/frontend/`: Shared helpers for the Streamlit fallback UI.
 - `frontend/`: React/Vite application.
 - `scripts/`: Command-line utilities and legacy ingestion helpers.
 
 ## Runtime Assets and Data
 
-- `assets/`: Static files used by the Streamlit UI.
 - `data/raw/`: Original shareholder letters.
 - `data/processed/`: Generated chunks and metadata.
 - `data/indices/`: Vector-store files.
@@ -28,4 +26,4 @@ This project now follows a source-first layout with generated data and historica
 
 ## Root Files
 
-The root is intentionally kept small: `README.md`, `config.py`, `app.py`, dependency files, and project-level tool configuration.
+The root is intentionally kept small: `README.md`, `config.py`, dependency files, and project-level tool configuration.
