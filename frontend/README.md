@@ -32,4 +32,3 @@ VECTOR_BACKEND=chroma \
 - `POST /search`
 - `POST /ask`
 
-The Streamlit app at the repository root is now a legacy/fallback frontend.
