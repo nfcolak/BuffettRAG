@@ -1,8 +1,9 @@
 """Cross-encoder reranker.
 
-We use BAAI/bge-reranker-base because it pairs naturally with the bge
-retrieval embeddings and is small enough (~280MB) to run on CPU at
-batch sizes 32-64. On GPU it's effectively free.
+We use BAAI/bge-reranker-v2-m3 (see RERANKER_MODEL in config.py) because it
+pairs naturally with the bge retrieval embeddings. Note the size: ~2.3GB of
+weights, so expect a large first-run download and noticeably slower CPU
+inference than the older bge-reranker-base. On GPU it's cheap.
 
 Standard usage in the pipeline:
     candidates = retriever.search(query, top_k=30)
