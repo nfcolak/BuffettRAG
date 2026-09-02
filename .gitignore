@@ -35,3 +35,7 @@ chroma/
 # Frontend build artifacts
 frontend/node_modules/
 frontend/dist/
+
+# Obsidian docs-vault (per-machine state only)
+docs-vault/.obsidian/workspace*
+docs-vault/.obsidian/cache
