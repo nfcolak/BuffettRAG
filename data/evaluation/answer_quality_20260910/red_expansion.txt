@@ -1,0 +1,29 @@
+......F                                                                  [100%]
+=================================== FAILURES ===================================
+_____ test_expansion_does_not_change_temporal_intent_or_reranker_question ______
+
+    def test_expansion_does_not_change_temporal_intent_or_reranker_question():
+        from src.retrieval.retriever import Retriever
+        from src.vector_store import SearchHit
+        docs = load_chunks_as_docs(ROOT / 'data/processed/chunks_v2.jsonl')[:10]
+        calls = []
+    
+        class CaptureRetriever(Retriever):
+            def _hybrid_for_filter(self, query, fetch_k, where):
+                calls.append((query, where))
+                return [SearchHit(docs[0].id, docs[0].text, docs[0].metadata, 1.0)]
+    
+        class CaptureReranker:
+            def rerank(self, query, candidates, top_k):
+                assert query == 'What are operating earnings?'
+                return candidates[:top_k]
+    
+        retriever = CaptureRetriever(None, None, docs, CaptureReranker())
+>       result = retriever.search('What are operating earnings?', rerank=True,
+                                  retrieval_query='What are operating earnings? 2008 accounting')
+E       TypeError: search() got an unexpected keyword argument 'retrieval_query'
+
+tests/test_answer_quality.py:86: TypeError
+=========================== short test summary info ============================
+FAILED tests/test_answer_quality.py::test_expansion_does_not_change_temporal_intent_or_reranker_question
+1 failed, 6 passed in 1.03s

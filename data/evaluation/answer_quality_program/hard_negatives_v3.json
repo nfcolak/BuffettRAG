@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "purpose": "Confusable V3 passage negatives for retrieval regression checks; a case passes only when evidence ranks above its named decoy.",
+  "source_corpus": "data/processed/chunks_v3_paragraph.jsonl",
+  "cases": [
+    {
+      "qid": "hn01_derivatives_vs_mass_risk",
+      "query": "What did Buffett say about derivatives being weapons of mass destruction?",
+      "relevant_ids": ["2002_p0086"],
+      "hard_negative_ids": ["2015_p0144"]
+    },
+    {
+      "qid": "hn02_crisis_vs_buybacks",
+      "query": "How did Berkshire respond when the financial system seized in September 2008?",
+      "relevant_ids": ["2009_p0021"],
+      "hard_negative_ids": ["2008_p0089"]
+    },
+    {
+      "qid": "hn03_bnsf_vs_railroad_dividends",
+      "query": "What did Buffett say about Berkshire's BNSF acquisition?",
+      "relevant_ids": ["2021_p0056"],
+      "hard_negative_ids": ["2020_p0076"]
+    },
+    {
+      "qid": "hn04_apple_earnings_vs_stake",
+      "query": "How did Buffett describe the economic benefit of Apple share repurchases?",
+      "relevant_ids": ["2021_p0030"],
+      "hard_negative_ids": ["2020_p0035"]
+    },
+    {
+      "qid": "hn05_index_funds_vs_manager_fees",
+      "query": "What investing advice did Buffett give individual investors about index funds?",
+      "relevant_ids": ["1996_p0092"],
+      "hard_negative_ids": ["2006_p0141"]
+    },
+    {
+      "qid": "hn06_dividend_policy_vs_tax",
+      "query": "Why did Buffett discuss not paying Berkshire a cash dividend?",
+      "relevant_ids": ["2012_p0109"],
+      "hard_negative_ids": ["2016_p0112"]
+    },
+    {
+      "qid": "hn07_see_operations_vs_table",
+      "query": "What did Buffett report about See's Candies in 1989?",
+      "relevant_ids": ["1989_p0033"],
+      "hard_negative_ids": ["1989_p0018"]
+    },
+    {
+      "qid": "hn08_greg_meeting_vs_midamerican",
+      "query": "What role did Greg Abel have at Berkshire's 2020 annual meeting?",
+      "relevant_ids": ["2020_p0081"],
+      "hard_negative_ids": ["2005_p0049"]
+    }
+  ],
+  "derived_from": "hard_negatives_v2.json + chunk_id_map_v2_to_v3.jsonl"
+}

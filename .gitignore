@@ -25,11 +25,13 @@ env/
 .env
 .env.*
 !.env.example
+.streamlit/secrets.toml
 
-# Generated/local indexes
+# Generated/local indexes and local backup archives
 indices/
 *.faiss
 *.index
+data/evaluation/**/source-before.tar.gz
 chroma/
 
 # Frontend build artifacts

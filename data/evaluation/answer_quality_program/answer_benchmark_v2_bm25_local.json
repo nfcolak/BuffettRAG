@@ -1,0 +1,257 @@
+{
+  "schema_version": 1,
+  "mode": "offline_bm25_embedded_extractive_not_live_llm_quality",
+  "corpus": "data/processed/chunks_v2.jsonl",
+  "n_cases": 8,
+  "accepted": 5,
+  "rows": [
+    {
+      "qid": "aq01_derivatives",
+      "answer": "In our view, however, derivatives are financial weapons of mass destruction, carrying dangers that, while now latent, are potentially lethal. [1]\n\nthat leads to mass devastation, the value of all equity investments will almost certainly be decimated. [2]\n\nThe probability of such mass destruction in any given year is likely very small. [3]",
+      "retrieved_ids": [
+        "2002_86",
+        "2015_144",
+        "2015_142",
+        "2014_239",
+        "2014_236",
+        "2003_87",
+        "1994_65",
+        "1989_152"
+      ],
+      "accepted": true,
+      "claim_coverage": 1.0,
+      "claims": [
+        {
+          "claim": "Buffett called derivatives financial weapons of mass destruction.",
+          "met": true
+        }
+      ],
+      "cited_passage_ids": [
+        "2002_86",
+        "2015_142",
+        "2015_144"
+      ],
+      "has_gold_citation": true,
+      "forbidden_terms_found": []
+    },
+    {
+      "qid": "aq02_crisis",
+      "answer": "If you believe that American investors are now more stable than in the past, think back to September 2008. [1]\n\nWhen the financial system went into cardiac arrest in September 2008, Berkshire was a supplier of liquidity and capital to the system, not a supplicant. [3]\n\nAfter September 11th, his quickness to respond, always important, has become a major competitive advantage. [5]",
+      "retrieved_ids": [
+        "2023_20",
+        "2014_230",
+        "2009_21",
+        "2014_199",
+        "2001_58",
+        "1981_71",
+        "2015_127",
+        "2009_76"
+      ],
+      "accepted": false,
+      "claim_coverage": 0.5,
+      "claims": [
+        {
+          "claim": "Berkshire supplied liquidity and capital during the crisis.",
+          "met": true
+        },
+        {
+          "claim": "It committed $15.5 billion.",
+          "met": false
+        }
+      ],
+      "cited_passage_ids": [
+        "2001_58",
+        "2009_21",
+        "2023_20"
+      ],
+      "has_gold_citation": true,
+      "forbidden_terms_found": []
+    },
+    {
+      "qid": "aq03_bnsf",
+      "answer": "Why did Berkshire’s acquisition of companies outside the insurance business work out so well for Berkshire shareholders when the normal result in such acquisitions is bad for shareholders of the acquirer? [1]\n\nNevertheless, BNSF has paid substantial dividends to Berkshire – $41.8 billion in total. [3]\n\nOur purchase is contingent upon the acquisition of American Broadcasting Companies, Inc. by Capital Cities, and will close when that transaction closes. [6]",
+      "retrieved_ids": [
+        "2014_239",
+        "2014_236",
+        "2020_76",
+        "1989_152",
+        "1987_10",
+        "1984_142",
+        "2015_162",
+        "1994_25"
+      ],
+      "accepted": false,
+      "claim_coverage": 0.0,
+      "claims": [
+        {
+          "claim": "Berkshire and BNSF announced a firm deal.",
+          "met": false
+        },
+        {
+          "claim": "Buffett predicted BNSF would be a key asset.",
+          "met": false
+        }
+      ],
+      "cited_passage_ids": [
+        "1984_142",
+        "2014_239",
+        "2020_76"
+      ],
+      "has_gold_citation": false,
+      "forbidden_terms_found": []
+    },
+    {
+      "qid": "aq04_apple",
+      "answer": "Yet our “share” of Apple’s earnings amounted to a staggering $5.6 billion. [1]\n\nAt Apple and Amex, repurchases increased Berkshire’s ownership a bit without any cost to us. [2]\n\nNew shareholders can get an understanding of its value by reading our annually updated explanation of float on page A-2. * * * * * * * * * * * * A very minor gain in per-share intrinsic value took place in 2022 through Berkshire share repurchases as well as similar moves at Apple and American Express, both significant investees of ours. [6]",
+      "retrieved_ids": [
+        "2021_30",
+        "2022_28",
+        "2020_36",
+        "2014_223",
+        "2020_34",
+        "2022_27",
+        "2023_29",
+        "2015_162"
+      ],
+      "accepted": true,
+      "claim_coverage": 1.0,
+      "claims": [
+        {
+          "claim": "Apple repurchases increased Berkshire's share.",
+          "met": true
+        },
+        {
+          "claim": "Berkshire's share of Apple earnings was $5.6 billion.",
+          "met": true
+        }
+      ],
+      "cited_passage_ids": [
+        "2021_30",
+        "2022_27",
+        "2022_28"
+      ],
+      "has_gold_citation": true,
+      "forbidden_terms_found": []
+    },
+    {
+      "qid": "aq05_index",
+      "answer": "(I have to use cash for individual bequests, because all of my Berkshire shares will be fully distributed to certain philanthropic organizations over the ten years following the closing of my estate.) My advice to the trustee could not be more simple: Put 10% of the cash in short-term government bonds and 90% in a very low-cost S&P 500 index fund. [3]\n\nMost investors, both institutional and individual, will find that the best way to own common stocks is through an index fund that charges minimal fees. [4]\n\nInvestors, on average and over time, will do better with a low-cost index fund than with a group of funds of funds. [6]",
+      "retrieved_ids": [
+        "2020_62",
+        "2014_236",
+        "2013_114",
+        "1996_92",
+        "2016_128",
+        "2016_129",
+        "1992_124",
+        "2016_137"
+      ],
+      "accepted": true,
+      "claim_coverage": 1.0,
+      "claims": [
+        {
+          "claim": "Most investors should use a low-fee index fund.",
+          "met": true
+        }
+      ],
+      "cited_passage_ids": [
+        "1996_92",
+        "2013_114",
+        "2016_129"
+      ],
+      "has_gold_citation": true,
+      "forbidden_terms_found": []
+    },
+    {
+      "qid": "aq06_dividends",
+      "answer": "Of course, a shareholder in our dividend-paying scenario could turn around and use his dividends to purchase more shares. [2]\n\nNote one crucial factor allowing this record-shattering payment: Berkshire shareholders during the same 1965-2024 period received only one cash dividend. [7]\n\nUnless passive rates fall, companies achieving 14% per year gains in earnings per share while paying no cash dividend are an economic failure for their individual shareholders. [8]",
+      "retrieved_ids": [
+        "2014_239",
+        "2012_123",
+        "2014_233",
+        "2008_63",
+        "2014_223",
+        "1986_11",
+        "2024_20",
+        "1981_35"
+      ],
+      "accepted": false,
+      "claim_coverage": 0.5,
+      "claims": [
+        {
+          "claim": "Some shareholders wanted a cash dividend.",
+          "met": true
+        },
+        {
+          "claim": "Berkshire paid out nothing itself.",
+          "met": false
+        }
+      ],
+      "cited_passage_ids": [
+        "1981_35",
+        "2012_123",
+        "2024_20"
+      ],
+      "has_gold_citation": false,
+      "forbidden_terms_found": []
+    },
+    {
+      "qid": "aq07_see",
+      "answer": "How can we miss with a fellow like that - particularly when he comes equipped with a talented and energetic family, Alan, Marvin Cohn, and Don Yale. o At See's Candies we had an 8% increase in pounds sold, even though 1988 was itself a record year. [1]\n\nAlso available will be plenty of Cherry Cokes, See's candies, and other lesser goodies. [2]\n\nWe failed: Let's call the group \"The Sainted Seven Plus One.\" This divine assemblage - Borsheim's, The Buffalo News, Fechheimer Bros., Kirby, Nebraska Furniture Mart, Scott Fetzer Manufacturing Group, See's Candies, World Book - is a collection of businesses with economic characteristics that range from good to superb. [3]",
+      "retrieved_ids": [
+        "1989_33",
+        "1992_124",
+        "1989_27",
+        "1989_18",
+        "1990_10",
+        "2015_162",
+        "2014_236",
+        "1989_39"
+      ],
+      "accepted": true,
+      "claim_coverage": 1.0,
+      "claims": [
+        {
+          "claim": "See's Candies had an 8% increase in pounds sold.",
+          "met": true
+        }
+      ],
+      "cited_passage_ids": [
+        "1989_27",
+        "1989_33",
+        "1992_124"
+      ],
+      "has_gold_citation": true,
+      "forbidden_terms_found": []
+    },
+    {
+      "qid": "aq08_greg_abel",
+      "answer": "There will be one important change, however, in our format: I’ve had suggestions from shareholders, media and board members that Ajit Jain and Greg Abel – our two key operating managers – be given more exposure at the meeting. [1]\n\nWe live in a very litigious society.) * * * * * * * * * * * * At 94, it won’t be long before Greg Abel replaces me as CEO and will be writing the annual letters. [2]\n\nGreg Abel, one of Berkshire’s Vice Chairmen, joined me on stage facing a dark arena, 18,000 empty seats and a camera. [3]",
+      "retrieved_ids": [
+        "2019_80",
+        "2024_3",
+        "2020_81",
+        "2023_57",
+        "1998_44",
+        "2005_50",
+        "2020_84",
+        "2017_96"
+      ],
+      "accepted": true,
+      "claim_coverage": 1.0,
+      "claims": [
+        {
+          "claim": "Greg Abel was a Berkshire vice chairman and joined Buffett on stage.",
+          "met": true
+        }
+      ],
+      "cited_passage_ids": [
+        "2019_80",
+        "2020_81",
+        "2024_3"
+      ],
+      "has_gold_citation": true,
+      "forbidden_terms_found": []
+    }
+  ]
+}

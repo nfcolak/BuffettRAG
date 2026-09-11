@@ -1,0 +1,201 @@
+{
+  "schema_version": 1,
+  "configurations": {
+    "bm25": {
+      "status": "ok",
+      "summary": {
+        "n_cases": 8,
+        "recall_at_8": 1.0,
+        "citation_support": 1.0,
+        "mean_latency_ms": 10.464745125000064
+      },
+      "rows": [
+        {
+          "qid": "aq01_derivatives",
+          "recall_at_8": 1.0,
+          "citation_support": 1.0,
+          "latency_ms": 13.592416999999912
+        },
+        {
+          "qid": "aq02_crisis",
+          "recall_at_8": 1.0,
+          "citation_support": 1.0,
+          "latency_ms": 9.857499999999852
+        },
+        {
+          "qid": "aq03_bnsf",
+          "recall_at_8": 1.0,
+          "citation_support": 1.0,
+          "latency_ms": 12.14045900000027
+        },
+        {
+          "qid": "aq04_apple",
+          "recall_at_8": 1.0,
+          "citation_support": 1.0,
+          "latency_ms": 8.610208000000341
+        },
+        {
+          "qid": "aq05_index",
+          "recall_at_8": 1.0,
+          "citation_support": 1.0,
+          "latency_ms": 9.56133399999981
+        },
+        {
+          "qid": "aq06_dividends",
+          "recall_at_8": 1.0,
+          "citation_support": 1.0,
+          "latency_ms": 8.53162499999982
+        },
+        {
+          "qid": "aq07_see",
+          "recall_at_8": 1.0,
+          "citation_support": 1.0,
+          "latency_ms": 10.971834000000236
+        },
+        {
+          "qid": "aq08_greg_abel",
+          "recall_at_8": 1.0,
+          "citation_support": 1.0,
+          "latency_ms": 10.452584000000265
+        }
+      ],
+      "wall_time_ms": 83.772
+    },
+    "embedding_only": {
+      "status": "ok",
+      "summary": {
+        "n_cases": 8,
+        "recall_at_8": 0.75,
+        "citation_support": 0.75,
+        "mean_latency_ms": 142.05019262499965
+      },
+      "rows": [
+        {
+          "qid": "aq01_derivatives",
+          "recall_at_8": 1.0,
+          "citation_support": 1.0,
+          "latency_ms": 985.4991249999996
+        },
+        {
+          "qid": "aq02_crisis",
+          "recall_at_8": 1.0,
+          "citation_support": 1.0,
+          "latency_ms": 21.4826669999999
+        },
+        {
+          "qid": "aq03_bnsf",
+          "recall_at_8": 1.0,
+          "citation_support": 1.0,
+          "latency_ms": 25.647708999999352
+        },
+        {
+          "qid": "aq04_apple",
+          "recall_at_8": 1.0,
+          "citation_support": 1.0,
+          "latency_ms": 19.97466600000042
+        },
+        {
+          "qid": "aq05_index",
+          "recall_at_8": 0.0,
+          "citation_support": 0.0,
+          "latency_ms": 20.56933299999919
+        },
+        {
+          "qid": "aq06_dividends",
+          "recall_at_8": 1.0,
+          "citation_support": 1.0,
+          "latency_ms": 19.758249999999755
+        },
+        {
+          "qid": "aq07_see",
+          "recall_at_8": 1.0,
+          "citation_support": 1.0,
+          "latency_ms": 22.82245799999938
+        },
+        {
+          "qid": "aq08_greg_abel",
+          "recall_at_8": 0.0,
+          "citation_support": 0.0,
+          "latency_ms": 20.647332999999435
+        }
+      ],
+      "wall_time_ms": 1136.566
+    },
+    "embedding_reranker": {
+      "status": "ok",
+      "summary": {
+        "n_cases": 8,
+        "recall_at_8": 0.875,
+        "citation_support": 0.875,
+        "mean_latency_ms": 4823.9602187499995
+      },
+      "rows": [
+        {
+          "qid": "aq01_derivatives",
+          "recall_at_8": 1.0,
+          "citation_support": 1.0,
+          "latency_ms": 7543.497208000001
+        },
+        {
+          "qid": "aq02_crisis",
+          "recall_at_8": 1.0,
+          "citation_support": 1.0,
+          "latency_ms": 4154.925332999997
+        },
+        {
+          "qid": "aq03_bnsf",
+          "recall_at_8": 1.0,
+          "citation_support": 1.0,
+          "latency_ms": 4669.374041999998
+        },
+        {
+          "qid": "aq04_apple",
+          "recall_at_8": 1.0,
+          "citation_support": 1.0,
+          "latency_ms": 4567.719083
+        },
+        {
+          "qid": "aq05_index",
+          "recall_at_8": 0.0,
+          "citation_support": 0.0,
+          "latency_ms": 4238.7312090000005
+        },
+        {
+          "qid": "aq06_dividends",
+          "recall_at_8": 1.0,
+          "citation_support": 1.0,
+          "latency_ms": 4508.3200830000005
+        },
+        {
+          "qid": "aq07_see",
+          "recall_at_8": 1.0,
+          "citation_support": 1.0,
+          "latency_ms": 4568.639542
+        },
+        {
+          "qid": "aq08_greg_abel",
+          "recall_at_8": 1.0,
+          "citation_support": 1.0,
+          "latency_ms": 4340.475250000004
+        }
+      ],
+      "wall_time_ms": 38591.833
+    }
+  },
+  "mode": "offline_retrieval_ablation_no_generation_provider",
+  "corpus": "data/processed/chunks_v3_paragraph.jsonl",
+  "corpus_sha256": "8263f08958729a77febf0922e7bbc4161bedd5fdb3e9a8b3fc9a64ab681ab5f0",
+  "cases": "data/evaluation/answer_quality_program/answer_benchmark_v3.json",
+  "cases_sha256": "2832d202750db493cff5e7a38f9353d8e734f5e9d85f0347e5f436f82c94de8a",
+  "models": {
+    "embedding": {
+      "model": "BAAI/bge-base-en-v1.5",
+      "dimension": 768,
+      "status": "ok"
+    },
+    "reranker": {
+      "model": "BAAI/bge-reranker-v2-m3",
+      "status": "ok"
+    }
+  }
+}

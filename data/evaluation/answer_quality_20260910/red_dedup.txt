@@ -1,0 +1,22 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+___________ test_dedup_retains_different_years_numbers_and_negation ____________
+
+    def test_dedup_retains_different_years_numbers_and_negation():
+        from src.retrieval.retriever import deduplicate_hits
+        from src.vector_store import SearchHit
+        docs = load_chunks_as_docs(ROOT / 'data/processed/chunks_v2.jsonl')
+        original = docs[0].text
+        a = SearchHit('a', original, {'year': 1977}, 1.0)
+        changed_number = SearchHit('b', original.replace('21,904,000', '31,904,000'), {'year': 1977}, 0.9)
+        changed_negation = SearchHit('c', original.replace('are not included', 'are included'), {'year': 1977}, 0.8)
+        different_year = SearchHit('d', original, {'year': 1978}, 0.7)
+>       assert len(deduplicate_hits([a, changed_number, changed_negation, different_year])) == 4
+E       AssertionError: assert 1 == 4
+E        +  where 1 = len([SearchHit(id='a', text='To the Stockholders of Berkshire Hathaway Inc.:\n\nOperating earnings in 1977 of $21,904,000,...ecord regarding aggregate\ncapital gains or losses obviously is of significance.', metadata={'year': 1977}, score=1.0)])
+E        +    where [SearchHit(id='a', text='To the Stockholders of Berkshire Hathaway Inc.:\n\nOperating earnings in 1977 of $21,904,000,...ecord regarding aggregate\ncapital gains or losses obviously is of significance.', metadata={'year': 1977}, score=1.0)] = <function deduplicate_hits at 0x1325c23a0>([SearchHit(id='a', text='To the Stockholders of Berkshire Hathaway Inc.:\n\nOperating earnings in 1977 of $21,904,000,...ecord regarding aggregate\ncapital gains or losses obviously is of significance.', metadata={'year': 1978}, score=0.7)])
+
+tests/test_answer_quality.py:189: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_answer_quality.py::test_dedup_retains_different_years_numbers_and_negation
+1 failed in 0.68s

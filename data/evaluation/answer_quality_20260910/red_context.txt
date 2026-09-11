@@ -1,0 +1,47 @@
+.FF                                                                      [100%]
+=================================== FAILURES ===================================
+_____ test_context_budget_preserves_anchor_without_repeating_real_overlap ______
+
+    def test_context_budget_preserves_anchor_without_repeating_real_overlap():
+        from src.retrieval.context import _compose_context
+        docs = load_chunks_as_docs(ROOT / 'data/processed/chunks_v2.jsonl')
+        # Real 1977 letter fragment, repeated as overlapping windows.
+        anchor = docs[0].text
+        before = anchor[:120]
+>       assert _compose_context(before=[before], current=anchor, after=[],
+                                max_chars=len(anchor) + 1) == anchor
+E       AssertionError: assert 'To the Stock...significance.' == 'To the Stock...significance.'
+E         
+E         Skipping 110 identical leading characters in diff, use -v to show
+E         + e, were mo
+E         + 
+E         + To the Stockholders of Berkshire Hathaway Inc.:
+E         + 
+E         + Operating earnings in 1977 of $21,904,000, or $22.54 per...
+E         
+E         ...Full output truncated (12 lines hidden), use '-vv' to show
+
+tests/test_answer_quality.py:21: AssertionError
+__________________ test_context_never_crosses_letter_boundary __________________
+
+    def test_context_never_crosses_letter_boundary():
+        from src.retrieval.context import build_doc_lookup, expand_hits_with_neighbors
+        from src.vector_store import SearchHit, StoredDoc
+        a = StoredDoc('a', 'Original evidence', {'year': 2008, 'source_file': '2008.pdf', 'next_chunk_id': 'b'})
+        b = StoredDoc('b', 'Unrelated later letter', {'year': 2009, 'source_file': '2009.pdf'})
+        hit = SearchHit(a.id, a.text, a.metadata, 1.0)
+        expanded = expand_hits_with_neighbors([hit], build_doc_lookup([a, b]))
+>       assert expanded[0].text == a.text
+E       AssertionError: assert 'Original evi... later letter' == 'Original evidence'
+E         
+E         - Original evidence
+E         + Original evidence
+E         ?                  +
+E         + 
+E         + Unrelated later letter
+
+tests/test_answer_quality.py:36: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_answer_quality.py::test_context_budget_preserves_anchor_without_repeating_real_overlap
+FAILED tests/test_answer_quality.py::test_context_never_crosses_letter_boundary
+2 failed, 1 passed in 0.77s

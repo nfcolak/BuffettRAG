@@ -30,7 +30,9 @@ _STOPWORDS = frozenset(
     letters shareholder""".split()
 )
 
-_MAX_SENTENCES = 3
+_MAX_ANCHORS = 3
+_MAX_SENTENCES = 6
+_CONTEXT_RADIUS = 2
 _CHARS_PER_TOKEN = 4
 
 
@@ -61,41 +63,70 @@ class LocalProvider:
         if not query_words:
             return REFUSAL_LINE
 
-        # Score every sentence by content-word overlap with the question,
-        # with a small bonus for earlier (higher-ranked) passages.
-        scored: List[Tuple[float, int, str]] = []
+        # Select a few high-overlap anchor sentences from distinct passages,
+        # then include nearby sentences from the same passage. Facts such as a
+        # quantity or consequence often follow the sentence that names the event.
+        passage_sentences: List[List[str]] = []
+        scored: List[Tuple[float, int, int, int, str]] = []
         for rank, (number, text) in enumerate(passages):
-            for sentence in _split_sentences(text):
+            sentences = _split_sentences(text)
+            passage_sentences.append(sentences)
+            for position, sentence in enumerate(sentences):
                 overlap = len(query_words & set(_content_words(sentence)))
                 if overlap == 0:
                     continue
                 score = overlap + (len(passages) - rank) * 0.01
-                scored.append((score, int(number), sentence))
+                scored.append((score, rank, int(number), position, sentence))
 
         if not scored:
             return REFUSAL_LINE
 
         scored.sort(key=lambda item: item[0], reverse=True)
-
-        budget = (max_new_tokens or 300) * _CHARS_PER_TOKEN
-        picked: List[Tuple[int, str]] = []
-        used_chars = 0
+        anchors: List[Tuple[float, int, int, int]] = []
         seen_passages = set()
         seen_sentences = set()
-        for _, number, sentence in scored:
-            # At most one sentence per passage keeps the answer diverse, and
-            # overlapping chunks can repeat the same sentence verbatim.
+        for score, rank, number, position, sentence in scored:
             fingerprint = re.sub(r"\W+", "", sentence.lower())
-            if number in seen_passages or fingerprint in seen_sentences:
+            if rank in seen_passages or fingerprint in seen_sentences:
                 continue
-            if used_chars + len(sentence) > budget and picked:
-                break
-            picked.append((number, sentence))
-            seen_passages.add(number)
+            anchors.append((score, rank, number, position))
+            seen_passages.add(rank)
             seen_sentences.add(fingerprint)
-            used_chars += len(sentence)
+            if len(anchors) >= _MAX_ANCHORS:
+                break
+
+        candidates: List[Tuple[float, int, int, int]] = list(anchors)
+        for score, rank, number, position in anchors:
+            sentences = passage_sentences[rank]
+            for distance in range(1, _CONTEXT_RADIUS + 1):
+                for neighbor in (position - distance, position + distance):
+                    if 0 <= neighbor < len(sentences):
+                        candidates.append((score - distance * 0.1, rank, number, neighbor))
+        candidates.sort(key=lambda item: item[0], reverse=True)
+
+        budget = (max_new_tokens or 300) * _CHARS_PER_TOKEN
+        picked: List[Tuple[int, int, str]] = []
+        used_chars = 0
+        seen_locations = set()
+        seen_sentences = set()
+        for _, rank, number, position in candidates:
+            location = (rank, position)
+            sentence = passage_sentences[rank][position]
+            fingerprint = re.sub(r"\W+", "", sentence.lower())
+            if location in seen_locations or fingerprint in seen_sentences:
+                continue
+            rendered_length = len(sentence) + len(str(number)) + 3
+            separator_length = 2 if picked else 0
+            if used_chars + separator_length + rendered_length > budget:
+                continue
+            picked.append((number, position, sentence))
+            seen_locations.add(location)
+            seen_sentences.add(fingerprint)
+            used_chars += separator_length + rendered_length
             if len(picked) >= _MAX_SENTENCES:
                 break
 
-        picked.sort(key=lambda item: item[0])
-        return "\n\n".join(f"{sentence} [{number}]" for number, sentence in picked)
+        if not picked:
+            return REFUSAL_LINE
+        picked.sort(key=lambda item: (item[0], item[1]))
+        return "\n\n".join(f"{sentence} [{number}]" for number, _, sentence in picked)

@@ -1,0 +1,84 @@
+...FFF                                                                   [100%]
+=================================== FAILURES ===================================
+________ test_comparison_retains_both_periods_after_one_sided_reranking ________
+
+    def test_comparison_retains_both_periods_after_one_sided_reranking():
+        from src.retrieval.retriever import Retriever
+        from src.vector_store import SearchHit
+        docs = load_chunks_as_docs(ROOT / 'data/processed/chunks_v2.jsonl')
+        period_docs = {y: [d for d in docs if d.metadata['year'] == y][:5] for y in (1990, 2020)}
+    
+        class PeriodRetriever(Retriever):
+            def _hybrid_for_filter(self, query, fetch_k, where):
+                year = where['year']['$gte']
+                return [SearchHit(d.id, d.text, d.metadata, 1.0) for d in period_docs[year]]
+    
+        class OneSidedReranker:
+            def rerank(self, query, hits, top_k):
+                return sorted(hits, key=lambda h: h.metadata['year'])[:top_k]
+    
+        retriever = PeriodRetriever(None, None, docs, OneSidedReranker())
+        result = retriever.search('Compare earnings in the 1990s and 2020s', top_k=2, rerank=True)
+>       assert {h.metadata['year'] for h in result.hits} == {1990, 2020}
+E       assert {1990} == {1990, 2020}
+E         
+E         Extra items in the right set:
+E         2020
+E         Use -v to get more diff
+
+tests/test_answer_quality.py:56: AssertionError
+__________ test_repeated_decade_does_not_crash_or_create_two_periods ___________
+
+    def test_repeated_decade_does_not_crash_or_create_two_periods():
+        from src.retrieval.retriever import detect_temporal_comparison
+>       assert detect_temporal_comparison('Compare the 1990s with the 1990s') is None
+
+tests/test_answer_quality.py:61: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+query = 'Compare the 1990s with the 1990s'
+
+    def detect_temporal_comparison(query: str) -> Optional[List[Dict[str, Any]]]:
+        """Detect whether a query compares two distinct time periods.
+    
+        Returns a list of two year-filter dicts (one per period) when a temporal
+        comparison pattern is found, or None otherwise.
+    
+        Examples that trigger this:
+            "How has Buffett's view on technology changed from the 1990s to the 2020s?"
+            "Compare Buffett's inflation views in the 1970s vs the 2000s"
+            "How did Berkshire evolve from 1980 to 2010?"
+        """
+        q = query.strip()
+    
+        if not _TEMPORAL_COMPARISON_RE.search(q):
+            return None
+    
+        decades_found = _DECADE_WORD_RE.findall(q)
+        if len(decades_found) >= 2:
+            seen: List[str] = []
+            for d in decades_found:
+                key = d.lower()
+                if key not in seen:
+                    seen.append(key)
+                if len(seen) == 2:
+                    break
+            a1, b1 = _DECADE_WORD_TO_RANGE[seen[0]]
+>           a2, b2 = _DECADE_WORD_TO_RANGE[seen[1]]
+E           IndexError: list index out of range
+
+src/retrieval/retriever.py:108: IndexError
+__ test_explicit_year_comparison_uses_requested_years_not_intervening_decades __
+
+    def test_explicit_year_comparison_uses_requested_years_not_intervening_decades():
+        from src.retrieval.retriever import detect_temporal_comparison
+>       assert detect_temporal_comparison('Compare 2008 versus 2020') == [{'year': 2008}, {'year': 2020}]
+E       AssertionError: assert None == [{'year': 2008}, {'year': 2020}]
+E        +  where None = <function detect_temporal_comparison at 0x132cc3c10>('Compare 2008 versus 2020')
+
+tests/test_answer_quality.py:66: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_answer_quality.py::test_comparison_retains_both_periods_after_one_sided_reranking
+FAILED tests/test_answer_quality.py::test_repeated_decade_does_not_crash_or_create_two_periods
+FAILED tests/test_answer_quality.py::test_explicit_year_comparison_uses_requested_years_not_intervening_decades
+3 failed, 3 passed in 0.94s

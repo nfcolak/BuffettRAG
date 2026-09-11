@@ -33,7 +33,7 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, Sequence
 
 from config import DEFAULT_TOP_K, RETRIEVAL_FETCH_K, RRF_K
-from src.retrieval.bm25 import BM25Retriever
+from src.retrieval.bm25 import BM25Retriever, _meta_matches
 from src.vector_store import SearchHit, StoredDoc
 
 if TYPE_CHECKING:
@@ -104,8 +104,12 @@ def detect_temporal_comparison(query: str) -> Optional[List[Dict[str, Any]]]:
                 seen.append(key)
             if len(seen) == 2:
                 break
+        if len(seen) < 2:
+            return None
         a1, b1 = _DECADE_WORD_TO_RANGE[seen[0]]
         a2, b2 = _DECADE_WORD_TO_RANGE[seen[1]]
+        if (a1, b1) == (a2, b2):
+            return None
         return [
             {"year": {"$gte": a1, "$lte": b1}},
             {"year": {"$gte": a2, "$lte": b2}},
@@ -121,6 +125,9 @@ def detect_temporal_comparison(query: str) -> Optional[List[Dict[str, Any]]]:
                 {"year": {"$gte": mid + 1, "$lte": y2}},
             ]
 
+    years = list(dict.fromkeys(int(y) for y in _YEAR_RE.findall(q)))
+    if len(years) == 2:
+        return [{"year": year} for year in years]
     return None
 
 
@@ -194,7 +201,14 @@ def deduplicate_hits(hits: Sequence[SearchHit]) -> List[SearchHit]:
     for hit in hits:
         tokens = set(_DEDUP_TOKEN_RE.findall(hit.text.lower()))
         is_dup = False
-        for seen in kept_tokens:
+        for previous, seen in zip(kept, kept_tokens):
+            if hit.metadata.get("year") != previous.metadata.get("year"):
+                continue
+            # Small changes to quantities/polarity are material evidence, even
+            # when almost every other token is identical. Preserve them.
+            guard = r"\b(?:\d+(?:[.,]\d+)*|not|never|no|without)\b"
+            if re.findall(guard, hit.text.lower()) != re.findall(guard, previous.text.lower()):
+                continue
             overlap = len(tokens & seen)
             union = len(tokens | seen) or 1
             smaller = min(len(tokens), len(seen)) or 1
@@ -268,17 +282,34 @@ class Retriever:
             hits = self._hybrid_for_filter(query, fetch_k, filt)
             sub_rankings.append(hits)
 
-        candidates = reciprocal_rank_fusion(sub_rankings, top_k=fetch_k)
-
+        # Keep every period's candidate pool until after reranking. Global
+        # truncation can otherwise remove an entire side of a comparison.
+        candidates = reciprocal_rank_fusion(
+            sub_rankings, top_k=sum(len(hits) for hits in sub_rankings)
+        )
         reranked = False
         if rerank and self.reranker is not None and candidates:
-            rerank_pool = self.reranker.rerank(
-                query, candidates, top_k=min(len(candidates), max(top_k * 2, top_k + 4))
-            )
-            candidates = deduplicate_hits(rerank_pool)[:top_k]
+            candidates = self.reranker.rerank(query, candidates, top_k=len(candidates))
             reranked = True
-        else:
-            candidates = deduplicate_hits(candidates)[:top_k]
+
+        # Reserve the best supported candidate per nonempty period; fill the
+        # remainder by relevance. Dedupe within periods, never across years.
+        buckets = [deduplicate_hits([h for h in candidates if _meta_matches(h.metadata, filt)])
+                   for filt in subquery_filters]
+        selected = []
+        seen_ids = set()
+        for bucket in buckets:
+            if bucket and len(selected) < top_k and bucket[0].id not in seen_ids:
+                selected.append(bucket[0])
+                seen_ids.add(bucket[0].id)
+        eligible = {h.id for bucket in buckets for h in bucket}
+        for hit in candidates:
+            if len(selected) >= top_k:
+                break
+            if hit.id in eligible and hit.id not in seen_ids:
+                selected.append(hit)
+                seen_ids.add(hit.id)
+        candidates = selected
 
         filter_summary = {"multi_subquery": subquery_filters}
         return RetrievalResult(
@@ -298,6 +329,7 @@ class Retriever:
         rerank: bool = False,
         where: Optional[Dict[str, Any]] = None,
         auto_year_filter: bool = True,
+        retrieval_query: Optional[str] = None,
     ) -> "RetrievalResult":
         applied_filter: Optional[Dict[str, Any]] = dict(where) if where else None
 
@@ -326,6 +358,11 @@ class Retriever:
             candidates = self._vector_search(query, top_k=fetch_k, where=applied_filter)
         elif strategy in ("hybrid", "hybrid_multi"):
             candidates = self._hybrid_for_filter(query, fetch_k, applied_filter)
+            if retrieval_query and retrieval_query != query:
+                expanded = self._hybrid_for_filter(retrieval_query, fetch_k, applied_filter)
+                # Expansion proposes candidates; it never replaces original
+                # intent, invents a year filter, or becomes the rerank question.
+                candidates = reciprocal_rank_fusion([candidates, expanded], top_k=fetch_k)
             if auto_applied:
                 # The auto-detected year filter is a guess; treat it as a boost
                 # rather than a hard constraint so a wrong guess cannot zero

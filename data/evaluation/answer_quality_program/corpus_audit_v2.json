@@ -1,0 +1,490 @@
+{
+  "n_sources": 48,
+  "n_chunks": 5833,
+  "duplicate_ids": 0,
+  "bad_neighbor_links": [],
+  "empty_source_files": [],
+  "note": "Line/paragraph and sentence-end counts are diagnostics, not quality labels. Tables/headings need layout-aware inspection.",
+  "files": [
+    {
+      "file": "buffet_1977.txt",
+      "source_sha256": "28c68929134055f09fc5b5197ff967ebb2e810b38d5f55fa5dc03b4e90eb3693",
+      "extracted_chars": 19768,
+      "paragraph_breaks": 39,
+      "line_breaks": 377,
+      "stored_chunks": 35,
+      "chunks_with_paragraph_breaks": 12,
+      "chunks_without_sentence_end": 13
+    },
+    {
+      "file": "buffet_1978.txt",
+      "source_sha256": "d0ead337e5b7d1c44a8732a1c3d3dbf60d214ee15802501d8d07a790c2f19e55",
+      "extracted_chars": 27858,
+      "paragraph_breaks": 53,
+      "line_breaks": 533,
+      "stored_chunks": 49,
+      "chunks_with_paragraph_breaks": 16,
+      "chunks_without_sentence_end": 23
+    },
+    {
+      "file": "buffet_1979.txt",
+      "source_sha256": "4f65e6438bb8aa7e00a9e5b3a6d0069720b764946c3186623d34c405a694febf",
+      "extracted_chars": 41145,
+      "paragraph_breaks": 83,
+      "line_breaks": 793,
+      "stored_chunks": 72,
+      "chunks_with_paragraph_breaks": 26,
+      "chunks_without_sentence_end": 25
+    },
+    {
+      "file": "buffet_1980.txt",
+      "source_sha256": "2371b54d45279155a14d314b6927dfcc7e4506fdf408a52d9c7bfbdc90b88cb8",
+      "extracted_chars": 47186,
+      "paragraph_breaks": 101,
+      "line_breaks": 913,
+      "stored_chunks": 84,
+      "chunks_with_paragraph_breaks": 24,
+      "chunks_without_sentence_end": 23
+    },
+    {
+      "file": "buffet_1981.txt",
+      "source_sha256": "4527762eddf004719ebc3c051852e6043934c110b50e7021c4da904687ca89be",
+      "extracted_chars": 42761,
+      "paragraph_breaks": 99,
+      "line_breaks": 846,
+      "stored_chunks": 77,
+      "chunks_with_paragraph_breaks": 31,
+      "chunks_without_sentence_end": 22
+    },
+    {
+      "file": "buffet_1982.txt",
+      "source_sha256": "53ba89da6184c6abf321b844c74ee1720dae88b4bc9a0038cac67017fca06361",
+      "extracted_chars": 49962,
+      "paragraph_breaks": 121,
+      "line_breaks": 995,
+      "stored_chunks": 89,
+      "chunks_with_paragraph_breaks": 33,
+      "chunks_without_sentence_end": 32
+    },
+    {
+      "file": "buffet_1983.txt",
+      "source_sha256": "11e007d1277cc05bbc78fb2f301d9f787915a7c921bb3cad5da5add9de4e5c1d",
+      "extracted_chars": 70656,
+      "paragraph_breaks": 175,
+      "line_breaks": 1200,
+      "stored_chunks": 131,
+      "chunks_with_paragraph_breaks": 49,
+      "chunks_without_sentence_end": 35
+    },
+    {
+      "file": "buffet_1984.txt",
+      "source_sha256": "65419ad88a274c604fed1ea03565c7141468fd65be6323272193b4b88902b860",
+      "extracted_chars": 78660,
+      "paragraph_breaks": 147,
+      "line_breaks": 1495,
+      "stored_chunks": 143,
+      "chunks_with_paragraph_breaks": 30,
+      "chunks_without_sentence_end": 55
+    },
+    {
+      "file": "buffet_1985.txt",
+      "source_sha256": "9c4b4784223608a955298645f6bacf16a2e321250a6ec8330a083ac8ededd45f",
+      "extracted_chars": 83679,
+      "paragraph_breaks": 172,
+      "line_breaks": 1606,
+      "stored_chunks": 150,
+      "chunks_with_paragraph_breaks": 41,
+      "chunks_without_sentence_end": 40
+    },
+    {
+      "file": "buffet_1986.txt",
+      "source_sha256": "3725aca63c5ec6695f9658ca0c1faae9de8d4b2d2844f93d05ae60befe1a31e4",
+      "extracted_chars": 84315,
+      "paragraph_breaks": 292,
+      "line_breaks": 1633,
+      "stored_chunks": 151,
+      "chunks_with_paragraph_breaks": 54,
+      "chunks_without_sentence_end": 35
+    },
+    {
+      "file": "buffet_1987.txt",
+      "source_sha256": "a4ab212860579458c81730ffcff1459e873ca612cc29cc2bf970178407fc9923",
+      "extracted_chars": 76333,
+      "paragraph_breaks": 180,
+      "line_breaks": 1497,
+      "stored_chunks": 135,
+      "chunks_with_paragraph_breaks": 45,
+      "chunks_without_sentence_end": 24
+    },
+    {
+      "file": "buffet_1988.txt",
+      "source_sha256": "9681acdc46cae551e3380de8ae9a97a47bbaa95390c6c08af154bb0659f4fc55",
+      "extracted_chars": 71717,
+      "paragraph_breaks": 192,
+      "line_breaks": 1440,
+      "stored_chunks": 126,
+      "chunks_with_paragraph_breaks": 59,
+      "chunks_without_sentence_end": 28
+    },
+    {
+      "file": "buffet_1989.txt",
+      "source_sha256": "f37942bdf75b6eee2226ab80636cddd3e8c7bbbca57656db0df932049f592af7",
+      "extracted_chars": 87098,
+      "paragraph_breaks": 206,
+      "line_breaks": 1693,
+      "stored_chunks": 153,
+      "chunks_with_paragraph_breaks": 54,
+      "chunks_without_sentence_end": 26
+    },
+    {
+      "file": "buffet_1990.txt",
+      "source_sha256": "dd86c4d563b45259b6c16602c9f1696e359cd4f5f3c1abbb410a5cb672d53b26",
+      "extracted_chars": 95224,
+      "paragraph_breaks": 310,
+      "line_breaks": 710,
+      "stored_chunks": 164,
+      "chunks_with_paragraph_breaks": 71,
+      "chunks_without_sentence_end": 35
+    },
+    {
+      "file": "buffet_1991.txt",
+      "source_sha256": "ef18b61d185d995c8c5f16cb41d26bd07f2b36949281963eef51ef0ad823a39a",
+      "extracted_chars": 55779,
+      "paragraph_breaks": 129,
+      "line_breaks": 1098,
+      "stored_chunks": 100,
+      "chunks_with_paragraph_breaks": 41,
+      "chunks_without_sentence_end": 37
+    },
+    {
+      "file": "buffet_1992.txt",
+      "source_sha256": "2ec857753c0b058825e81989a80d96c556fb550d1585ca29613caf18b3507639",
+      "extracted_chars": 68414,
+      "paragraph_breaks": 158,
+      "line_breaks": 1333,
+      "stored_chunks": 125,
+      "chunks_with_paragraph_breaks": 49,
+      "chunks_without_sentence_end": 43
+    },
+    {
+      "file": "buffet_1993.txt",
+      "source_sha256": "00d3416dd8800fc19ef2d373d07dbe58c6ac33ddebad07d6cfacedbc5efa47da",
+      "extracted_chars": 66997,
+      "paragraph_breaks": 151,
+      "line_breaks": 1309,
+      "stored_chunks": 117,
+      "chunks_with_paragraph_breaks": 45,
+      "chunks_without_sentence_end": 35
+    },
+    {
+      "file": "buffet_1994.txt",
+      "source_sha256": "2160853cf23b35a2004007144ea8f8f4864c682f83d877145cde1ee9db0036e0",
+      "extracted_chars": 58106,
+      "paragraph_breaks": 143,
+      "line_breaks": 1157,
+      "stored_chunks": 105,
+      "chunks_with_paragraph_breaks": 40,
+      "chunks_without_sentence_end": 26
+    },
+    {
+      "file": "buffet_1995.txt",
+      "source_sha256": "420bc80ea15bf22c6ddd47c25e4ba2a0d9d3de767be2fd59dde7d55b1ed515cf",
+      "extracted_chars": 70646,
+      "paragraph_breaks": 168,
+      "line_breaks": 1389,
+      "stored_chunks": 127,
+      "chunks_with_paragraph_breaks": 46,
+      "chunks_without_sentence_end": 29
+    },
+    {
+      "file": "buffet_1996.txt",
+      "source_sha256": "cac78ad40df09993694c9e1f2487793bd208138ef25edceb89a28d6e59fdfe58",
+      "extracted_chars": 71158,
+      "paragraph_breaks": 157,
+      "line_breaks": 1268,
+      "stored_chunks": 128,
+      "chunks_with_paragraph_breaks": 44,
+      "chunks_without_sentence_end": 35
+    },
+    {
+      "file": "buffet_1997.txt",
+      "source_sha256": "e260d7c8b5a3f3c0d97620a9ee0c8139a041f1e2a29af05e12a94b445f58ad6a",
+      "extracted_chars": 69467,
+      "paragraph_breaks": 166,
+      "line_breaks": 453,
+      "stored_chunks": 124,
+      "chunks_with_paragraph_breaks": 54,
+      "chunks_without_sentence_end": 34
+    },
+    {
+      "file": "buffet_1998.pdf",
+      "source_sha256": "1d798cda07b82e582643a0d9c0a5adf9a141f908426e666774fca9a592944941",
+      "extracted_chars": 69728,
+      "paragraph_breaks": 22,
+      "line_breaks": 888,
+      "stored_chunks": 110,
+      "chunks_with_paragraph_breaks": 2,
+      "chunks_without_sentence_end": 79
+    },
+    {
+      "file": "buffet_1999.pdf",
+      "source_sha256": "cf6b22508de51e7ba96e61f1eee51e45d3a5aaf27182cf491fd3e0ca94089d3b",
+      "extracted_chars": 75482,
+      "paragraph_breaks": 27,
+      "line_breaks": 958,
+      "stored_chunks": 123,
+      "chunks_with_paragraph_breaks": 3,
+      "chunks_without_sentence_end": 87
+    },
+    {
+      "file": "buffet_2000.pdf",
+      "source_sha256": "401a40b7011271dfc00c246a92aefd30887a6fdaf53ab0c8a1132b3d6c3078b9",
+      "extracted_chars": 82135,
+      "paragraph_breaks": 20,
+      "line_breaks": 1192,
+      "stored_chunks": 130,
+      "chunks_with_paragraph_breaks": 0,
+      "chunks_without_sentence_end": 90
+    },
+    {
+      "file": "buffet_2001.pdf",
+      "source_sha256": "50a79a227522a66ef79286a50ff9fb4b39dec5d025431dbb4ecedf126ad0caa0",
+      "extracted_chars": 76697,
+      "paragraph_breaks": 18,
+      "line_breaks": 1099,
+      "stored_chunks": 123,
+      "chunks_with_paragraph_breaks": 0,
+      "chunks_without_sentence_end": 97
+    },
+    {
+      "file": "buffet_2002.pdf",
+      "source_sha256": "50492594fa06be7ad895fce63e57f7aca14aab24ea0d70dc6ae2161c26953c90",
+      "extracted_chars": 91511,
+      "paragraph_breaks": 23,
+      "line_breaks": 1331,
+      "stored_chunks": 146,
+      "chunks_with_paragraph_breaks": 0,
+      "chunks_without_sentence_end": 107
+    },
+    {
+      "file": "buffet_2003.pdf",
+      "source_sha256": "207377b7b267bbf327cbc49da20dd749b564328b31e0224d70982b7885b5475e",
+      "extracted_chars": 85756,
+      "paragraph_breaks": 22,
+      "line_breaks": 1395,
+      "stored_chunks": 138,
+      "chunks_with_paragraph_breaks": 0,
+      "chunks_without_sentence_end": 101
+    },
+    {
+      "file": "buffet_2004.pdf",
+      "source_sha256": "d26d34d2e6b6f19e07844553069c4a113874749ae6317d5f4a33f0b11fb32768",
+      "extracted_chars": 95872,
+      "paragraph_breaks": 331,
+      "line_breaks": 2189,
+      "stored_chunks": 174,
+      "chunks_with_paragraph_breaks": 73,
+      "chunks_without_sentence_end": 58
+    },
+    {
+      "file": "buffet_2005.pdf",
+      "source_sha256": "e0c91795c8709ed2376ba67e5de5dbc2857d1bc15e3ed742bf6ac95f5850cc2b",
+      "extracted_chars": 85396,
+      "paragraph_breaks": 286,
+      "line_breaks": 1800,
+      "stored_chunks": 150,
+      "chunks_with_paragraph_breaks": 60,
+      "chunks_without_sentence_end": 49
+    },
+    {
+      "file": "buffet_2006.pdf",
+      "source_sha256": "f12c2abd96a052747157fcabd26f7ef5ab4df1c2747b1af8c42abd803e57a7b6",
+      "extracted_chars": 91357,
+      "paragraph_breaks": 267,
+      "line_breaks": 1849,
+      "stored_chunks": 166,
+      "chunks_with_paragraph_breaks": 66,
+      "chunks_without_sentence_end": 55
+    },
+    {
+      "file": "buffet_2007.pdf",
+      "source_sha256": "8288aa8a17b677ca1215c31ef0afb887d3f95dbb0e2241f77b54b51f0c3f7cfa",
+      "extracted_chars": 77823,
+      "paragraph_breaks": 277,
+      "line_breaks": 1748,
+      "stored_chunks": 135,
+      "chunks_with_paragraph_breaks": 61,
+      "chunks_without_sentence_end": 39
+    },
+    {
+      "file": "buffet_2008.pdf",
+      "source_sha256": "46920242cbb861fd844453d5e20edd8b0ecea977d85111cf2a7cfb249913c6cf",
+      "extracted_chars": 88884,
+      "paragraph_breaks": 21,
+      "line_breaks": 1255,
+      "stored_chunks": 140,
+      "chunks_with_paragraph_breaks": 0,
+      "chunks_without_sentence_end": 98
+    },
+    {
+      "file": "buffet_2009.pdf",
+      "source_sha256": "f53e845e58cf4cc34c78538c662a0aebcbd5689fda3f16eaa605a73fee3d31df",
+      "extracted_chars": 76819,
+      "paragraph_breaks": 18,
+      "line_breaks": 1144,
+      "stored_chunks": 120,
+      "chunks_with_paragraph_breaks": 2,
+      "chunks_without_sentence_end": 92
+    },
+    {
+      "file": "buffet_2010.pdf",
+      "source_sha256": "50425cd27fd39fa50a94256d9ff69e8c50b8d6d1b8935e5db9df0fd2bbdf76ad",
+      "extracted_chars": 103224,
+      "paragraph_breaks": 25,
+      "line_breaks": 1622,
+      "stored_chunks": 164,
+      "chunks_with_paragraph_breaks": 0,
+      "chunks_without_sentence_end": 108
+    },
+    {
+      "file": "buffet_2011.pdf",
+      "source_sha256": "6f5125e45c30007cd3188092cd59d339c7d8266b2f6c8e87387ad397ac1c0083",
+      "extracted_chars": 92905,
+      "paragraph_breaks": 20,
+      "line_breaks": 1331,
+      "stored_chunks": 146,
+      "chunks_with_paragraph_breaks": 0,
+      "chunks_without_sentence_end": 111
+    },
+    {
+      "file": "buffet_2012.pdf",
+      "source_sha256": "a14b3a546e903974dc654e10213316f75bfa0a8b6e038dc673e8602bce225573",
+      "extracted_chars": 93331,
+      "paragraph_breaks": 22,
+      "line_breaks": 1322,
+      "stored_chunks": 150,
+      "chunks_with_paragraph_breaks": 0,
+      "chunks_without_sentence_end": 102
+    },
+    {
+      "file": "buffet_2013.pdf",
+      "source_sha256": "ad24565997a09a1f7ef752da875161a24e025329510f3489afd912ff1e2673f5",
+      "extracted_chars": 89443,
+      "paragraph_breaks": 22,
+      "line_breaks": 1307,
+      "stored_chunks": 140,
+      "chunks_with_paragraph_breaks": 1,
+      "chunks_without_sentence_end": 99
+    },
+    {
+      "file": "buffet_2014.pdf",
+      "source_sha256": "dd00248b32ad1f67234bb4dba66755bf45a623bd94e40465a2a88707b73cd426",
+      "extracted_chars": 154139,
+      "paragraph_breaks": 41,
+      "line_breaks": 2060,
+      "stored_chunks": 246,
+      "chunks_with_paragraph_breaks": 1,
+      "chunks_without_sentence_end": 161
+    },
+    {
+      "file": "buffet_2015.pdf",
+      "source_sha256": "139d8db9c20f0f86316e4b815fdc86687985c7adcdbdd70605a188bcc804cde7",
+      "extracted_chars": 111458,
+      "paragraph_breaks": 29,
+      "line_breaks": 1549,
+      "stored_chunks": 178,
+      "chunks_with_paragraph_breaks": 0,
+      "chunks_without_sentence_end": 125
+    },
+    {
+      "file": "buffet_2016.pdf",
+      "source_sha256": "b8096f989e52bab3f18ad6ea7902891ddc038868df5437b89653719c79348d18",
+      "extracted_chars": 103691,
+      "paragraph_breaks": 27,
+      "line_breaks": 1658,
+      "stored_chunks": 167,
+      "chunks_with_paragraph_breaks": 1,
+      "chunks_without_sentence_end": 111
+    },
+    {
+      "file": "buffet_2017.pdf",
+      "source_sha256": "0b170cb5984255970c617cae0f7c575ea03c280ae00eeb77193d03e6195c6650",
+      "extracted_chars": 61585,
+      "paragraph_breaks": 15,
+      "line_breaks": 1008,
+      "stored_chunks": 98,
+      "chunks_with_paragraph_breaks": 1,
+      "chunks_without_sentence_end": 74
+    },
+    {
+      "file": "buffet_2018.pdf",
+      "source_sha256": "0e6531e162fcbc5ecb9c771dd468be1f0e06ff895ed38a26765e1338dbc4b3bd",
+      "extracted_chars": 50864,
+      "paragraph_breaks": 13,
+      "line_breaks": 810,
+      "stored_chunks": 84,
+      "chunks_with_paragraph_breaks": 0,
+      "chunks_without_sentence_end": 62
+    },
+    {
+      "file": "buffet_2019.pdf",
+      "source_sha256": "d6df1c022f6bac02f430887ce59cfd0cf8945f69afe60f9c2e84d03dd4e67173",
+      "extracted_chars": 52842,
+      "paragraph_breaks": 12,
+      "line_breaks": 767,
+      "stored_chunks": 82,
+      "chunks_with_paragraph_breaks": 1,
+      "chunks_without_sentence_end": 57
+    },
+    {
+      "file": "buffet_2020.pdf",
+      "source_sha256": "e556a52b8d4dc490d04c5f34bab98708d414cf1f632d9f68671d5a5c645afca5",
+      "extracted_chars": 53281,
+      "paragraph_breaks": 13,
+      "line_breaks": 769,
+      "stored_chunks": 85,
+      "chunks_with_paragraph_breaks": 0,
+      "chunks_without_sentence_end": 52
+    },
+    {
+      "file": "buffet_2021.pdf",
+      "source_sha256": "fd5687aec746816b08113e9ccf8c4826eaa258906e66f7b4abe90c8b4f8b30ba",
+      "extracted_chars": 40850,
+      "paragraph_breaks": 10,
+      "line_breaks": 617,
+      "stored_chunks": 64,
+      "chunks_with_paragraph_breaks": 0,
+      "chunks_without_sentence_end": 45
+    },
+    {
+      "file": "buffet_2022.pdf",
+      "source_sha256": "a99f263003295b177e8c50ec34f2307093857a357276527e98d5a6205e21a908",
+      "extracted_chars": 30900,
+      "paragraph_breaks": 9,
+      "line_breaks": 482,
+      "stored_chunks": 48,
+      "chunks_with_paragraph_breaks": 0,
+      "chunks_without_sentence_end": 34
+    },
+    {
+      "file": "buffet_2023.pdf",
+      "source_sha256": "829169be21f4ce05202720fe5645cc1b9a5b1ae20bf5e6ebaff987349766eafd",
+      "extracted_chars": 50059,
+      "paragraph_breaks": 18,
+      "line_breaks": 732,
+      "stored_chunks": 76,
+      "chunks_with_paragraph_breaks": 2,
+      "chunks_without_sentence_end": 44
+    },
+    {
+      "file": "buffet_2024.pdf",
+      "source_sha256": "ff21ab9407dec219757587b6ce6a1bf30e59cfff15bb21e81d1faaec7f97a8a7",
+      "extracted_chars": 40068,
+      "paragraph_breaks": 26,
+      "line_breaks": 673,
+      "stored_chunks": 65,
+      "chunks_with_paragraph_breaks": 3,
+      "chunks_without_sentence_end": 42
+    }
+  ]
+}

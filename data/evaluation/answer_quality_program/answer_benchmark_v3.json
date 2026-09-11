@@ -1,0 +1,245 @@
+{
+  "schema_version": 1,
+  "purpose": "Human-curated V3 answer benchmark with explicit claims, source passage IDs, and accept/reject criteria.",
+  "source_corpus": "data/processed/chunks_v3_paragraph.jsonl",
+  "cases": [
+    {
+      "qid": "aq01_derivatives",
+      "query": "What did Buffett say about derivatives being weapons of mass destruction?",
+      "gold_passage_ids": [
+        "2002_p0086"
+      ],
+      "gold_claims": [
+        {
+          "claim": "Buffett called derivatives financial weapons of mass destruction.",
+          "gold_passage_ids": ["2002_p0086"],
+          "required_terms": [
+            "financial weapons",
+            "mass destruction"
+          ]
+        }
+      ],
+      "accept": {
+        "min_claim_coverage": 1.0,
+        "require_valid_citation": true
+      },
+      "reject": {
+        "forbidden_terms": [
+          "safe investments"
+        ]
+      }
+    },
+    {
+      "qid": "aq02_crisis",
+      "query": "How did Berkshire respond when the financial system seized in September 2008?",
+      "gold_passage_ids": [
+        "2009_p0021"
+      ],
+      "gold_claims": [
+        {
+          "claim": "Berkshire supplied liquidity and capital during the crisis.",
+          "gold_passage_ids": ["2009_p0021"],
+          "required_terms": [
+            "supplier of liquidity",
+            "capital"
+          ]
+        },
+        {
+          "claim": "It committed $15.5 billion.",
+          "gold_passage_ids": ["2009_p0021"],
+          "required_terms": [
+            "15.5 billion"
+          ]
+        }
+      ],
+      "accept": {
+        "min_claim_coverage": 1.0,
+        "require_valid_citation": true
+      },
+      "reject": {
+        "forbidden_terms": [
+          "asked the government for a bailout"
+        ]
+      }
+    },
+    {
+      "qid": "aq03_bnsf",
+      "query": "What firm deal did Berkshire and BNSF announce, and what did Buffett predict about BNSF as a key asset?",
+      "gold_passage_ids": [
+        "2021_p0056"
+      ],
+      "gold_claims": [
+        {
+          "claim": "Berkshire and BNSF announced a firm deal.",
+          "gold_passage_ids": ["2021_p0056"],
+          "required_terms": [
+            "BNSF",
+            "firm deal"
+          ]
+        },
+        {
+          "claim": "Buffett predicted BNSF would be a key asset.",
+          "gold_passage_ids": ["2021_p0056"],
+          "required_terms": [
+            "key asset"
+          ]
+        }
+      ],
+      "accept": {
+        "min_claim_coverage": 1.0,
+        "require_valid_citation": true
+      },
+      "reject": {
+        "forbidden_terms": [
+          "sold BNSF"
+        ]
+      }
+    },
+    {
+      "qid": "aq04_apple",
+      "query": "How did Buffett describe the economic benefit of Apple share repurchases?",
+      "gold_passage_ids": [
+        "2021_p0030",
+        "2022_p0028"
+      ],
+      "gold_claims": [
+        {
+          "claim": "Apple repurchases increased Berkshire's share.",
+          "gold_passage_ids": ["2022_p0028"],
+          "required_terms": [
+            "Apple",
+            "repurchases"
+          ]
+        },
+        {
+          "claim": "Berkshire's share of Apple earnings was $5.6 billion.",
+          "gold_passage_ids": ["2021_p0030"],
+          "required_terms": [
+            "5.6 billion"
+          ]
+        }
+      ],
+      "accept": {
+        "min_claim_coverage": 1.0,
+        "require_valid_citation": true
+      },
+      "reject": {
+        "forbidden_terms": [
+          "Berkshire sold all Apple shares"
+        ]
+      }
+    },
+    {
+      "qid": "aq05_index",
+      "query": "What investing advice did Buffett give individual investors about index funds?",
+      "gold_passage_ids": [
+        "1996_p0092"
+      ],
+      "gold_claims": [
+        {
+          "claim": "Most investors should use a low-fee index fund.",
+          "gold_passage_ids": ["1996_p0092"],
+          "required_terms": [
+            "index fund",
+            "minimal fees"
+          ]
+        }
+      ],
+      "accept": {
+        "min_claim_coverage": 1.0,
+        "require_valid_citation": true
+      },
+      "reject": {
+        "forbidden_terms": [
+          "high-fee hedge fund"
+        ]
+      }
+    },
+    {
+      "qid": "aq06_dividends",
+      "query": "Why did Buffett discuss not paying Berkshire a cash dividend?",
+      "gold_passage_ids": [
+        "2012_p0109"
+      ],
+      "gold_claims": [
+        {
+          "claim": "Some shareholders wanted a cash dividend.",
+          "gold_passage_ids": ["2012_p0109"],
+          "required_terms": [
+            "cash dividend"
+          ]
+        },
+        {
+          "claim": "Berkshire paid out nothing itself.",
+          "gold_passage_ids": ["2012_p0109"],
+          "required_terms": [
+            "pay out nothing"
+          ]
+        }
+      ],
+      "accept": {
+        "min_claim_coverage": 1.0,
+        "require_valid_citation": true
+      },
+      "reject": {
+        "forbidden_terms": [
+          "Berkshire announced a regular dividend"
+        ]
+      }
+    },
+    {
+      "qid": "aq07_see",
+      "query": "What did Buffett report about See's Candies in 1989?",
+      "gold_passage_ids": [
+        "1989_p0033"
+      ],
+      "gold_claims": [
+        {
+          "claim": "See's Candies had an 8% increase in pounds sold.",
+          "gold_passage_ids": ["1989_p0033"],
+          "required_terms": [
+            "8% increase",
+            "pounds sold"
+          ]
+        }
+      ],
+      "accept": {
+        "min_claim_coverage": 1.0,
+        "require_valid_citation": true
+      },
+      "reject": {
+        "forbidden_terms": [
+          "closed See's Candies"
+        ]
+      }
+    },
+    {
+      "qid": "aq08_greg_abel",
+      "query": "Which Berkshire vice chairman joined Buffett on stage at the 2020 annual meeting?",
+      "gold_passage_ids": [
+        "2020_p0081"
+      ],
+      "gold_claims": [
+        {
+          "claim": "Greg Abel was a Berkshire vice chairman and joined Buffett on stage.",
+          "gold_passage_ids": ["2020_p0081"],
+          "required_terms": [
+            "Greg Abel",
+            "Vice Chairmen",
+            "joined me on stage"
+          ]
+        }
+      ],
+      "accept": {
+        "min_claim_coverage": 1.0,
+        "require_valid_citation": true
+      },
+      "reject": {
+        "forbidden_terms": [
+          "was not at the meeting"
+        ]
+      }
+    }
+  ],
+  "derived_from": "answer_benchmark.json + chunk_id_map_v2_to_v3.jsonl"
+}

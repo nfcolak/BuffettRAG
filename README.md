@@ -1,26 +1,26 @@
 # BuffettRAG
 
-BuffettRAG answers questions about Warren Buffett's Berkshire Hathaway shareholder letters (1977 to 2024) with sentence-level citations back to the source passages. All 48 letters are split into 5,833 chunks of roughly 800 characters. A FastAPI backend runs hybrid retrieval and cross-encoder reranking, an LLM writes the answer from the retrieved passages alone, and a React frontend renders the answer next to the passages it cites.
+BuffettRAG answers questions about Warren Buffett's Berkshire Hathaway shareholder letters (1977 to 2024) with sentence-level citations back to the source passages. All 48 letters are indexed as 5,831 paragraph-aware records with source hashes and neighbour provenance. A FastAPI backend runs hybrid retrieval and cross-encoder reranking, an LLM writes the answer from the retrieved passages alone, and a React frontend renders the answer next to the passages it cites.
 
 ## How a question is answered
 
 The backend first expands the query. The configured LLM proposes up to eight extra search keywords (companies, people, events, financial terms) so that questions phrased outside the corpus vocabulary still land, for example "Middle East" maps to ISCAR and Israel. Expansion failures are swallowed and retrieval falls back to the original query.
 
-Retrieval is hybrid. The expanded query runs through BM25 and through vector search over bge-base-en-v1.5 embeddings, and the two rankings are merged with reciprocal rank fusion. Thirty candidates go into a bge-reranker-v2-m3 cross-encoder, which reorders them by relevance to the actual question. Near-duplicate passages are dropped by token-overlap comparison, since overlapping chunk windows would otherwise fill the context with repeats. The top passages are then widened with their neighboring chunks (the chunk file stores previous and next chunk ids) so the LLM sees full paragraphs while retrieval stays precise over compact chunks.
+Retrieval is hybrid. The expanded query runs through BM25 and through vector search over bge-base-en-v1.5 embeddings, and the two rankings are merged with reciprocal rank fusion. The original query and expanded variant contribute candidate rankings; temporal interpretation and cross-encoder reranking always use the original question. Normal hybrid retrieval sends thirty fused candidates to bge-reranker-v2-m3; temporal comparison can retain up to thirty per period before reranking. Near-duplicate passages are dropped by token-overlap comparison, since overlapping chunk windows would otherwise fill the context with repeats. The top passages are then widened with their neighboring chunks (the chunk file stores previous and next chunk ids) so the LLM sees full paragraphs while retrieval stays precise over compact chunks.
 
-Generation is grounded by contract. The system prompt requires the model to test each passage against the question, answer only from passages that pass, cite every sentence as [n], and output a fixed refusal line when nothing is relevant. Citations are parsed and validated server-side; markers pointing outside the passage list are dropped. Both a blocking endpoint and a server-sent-events streaming endpoint are available.
+Generation is grounded by contract. The system prompt requires the model to test each passage against the question, answer only from passages that pass, cite every sentence as [n], and output a fixed refusal line when nothing is relevant. Citation references are resolved server-side, with invalid numbers reported explicitly. This validates reference existence, not whether a claim is true or entailed. Answer responses expose the exact expanded passage text used in the prompt; original retrieval chunks remain available separately. Both a blocking endpoint and a server-sent-events streaming endpoint are available.
 
 ## Retrieval design choices
 
 Year handling treats detected years as a hint rather than a constraint. When a query mentions "in 2008" or "the 1990s", the backend runs the search twice, with and without the year filter, and fuses both rankings with the filtered one weighted double. A wrongly guessed year can therefore lower ranking quality without zeroing out recall.
 
-Questions that compare two periods ("How did his view on technology change from the 1990s to the 2020s?") are detected by pattern and decomposed into one search per period. Each sub-search keeps the full original query so the embedding stays on topic while only the year filter changes, and the per-period rankings are fused into one result set that spans both eras.
+Questions that compare two periods ("How did his view on technology change from the 1990s to the 2020s?") are detected by pattern and decomposed into one search per period. Each sub-search keeps the full original query so the embedding stays on topic while only the year filter changes, and the final selection reserves a top candidate from each nonempty period when at least two passage slots are available. This preserves coverage, but does not itself establish relevance or a change of opinion.
 
 Three vector backends share one interface. pgvector is the production store, Chroma and FAISS remain available for local work and comparison runs, selected with `VECTOR_BACKEND` (see configuration). Metadata filters are validated against a field whitelist and built as parameterized SQL, and the table name is checked against a strict identifier pattern.
 
 ## Evaluation
 
-The evaluation pipeline scores retrieval strategies against a 50-query gold set with year-labeled relevance judgments. On that set, hybrid retrieval with reranking reaches MRR 0.739, recall@1 0.60 and recall@10 0.98. A separate citation-faithfulness check over generated answers measures citation coverage at 0.91 with zero citations pointing at nonexistent passages. Raw reports live in `data/evaluation/`.
+The evaluation pipeline scores retrieval strategies against a 50-query gold set with year-labeled relevance judgments. On that set, hybrid retrieval with reranking reaches MRR 0.739, recall@1 0.60 and recall@10 0.98. The historical answer run attempted 50 questions: 39 were scored and 11 failed at the provider. Its citation coverage was 0.912 and lexical support proxy 0.254; neither is a measured faithfulness rate, and the old artifact did not save passage text. Raw reports live in `data/evaluation/`. The offline baseline/after audit and limitations are documented in [the answer-quality report](docs/ANSWER_QUALITY_20260910_TR.md).
 
 ## Quick start
 
@@ -99,10 +99,12 @@ For shared or public deployments there are separate hardening knobs.
 └── tests/                  # unit and end-to-end smoke tests
 ```
 
-Tests run without a database or an LLM, so they finish in seconds:
+Tests run without a database or cloud LLM (install `pytest` for the regression suite). Deterministic offline diagnostics also use the tracked corpus and local extractive provider:
 
 ```bash
-python -m unittest discover tests
+PYTHON_DOTENV_DISABLED=1 python -m pytest tests -q
+PYTHON_DOTENV_DISABLED=1 python scripts/eval_offline_quality.py --output data/evaluation/offline.json
+PYTHON_DOTENV_DISABLED=1 python scripts/audit_corpus.py
 ```
 
 ## Limitations

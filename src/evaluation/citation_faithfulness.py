@@ -7,11 +7,11 @@ We provide two implementations:
 
     1. Lexical (default) -- compute n-gram overlap between (a) the sentences
        around each citation marker in the answer and (b) the cited passage.
-       High overlap == the model is paraphrasing the passage. Low overlap
-       == possible hallucination.
+       High overlap is only shared wording, NOT entailment. Negations and
+       changed quantities may still score highly; valid paraphrases may score low.
 
        This is fast, has zero dependencies beyond the standard library, and
-       correlates reasonably well with human judgment on RAG outputs.
+       is a diagnostic proxy, not a calibrated human-judgment substitute.
 
     2. NLI-based (optional, opt-in) -- use a small NLI model
        (cross-encoder/nli-deberta-v3-small) to score entailment of each
@@ -26,20 +26,20 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass
-from typing import Dict, List, Optional, Sequence
+from typing import Callable, Dict, List, Optional, Sequence
 
-from src.generation.prompt import parse_citations
 from src.vector_store import SearchHit
-
-
-_SENTENCE_SPLIT = re.compile(r"(?<=[.!?])\s+(?=[A-Z0-9\"'])")
 
 
 def split_sentences(text: str) -> List[str]:
     text = text.strip()
     if not text:
         return []
-    return [s.strip() for s in _SENTENCE_SPLIT.split(text) if s.strip()]
+    # Citations belong to the sentence before them, not the next claim.
+    text = re.sub(r"(?m)^\s*(?:[-*]|\d+\.)\s+", "", text)
+    text = re.sub(r"([.!?](?:[ \t]*\[\d+(?:\s*,\s*\d+)*\])*)"
+                  r"\s+(?=[A-Z0-9\"'])", r"\1\n", text)
+    return [s.strip() for s in text.splitlines() if s.strip()]
 
 
 def _ngrams(tokens: List[str], n: int) -> set:
@@ -89,7 +89,7 @@ def evaluate_faithfulness(
     answer: str,
     hits: Sequence[SearchHit],
     *,
-    nli_scorer: Optional[object] = None,
+    nli_scorer: Optional[Callable[[str, str], float]] = None,
 ) -> FaithfulnessReport:
     """Compute faithfulness metrics for one (answer, hits) pair.
 
@@ -112,7 +112,6 @@ def evaluate_faithfulness(
         )
 
     # Identify citations we know about overall (for invalid-rate denominator).
-    all_citations = parse_citations(answer, hits)
     total_markers = len(_CITATION_IN_SENT_RE.findall(answer))
     invalid_markers = sum(
         1
@@ -127,6 +126,7 @@ def evaluate_faithfulness(
 
     for sent in sentences:
         markers = _CITATION_IN_SENT_RE.findall(sent)
+        claim = _CITATION_IN_SENT_RE.sub("", sent).strip()
         cited_idxs: List[int] = []
         for m in markers:
             for n in m.split(","):
@@ -145,9 +145,9 @@ def evaluate_faithfulness(
             for idx in cited_idxs:
                 passage_text = hits[idx].text
                 if nli_scorer is not None:
-                    sub_scores.append(float(nli_scorer(passage_text, sent)))
+                    sub_scores.append(float(nli_scorer(passage_text, claim)))
                 else:
-                    sub_scores.append(lexical_support_score(sent, passage_text))
+                    sub_scores.append(lexical_support_score(claim, passage_text))
             support = max(sub_scores) if sub_scores else 0.0
             support_scores.append(support)
 

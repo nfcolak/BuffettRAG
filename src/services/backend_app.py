@@ -30,7 +30,7 @@ import json
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.responses import JSONResponse, StreamingResponse
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator, model_validator
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 if str(PROJECT_ROOT) not in sys.path:
@@ -38,15 +38,20 @@ if str(PROJECT_ROOT) not in sys.path:
 
 from config import (
     API_KEYS,
+    ALLOW_LLM_REQUEST_OVERRIDES,
     ANSWER_CONTEXT_MAX_CHARS,
     ANSWER_CONTEXT_NEIGHBORS,
     CHUNKS_FILE,
     CHUNKS_V2_FILE,
+    CHUNKS_V3_FILE,
     CORS_ORIGINS,
     DEFAULT_TOP_K,
     EMBEDDING_DEVICE,
     EMBEDDING_MODEL_PRIMARY,
     EXPOSE_DEBUG_STATUS,
+    FAISS_DIR,
+    MAX_REQUEST_BODY_BYTES,
+    PUBLIC_DEMO_MODE,
     RATE_LIMIT_REQUESTS,
     RATE_LIMIT_WINDOW_SECONDS,
     RETRIEVAL_FETCH_K,
@@ -62,13 +67,16 @@ from src.generation.prompt import (
     parse_citations,
     strip_chat_artifacts,
 )
+from src.generation.evidence_gate import assess_evidence
+from src.evaluation.claim_validator import validate_and_filter_answer
 from src.generation.providers import create_llm_provider
+from src.index_manifest import load_and_validate_index_manifest, write_index_manifest
 from src.retrieval.context import build_doc_lookup, expand_hits_with_neighbors
-from src.retrieval.query_expansion import expand_query
+from src.retrieval.query_expansion import expand_query, expand_query_structured
 from src.retrieval.reranker import CrossEncoderReranker
 from src.retrieval.retriever import Retriever
 from src.services.security import FixedWindowRateLimiter, client_key, is_authorized
-from src.vector_store import SearchHit, get_vector_store, load_chunks_as_docs
+from src.vector_store import FaissStore, SearchHit, get_vector_store, load_chunks_as_docs
 
 
 # -----------------------------------------------------------------------------
@@ -84,6 +92,46 @@ class SearchRequest(BaseModel):
     where: Optional[Dict[str, Any]] = None
     auto_year_filter: bool = True
 
+    @field_validator("query")
+    @classmethod
+    def validate_query(cls, value: str) -> str:
+        value = value.strip()
+        if not value:
+            raise ValueError("query must contain non-whitespace characters")
+        return value
+
+    @field_validator("where")
+    @classmethod
+    def validate_where(cls, value: Optional[Dict[str, Any]]) -> Optional[Dict[str, Any]]:
+        if value is None:
+            return None
+        allowed_fields = {"year", "decade", "source_file", "chunk_index", "topics"}
+        allowed_ops = {"$eq", "$gte", "$lte", "$gt", "$lt", "$in"}
+        if len(value) > len(allowed_fields) or set(value) - allowed_fields:
+            raise ValueError("unsupported metadata filter field")
+        for field, condition in value.items():
+            if isinstance(condition, dict):
+                if not condition or set(condition) - allowed_ops:
+                    raise ValueError("unsupported metadata filter operator")
+                for operator, target in condition.items():
+                    if operator == "$in":
+                        if not isinstance(target, list) or not target or len(target) > 50:
+                            raise ValueError("metadata $in requires 1 to 50 scalar values")
+                        targets = target
+                    else:
+                        targets = [target]
+                    if any(isinstance(item, (dict, list)) or item is None for item in targets):
+                        raise ValueError("metadata filters require scalar values")
+            elif isinstance(condition, (dict, list)) or condition is None:
+                raise ValueError("metadata filters require scalar values")
+            if field in {"year", "decade", "chunk_index"}:
+                raw_values = condition.values() if isinstance(condition, dict) else [condition]
+                for raw in raw_values:
+                    values = raw if isinstance(raw, list) else [raw]
+                    if any(not isinstance(item, int) or isinstance(item, bool) for item in values):
+                        raise ValueError(f"{field} filters require integers")
+        return value
+
 
 class HistoryTurn(BaseModel):
     role: Literal["user", "assistant"]
@@ -97,6 +145,16 @@ class AskRequest(SearchRequest):
     llm_model: Optional[str] = Field(default=None, max_length=200)
     expand_query: bool = True
     history: List[HistoryTurn] = Field(default_factory=list, max_length=12)
+
+    @model_validator(mode="after")
+    def validate_ask(self):
+        if sum(len(turn.content) for turn in self.history) > 8000:
+            raise ValueError("conversation history is too large")
+        if (PUBLIC_DEMO_MODE or not ALLOW_LLM_REQUEST_OVERRIDES) and (
+            self.llm_provider or self.llm_api_key or self.llm_model
+        ):
+            raise ValueError("request-level LLM overrides are disabled")
+        return self
 
 
 class HitOut(BaseModel):
@@ -117,6 +175,7 @@ class SearchResponse(BaseModel):
 
 
 class AskResponse(SearchResponse):
+    retrieved_hits: List[HitOut] = Field(default_factory=list)
     answer: Optional[str] = None
     citations: List[Dict[str, Any]] = Field(default_factory=list)
 
@@ -141,26 +200,78 @@ _rate_limiter = FixedWindowRateLimiter(
 )
 
 
+def validate_deployment_security(
+    *, public_demo: bool, api_keys, cors_origins, debug: bool,
+    trust_proxy_headers: bool = False, allow_llm_request_overrides: bool = False,
+) -> None:
+    if not public_demo:
+        return
+    if not tuple(key for key in api_keys if key):
+        raise RuntimeError("PUBLIC_DEMO_MODE requires at least one API_KEYS entry")
+    if debug:
+        raise RuntimeError("PUBLIC_DEMO_MODE does not permit EXPOSE_DEBUG_STATUS")
+    if trust_proxy_headers:
+        raise RuntimeError("PUBLIC_DEMO_MODE does not permit trusted proxy headers; use edge rate limiting")
+    if allow_llm_request_overrides:
+        raise RuntimeError("PUBLIC_DEMO_MODE does not permit LLM request overrides")
+    for origin in cors_origins:
+        if origin in {"*", "null"} or not origin.startswith("https://"):
+            raise RuntimeError("PUBLIC_DEMO_MODE permits only exact HTTPS CORS origins")
+
+
 @app.middleware("http")
 async def security_middleware(request: Request, call_next):
     if request.method == "OPTIONS":
         return await call_next(request)
 
     path = request.url.path
-    if path != "/health" and not is_authorized(request, API_KEYS):
+    public_endpoint = path in {"/health", "/ready"}
+    if not public_endpoint and (
+        (PUBLIC_DEMO_MODE and not API_KEYS) or not is_authorized(request, API_KEYS)
+    ):
         return JSONResponse({"detail": "Unauthorized"}, status_code=401)
 
     if request.method in {"POST", "PUT", "PATCH", "DELETE"}:
+        content_length = request.headers.get("content-length")
+        try:
+            declared_size = int(content_length) if content_length is not None else None
+        except ValueError:
+            return JSONResponse({"detail": "Invalid Content-Length"}, status_code=400)
+        if declared_size is not None and declared_size > MAX_REQUEST_BODY_BYTES:
+            return JSONResponse({"detail": "Request body too large"}, status_code=413)
+        body = await request.body()
+        if len(body) > MAX_REQUEST_BODY_BYTES:
+            return JSONResponse({"detail": "Request body too large"}, status_code=413)
+
         key = f"{client_key(request, TRUST_PROXY_HEADERS)}:{path}"
         if not _rate_limiter.allow(key):
-            return JSONResponse({"detail": "Rate limit exceeded"}, status_code=429)
+            return JSONResponse(
+                {"detail": "Rate limit exceeded"},
+                status_code=429,
+                headers={"Retry-After": str(RATE_LIMIT_WINDOW_SECONDS)},
+            )
 
     return await call_next(request)
 
 
+def _resolve_chunks_path() -> Path:
+    for candidate in (CHUNKS_V3_FILE, CHUNKS_V2_FILE, CHUNKS_FILE):
+        if candidate.exists():
+            return candidate
+    return CHUNKS_V3_FILE
+
+
 @app.on_event("startup")
 async def startup() -> None:
-    chunks_path = CHUNKS_V2_FILE if CHUNKS_V2_FILE.exists() else CHUNKS_FILE
+    validate_deployment_security(
+        public_demo=PUBLIC_DEMO_MODE,
+        api_keys=API_KEYS,
+        cors_origins=CORS_ORIGINS,
+        debug=EXPOSE_DEBUG_STATUS,
+        trust_proxy_headers=TRUST_PROXY_HEADERS,
+        allow_llm_request_overrides=ALLOW_LLM_REQUEST_OVERRIDES,
+    )
+    chunks_path = _resolve_chunks_path()
     if not chunks_path.exists():
         raise RuntimeError(
             "No chunks file found. Run `python -m src.ingestion.pipeline_v2` first."
@@ -169,17 +280,29 @@ async def startup() -> None:
     embedder = BGEEmbedder(model_name=EMBEDDING_MODEL_PRIMARY, device=EMBEDDING_DEVICE)
     docs = load_chunks_as_docs(chunks_path)
 
+    if VECTOR_BACKEND == "faiss" and (FAISS_DIR / FaissStore.INDEX_FILE).exists():
+        load_and_validate_index_manifest(
+            FAISS_DIR,
+            corpus=chunks_path,
+            docs=docs,
+            backend="faiss",
+            model_name=embedder.model_name,
+            dimension=embedder.dimension,
+        )
     vs = get_vector_store(backend=VECTOR_BACKEND, dim=embedder.dimension)
     if len(vs) == 0:
         embeddings = embedder.embed_documents([d.text for d in docs])
         vs.add(docs, embeddings)
+        if isinstance(vs, FaissStore):
+            write_index_manifest(
+                Path(vs.persist_dir), corpus=chunks_path, docs=docs, backend="faiss",
+                model_name=embedder.model_name, dimension=embedder.dimension,
+                artifact_names=(vs.INDEX_FILE, vs.META_JSON_FILE),
+            )
     elif len(vs) != len(docs):
-        # A partially populated store (interrupted indexing, stale chunks file)
-        # would otherwise serve incomplete results silently.
-        print(
-            f"[backend] warning: vector store holds {len(vs)} rows but the chunks "
-            f"file has {len(docs)}; re-run indexing if these should match",
-            flush=True,
+        raise RuntimeError(
+            f"Vector store has {len(vs)} rows but active corpus has {len(docs)}; "
+            "rebuild the index for the active corpus"
         )
 
     reranker = CrossEncoderReranker()
@@ -227,7 +350,7 @@ def _llm_error_message(exc: Exception) -> str:
     return "[LLM unavailable]"
 
 
-def _do_search(req: SearchRequest):
+def _do_search(req: SearchRequest, retrieval_query: Optional[str] = None):
     retriever: Retriever = _state["retriever"]
     result = retriever.search(
         query=req.query,
@@ -237,6 +360,7 @@ def _do_search(req: SearchRequest):
         rerank=req.rerank,
         where=req.where,
         auto_year_filter=req.auto_year_filter,
+        retrieval_query=retrieval_query,
     )
     return result.hits, result.used_filter, result.reranked
 
@@ -258,15 +382,26 @@ def _llm_for_request(req: AskRequest):
 # -----------------------------------------------------------------------------
 
 @app.get("/health")
-def health() -> Dict[str, Any]:
+def health() -> Dict[str, str]:
+    return {"status": "alive"}
+
+
+@app.get("/ready")
+def readiness():
     vs = _state.get("vector_store")
+    docs = _state.get("docs")
+    retriever = _state.get("retriever")
+    indexed_count = len(vs) if vs is not None else 0
+    document_count = len(docs) if docs is not None else 0
+    ready = retriever is not None and indexed_count > 0 and indexed_count == document_count
     payload: Dict[str, Any] = {
-        "status": "ok",
-        "indexed_count": len(vs) if vs else 0,
+        "status": "ready" if ready else "not_ready",
+        "indexed_count": indexed_count,
+        "document_count": document_count,
     }
     if EXPOSE_DEBUG_STATUS:
         payload["chunks_path"] = _state.get("chunks_path")
-    return payload
+    return JSONResponse(payload, status_code=200 if ready else 503)
 
 
 @app.get("/stats")
@@ -290,7 +425,7 @@ def search(req: SearchRequest) -> SearchResponse:
     try:
         hits, used_filter, reranked = _do_search(req)
     except ValueError as exc:
-        raise HTTPException(status_code=400, detail=str(exc)) from exc
+        raise HTTPException(status_code=400, detail="Invalid retrieval configuration") from exc
     return SearchResponse(
         query=req.query,
         strategy=req.strategy,
@@ -308,19 +443,20 @@ def ask(req: AskRequest) -> AskResponse:
     try:
         llm, hits, used_filter, reranked, context_hits, prompt = _prepare_ask(req)
     except ValueError as exc:
-        raise HTTPException(status_code=400, detail=str(exc)) from exc
+        raise HTTPException(status_code=400, detail="Invalid retrieval configuration") from exc
 
     answer: Optional[str] = None
     citations: List[Dict[str, Any]] = []
     if hits:
-        answer, citations = _generate_answer(llm, prompt, context_hits, req.max_new_tokens)
+        answer, citations = _generate_answer(llm, prompt, context_hits, req.max_new_tokens, req.query)
 
     return AskResponse(
         query=req.query,
         strategy=req.strategy,
         reranked=reranked,
         used_filter=used_filter,
-        hits=_hits_to_out(hits),
+        hits=_hits_to_out(context_hits),
+        retrieved_hits=_hits_to_out(hits),
         answer=answer,
         citations=citations,
     )
@@ -331,17 +467,19 @@ def _prepare_ask(req: AskRequest):
     llm = _llm_for_request(req)
     history_dicts = [turn.model_dump() for turn in req.history]
 
-    search_req = req
+    expanded = None
     if req.expand_query:
-        expanded = expand_query(
+        structured = expand_query_structured(
+            req.query, llm, history_text=format_history_block(history_dicts)
+        )
+        expanded = structured.retrieval_query if structured else expand_query(
             req.query, llm, history_text=format_history_block(history_dicts)
         )
         if expanded:
-            search_req = req.model_copy(update={"query": expanded})
             if EXPOSE_DEBUG_STATUS:
                 print(f"[backend] expanded query: {expanded!r}", flush=True)
 
-    hits, used_filter, reranked = _do_search(search_req)
+    hits, used_filter, reranked = _do_search(req, retrieval_query=expanded)
 
     context_hits: List[Any] = []
     prompt = ""
@@ -358,22 +496,22 @@ def _prepare_ask(req: AskRequest):
 
 
 def _finalize_answer(llm, prompt: str, context_hits, raw_answer: str, max_new_tokens: int):
-    """Format a raw completion, apply the refusal-retry safety net, parse citations."""
+    """Format and resolve citation references; this is not entailment validation.
+
+    A refusal is not a provider error. Repeating the same prompt until the
+    model answers selects against justified abstention without new evidence.
+    """
     answer = format_answer_markdown(strip_chat_artifacts(raw_answer))
-    # Free-tier models occasionally refuse borderline questions the
-    # passages can answer; one retry is a cheap safety net.
-    if answer.strip().startswith(REFUSAL_LINE):
-        try:
-            retry_raw = llm.generate(prompt, max_new_tokens=max_new_tokens)
-            retry_answer = format_answer_markdown(strip_chat_artifacts(retry_raw))
-            if retry_answer.strip() and not retry_answer.strip().startswith(REFUSAL_LINE):
-                answer = retry_answer
-        except Exception:
-            pass
+    if answer == REFUSAL_LINE:
+        return answer, []
+    validation = validate_and_filter_answer(answer, context_hits)
+    answer = validation.safe_answer or REFUSAL_LINE
     return answer, parse_citations(answer, context_hits)
 
 
-def _generate_answer(llm, prompt: str, context_hits, max_new_tokens: int):
+def _generate_answer(llm, prompt: str, context_hits, max_new_tokens: int, query: Optional[str] = None):
+    if query and not assess_evidence(query, context_hits).sufficient:
+        return REFUSAL_LINE, []
     try:
         raw_answer = llm.generate(prompt, max_new_tokens=max_new_tokens)
     except Exception as exc:
@@ -396,7 +534,7 @@ def ask_stream(req: AskRequest) -> StreamingResponse:
     try:
         llm, hits, used_filter, reranked, context_hits, prompt = _prepare_ask(req)
     except ValueError as exc:
-        raise HTTPException(status_code=400, detail=str(exc)) from exc
+        raise HTTPException(status_code=400, detail="Invalid retrieval configuration") from exc
 
     def event_source():
         yield _sse(
@@ -406,27 +544,31 @@ def ask_stream(req: AskRequest) -> StreamingResponse:
                 "strategy": req.strategy,
                 "reranked": reranked,
                 "used_filter": used_filter,
-                "hits": [h.model_dump() for h in _hits_to_out(hits)],
+                "hits": [h.model_dump() for h in _hits_to_out(context_hits)],
+                "retrieved_hits": [h.model_dump() for h in _hits_to_out(hits)],
             },
         )
         if not hits:
             yield _sse("done", {"answer": None, "citations": []})
             return
+        if not assess_evidence(req.query, context_hits).sufficient:
+            yield _sse("done", {"answer": REFUSAL_LINE, "citations": []})
+            return
 
         raw_answer = ""
         try:
             if hasattr(llm, "generate_stream"):
+                # Raw tokens cannot be claim-validated incrementally. Buffer them
+                # and expose only the post-validation answer in the done event.
                 for delta in llm.generate_stream(prompt, max_new_tokens=req.max_new_tokens):
                     raw_answer += delta
-                    yield _sse("delta", {"text": delta})
             else:
                 raw_answer = llm.generate(prompt, max_new_tokens=req.max_new_tokens)
-                yield _sse("delta", {"text": raw_answer})
         except Exception as exc:
             if EXPOSE_DEBUG_STATUS:
                 print(f"[backend] stream failed, falling back: {exc}", flush=True)
             # The non-streaming path carries the full retry/fallback logic.
-            answer, citations = _generate_answer(llm, prompt, context_hits, req.max_new_tokens)
+            answer, citations = _generate_answer(llm, prompt, context_hits, req.max_new_tokens, req.query)
             yield _sse("done", {"answer": answer, "citations": citations})
             return
 

@@ -13,7 +13,7 @@ from typing import Dict, List, Optional, Sequence
 from src.vector_store import SearchHit
 
 
-REFUSAL_LINE = "The shareholder letters do not contain information specifically about this topic."
+REFUSAL_LINE = "The retrieved passages do not provide enough evidence to answer this question."
 
 
 SYSTEM_PROMPT = """\
@@ -34,9 +34,12 @@ Step 3 — Pick one path:
   before or after it.
 - If one or more passages pass → answer using only those passages.
 Step 4 — Stay inside the passages. Do not add facts, numbers, dates, names, causes, or \
-background the passages do not state. Do not infer or extrapolate. If you cannot point \
-to the exact words that support a claim, do not make the claim. If the passages answer \
-only part of the question, answer that part and stop — do not mention the missing part.
+background the passages do not state. You may synthesize explicitly supported points \
+to explain an idea; do not invent motives, causation, numbers or trends. If the passages \
+answer only part of the question, answer that part and identify the missing evidence. \
+For a comparison, separate the periods, cite evidence for each, and do not claim a \
+change unless both sides support it. Missing retrieved evidence does not prove that \
+the entire collection is silent on a topic.
 
 ## SELF-CONTAINED SENTENCES
 Every sentence you write must be understandable on its own. Never copy a passage \
@@ -48,7 +51,7 @@ and the passages only mention it in passing, say plainly that the letters touch 
 only briefly, then summarize the passing mention with enough context to be understood.
 
 ## REFUSAL LINE — copy exactly, alone, no citation, no apology, no extra text
-The shareholder letters do not contain information specifically about this topic.
+The retrieved passages do not provide enough evidence to answer this question.
 
 ## CITATIONS
 - Support every sentence with the passage it came from: [3] for one, [3,7] for several.
@@ -168,6 +171,8 @@ def parse_citations(answer: str, hits: Sequence[SearchHit]) -> List[Dict]:
                 "marker": m.group(0),
                 "passage_indices": valid_idxs,
                 "raw_numbers": nums,
+                "invalid_numbers": [n for n in nums if not 1 <= n <= len(hits)],
+                "passage_ids": [hits[i].id for i in valid_idxs],
                 "years": years,
                 "sources": sources,
             }

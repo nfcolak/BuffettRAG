@@ -1,0 +1,91 @@
+.........FFF                                                             [100%]
+=================================== FAILURES ===================================
+_________ test_answer_evaluation_persists_evidence_and_scoring_method __________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x302122b80>
+
+    def test_answer_evaluation_persists_evidence_and_scoring_method(monkeypatch):
+        from src.evaluation import run_eval
+        from src.evaluation.gold_set import get_gold_queries
+        passage = {'id': '1977_0', 'text': 'Operating earnings increased.', 'year': 1977}
+    
+        class OfflinePipeline:
+            llm = object()
+            def ask(self, *args, **kwargs):
+                return {'answer': 'Operating earnings increased. [1]', 'passages': [passage],
+                        'citations': [], 'retrieved_passages': [passage]}
+    
+        monkeypatch.setattr(run_eval, 'get_gold_queries', lambda: get_gold_queries()[:1])
+        monkeypatch.setattr(run_eval.time, 'sleep', lambda _: None)
+        row = run_eval.evaluate_answers(OfflinePipeline())[0]
+>       assert row['passages'] == [passage]
+E       KeyError: 'passages'
+
+tests/test_answer_quality.py:144: KeyError
+__________ test_backend_refusal_is_not_retried_until_it_hallucinates ___________
+
+    def test_backend_refusal_is_not_retried_until_it_hallucinates():
+        from src.services.backend_app import _finalize_answer
+        from src.generation.prompt import REFUSAL_LINE
+        class NeverCalled:
+            def generate(self, *args, **kwargs):
+                raise AssertionError('A grounded refusal must not be retried without new evidence')
+        # Catch swallowed retry exceptions too.
+        calls = []
+        class Capture:
+            def generate(self, *args, **kwargs):
+                calls.append(True)
+                return 'Unsupported alternative answer. [1]'
+        answer, citations = _finalize_answer(Capture(), 'prompt', [], REFUSAL_LINE, 100)
+>       assert answer == REFUSAL_LINE
+E       AssertionError: assert 'Unsupported ...e answer. [1]' == 'The sharehol...t this topic.'
+E         
+E         - The shareholder letters do not contain information specifically about this topic.
+E         + Unsupported alternative answer. [1]
+
+tests/test_answer_quality.py:162: AssertionError
+____________ test_backend_returns_prompt_passages_in_citation_order ____________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x30256f820>
+
+    def test_backend_returns_prompt_passages_in_citation_order(monkeypatch):
+        from src.services import backend_app as backend
+        from src.vector_store import SearchHit
+        raw = SearchHit('1977_0', 'anchor', {'year': 1977}, 1.0)
+        expanded = SearchHit('1977_0', 'before anchor after', {'year': 1977}, 1.0)
+        monkeypatch.setitem(backend._state, 'test_ready', True)
+        monkeypatch.setattr(backend, '_prepare_ask', lambda req: (None, [raw], None, False, [expanded], 'prompt'))
+        monkeypatch.setattr(backend, '_generate_answer', lambda *args: ('Evidence. [1]', []))
+        result = backend.ask(backend.AskRequest(query='Earnings?'))
+>       assert result.hits[0].text == expanded.text
+E       AssertionError: assert 'anchor' == 'before anchor after'
+E         
+E         - before anchor after
+E         + anchor
+
+tests/test_answer_quality.py:176: AssertionError
+=============================== warnings summary ===============================
+tests/test_answer_quality.py::test_backend_refusal_is_not_retried_until_it_hallucinates
+  /Users/necatifurkancolak/AI-Workplace/Projects/done/BuffettRAG/src/services/backend_app.py:161: DeprecationWarning: 
+          on_event is deprecated, use lifespan event handlers instead.
+  
+          Read more about it in the
+          [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
+          
+    @app.on_event("startup")
+
+tests/test_answer_quality.py::test_backend_refusal_is_not_retried_until_it_hallucinates
+  /Users/necatifurkancolak/Library/Python/3.9/lib/python/site-packages/fastapi/applications.py:4579: DeprecationWarning: 
+          on_event is deprecated, use lifespan event handlers instead.
+  
+          Read more about it in the
+          [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
+          
+    return self.router.on_event(event_type)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_answer_quality.py::test_answer_evaluation_persists_evidence_and_scoring_method
+FAILED tests/test_answer_quality.py::test_backend_refusal_is_not_retried_until_it_hallucinates
+FAILED tests/test_answer_quality.py::test_backend_returns_prompt_passages_in_citation_order
+3 failed, 9 passed, 2 warnings in 2.83s

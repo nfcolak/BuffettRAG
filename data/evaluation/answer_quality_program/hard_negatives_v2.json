@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "purpose": "Confusable, named passage negatives for retrieval regression checks; a case passes only when evidence ranks above its decoy.",
+  "cases": [
+    {"qid":"hn01_derivatives_vs_mass_risk","query":"What did Buffett say about derivatives being weapons of mass destruction?","relevant_ids":["2002_86"],"hard_negative_ids":["2015_144"]},
+    {"qid":"hn02_crisis_vs_buybacks","query":"How did Berkshire respond when the financial system seized in September 2008?","relevant_ids":["2009_21"],"hard_negative_ids":["2008_89"]},
+    {"qid":"hn03_bnsf_vs_railroad_dividends","query":"What did Buffett say about Berkshire's BNSF acquisition?","relevant_ids":["2021_56"],"hard_negative_ids":["2020_76"]},
+    {"qid":"hn04_apple_earnings_vs_stake","query":"How did Buffett describe the economic benefit of Apple share repurchases?","relevant_ids":["2021_30"],"hard_negative_ids":["2020_35"]},
+    {"qid":"hn05_index_funds_vs_manager_fees","query":"What investing advice did Buffett give individual investors about index funds?","relevant_ids":["1996_92"],"hard_negative_ids":["2006_141"]},
+    {"qid":"hn06_dividend_policy_vs_tax","query":"Why did Buffett discuss not paying Berkshire a cash dividend?","relevant_ids":["2012_109"],"hard_negative_ids":["2016_112"]},
+    {"qid":"hn07_see_operations_vs_table","query":"What did Buffett report about See's Candies in 1989?","relevant_ids":["1989_33"],"hard_negative_ids":["1989_18"]},
+    {"qid":"hn08_greg_meeting_vs_midamerican","query":"What role did Greg Abel have at Berkshire's 2020 annual meeting?","relevant_ids":["2020_81"],"hard_negative_ids":["2005_50"]}
+  ]
+}

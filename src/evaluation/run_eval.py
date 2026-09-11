@@ -107,12 +107,16 @@ def evaluate_answers(
                 "query": g.query,
                 "answer": result["answer"],
                 "citations": result["citations"],
+                "passages": result["passages"],
+                "retrieved_passages": result.get("retrieved_passages", result["passages"]),
                 "answer_keyword_hit_rate": keyword_hit_rate,
                 "faithfulness": {
                     "n_sentences": report.n_sentences,
                     "citation_coverage": report.citation_coverage,
                     "invalid_citation_rate": report.invalid_citation_rate,
                     "mean_support": report.mean_support,
+                    "support_method": "lexical_bigram_proxy_not_entailment",
+                    "per_sentence": report.per_sentence,
                 },
             }
         )

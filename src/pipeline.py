@@ -18,11 +18,12 @@ from typing import Any, Dict, List, Optional
 
 from config import (
     CHUNKS_FILE,
-    CHUNKS_V2_FILE,
+    CHUNKS_V3_FILE,
     DEFAULT_LLM_PROVIDER,
     DEFAULT_TOP_K,
     EMBEDDING_DEVICE,
     EMBEDDING_MODEL_PRIMARY,
+    FAISS_DIR,
     RETRIEVAL_FETCH_K,
     ANSWER_CONTEXT_MAX_CHARS,
     ANSWER_CONTEXT_NEIGHBORS,
@@ -30,14 +31,19 @@ from config import (
 )
 from src.embeddings import BGEEmbedder
 from src.generation.prompt import (
+    REFUSAL_LINE,
     build_cited_prompt,
     parse_citations,
     strip_chat_artifacts,
 )
+from src.generation.evidence_gate import assess_evidence
+from src.evaluation.claim_validator import validate_and_filter_answer
 from src.generation.providers import LLMProvider, create_llm_provider
+from src.index_manifest import load_and_validate_index_manifest, write_index_manifest
 from src.retrieval import CrossEncoderReranker, Retriever
 from src.retrieval.context import build_doc_lookup, expand_hits_with_neighbors
 from src.vector_store import (
+    FaissStore,
     SearchHit,
     StoredDoc,
     get_vector_store,
@@ -47,7 +53,7 @@ from src.vector_store import (
 
 @dataclass
 class PipelineConfig:
-    chunks_file: Path = CHUNKS_V2_FILE
+    chunks_file: Path = CHUNKS_V3_FILE
     embedding_model: str = EMBEDDING_MODEL_PRIMARY
     vector_backend: str = VECTOR_BACKEND
     device: str = EMBEDDING_DEVICE
@@ -72,7 +78,7 @@ class BuffettRAGPipeline:
     @classmethod
     def build(cls, cfg: Optional[PipelineConfig] = None) -> "BuffettRAGPipeline":
         cfg = cfg or PipelineConfig()
-        # Fall back to v1 chunks if v2 hasn't been generated yet.
+        # Fall back to the legacy corpus only when the active V3 corpus is absent.
         chunks_path = cfg.chunks_file if cfg.chunks_file.exists() else CHUNKS_FILE
         if not chunks_path.exists():
             raise FileNotFoundError(
@@ -85,13 +91,28 @@ class BuffettRAGPipeline:
 
         embedder = BGEEmbedder(model_name=cfg.embedding_model, device=cfg.device)
 
+        if cfg.vector_backend == "faiss" and (FAISS_DIR / FaissStore.INDEX_FILE).exists():
+            load_and_validate_index_manifest(
+                FAISS_DIR, corpus=chunks_path, docs=docs, backend="faiss",
+                model_name=embedder.model_name, dimension=embedder.dimension,
+            )
         store = get_vector_store(backend=cfg.vector_backend, dim=embedder.dimension)
         if len(store) == 0:
             print(f"Vector store empty -- building index ({cfg.vector_backend})")
             texts = [d.text for d in docs]
             embeddings = embedder.embed_documents(texts)
             store.add(docs, embeddings)
+            if isinstance(store, FaissStore):
+                write_index_manifest(
+                    Path(store.persist_dir), corpus=chunks_path, docs=docs, backend="faiss",
+                    model_name=embedder.model_name, dimension=embedder.dimension,
+                    artifact_names=(store.INDEX_FILE, store.META_JSON_FILE),
+                )
         else:
+            if len(store) != len(docs):
+                raise RuntimeError(
+                    f"Vector store has {len(store)} rows but active corpus has {len(docs)}"
+                )
             print(f"Vector store already populated: {len(store)} vectors")
 
         reranker = CrossEncoderReranker(device=cfg.device) if cfg.use_reranker else None
@@ -138,6 +159,21 @@ class BuffettRAGPipeline:
                 "reranked": result.reranked,
             }
 
+        evidence = assess_evidence(query, result.hits)
+        if not evidence.sufficient:
+            return {
+                "query": query,
+                "strategy": strategy,
+                "answer": REFUSAL_LINE,
+                "passages": [_hit_to_dict(h) for h in result.hits],
+                "retrieved_passages": [_hit_to_dict(h) for h in result.hits],
+                "citations": [],
+                "used_filter": result.used_filter,
+                "reranked": result.reranked,
+                "evidence": {"sufficient": False, "reason": evidence.reason,
+                             "best_overlap": evidence.best_overlap},
+            }
+
         context_hits = expand_hits_with_neighbors(
             result.hits,
             self.docs_by_id,
@@ -147,16 +183,24 @@ class BuffettRAGPipeline:
         prompt = build_cited_prompt(query, context_hits)
         raw_answer = self.llm.generate(prompt)
         answer = strip_chat_artifacts(raw_answer)
+        validation = validate_and_filter_answer(answer, context_hits)
+        answer = validation.safe_answer or REFUSAL_LINE
         citations = parse_citations(answer, context_hits)
 
         return {
             "query": query,
             "strategy": strategy,
             "answer": answer,
-            "passages": [_hit_to_dict(h) for h in result.hits],
+            "passages": [_hit_to_dict(h) for h in context_hits],
+            "retrieved_passages": [_hit_to_dict(h) for h in result.hits],
             "citations": citations,
             "used_filter": result.used_filter,
             "reranked": result.reranked,
+            "evidence": {"sufficient": True, "reason": evidence.reason,
+                         "best_overlap": evidence.best_overlap},
+            "citation_validation": {"blocked_claims": validation.blocked_claims,
+                                     "validations": validation.validations,
+                                     "nli_available": validation.nli_available},
         }
 
     def compare_decades(

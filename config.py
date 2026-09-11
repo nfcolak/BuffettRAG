@@ -32,13 +32,14 @@ DATA_DIR = BASE_DIR / "data"
 RAW_DATA_DIR = DATA_DIR / "raw"
 OUTPUT_DIR = DATA_DIR / "processed"
 CHUNKS_FILE = OUTPUT_DIR / "chunks.jsonl"
-CHUNKS_V2_FILE = OUTPUT_DIR / "chunks_v2.jsonl"  # output of improved pipeline
+CHUNKS_V2_FILE = OUTPUT_DIR / "chunks_v2.jsonl"  # historical compatibility corpus
+CHUNKS_V3_FILE = OUTPUT_DIR / "chunks_v3_paragraph.jsonl"  # active paragraph-aware corpus
 METADATA_FILE = OUTPUT_DIR / "metadata.json"
 METADATA_V2_FILE = OUTPUT_DIR / "metadata_v2.json"
 
 INDEX_DIR = DATA_DIR / "indices"
 CHROMA_DIR = INDEX_DIR / "chroma"
-FAISS_DIR = INDEX_DIR / "faiss"
+FAISS_DIR = INDEX_DIR / os.getenv("FAISS_INDEX_NAME", "faiss_v3")
 
 EVAL_DIR = DATA_DIR / "evaluation"
 
@@ -167,6 +168,10 @@ CORS_ORIGINS = _csv_env(
 )
 RATE_LIMIT_REQUESTS = int(os.getenv("RATE_LIMIT_REQUESTS", "60"))
 RATE_LIMIT_WINDOW_SECONDS = int(os.getenv("RATE_LIMIT_WINDOW_SECONDS", "60"))
+MAX_REQUEST_BODY_BYTES = min(max(int(os.getenv("MAX_REQUEST_BODY_BYTES", "65536")), 1024), 1_048_576)
+PUBLIC_DEMO_MODE = os.getenv("PUBLIC_DEMO_MODE", "0") == "1"
+# Public demo requests use only the deployment-owned provider and model.
+ALLOW_LLM_REQUEST_OVERRIDES = os.getenv("ALLOW_LLM_REQUEST_OVERRIDES", "0") == "1"
 # Only trust X-Forwarded-For for rate-limit client identity when the service
 # actually runs behind a reverse proxy that sets it; otherwise the header is
 # client-controlled and lets callers reset their own rate-limit bucket.

@@ -1,0 +1,72 @@
+/Users/necatifurkancolak/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+FFFFFFFF                                                                 [100%]
+=================================== FAILURES ===================================
+______ test_answer_benchmark_accepts_all_gold_claims_with_valid_passages _______
+
+    def test_answer_benchmark_accepts_all_gold_claims_with_valid_passages():
+>       from src.evaluation.answer_benchmark import evaluate_answer, validate_benchmark_case
+E       ModuleNotFoundError: No module named 'src.evaluation.answer_benchmark'
+
+tests/test_full_quality_program.py:12: ModuleNotFoundError
+____ test_claim_validator_splits_compound_claim_and_blocks_unsupported_part ____
+
+    def test_claim_validator_splits_compound_claim_and_blocks_unsupported_part():
+>       from src.evaluation.claim_validator import validate_and_filter_answer
+E       ModuleNotFoundError: No module named 'src.evaluation.claim_validator'
+
+tests/test_full_quality_program.py:27: ModuleNotFoundError
+_______ test_paragraph_chunking_records_source_provenance_and_stable_ids _______
+
+tmp_path = PosixPath('/private/var/folders/t9/vq0vys6j7g5bfk69nvl5nhph0000gn/T/pytest-of-necatifurkancolak/pytest-18/test_paragraph_chunking_record0')
+
+    def test_paragraph_chunking_records_source_provenance_and_stable_ids(tmp_path):
+>       from src.ingestion.paragraph_index import build_paragraph_records
+E       ModuleNotFoundError: No module named 'src.ingestion.paragraph_index'
+
+tests/test_full_quality_program.py:36: ModuleNotFoundError
+________ test_hard_negative_case_requires_relevant_ahead_of_named_decoy ________
+
+    def test_hard_negative_case_requires_relevant_ahead_of_named_decoy():
+>       from src.evaluation.hard_negatives import score_hard_negative_case
+E       ModuleNotFoundError: No module named 'src.evaluation.hard_negatives'
+
+tests/test_full_quality_program.py:47: ModuleNotFoundError
+_____ test_ablation_orchestrator_marks_missing_optional_models_unavailable _____
+
+    def test_ablation_orchestrator_marks_missing_optional_models_unavailable():
+>       from src.evaluation.ablation import benchmark_configurations
+E       ModuleNotFoundError: No module named 'src.evaluation.ablation'
+
+tests/test_full_quality_program.py:55: ModuleNotFoundError
+__________ test_structured_expansion_preserves_year_and_named_entity ___________
+
+    def test_structured_expansion_preserves_year_and_named_entity():
+>       from src.retrieval.query_expansion import expand_query_structured
+E       ImportError: cannot import name 'expand_query_structured' from 'src.retrieval.query_expansion' (/Users/necatifurkancolak/AI-Workplace/Projects/done/BuffettRAG/src/retrieval/query_expansion.py)
+
+tests/test_full_quality_program.py:63: ImportError
+__________ test_evidence_gate_refuses_when_hits_do_not_support_query ___________
+
+    def test_evidence_gate_refuses_when_hits_do_not_support_query():
+>       from src.generation.evidence_gate import assess_evidence
+E       ModuleNotFoundError: No module named 'src.generation.evidence_gate'
+
+tests/test_full_quality_program.py:78: ModuleNotFoundError
+____ test_demo_security_rejects_private_backend_and_enforces_request_budget ____
+
+    def test_demo_security_rejects_private_backend_and_enforces_request_budget():
+>       from src.services.demo_security import DemoRequestBudget, validate_demo_backend_url
+E       ModuleNotFoundError: No module named 'src.services.demo_security'
+
+tests/test_full_quality_program.py:86: ModuleNotFoundError
+=========================== short test summary info ============================
+FAILED tests/test_full_quality_program.py::test_answer_benchmark_accepts_all_gold_claims_with_valid_passages
+FAILED tests/test_full_quality_program.py::test_claim_validator_splits_compound_claim_and_blocks_unsupported_part
+FAILED tests/test_full_quality_program.py::test_paragraph_chunking_records_source_provenance_and_stable_ids
+FAILED tests/test_full_quality_program.py::test_hard_negative_case_requires_relevant_ahead_of_named_decoy
+FAILED tests/test_full_quality_program.py::test_ablation_orchestrator_marks_missing_optional_models_unavailable
+FAILED tests/test_full_quality_program.py::test_structured_expansion_preserves_year_and_named_entity
+FAILED tests/test_full_quality_program.py::test_evidence_gate_refuses_when_hits_do_not_support_query
+FAILED tests/test_full_quality_program.py::test_demo_security_rejects_private_backend_and_enforces_request_budget
+8 failed in 0.85s

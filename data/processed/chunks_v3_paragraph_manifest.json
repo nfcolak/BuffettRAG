@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "corpus": "paragraph_v3",
+  "source_files": 48,
+  "chunks": 5831,
+  "chunk_config": {
+    "size": 800,
+    "overlap": 120,
+    "min_chunk_chars": 160
+  },
+  "corpus_sha256": "8263f08958729a77febf0922e7bbc4161bedd5fdb3e9a8b3fc9a64ab681ab5f0",
+  "mapping_sha256": "902f023ff7c13e80e46ef45fe875e57cde39c88b6f0997a01c7c5f00d300dcc6",
+  "vector_index": {
+    "status": "not_built",
+    "reason": "requires explicit local vector backend/model run"
+  }
+}

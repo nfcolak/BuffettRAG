@@ -1,0 +1,294 @@
+{
+  "schema_version": 1,
+  "mode": "offline_bm25_embedded_extractive_not_live_llm_quality",
+  "corpus": "data/processed/chunks_v3_paragraph.jsonl",
+  "corpus_sha256": "8263f08958729a77febf0922e7bbc4161bedd5fdb3e9a8b3fc9a64ab681ab5f0",
+  "cases_sha256": "2832d202750db493cff5e7a38f9353d8e734f5e9d85f0347e5f436f82c94de8a",
+  "answer_engine": {
+    "provider": "local",
+    "model": "embedded-extractive-v1"
+  },
+  "n_cases": 8,
+  "accepted": 8,
+  "rows": [
+    {
+      "qid": "aq01_derivatives",
+      "answer": "Charlie and I believe Berkshire should be a fortress of financial strength – for the sake of our owners, creditors, policyholders and employees. [1]\n\nWe try to be alert to any sort of megacatastrophe risk, and that posture may make us unduly apprehensive about the burgeoning quantities of long-term derivatives contracts and the massive amount of uncollateralized receivables that are growing alongside. [1]\n\nIn our view, however, derivatives are financial weapons of mass destruction, carrying dangers that, while now latent, are potentially lethal. [1]\n\nInvestments Below we show our common stock investments. [1]\n\nThose that had a market value of more than $500 million at the end of 2002 are itemized. 12/31/02 Shares Company Cost Market (dollars in millions) 151,610,700 [1]\n\nThe probability of such mass destruction in any given year is likely very small. [2]",
+      "retrieved_ids": [
+        "2002_p0086",
+        "2015_p0142",
+        "2015_p0144",
+        "2006_p0105",
+        "2005_p0075",
+        "2002_p0068",
+        "2003_p0087",
+        "2012_p0088"
+      ],
+      "accepted": true,
+      "claim_coverage": 1.0,
+      "claims": [
+        {
+          "claim": "Buffett called derivatives financial weapons of mass destruction.",
+          "met": true,
+          "supporting_sentences": [
+            "In our view, however, derivatives are financial weapons of mass destruction, carrying dangers that, while now latent, are potentially lethal. [1]"
+          ]
+        }
+      ],
+      "cited_passage_ids": [
+        "2002_p0086",
+        "2015_p0142"
+      ],
+      "has_gold_citation": true,
+      "forbidden_terms_found": []
+    },
+    {
+      "qid": "aq02_crisis",
+      "answer": "we may conceivably have will be dwarfed by our own liquidity. [1]\n\nMoreover, that liquidity will be constantly refreshed by a gusher of earnings from our many and diverse businesses. [1]\n\nWhen the financial system went into cardiac arrest in September 2008, Berkshire was a supplier of liquidity and capital to the system, not a supplicant. [1]\n\nAt the very peak of the crisis, we poured $15.5 billion into a business world that could otherwise look only to the federal government for help. [1]\n\nOf that, $9 billion went to bolster capital at three highly-regarded and previously-secure American businesses that needed – without delay – our tangible vote of confidence. [1]\n\nAfter September 11th, his quickness to respond, always important, has become a major competitive advantage. [4]",
+      "retrieved_ids": [
+        "2009_p0021",
+        "2023_p0020",
+        "2014_p0199",
+        "2001_p0058",
+        "2010_p0029",
+        "2015_p0127",
+        "1981_p0071",
+        "2023_p0023"
+      ],
+      "accepted": true,
+      "claim_coverage": 1.0,
+      "claims": [
+        {
+          "claim": "Berkshire supplied liquidity and capital during the crisis.",
+          "met": true,
+          "supporting_sentences": [
+            "When the financial system went into cardiac arrest in September 2008, Berkshire was a supplier of liquidity and capital to the system, not a supplicant. [1]"
+          ]
+        },
+        {
+          "claim": "It committed $15.5 billion.",
+          "met": true,
+          "supporting_sentences": [
+            "At the very peak of the crisis, we poured $15.5 billion into a business world that could otherwise look only to the federal government for help. [1]"
+          ]
+        }
+      ],
+      "cited_passage_ids": [
+        "2001_p0058",
+        "2009_p0021"
+      ],
+      "has_gold_citation": true,
+      "forbidden_terms_found": []
+    },
+    {
+      "qid": "aq03_bnsf",
+      "answer": "I also told him the maximum price that Berkshire would pay. [1]\n\nMatt relayed the offer to his directors and advisors. [1]\n\nEleven busy days later, Berkshire and BNSF announced a firm deal. [1]\n\nAnd here I’ll venture a rare prediction: BNSF will be a key asset for Berkshire and our country a century from now. [1]\n\nThe BNSF acquisition would never have happened if Paul Andrews hadn’t sized up Berkshire as the right home for TTI. [1]\n\nHere are the key financial figures for both: BNSF Earnings (in millions) 2016 2015 2014 Revenues.................................................................................. $ 19,829 $ 21,967 $ 23,239 Operating expenses .................................................................... 13,144 14,264 16,237 Operating earnings before interest and taxes.................................... 6,685 7,703 7,002 Interest (net) ............................................................................. [2]",
+      "retrieved_ids": [
+        "2021_p0056",
+        "2016_p0069",
+        "2020_p0075",
+        "2011_p0059",
+        "2010_p0082",
+        "2023_p0042",
+        "2012_p0052",
+        "2020_p0073"
+      ],
+      "accepted": true,
+      "claim_coverage": 1.0,
+      "claims": [
+        {
+          "claim": "Berkshire and BNSF announced a firm deal.",
+          "met": true,
+          "supporting_sentences": [
+            "Eleven busy days later, Berkshire and BNSF announced a firm deal. [1]"
+          ]
+        },
+        {
+          "claim": "Buffett predicted BNSF would be a key asset.",
+          "met": true,
+          "supporting_sentences": [
+            "And here I’ll venture a rare prediction: BNSF will be a key asset for Berkshire and our country a century from now. [1]"
+          ]
+        }
+      ],
+      "cited_passage_ids": [
+        "2016_p0069",
+        "2021_p0056"
+      ],
+      "has_gold_citation": true,
+      "forbidden_terms_found": []
+    },
+    {
+      "qid": "aq04_apple",
+      "answer": "Yet our “share” of Apple’s earnings amounted to a staggering $5.6 billion. [1]\n\nAt Apple and Amex, repurchases increased Berkshire’s ownership a bit without any cost to us. [2]\n\nSince purchasing our first property-casualty insurer in 1967, Berkshire’s float has increased 8,000-fold through acquisitions, operations and innovations. [4]\n\nThough not recognized in our financial statements, this float has been an extraordinary asset for Berkshire. [4]\n\nNew shareholders can get an understanding of its value by reading our annually updated explanation of float on page A-2. * * * * * * * * * * * * A very minor gain in per-share intrinsic value took place in 2022 through Berkshire share repurchases as well as similar moves at Apple and American Express, both significant investees of ours. [4]\n\nAt Berkshire, we directly increased your interest in our unique collection of businesses by repurchasing 1.2% of the company’s outstanding shares. [4]",
+      "retrieved_ids": [
+        "2021_p0030",
+        "2022_p0028",
+        "2020_p0036",
+        "2022_p0027",
+        "2020_p0034",
+        "2018_p0037",
+        "2020_p0035",
+        "2023_p0029"
+      ],
+      "accepted": true,
+      "claim_coverage": 1.0,
+      "claims": [
+        {
+          "claim": "Apple repurchases increased Berkshire's share.",
+          "met": true,
+          "supporting_sentences": [
+            "At Apple and Amex, repurchases increased Berkshire’s ownership a bit without any cost to us. [2]"
+          ]
+        },
+        {
+          "claim": "Berkshire's share of Apple earnings was $5.6 billion.",
+          "met": true,
+          "supporting_sentences": [
+            "Yet our “share” of Apple’s earnings amounted to a staggering $5.6 billion. [1]"
+          ]
+        }
+      ],
+      "cited_passage_ids": [
+        "2021_p0030",
+        "2022_p0027",
+        "2022_p0028"
+      ],
+      "has_gold_citation": true,
+      "forbidden_terms_found": []
+    },
+    {
+      "qid": "aq05_index",
+      "answer": "One bequest provides that cash will be delivered to a trustee for my wife’s benefit. [1]\n\n(I have to use cash for individual bequests, because all of my Berkshire shares will be fully distributed to certain philanthropic organizations over the ten years following the closing of my estate.) My advice to the trustee could not be more simple: Put 10% of the cash in short-term government bonds and 90% in a very low-cost S&P 500 index fund. [1]\n\n(I suggest Vanguard’s.) I believe the trust’s long-term results from this policy will be superior to those attained by most investors – whether pension funds, institutions or individuals – who employ high-fee managers. * * * * * * * * * * * * [1]\n\nBut to a great extent their efforts are self-neutralizing, and their IQ will not overcome the costs they impose on investors. [3]\n\nInvestors, on average and over time, will do better with a low-cost index fund than with a group of funds of funds. [3]\n\nMost investors, both institutional and individual, will find that the best way to own common stocks is through an index fund that charges minimal fees. [5]",
+      "retrieved_ids": [
+        "2013_p0114",
+        "2016_p0137",
+        "2016_p0129",
+        "2020_p0062",
+        "1996_p0092",
+        "2016_p0134",
+        "2016_p0123",
+        "2013_p0113"
+      ],
+      "accepted": true,
+      "claim_coverage": 1.0,
+      "claims": [
+        {
+          "claim": "Most investors should use a low-fee index fund.",
+          "met": true,
+          "supporting_sentences": [
+            "Most investors, both institutional and individual, will find that the best way to own common stocks is through an index fund that charges minimal fees. [5]"
+          ]
+        }
+      ],
+      "cited_passage_ids": [
+        "1996_p0092",
+        "2013_p0114",
+        "2016_p0129"
+      ],
+      "has_gold_citation": true,
+      "forbidden_terms_found": []
+    },
+    {
+      "qid": "aq06_dividends",
+      "answer": "Dividends A number of Berkshire shareholders – including some of my good friends – would like Berkshire to pay a cash dividend. [1]\n\nIt puzzles them that we relish the dividends we receive from most of the stocks that Berkshire owns, but pay out nothing ourselves. [1]\n\nOf course, a shareholder in our dividend-paying scenario could turn around and use his dividends to purchase more shares. [2]\n\nUnless passive rates fall, companies achieving 14% per year gains in earnings per share while paying no cash dividend are an economic failure for their individual shareholders. [4]\n\nThe returns from passive capital outstrip the returns from active capital. [4]\n\nThis is an unpleasant fact for both investors and corporate managers and, therefore, one they may wish to ignore. [4]",
+      "retrieved_ids": [
+        "2012_p0109",
+        "2012_p0123",
+        "2023_p0024",
+        "1981_p0035",
+        "1980_p0023",
+        "2014_p0228",
+        "1997_p0005",
+        "1994_p0019"
+      ],
+      "accepted": true,
+      "claim_coverage": 1.0,
+      "claims": [
+        {
+          "claim": "Some shareholders wanted a cash dividend.",
+          "met": true,
+          "supporting_sentences": [
+            "Dividends A number of Berkshire shareholders – including some of my good friends – would like Berkshire to pay a cash dividend. [1]"
+          ]
+        },
+        {
+          "claim": "Berkshire paid out nothing itself.",
+          "met": true,
+          "supporting_sentences": [
+            "It puzzles them that we relish the dividends we receive from most of the stocks that Berkshire owns, but pay out nothing ourselves. [1]"
+          ]
+        }
+      ],
+      "cited_passage_ids": [
+        "1981_p0035",
+        "2012_p0109",
+        "2012_p0123"
+      ],
+      "has_gold_citation": true,
+      "forbidden_terms_found": []
+    },
+    {
+      "qid": "aq07_see",
+      "answer": "How can we miss with a fellow like that - particularly when he comes equipped with a talented and energetic family, Alan, Marvin Cohn, and Don Yale. o At See's Candies we had an 8% increase in pounds sold, even though 1988 was itself a record year. [1]\n\nIncluded in the 1989 performance were excellent same-store poundage gains, our first in many years. [1]\n\nAdvertising played an important role in this outstanding performance. [1]\n\nNon-Insurance Operations In the past, we have labeled our major manufacturing, publishing and retail operations \"The Sainted Seven.\" With our acquisition of Borsheim's early in 1989, the challenge was to find a new title both alliterative and appropriate. [2]\n\nWe failed: Let's call the group \"The Sainted Seven Plus One.\" This divine assemblage - Borsheim's, The Buffalo News, Fechheimer Bros., Kirby, Nebraska Furniture Mart, Scott Fetzer Manufacturing Group, See's Candies, World Book - is a collection of businesses with economic characteristics that range from good to superb. [2]\n\nIts managers range from superb to superb. [2]",
+      "retrieved_ids": [
+        "1989_p0033",
+        "1989_p0027",
+        "1989_p0018",
+        "1990_p0010",
+        "1977_p0034",
+        "1999_p0076",
+        "1998_p0053",
+        "1989_p0039"
+      ],
+      "accepted": true,
+      "claim_coverage": 1.0,
+      "claims": [
+        {
+          "claim": "See's Candies had an 8% increase in pounds sold.",
+          "met": true,
+          "supporting_sentences": [
+            "How can we miss with a fellow like that - particularly when he comes equipped with a talented and energetic family, Alan, Marvin Cohn, and Don Yale. o At See's Candies we had an 8% increase in pounds sold, even though 1988 was itself a record year. [1]"
+          ]
+        }
+      ],
+      "cited_passage_ids": [
+        "1989_p0027",
+        "1989_p0033"
+      ],
+      "has_gold_citation": true,
+      "forbidden_terms_found": []
+    },
+    {
+      "qid": "aq08_greg_abel",
+      "answer": "Miraculously, their improvisations worked. [3]\n\nGreg Abel, one of Berkshire’s Vice Chairmen, joined me on stage facing a dark arena, 18,000 empty seats and a camera. [3]\n\nThere was no rehearsal: Greg and I arrived about 45 minutes before “showtime.” [3]\n\nLast year we had representatives from all 50 states, as well as Australia, Greece, Israel, Portugal, Singapore, Sweden, Switzerland, and the United Kingdom. [8]\n\nThe annual meeting is a time for owners to get their business-related questions answered, and therefore Charlie and I will stay on stage until we start getting punchy. [8]\n\n(When that happens, I hope you notice a change.) [8]",
+      "retrieved_ids": [
+        "2020_p0084",
+        "2003_p0137",
+        "2020_p0081",
+        "2009_p0119",
+        "2004_p0173",
+        "2006_p0118",
+        "1991_p0099",
+        "1996_p0118"
+      ],
+      "accepted": true,
+      "claim_coverage": 1.0,
+      "claims": [
+        {
+          "claim": "Greg Abel was a Berkshire vice chairman and joined Buffett on stage.",
+          "met": true,
+          "supporting_sentences": [
+            "Greg Abel, one of Berkshire’s Vice Chairmen, joined me on stage facing a dark arena, 18,000 empty seats and a camera. [3]"
+          ]
+        }
+      ],
+      "cited_passage_ids": [
+        "1996_p0118",
+        "2020_p0081"
+      ],
+      "has_gold_citation": true,
+      "forbidden_terms_found": []
+    }
+  ]
+}

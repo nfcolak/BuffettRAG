@@ -1,0 +1,16 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+______________ test_bm25_no_lexical_evidence_does_not_vote_in_rrf ______________
+
+    def test_bm25_no_lexical_evidence_does_not_vote_in_rrf():
+        docs = load_chunks_as_docs(ROOT / 'data/processed/chunks_v2.jsonl')
+>       assert BM25Retriever(docs).search('xyzzyqzzzzz') == []
+E       AssertionError: assert [SearchHit(id...ore=0.0), ...] == []
+E         
+E         Left contains 10 more items, first extra item: SearchHit(id='1977_0', text='To the Stockholders of Berkshire Hathaway Inc.:\n\nOperating earnings in 1977 of $21,904,...cs': 'insurance,berkshire_subsidiary', 'n_topics': 2, 'previous_chunk_id': None, 'next_chunk_id': '1977_1'}, score=0.0)
+E         Use -v to get more diff
+
+tests/test_answer_quality.py:12: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_answer_quality.py::test_bm25_no_lexical_evidence_does_not_vote_in_rrf
+1 failed in 0.73s

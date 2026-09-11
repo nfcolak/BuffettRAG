@@ -1,0 +1,69 @@
+{
+  "schema_version": 1,
+  "configurations": {
+    "bm25": {
+      "status": "ok",
+      "rows": [
+        {
+          "qid": "hn01_derivatives_vs_mass_risk",
+          "recall_at_8": 1.0,
+          "citation_support": 1.0,
+          "latency_ms": 12.393749999999981
+        },
+        {
+          "qid": "hn02_crisis_vs_buybacks",
+          "recall_at_8": 1.0,
+          "citation_support": 1.0,
+          "latency_ms": 12.877417000000001
+        },
+        {
+          "qid": "hn03_bnsf_vs_railroad_dividends",
+          "recall_at_8": 0.0,
+          "citation_support": 0.0,
+          "latency_ms": 7.9551660000000135
+        },
+        {
+          "qid": "hn04_apple_earnings_vs_stake",
+          "recall_at_8": 1.0,
+          "citation_support": 1.0,
+          "latency_ms": 10.193833000000097
+        },
+        {
+          "qid": "hn05_index_funds_vs_manager_fees",
+          "recall_at_8": 1.0,
+          "citation_support": 1.0,
+          "latency_ms": 10.291250000000085
+        },
+        {
+          "qid": "hn06_dividend_policy_vs_tax",
+          "recall_at_8": 0.0,
+          "citation_support": 0.0,
+          "latency_ms": 10.091041000000022
+        },
+        {
+          "qid": "hn07_see_operations_vs_table",
+          "recall_at_8": 1.0,
+          "citation_support": 1.0,
+          "latency_ms": 9.777499999999995
+        },
+        {
+          "qid": "hn08_greg_meeting_vs_midamerican",
+          "recall_at_8": 1.0,
+          "citation_support": 1.0,
+          "latency_ms": 11.338417000000046
+        }
+      ],
+      "wall_time_ms": 84.953
+    },
+    "embedding_only": {
+      "status": "unavailable",
+      "reason": "runner/model not available locally"
+    },
+    "embedding_reranker": {
+      "status": "unavailable",
+      "reason": "runner/model not available locally"
+    }
+  },
+  "mode": "local_bm25; embedding/reranker intentionally unavailable",
+  "corpus": "data/processed/chunks_v2.jsonl"
+}

@@ -1,0 +1,44 @@
+.......FF                                                                [100%]
+=================================== FAILURES ===================================
+____________ test_citation_at_end_does_not_cover_next_uncited_claim ____________
+
+    def test_citation_at_end_does_not_cover_next_uncited_claim():
+        from src.evaluation.citation_faithfulness import evaluate_faithfulness
+        from src.vector_store import SearchHit
+        passage = SearchHit('real', 'Operating earnings increased.', {'year': 1977}, 1.0)
+        report = evaluate_faithfulness('Operating earnings increased. [1] The moon is cheese.', [passage])
+>       assert report.n_sentences == 2
+E       AssertionError: assert 1 == 2
+E        +  where 1 = FaithfulnessReport(answer='Operating earnings increased. [1] The moon is cheese.', n_sentences=1, n_cited_sentences=1,...ence': 'Operating earnings increased. [1] The moon is cheese.', 'cited_passages': [0], 'support': 0.2857142857142857}]).n_sentences
+
+tests/test_answer_quality.py:98: AssertionError
+_________ test_pipeline_exposes_exact_prompt_evidence_and_citation_ids _________
+
+    def test_pipeline_exposes_exact_prompt_evidence_and_citation_ids():
+        from src.pipeline import BuffettRAGPipeline
+        from src.retrieval.retriever import RetrievalResult
+        from src.retrieval.context import build_doc_lookup
+        from src.vector_store import SearchHit
+        docs = load_chunks_as_docs(ROOT / 'data/processed/chunks_v2.jsonl')[:3]
+        hit = SearchHit(docs[1].id, docs[1].text, docs[1].metadata, 1.0)
+    
+        class FixedRetriever:
+            def search(self, *args, **kwargs):
+                return RetrievalResult(args[0], 'hybrid', [hit])
+    
+        class EvidenceLLM:
+            def generate(self, prompt):
+                self.prompt = prompt
+                return 'Operating earnings. [1,99]'
+    
+        llm = EvidenceLLM()
+        result = BuffettRAGPipeline(FixedRetriever(), build_doc_lookup(docs), llm).ask('Earnings?')
+>       assert result['passages'][0]['text'] != hit.text
+E       AssertionError: assert 'Textile operations came in well below forecast, while the\nresults of the Illinois National Bank as well as the opera...of Phil Liesche’s\nmanagerial group at National Indemnity Company, were even better\nthan our optimistic expectations.' != 'Textile operations came in well below forecast, while the\nresults of the Illinois National Bank as well as the opera...of Phil Liesche’s\nmanagerial group at National Indemnity Company, were even better\nthan our optimistic expectations.'
+E        +  where 'Textile operations came in well below forecast, while the\nresults of the Illinois National Bank as well as the opera...of Phil Liesche’s\nmanagerial group at National Indemnity Company, were even better\nthan our optimistic expectations.' = SearchHit(id='1977_1', text='Textile operations came in well below forecast, while the\nresults of the Illinois Nation... 'insurance,berkshire_subsidiary', 'n_topics': 2, 'previous_chunk_id': '1977_0', 'next_chunk_id': '1977_2'}, score=1.0).text
+
+tests/test_answer_quality.py:123: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_answer_quality.py::test_citation_at_end_does_not_cover_next_uncited_claim
+FAILED tests/test_answer_quality.py::test_pipeline_exposes_exact_prompt_evidence_and_citation_ids
+2 failed, 7 passed in 4.31s
