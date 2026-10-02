@@ -102,10 +102,7 @@ EMBEDDING_DEVICE = os.getenv("EMBEDDING_DEVICE", _default_device())
 VECTOR_BACKEND = os.getenv("VECTOR_BACKEND", "pgvector")  # 'pgvector' | 'chroma' | 'faiss'
 CHROMA_COLLECTION = "buffett_letters"
 
-# pgvector / Postgres connection.
-# Nuvolos exposes the Database app via fixed hostnames inside the same
-# instance. These env vars are typically set by the Nuvolos UI; we fall back
-# to localhost defaults so the code is also runnable outside the platform.
+# pgvector / Postgres connection (standard libpq env vars, localhost defaults).
 PG_HOST = os.getenv("PGHOST", "localhost")
 PG_PORT = int(os.getenv("PGPORT", "5432"))
 PG_USER = os.getenv("PGUSER", "postgres")
@@ -120,21 +117,23 @@ PG_IVFFLAT_LISTS = int(os.getenv("PG_IVFFLAT_LISTS", "100"))
 # -----------------------------------------------------------------------------
 DEFAULT_TOP_K = 8           # final passages returned to the LLM
 RETRIEVAL_FETCH_K = 30      # candidates fetched before reranking / fusion
-HYBRID_ALPHA = 0.6          # weight for vector score; (1 - alpha) for BM25
 RRF_K = 60                  # reciprocal rank fusion constant
 ANSWER_CONTEXT_NEIGHBORS = int(os.getenv("ANSWER_CONTEXT_NEIGHBORS", "1"))
 # Per-passage context budget. Modern cloud models handle 100k+ token windows;
 # 9000 chars (~2250 tokens) per passage keeps neighbor expansion from truncating.
 ANSWER_CONTEXT_MAX_CHARS = int(os.getenv("ANSWER_CONTEXT_MAX_CHARS", "9000"))
+# Max candidates sent to the cross-encoder (cost is linear in this).
+RERANK_CANDIDATES = int(os.getenv("RERANK_CANDIDATES", "15"))
+# Query expansion: "auto" (only when first-pass evidence is weak) | "always" | "off"
+EXPANSION_MODE = os.getenv("EXPANSION_MODE", "auto").strip().lower()
 
 # Reranker
 RERANKER_MODEL = "BAAI/bge-reranker-v2-m3"
-RERANK_TOP_K = 8
 
 # -----------------------------------------------------------------------------
 # Generation
 # -----------------------------------------------------------------------------
-LLM_MAX_NEW_TOKENS = 600
+LLM_MAX_NEW_TOKENS = 900
 DEFAULT_LLM_PROVIDER = os.getenv("DEFAULT_LLM_PROVIDER", "openrouter").strip().lower()
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
 OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-4.1-mini")
@@ -149,10 +148,9 @@ OPENROUTER_SITE_URL = os.getenv("OPENROUTER_SITE_URL", "")
 OPENROUTER_APP_NAME = os.getenv("OPENROUTER_APP_NAME", "BuffettRAG")
 
 # -----------------------------------------------------------------------------
-# Service URLs (3-tier deployment on Nuvolos)
+# Service URLs
 # -----------------------------------------------------------------------------
 # Backend FastAPI URL -- Frontend uses this to reach the RAG service.
-# On Nuvolos, the Backend app gets a fixed hostname inside the instance.
 BACKEND_URL = os.getenv("BACKEND_URL", "http://localhost:8000")
 # -----------------------------------------------------------------------------
 # API security

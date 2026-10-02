@@ -32,7 +32,7 @@ import re
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, Sequence
 
-from config import DEFAULT_TOP_K, RETRIEVAL_FETCH_K, RRF_K
+from config import DEFAULT_TOP_K, RERANK_CANDIDATES, RETRIEVAL_FETCH_K, RRF_K
 from src.retrieval.bm25 import BM25Retriever, _meta_matches
 from src.vector_store import SearchHit, StoredDoc
 
@@ -289,7 +289,17 @@ class Retriever:
         )
         reranked = False
         if rerank and self.reranker is not None and candidates:
-            candidates = self.reranker.rerank(query, candidates, top_k=len(candidates))
+            per_period = max(RERANK_CANDIDATES // max(len(subquery_filters), 1), 4)
+            pool: List[SearchHit] = []
+            pooled = set()
+            for filt in subquery_filters:
+                matching = [h for h in candidates if _meta_matches(h.metadata, filt)]
+                for h in matching[:per_period]:
+                    if h.id not in pooled:
+                        pooled.add(h.id)
+                        pool.append(h)
+            pool = pool or candidates[:RERANK_CANDIDATES]
+            candidates = self.reranker.rerank(query, pool, top_k=len(pool))
             reranked = True
 
         # Reserve the best supported candidate per nonempty period; fill the
@@ -376,8 +386,9 @@ class Retriever:
 
         reranked = False
         if rerank and self.reranker is not None and candidates:
+            to_rerank = candidates[:RERANK_CANDIDATES]
             rerank_pool = self.reranker.rerank(
-                query, candidates, top_k=min(len(candidates), max(top_k * 2, top_k + 4))
+                query, to_rerank, top_k=min(len(to_rerank), max(top_k * 2, top_k + 4))
             )
             candidates = deduplicate_hits(rerank_pool)[:top_k]
             reranked = True
@@ -391,25 +402,3 @@ class Retriever:
             used_filter=applied_filter,
             reranked=reranked,
         )
-
-    def cross_decade_compare(
-        self,
-        query: str,
-        decades: Sequence[int] = (1980, 1990, 2000, 2010, 2020),
-        per_decade_k: int = 3,
-        rerank: bool = False,
-    ) -> Dict[int, List[SearchHit]]:
-        out: Dict[int, List[SearchHit]] = {}
-
-        for d in decades:
-            res = self.search(
-                query,
-                strategy="hybrid",
-                top_k=per_decade_k,
-                where={"decade": d},
-                rerank=rerank,
-                auto_year_filter=False,
-            )
-            out[d] = res.hits
-
-        return out

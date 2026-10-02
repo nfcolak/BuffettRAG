@@ -7,6 +7,7 @@ so this class can be passed directly to `langchain_chroma.Chroma` if needed.
 
 from __future__ import annotations
 
+from collections import OrderedDict
 from typing import List
 
 import numpy as np
@@ -71,6 +72,18 @@ class BGEEmbedder:
         return emb.astype(np.float32).tolist()
 
     def embed_query(self, query: str) -> List[float]:
+        cache = self.__dict__.setdefault("_query_cache", OrderedDict())
+        hit = cache.get(query)
+        if hit is not None:
+            cache.move_to_end(query)
+            return list(hit)
+        result = self._embed_query_uncached(query)
+        cache[query] = tuple(result)
+        if len(cache) > 256:
+            cache.popitem(last=False)
+        return result
+
+    def _embed_query_uncached(self, query: str) -> List[float]:
         # BGE retrieval models expect the instruction prefix on the QUERY only,
         # never on the documents. This is the official guidance from BAAI.
         instructed = BGE_QUERY_INSTRUCTION + query
