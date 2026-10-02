@@ -56,7 +56,7 @@ class QueryExpansionTests(unittest.TestCase):
 
     def test_expand_query_appends_keywords(self) -> None:
         class FakeLLM:
-            provider_name = "openrouter"
+            provider_name = "llama"
 
             def generate(self, prompt, max_new_tokens=None):
                 return "Israel, ISCAR, OPEC"
@@ -75,7 +75,7 @@ class QueryExpansionTests(unittest.TestCase):
 
     def test_expand_query_swallows_provider_errors(self) -> None:
         class Broken:
-            provider_name = "openrouter"
+            provider_name = "llama"
 
             def generate(self, prompt, max_new_tokens=None):
                 raise RuntimeError("boom")

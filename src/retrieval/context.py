@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Dict, Iterable, List
+from typing import Dict, Iterable, List, Optional, Sequence
 
 from src.vector_store import SearchHit, StoredDoc
 
@@ -120,3 +120,56 @@ def _compose_context(
     before_text = before_text[-before_budget:].lstrip() if before_budget else ""
     after_text = after_text[:after_budget].rstrip() if after_budget else ""
     return "\n\n".join(part for part in (before_text, current_text, after_text) if part)
+
+
+_CHARS_PER_TOKEN = 4  # rough estimate used for the prompt budget
+
+
+def truncate_around_anchor(text: str, anchor: str, max_chars: int) -> str:
+    """Cut ``text`` to ``max_chars``, keeping the anchor chunk centred in the window."""
+    if len(text) <= max_chars:
+        return text
+    anchor = anchor.strip()
+    start = text.find(anchor) if anchor else -1
+    if start < 0:
+        return text[:max_chars].rstrip()
+    end = start + len(anchor)
+    if end - start >= max_chars:
+        return text[start:start + max_chars].rstrip()
+    spare = max_chars - (end - start)
+    lo = max(0, start - spare // 2)
+    hi = min(len(text), end + (spare - (start - lo)))
+    lo = max(0, hi - max_chars)
+    return text[lo:hi].strip()
+
+
+def fit_context_to_llm(
+    expanded: Sequence[SearchHit],
+    anchors: Sequence[SearchHit],
+    query: str,
+    *,
+    history: Optional[Sequence[Dict[str, str]]] = None,
+    max_new_tokens: int,
+    n_ctx: int,
+    max_passages: int,
+    passage_max_chars: int,
+) -> List[SearchHit]:
+    """Shrink answer context for a small-window model.
+
+    Keeps the first ``max_passages`` passages, truncates each around its anchor
+    chunk and drops trailing passages until the prompt fits
+    ``n_ctx - max_new_tokens`` (4 chars/token). Passage order is preserved, so
+    the [n] numbering of the returned list is the numbering the model sees.
+    """
+    from src.generation.prompt import build_cited_prompt
+
+    anchor_text = {a.id: a.text for a in anchors}
+    kept: List[SearchHit] = []
+    for hit in list(expanded)[: max(1, max_passages)]:
+        text = truncate_around_anchor(hit.text, anchor_text.get(hit.id, ""), passage_max_chars)
+        kept.append(SearchHit(id=hit.id, text=text, metadata=dict(hit.metadata), score=hit.score))
+
+    budget_chars = max(0, n_ctx - max_new_tokens) * _CHARS_PER_TOKEN
+    while len(kept) > 1 and len(build_cited_prompt(query, kept, history)) > budget_chars:
+        kept.pop()
+    return kept

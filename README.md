@@ -1,10 +1,10 @@
 # BuffettRAG
 
-BuffettRAG answers questions about Warren Buffett's Berkshire Hathaway shareholder letters (1977 to 2024) with sentence-level citations back to the source passages. All 48 letters are indexed as 5,831 paragraph-aware records with source hashes and neighbour provenance. A FastAPI backend runs hybrid retrieval and cross-encoder reranking, an LLM writes the answer from the retrieved passages alone, and a React frontend renders the answer next to the passages it cites.
+BuffettRAG answers questions about Warren Buffett's Berkshire Hathaway shareholder letters (1977 to 2024) with sentence-level citations back to the source passages. All 48 letters are indexed as 5,831 paragraph-aware records with source hashes and neighbour provenance. A FastAPI backend runs hybrid retrieval and cross-encoder reranking, an embedded local LLM (llama.cpp, Qwen2.5-1.5B-Instruct GGUF) writes the answer from the retrieved passages alone, and a React frontend renders the answer next to the passages it cites.
 
 ## How a question is answered
 
-The backend can expand the query (`EXPANSION_MODE`: `auto` expands only when first-pass evidence is weak, `always`, or `off`). The configured LLM proposes up to eight extra search keywords (companies, people, events, financial terms) so that questions phrased outside the corpus vocabulary still land, for example "Middle East" maps to ISCAR and Israel. Expansion failures are swallowed and retrieval falls back to the original query.
+The backend can expand the query (`EXPANSION_MODE`: `auto` expands only when first-pass evidence is weak, `always`, or `off`). The embedded LLM proposes up to eight extra search keywords (companies, people, events, financial terms) so that questions phrased outside the corpus vocabulary still land, for example "Middle East" maps to ISCAR and Israel. Expansion failures are swallowed and retrieval falls back to the original query.
 
 Retrieval is hybrid. The expanded query runs through BM25 and through vector search over bge-base-en-v1.5 embeddings, and the two rankings are merged with reciprocal rank fusion. The original query and expanded variant contribute candidate rankings; temporal interpretation and cross-encoder reranking always use the original question. Normal hybrid retrieval sends up to `RERANK_CANDIDATES` (default 15) fused candidates to bge-reranker-v2-m3; temporal comparison can retain up to thirty per period before reranking. Near-duplicate passages are dropped by token-overlap comparison, since overlapping chunk windows would otherwise fill the context with repeats. The top passages are then widened with their neighboring chunks (the chunk file stores previous and next chunk ids) so the LLM sees full paragraphs while retrieval stays precise over compact chunks.
 
@@ -44,7 +44,21 @@ VITE_BACKEND_URL=http://localhost:8000 npm run dev
 
 The first backend start downloads the embedding model (~440MB) and the reranker (~2.3GB). On CPU the reranker adds noticeable latency per query; a GPU removes most of it.
 
-Per-request LLM overrides are off by default: the server rejects `llm_provider`, `llm_api_key` and `llm_model`, and the frontend neither sends them nor shows provider settings. For local bring-your-own-key use, set `ALLOW_LLM_REQUEST_OVERRIDES=1` on the backend and build the frontend with `VITE_ALLOW_LLM_OVERRIDES=1`.
+## Embedded answer model
+
+Answers come from a small model that runs inside the backend process through llama.cpp (`llama-cpp-python`): Qwen2.5-1.5B-Instruct, 4-bit GGUF (`q4_k_m`, about 1.1GB). **No external API keys are used anywhere**: no OpenAI, Anthropic or OpenRouter calls, no per-request provider or key fields, and the frontend stores no keys.
+
+Download the weights once (they are git-ignored under `models/`):
+
+```bash
+hf download Qwen/Qwen2.5-1.5B-Instruct-GGUF qwen2.5-1.5b-instruct-q4_k_m.gguf --local-dir models/qwen2.5-1.5b-gguf
+```
+
+Providers: `llama` (default) and `local` (the extractive engine, no model needed). If `llama` is selected but the model file is missing or `llama_cpp` cannot be imported, the factory logs one line and falls back to `local`.
+
+Latency: with Metal (`LLM_GPU_LAYERS=-1`) an answer takes a few seconds. On a CPU-only server (`LLM_GPU_LAYERS=0`) expect roughly 10 to 40 seconds per answer depending on cores. To keep the prompt inside what a 1.5B model handles, the prompt uses only the first `LLM_CONTEXT_PASSAGES` expanded passages, each cut around its anchor chunk to `LLM_PASSAGE_MAX_CHARS`, and trailing passages are dropped until the prompt fits `LLM_N_CTX` minus the answer budget (4 chars per token estimate). Citation numbers always match the passages shown.
+
+Query expansion is off by default (`EXPANSION_MODE=off`): a 1.5B model proposes unreliable keywords. Set `auto` or `always` only if you accept that.
 
 ## Configuration
 
@@ -52,16 +66,20 @@ Everything is set through environment variables, read in `config.py`.
 
 | Variable | Default | Purpose |
 |---|---|---|
-| `DEFAULT_LLM_PROVIDER` | `openrouter` | `openai`, `anthropic`, `openrouter`, or `local` (offline extractive engine) |
-| `OPENAI_API_KEY`, `OPENAI_MODEL` | empty, `gpt-4.1-mini` | OpenAI provider |
-| `ANTHROPIC_API_KEY`, `ANTHROPIC_MODEL` | empty, `claude-haiku-4-5-20251001` | Anthropic provider |
-| `OPENROUTER_API_KEY`, `OPENROUTER_MODEL` | empty, a free-tier model | OpenRouter provider; retries once on a fallback model when rate-limited |
+| `DEFAULT_LLM_PROVIDER` | `llama` | `llama` (embedded GGUF model) or `local` (extractive engine) |
+| `LLM_MODEL_PATH` | `models/qwen2.5-1.5b-gguf/qwen2.5-1.5b-instruct-q4_k_m.gguf` | GGUF file, relative to the repo root |
+| `LLM_N_CTX` | `8192` | Context window |
+| `LLM_N_THREADS` | `0` | CPU threads (0 = auto) |
+| `LLM_TEMPERATURE` | `0.1` | Sampling temperature (seed is fixed) |
+| `LLM_GPU_LAYERS` | `-1` | `-1` all layers on Metal/GPU, `0` CPU only |
+| `LLM_CONTEXT_PASSAGES` | `5` | Passages placed in the prompt for the llama provider |
+| `LLM_PASSAGE_MAX_CHARS` | `1800` | Per-passage character cap for the llama provider |
 | `VECTOR_BACKEND` | `pgvector` | `pgvector`, `chroma`, or `faiss` |
 | `PGHOST`, `PGPORT`, `PGUSER`, `PGPASSWORD`, `PGDATABASE`, `PG_TABLE` | localhost defaults | Postgres connection for pgvector |
 | `EMBEDDING_MODEL` | `BAAI/bge-base-en-v1.5` | Embedding model id |
 | `EMBEDDING_DEVICE` | auto | `cuda` when available, otherwise `cpu` |
 | `RERANK_CANDIDATES` | `15` | Max candidates sent to the cross-encoder |
-| `EXPANSION_MODE` | `auto` | `auto`, `always`, or `off` for the LLM query-expansion call |
+| `EXPANSION_MODE` | `off` | `auto`, `always`, or `off` for the LLM query-expansion call |
 
 For shared or public deployments there are separate hardening knobs.
 
@@ -73,7 +91,6 @@ For shared or public deployments there are separate hardening knobs.
 | `TRUST_PROXY_HEADERS` | `0` | Set to `1` only behind a reverse proxy, so rate limiting keys on `X-Forwarded-For` |
 | `EXPOSE_DEBUG_STATUS` | `0` | Include internal paths and model names in `/ready` and `/stats` |
 | `PUBLIC_DEMO_MODE` | `0` | Public-demo hardening (see `config.py`) |
-| `ALLOW_LLM_REQUEST_OVERRIDES` | `0` | Accept per-request `llm_provider`, `llm_api_key`, `llm_model` |
 | `MAX_REQUEST_BODY_BYTES` | see `config.py` | Reject request bodies larger than this |
 
 ## API
@@ -85,7 +102,7 @@ For shared or public deployments there are separate hardening knobs.
 - `POST /ask` runs retrieval plus generation and returns the answer with parsed citations
 - `POST /ask/stream` streams the answer as server-sent events (meta, status, done); the answer is validated before it is sent, so there is no token streaming
 
-`/ask` rejects `llm_provider`, `llm_api_key` and `llm_model` unless `ALLOW_LLM_REQUEST_OVERRIDES=1`.
+`/ask` takes no provider, key or model fields; it always uses the server's embedded provider.
 
 ## Project layout
 
@@ -108,7 +125,7 @@ For shared or public deployments there are separate hardening knobs.
 └── tests/                  # unit and end-to-end smoke tests
 ```
 
-Tests run without a database or cloud LLM (install `pytest` for the regression suite). Deterministic offline diagnostics also use the tracked corpus and local extractive provider:
+Tests run without a database (the llama smoke test runs only if the GGUF file exists) (install `pytest` for the regression suite). Deterministic offline diagnostics also use the tracked corpus and local extractive provider:
 
 ```bash
 PYTHON_DOTENV_DISABLED=1 python -m pytest tests -q
@@ -118,4 +135,4 @@ PYTHON_DOTENV_DISABLED=1 python scripts/audit_corpus.py
 
 ## Limitations
 
-Free-tier OpenRouter models are rate-limited upstream and sometimes refuse or stall; the backend retries once on a fallback model and surfaces remaining failures as marked error messages rather than answers. The corpus is English only, and answers are only as current as the 2024 letter. The letters themselves are copyright Berkshire Hathaway and are included here for research use; the originals are published at berkshirehathaway.com.
+The 1.5B embedded model is weaker than large hosted models: it can miss nuance and refuse more often, and claim validation drops unsupported sentences. The corpus is English only, and answers are only as current as the 2024 letter. The letters themselves are copyright Berkshire Hathaway and are included here for research use; the originals are published at berkshirehathaway.com.

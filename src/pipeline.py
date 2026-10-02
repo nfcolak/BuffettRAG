@@ -24,6 +24,10 @@ from config import (
     EMBEDDING_DEVICE,
     EMBEDDING_MODEL_PRIMARY,
     FAISS_DIR,
+    LLM_CONTEXT_PASSAGES,
+    LLM_MAX_NEW_TOKENS,
+    LLM_N_CTX,
+    LLM_PASSAGE_MAX_CHARS,
     RETRIEVAL_FETCH_K,
     ANSWER_CONTEXT_MAX_CHARS,
     ANSWER_CONTEXT_NEIGHBORS,
@@ -41,7 +45,7 @@ from src.evaluation.claim_validator import validate_and_filter_answer
 from src.generation.providers import LLMProvider, create_llm_provider
 from src.index_manifest import ensure_index_identity, write_index_identity
 from src.retrieval import CrossEncoderReranker, Retriever
-from src.retrieval.context import build_doc_lookup, expand_hits_with_neighbors
+from src.retrieval.context import build_doc_lookup, expand_hits_with_neighbors, fit_context_to_llm
 from src.vector_store import (
     FaissStore,
     SearchHit,
@@ -170,6 +174,12 @@ class BuffettRAGPipeline:
             neighbors=ANSWER_CONTEXT_NEIGHBORS,
             max_chars=ANSWER_CONTEXT_MAX_CHARS,
         )
+        if getattr(self.llm, "provider_name", "") == "llama":
+            context_hits = fit_context_to_llm(
+                context_hits, result.hits, query,
+                max_new_tokens=LLM_MAX_NEW_TOKENS, n_ctx=LLM_N_CTX,
+                max_passages=LLM_CONTEXT_PASSAGES, passage_max_chars=LLM_PASSAGE_MAX_CHARS,
+            )
         prompt = build_cited_prompt(query, context_hits)
         raw_answer = self.llm.generate(prompt)
         answer = strip_chat_artifacts(raw_answer)

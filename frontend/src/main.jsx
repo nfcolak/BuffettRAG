@@ -1,15 +1,12 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
-import { AlertTriangle, BookOpen, Check, ChevronRight, Cloud, Gift, Paperclip, Send, Settings, Trash2 } from "lucide-react";
+import { BookOpen, ChevronRight, Paperclip, Send, Trash2 } from "lucide-react";
 
 import "./styles.css";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "/api";
 const BACKEND_API_KEY = import.meta.env.VITE_BACKEND_API_KEY || "";
 const HISTORY_KEY = "buffettrag.messages.v1";
-const LLM_SETTINGS_KEY = "buffettrag.llmSettings.v1";
-const SETUP_KEY = "buffettrag.setup.v1";
-const ALLOW_LLM_OVERRIDES = import.meta.env.VITE_ALLOW_LLM_OVERRIDES === "1";
 const STAGE_LABELS = {
   expanding: "Expanding query…",
   retrieving: "Searching letters…",
@@ -17,47 +14,15 @@ const STAGE_LABELS = {
   validating: "Checking citations…",
 };
 
-if (!ALLOW_LLM_OVERRIDES) {
-  try {
-    localStorage.removeItem(LLM_SETTINGS_KEY);
-    localStorage.removeItem(SETUP_KEY);
-  } catch {
-    // storage unavailable
+// The answer model is embedded in the backend. Clear provider/key settings that
+// older builds stored in this browser.
+try {
+  for (const legacyKey of ["buffettrag.llmSettings.v1", "buffettrag.setup.v1"]) {
+    localStorage.removeItem(legacyKey);
   }
+} catch {
+  // storage unavailable
 }
-
-const LLM_PROVIDERS = [
-  { value: "openai", label: "OpenAI", defaultModel: "gpt-4.1-mini" },
-  { value: "anthropic", label: "Anthropic", defaultModel: "claude-haiku-4-5-20251001" },
-  { value: "openrouter", label: "Free Model", defaultModel: "nvidia/nemotron-3-ultra-550b-a55b:free" },
-];
-
-const SETUP_OPTIONS = [
-  {
-    value: "openai",
-    title: "OpenAI",
-    icon: Cloud,
-    description:
-      "Cloud-hosted GPT models with strong reasoning and high-quality grounded answers. Requires an OpenAI API key configured on the backend or added later in Settings.",
-  },
-  {
-    value: "anthropic",
-    title: "Anthropic",
-    icon: Cloud,
-    description:
-      "Cloud-hosted Claude models with careful, well-cited answers. Requires an Anthropic API key configured on the backend or added later in Settings.",
-  },
-  {
-    value: "openrouter",
-    title: "Free Model",
-    icon: Gift,
-    badge: "Default",
-    description:
-      "A free cloud model served through the OpenRouter API (currently nvidia/nemotron-3-ultra-550b-a55b:free). Costs nothing — uses the OpenRouter key configured on the backend, or one you add later in Settings.",
-    warning:
-      "Free-tier models are rate-limited and may respond slower or be temporarily unavailable under heavy load. Answer quality may be lower than paid cloud LLMs such as OpenAI or Anthropic.",
-  },
-];
 
 const EXAMPLE_QUERIES = [
   "How did Buffett react to the 2008 financial crisis?",
@@ -101,64 +66,6 @@ function persistHistory(messages) {
   localStorage.setItem(HISTORY_KEY, JSON.stringify(messages.slice(-200)));
 }
 
-function defaultModelForProvider(provider) {
-  return LLM_PROVIDERS.find((item) => item.value === provider)?.defaultModel || "";
-}
-
-function labelForProvider(provider) {
-  return LLM_PROVIDERS.find((item) => item.value === provider)?.label || provider;
-}
-
-function readLlmSettings() {
-  if (!ALLOW_LLM_OVERRIDES) {
-    return { llmProvider: "openrouter", llmModel: "", llmApiKey: "", rememberLlmSettings: false };
-  }
-  try {
-    const raw = localStorage.getItem(LLM_SETTINGS_KEY);
-    const parsed = raw ? JSON.parse(raw) : {};
-    const provider = parsed.provider || "openrouter";
-    return {
-      llmProvider: provider,
-      llmModel: parsed.model || defaultModelForProvider(provider),
-      llmApiKey: parsed.remember ? parsed.apiKey || "" : "",
-      rememberLlmSettings: Boolean(parsed.remember),
-    };
-  } catch {
-    return {
-      llmProvider: "openrouter",
-      llmModel: defaultModelForProvider("openrouter"),
-      llmApiKey: "",
-      rememberLlmSettings: false,
-    };
-  }
-}
-
-function isSetupComplete() {
-  if (!ALLOW_LLM_OVERRIDES) return true;
-  try {
-    return Boolean(localStorage.getItem(SETUP_KEY));
-  } catch {
-    return false;
-  }
-}
-
-function persistSetupComplete(provider) {
-  localStorage.setItem(
-    SETUP_KEY,
-    JSON.stringify({ provider, completedAt: new Date().toISOString() })
-  );
-}
-
-function persistLlmSettings(settings) {
-  const payload = {
-    provider: settings.llmProvider,
-    model: settings.llmModel,
-    remember: Boolean(settings.rememberLlmSettings),
-    ...(settings.rememberLlmSettings ? { apiKey: settings.llmApiKey } : {}),
-  };
-  localStorage.setItem(LLM_SETTINGS_KEY, JSON.stringify(payload));
-}
-
 function buildWhere(config) {
   if (config.scope === "year") return { year: Number(config.year) };
   if (config.scope === "decade" && config.decade !== null) return { decade: config.decade };
@@ -190,9 +97,6 @@ function buildAskPayload(query, config, history) {
     where: buildWhere(config),
     auto_year_filter: true,
     ...(config.useLlm ? { history } : {}),
-    ...(ALLOW_LLM_OVERRIDES && config.useLlm ? { llm_provider: config.llmProvider } : {}),
-    ...(ALLOW_LLM_OVERRIDES && config.useLlm && config.llmApiKey ? { llm_api_key: config.llmApiKey } : {}),
-    ...(ALLOW_LLM_OVERRIDES && config.useLlm && config.llmModel ? { llm_model: config.llmModel } : {}),
   };
 }
 
@@ -285,69 +189,7 @@ async function getBackendHealth() {
   }
 }
 
-function FirstRunSetup({ onConfirm }) {
-  const [selected, setSelected] = React.useState(null);
-
-  return (
-    <div className="setup-screen">
-      <div className="setup-panel">
-        <div className="setup-kicker">First-run setup</div>
-        <h1 className="setup-title">Choose Your LLM Provider</h1>
-        <p className="setup-sub">
-          Select the language model backend you want to use for the RAG system.
-          You can change this later in Settings.
-        </p>
-
-        <div className="setup-options">
-          {SETUP_OPTIONS.map((option) => {
-            const Icon = option.icon;
-            const isSelected = selected === option.value;
-            return (
-              <button
-                key={option.value}
-                className={`setup-card ${isSelected ? "selected" : ""}`}
-                onClick={() => setSelected(option.value)}
-                aria-pressed={isSelected}
-              >
-                <span className="setup-card-icon"><Icon /></span>
-                <span className="setup-card-body">
-                  <span className="setup-card-head">
-                    <span className="setup-card-title">{option.title}</span>
-                    {option.badge && <span className="setup-badge">{option.badge}</span>}
-                  </span>
-                  <span className="setup-card-desc">{option.description}</span>
-                  {option.warning && (
-                    <span className="setup-warning">
-                      <AlertTriangle />
-                      <span>{option.warning}</span>
-                    </span>
-                  )}
-                </span>
-                <span className="setup-card-check"><Check /></span>
-              </button>
-            );
-          })}
-        </div>
-
-        <div className="setup-actions">
-          <span className="setup-note">
-            API keys are never stored in the frontend code. Cloud providers use the
-            backend configuration, or a key you add later in Settings.
-          </span>
-          <button
-            className="setup-continue"
-            disabled={!selected}
-            onClick={() => selected && onConfirm(selected)}
-          >
-            Continue to RAG
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function TopBar({ health, provider, onOpenSettings }) {
+function TopBar({ health }) {
   return (
     <header className="topbar">
       <div className="brand">
@@ -385,15 +227,10 @@ function TopBar({ health, provider, onOpenSettings }) {
           <span>embed</span>
           <strong>bge-base</strong>
         </span>
-        {ALLOW_LLM_OVERRIDES && (
-          <span className="status-chip">
-            <span>llm</span>
-            <strong>{labelForProvider(provider)}</strong>
-          </span>
-        )}
-        <button className="icon-btn" title="Settings" onClick={onOpenSettings}>
-          <Settings />
-        </button>
+        <span className="status-chip">
+          <span>llm</span>
+          <strong>embedded</strong>
+        </span>
       </div>
     </header>
   );
@@ -523,113 +360,6 @@ function Toggle({ label, hint, on, onChange }) {
       </span>
       <span className={`toggle-switch ${on ? "on" : ""}`} />
     </button>
-  );
-}
-
-function LlmSettingsModal({ open, config, setConfig, onClose }) {
-  const [draft, setDraft] = React.useState(config);
-
-  React.useEffect(() => {
-    if (open) setDraft(config);
-  }, [open, config]);
-
-  if (!open) return null;
-
-  const setDraftKey = (key, value) => {
-    setDraft((current) => ({ ...current, [key]: value }));
-  };
-
-  const chooseProvider = (provider) => {
-    setDraft((current) => ({
-      ...current,
-      llmProvider: provider,
-      llmModel:
-        !current.llmModel || current.llmModel === defaultModelForProvider(current.llmProvider)
-          ? defaultModelForProvider(provider)
-          : current.llmModel,
-    }));
-  };
-
-  const save = () => {
-    setConfig((current) => ({ ...current, ...draft }));
-    persistLlmSettings(draft);
-    onClose();
-  };
-
-  const clearKey = () => {
-    const next = { ...draft, llmApiKey: "", rememberLlmSettings: false };
-    setDraft(next);
-    localStorage.removeItem(LLM_SETTINGS_KEY);
-    setConfig((current) => ({ ...current, llmApiKey: "", rememberLlmSettings: false }));
-  };
-
-  return (
-    <div className="modal-backdrop" onMouseDown={onClose}>
-      <div className="settings-modal" onMouseDown={(event) => event.stopPropagation()}>
-        <div className="modal-head">
-          <div>
-            <div className="modal-title">LLM settings</div>
-            <div className="modal-kicker">Choose the answer engine for this browser.</div>
-          </div>
-          <button className="icon-btn" onClick={onClose} title="Close">x</button>
-        </div>
-
-        {ALLOW_LLM_OVERRIDES ? (
-          <>
-        <div className="field">
-          <div className="field-label">Provider</div>
-          <div className="segmented cols-3">
-            {LLM_PROVIDERS.map((provider) => (
-              <button
-                key={provider.value}
-                className={`seg-btn ${draft.llmProvider === provider.value ? "active" : ""}`}
-                onClick={() => chooseProvider(provider.value)}
-              >
-                {provider.label}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <div className="field">
-          <div className="field-label">Model</div>
-          <input
-            className="settings-input"
-            value={draft.llmModel}
-            placeholder={defaultModelForProvider(draft.llmProvider)}
-            onChange={(event) => setDraftKey("llmModel", event.target.value)}
-          />
-        </div>
-
-        <div className="field">
-          <div className="field-label">API key</div>
-          <input
-            className="settings-input"
-            type="password"
-            value={draft.llmApiKey}
-            placeholder={`${labelForProvider(draft.llmProvider)} API key (optional if set on backend)`}
-            onChange={(event) => setDraftKey("llmApiKey", event.target.value)}
-          />
-        </div>
-
-        <Toggle
-          label="Remember on this device"
-          hint="stores provider settings locally"
-          on={draft.rememberLlmSettings}
-          onChange={(value) => setDraftKey("rememberLlmSettings", value)}
-        />
-
-          </>
-        ) : (
-          <div className="modal-kicker">The answer engine is configured on the backend.</div>
-        )}
-
-        <div className="modal-actions">
-          <button className="clear-btn" onClick={clearKey}>Clear key</button>
-          <button className="save-btn" onClick={save}>Save settings</button>
-        </div>
-      </div>
-    </div>
   );
 }
 
@@ -966,8 +696,6 @@ function App() {
   const [stage, setStage] = React.useState("");
   const [error, setError] = React.useState("");
   const [health, setHealth] = React.useState(null);
-  const [settingsOpen, setSettingsOpen] = React.useState(false);
-  const [setupDone, setSetupDone] = React.useState(isSetupComplete);
   const inputRef = React.useRef(null);
 
   const [config, setConfig] = React.useState({
@@ -978,7 +706,6 @@ function App() {
     scope: "all",
     year: 2024,
     decade: 1970,
-    ...readLlmSettings(),
   });
 
   React.useEffect(() => {
@@ -1031,7 +758,7 @@ function App() {
           strategy: response.strategy ?? config.strategy,
           reranked: response.reranked ?? config.rerank,
           used_filter: response.used_filter ?? buildWhere(config),
-          provider: config.llmProvider,
+          provider: "embedded",
         },
       };
       setMessages((current) => [...current, assistantMessage]);
@@ -1063,7 +790,7 @@ function App() {
                   strategy: m.strategy ?? config.strategy,
                   reranked: m.reranked ?? config.rerank,
                   used_filter: m.used_filter ?? buildWhere(config),
-                  provider: config.llmProvider,
+                  provider: "embedded",
                 },
               },
             ]);
@@ -1124,32 +851,9 @@ function App() {
     inputRef.current?.focus();
   };
 
-  const completeSetup = (provider) => {
-    const llmModel = defaultModelForProvider(provider);
-    const stored = readLlmSettings();
-    persistLlmSettings({ ...stored, llmProvider: provider, llmModel });
-    persistSetupComplete(provider);
-    setConfig((current) => ({ ...current, llmProvider: provider, llmModel }));
-    setSetupDone(true);
-  };
-
-  if (!setupDone) {
-    return <FirstRunSetup onConfirm={completeSetup} />;
-  }
-
   return (
     <>
-      <TopBar
-        health={health}
-        provider={config.llmProvider}
-        onOpenSettings={() => setSettingsOpen(true)}
-      />
-      <LlmSettingsModal
-        open={settingsOpen}
-        config={config}
-        setConfig={setConfig}
-        onClose={() => setSettingsOpen(false)}
-      />
+      <TopBar health={health} />
       {error && <div className="error-banner">{error}</div>}
       <div className="workspace">
         <LeftRail config={config} setConfig={setConfig} onPickExample={pickExample} onClear={clearChat} />

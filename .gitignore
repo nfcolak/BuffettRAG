@@ -41,3 +41,7 @@ frontend/dist/
 # Obsidian docs-vault (per-machine state only)
 docs-vault/.obsidian/workspace*
 docs-vault/.obsidian/cache
+
+# Local model weights (GGUF)
+models/
+/models

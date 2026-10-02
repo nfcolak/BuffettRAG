@@ -30,6 +30,8 @@ def main() -> None:
     ap.add_argument("--no-rerank", action="store_true")
     ap.add_argument("--no-llm", action="store_true",
                     help="Skip LLM; just print retrieved passages")
+    ap.add_argument("--provider", choices=["llama", "local"], default=None,
+                    help="Answer engine: embedded llama.cpp model or extractive local (default: config)")
     ap.add_argument("--year", type=int, default=None)
     ap.add_argument("--decade", type=int, default=None)
     ap.add_argument("--json", action="store_true",
@@ -42,7 +44,8 @@ def main() -> None:
     if args.decade is not None:
         where["decade"] = args.decade
 
-    cfg = PipelineConfig(use_llm=not args.no_llm, use_reranker=not args.no_rerank)
+    cfg_kwargs = {"llm_provider": args.provider} if args.provider else {}
+    cfg = PipelineConfig(use_llm=not args.no_llm, use_reranker=not args.no_rerank, **cfg_kwargs)
     pipeline = BuffettRAGPipeline.build(cfg)
 
     out = pipeline.ask(

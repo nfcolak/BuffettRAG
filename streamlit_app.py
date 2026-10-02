@@ -1,7 +1,7 @@
 """Secure, deployment-oriented Streamlit demo for BuffettRAG.
 
-The app never asks visitors for an LLM/API key and only reads deployment values
-from st.secrets. Keep the backend API key server-side in Streamlit Secrets.
+The app never asks visitors for any model settings (answers come from the
+backend's embedded model) and only reads deployment values from st.secrets. Keep the backend API key server-side in Streamlit Secrets.
 """
 from __future__ import annotations
 

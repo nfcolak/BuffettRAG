@@ -125,7 +125,8 @@ ANSWER_CONTEXT_MAX_CHARS = int(os.getenv("ANSWER_CONTEXT_MAX_CHARS", "9000"))
 # Max candidates sent to the cross-encoder (cost is linear in this).
 RERANK_CANDIDATES = int(os.getenv("RERANK_CANDIDATES", "15"))
 # Query expansion: "auto" (only when first-pass evidence is weak) | "always" | "off"
-EXPANSION_MODE = os.getenv("EXPANSION_MODE", "auto").strip().lower()
+# Defaults to "off": a 1.5B embedded model produces unreliable expansions.
+EXPANSION_MODE = os.getenv("EXPANSION_MODE", "off").strip().lower()
 
 # Reranker
 RERANKER_MODEL = "BAAI/bge-reranker-v2-m3"
@@ -135,18 +136,19 @@ RERANK_TOP_K = 8
 # Generation
 # -----------------------------------------------------------------------------
 LLM_MAX_NEW_TOKENS = 900
-DEFAULT_LLM_PROVIDER = os.getenv("DEFAULT_LLM_PROVIDER", "openrouter").strip().lower()
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
-OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-4.1-mini")
-ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "")
-ANTHROPIC_MODEL = os.getenv("ANTHROPIC_MODEL", "claude-haiku-4-5-20251001")
-OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY", "")
-OPENROUTER_MODEL = os.getenv("OPENROUTER_MODEL", "nvidia/nemotron-3-ultra-550b-a55b:free")
-# Free-tier models are often rate-limited upstream; retry once on this model.
-OPENROUTER_FALLBACK_MODEL = os.getenv("OPENROUTER_FALLBACK_MODEL", "openai/gpt-oss-120b:free")
-OPENROUTER_BASE_URL = os.getenv("OPENROUTER_BASE_URL", "https://openrouter.ai/api/v1")
-OPENROUTER_SITE_URL = os.getenv("OPENROUTER_SITE_URL", "")
-OPENROUTER_APP_NAME = os.getenv("OPENROUTER_APP_NAME", "BuffettRAG")
+# Providers: "llama" (embedded llama.cpp GGUF model) | "local" (extractive, no model).
+# No external API is used anywhere.
+DEFAULT_LLM_PROVIDER = os.getenv("DEFAULT_LLM_PROVIDER", "llama").strip().lower()
+LLM_MODEL_PATH = Path(os.getenv("LLM_MODEL_PATH", "models/qwen2.5-1.5b-gguf/qwen2.5-1.5b-instruct-q4_k_m.gguf"))
+if not LLM_MODEL_PATH.is_absolute():
+    LLM_MODEL_PATH = BASE_DIR / LLM_MODEL_PATH
+LLM_N_CTX = int(os.getenv("LLM_N_CTX", "8192"))
+LLM_N_THREADS = int(os.getenv("LLM_N_THREADS", "0"))  # 0 = auto
+LLM_TEMPERATURE = float(os.getenv("LLM_TEMPERATURE", "0.1"))
+LLM_GPU_LAYERS = int(os.getenv("LLM_GPU_LAYERS", "-1"))  # -1 = all (Metal); 0 = CPU only
+# A small CPU model cannot take 8 x 9000-char passages: cap what the prompt carries.
+LLM_CONTEXT_PASSAGES = int(os.getenv("LLM_CONTEXT_PASSAGES", "5"))
+LLM_PASSAGE_MAX_CHARS = int(os.getenv("LLM_PASSAGE_MAX_CHARS", "1800"))
 
 # -----------------------------------------------------------------------------
 # Service URLs
@@ -169,8 +171,6 @@ RATE_LIMIT_REQUESTS = int(os.getenv("RATE_LIMIT_REQUESTS", "60"))
 RATE_LIMIT_WINDOW_SECONDS = int(os.getenv("RATE_LIMIT_WINDOW_SECONDS", "60"))
 MAX_REQUEST_BODY_BYTES = min(max(int(os.getenv("MAX_REQUEST_BODY_BYTES", "65536")), 1024), 1_048_576)
 PUBLIC_DEMO_MODE = os.getenv("PUBLIC_DEMO_MODE", "0") == "1"
-# Public demo requests use only the deployment-owned provider and model.
-ALLOW_LLM_REQUEST_OVERRIDES = os.getenv("ALLOW_LLM_REQUEST_OVERRIDES", "0") == "1"
 # Only trust X-Forwarded-For for rate-limit client identity when the service
 # actually runs behind a reverse proxy that sets it; otherwise the header is
 # client-controlled and lets callers reset their own rate-limit bucket.

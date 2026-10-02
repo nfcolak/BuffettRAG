@@ -39,7 +39,6 @@ if str(PROJECT_ROOT) not in sys.path:
 
 from config import (
     API_KEYS,
-    ALLOW_LLM_REQUEST_OVERRIDES,
     ANSWER_CONTEXT_MAX_CHARS,
     ANSWER_CONTEXT_NEIGHBORS,
     CHUNKS_FILE,
@@ -52,6 +51,9 @@ from config import (
     EXPANSION_MODE,
     EXPOSE_DEBUG_STATUS,
     FAISS_DIR,
+    LLM_CONTEXT_PASSAGES,
+    LLM_N_CTX,
+    LLM_PASSAGE_MAX_CHARS,
     MAX_REQUEST_BODY_BYTES,
     PUBLIC_DEMO_MODE,
     RATE_LIMIT_REQUESTS,
@@ -73,7 +75,7 @@ from src.generation.evidence_gate import assess_evidence
 from src.evaluation.claim_validator import validate_and_filter_answer
 from src.generation.providers import create_llm_provider
 from src.index_manifest import ensure_index_identity, write_index_identity
-from src.retrieval.context import build_doc_lookup, expand_hits_with_neighbors
+from src.retrieval.context import build_doc_lookup, expand_hits_with_neighbors, fit_context_to_llm
 from src.retrieval.query_expansion import expand_query, expand_query_structured
 from src.retrieval.reranker import CrossEncoderReranker
 from src.retrieval.retriever import Retriever
@@ -142,9 +144,6 @@ class HistoryTurn(BaseModel):
 
 class AskRequest(SearchRequest):
     max_new_tokens: int = Field(default=900, ge=1, le=2000)
-    llm_provider: Optional[Literal["openai", "openrouter", "anthropic", "local"]] = None
-    llm_api_key: Optional[str] = Field(default=None, max_length=4096)
-    llm_model: Optional[str] = Field(default=None, max_length=200)
     expand_query: bool = True
     history: List[HistoryTurn] = Field(default_factory=list, max_length=12)
 
@@ -152,10 +151,6 @@ class AskRequest(SearchRequest):
     def validate_ask(self):
         if sum(len(turn.content) for turn in self.history) > 8000:
             raise ValueError("conversation history is too large")
-        if (PUBLIC_DEMO_MODE or not ALLOW_LLM_REQUEST_OVERRIDES) and (
-            self.llm_provider or self.llm_api_key or self.llm_model
-        ):
-            raise ValueError("request-level LLM overrides are disabled")
         return self
 
 
@@ -210,7 +205,7 @@ _rate_limiter = FixedWindowRateLimiter(
 
 def validate_deployment_security(
     *, public_demo: bool, api_keys, cors_origins, debug: bool,
-    trust_proxy_headers: bool = False, allow_llm_request_overrides: bool = False,
+    trust_proxy_headers: bool = False,
 ) -> None:
     if not public_demo:
         return
@@ -220,8 +215,6 @@ def validate_deployment_security(
         raise RuntimeError("PUBLIC_DEMO_MODE does not permit EXPOSE_DEBUG_STATUS")
     if trust_proxy_headers:
         raise RuntimeError("PUBLIC_DEMO_MODE does not permit trusted proxy headers; use edge rate limiting")
-    if allow_llm_request_overrides:
-        raise RuntimeError("PUBLIC_DEMO_MODE does not permit LLM request overrides")
     for origin in cors_origins:
         if origin in {"*", "null"} or not origin.startswith("https://"):
             raise RuntimeError("PUBLIC_DEMO_MODE permits only exact HTTPS CORS origins")
@@ -276,7 +269,6 @@ async def startup() -> None:
         cors_origins=CORS_ORIGINS,
         debug=EXPOSE_DEBUG_STATUS,
         trust_proxy_headers=TRUST_PROXY_HEADERS,
-        allow_llm_request_overrides=ALLOW_LLM_REQUEST_OVERRIDES,
     )
     chunks_path = _resolve_chunks_path()
     if not chunks_path.exists():
@@ -328,20 +320,7 @@ def _hits_to_out(hits: List[SearchHit]) -> List[HitOut]:
 
 
 def _llm_error_message(exc: Exception) -> str:
-    raw = str(exc).lower()
-    if "insufficient_quota" in raw or "exceeded your current quota" in raw:
-        return "[LLM unavailable: OpenAI API quota or billing limit reached]"
-    if "invalid_api_key" in raw or "incorrect api key" in raw:
-        return "[LLM unavailable: provider API key is invalid]"
-    if "authentication_error" in raw or "no auth credentials" in raw or "unauthorized" in raw:
-        return "[LLM unavailable: provider API key is missing or invalid]"
-    if "api_key is required" in raw:
-        return "[LLM unavailable: provider API key is missing]"
-    if "model_not_found" in raw or "does not exist" in raw:
-        return "[LLM unavailable: selected provider model is not available]"
-    if any(m in raw for m in ("429", "rate-limit", "rate limit", "resourceexhausted", "resource exhausted", "limit reached", "502", "503", "overloaded")):
-        return "[LLM unavailable: the free model is busy or rate-limited right now — please retry in a moment]"
-    return "[LLM unavailable]"
+    return "[LLM unavailable: the embedded model failed to generate an answer]"
 
 
 def _do_search(req: SearchRequest, retrieval_query: Optional[str] = None):
@@ -359,13 +338,7 @@ def _do_search(req: SearchRequest, retrieval_query: Optional[str] = None):
     return result.hits, result.used_filter, result.reranked
 
 
-def _llm_for_request(req: AskRequest):
-    if req.llm_provider or req.llm_api_key or req.llm_model:
-        return create_llm_provider(
-            provider=req.llm_provider,
-            api_key=req.llm_api_key or None,
-            model=req.llm_model or None,
-        )
+def _server_llm():
     if "llm" not in _state:
         _state["llm"] = create_llm_provider()
     return _state["llm"]
@@ -468,7 +441,7 @@ def _extra_queries(req: AskRequest, expanded: Optional[str]) -> List[str]:
 
 def _prepare_ask_steps(req: AskRequest):
     """Generator: yields stage names, returns the prepared tuple (via StopIteration.value)."""
-    llm = _llm_for_request(req)
+    llm = _server_llm()
     history_dicts = [turn.model_dump() for turn in req.history]
     history_text = format_history_block(history_dicts)
 
@@ -504,6 +477,12 @@ def _prepare_ask_steps(req: AskRequest):
             neighbors=ANSWER_CONTEXT_NEIGHBORS,
             max_chars=ANSWER_CONTEXT_MAX_CHARS,
         )
+        if getattr(llm, "provider_name", "") == "llama":
+            context_hits = fit_context_to_llm(
+                context_hits, hits, req.query, history=history_dicts,
+                max_new_tokens=req.max_new_tokens, n_ctx=LLM_N_CTX,
+                max_passages=LLM_CONTEXT_PASSAGES, passage_max_chars=LLM_PASSAGE_MAX_CHARS,
+            )
         prompt = build_cited_prompt(query=req.query, hits=context_hits, history=history_dicts)
 
     return llm, hits, used_filter, reranked, context_hits, prompt, expanded
