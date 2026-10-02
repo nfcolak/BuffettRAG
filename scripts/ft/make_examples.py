@@ -173,13 +173,20 @@ class Builder:
         self.attempts.append(record)
         self.done.add(ident)
 
-    def materialize(self):
+    def materialize(self, *, final=False):
         selected = []
         for split in ('train', 'valid'):
             positives = [row for row in self.rows if row['split'] == split and row['type'] == 'answerable']
             negatives = [row for row in self.rows if row['split'] == split and row['type'] != 'answerable']
-            # Preserve all accepted positives, cap refusal share at 25%. Prefer
-            # a blend of negative types instead of letting creation order decide.
+            # Never fabricate negatives or relax their checks. If the final
+            # positive yield is unusually high, downsample positives to attain
+            # the requested minimum 15% refusal share instead.
+            if final and negatives:
+                positive_limit = len(negatives) * 17 // 3
+                positives.sort(key=lambda row: sha(f'{SEED}:positive:{row["id"]}'.encode()))
+                positives = positives[:positive_limit]
+            # Preserve accepted positives during progress snapshots; cap refusal
+            # share at 25%. Mix negative types independently of creation order.
             negatives.sort(key=lambda row: sha(f'{SEED}:{row["id"]}'.encode()))
             negatives = negatives[:len(positives) // 3]
             rows = positives + negatives
@@ -199,7 +206,7 @@ class Builder:
         return selected
 
     def finish(self):
-        selected = self.materialize()
+        selected = self.materialize(final=True)
         counts = {split: dict(Counter(row['type'] for row in selected if row['split'] == split)) for split in ('train', 'valid')}
         totals = {split: sum(counts[split].values()) for split in counts}
         answer_attempts = [row for row in self.attempts if row['type'] != 'distractor']
