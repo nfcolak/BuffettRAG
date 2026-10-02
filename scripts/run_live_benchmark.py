@@ -70,13 +70,16 @@ class _TrackedProvider:
         self.requests = []
         self.call_count = 0
         self.temperature = temperature
+        self.raw_outputs = []  # (stage, raw model text) for --save-raw; pre-validation
 
     def generate(self, prompt, max_new_tokens=None):
         self.call_count += 1
         stage = "expanding" if prompt.startswith(("Return JSON only:", "You expand search queries")) else "generating"
         self.requests.append({"model": self.model, "temperature": self.temperature})
         try:
-            return self._provider.generate(prompt, max_new_tokens=max_new_tokens)
+            output = self._provider.generate(prompt, max_new_tokens=max_new_tokens)
+            self.raw_outputs.append((stage, output))
+            return output
         except Exception as exc:
             self.failures.append({"stage": stage, "error_type": type(exc).__name__})
             # Production debug paths must not accidentally print provider error
@@ -99,6 +102,7 @@ def run(
     temperature: float = 0.0,
     max_cases: Optional[int] = None,
     retrieval: str = "hybrid",
+    save_raw: bool = False,
 ) -> Dict[str, Any]:
     """Validate every fixture first, then call backend.ask without HTTP/startup."""
     if retrieval not in {"bm25", "hybrid"}:
@@ -168,6 +172,7 @@ def run(
                 failure_offset = len(llm.failures)
                 request_offset = len(llm.requests)
                 call_offset = llm.call_count
+                raw_offset = len(llm.raw_outputs)
                 req = backend.AskRequest(query=case["query"], history=case.get("history", []),
                                          strategy="hybrid", rerank=retrieval == "hybrid")
                 response = backend.ask(req)
@@ -178,6 +183,8 @@ def run(
                             "provider_calls": llm.call_count - call_offset,
                             "provider_failures": llm.failures[failure_offset:],
                             "model_requests": llm.requests[request_offset:]})
+                if save_raw:
+                    row["raw_answers"] = [text for stage, text in llm.raw_outputs[raw_offset:] if stage == "generating"]
                 if row["provider_failures"] or (response.answer or "").startswith("[LLM unavailable"):
                     row["status"] = "provider_failure"
                     if not row["provider_failures"]:
@@ -240,10 +247,11 @@ def main() -> int:
     parser.add_argument("--max-cases", type=int, default=None)
     parser.add_argument("--retrieval", choices=("bm25", "hybrid"), default="hybrid")
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--save-raw", action="store_true", help="store each raw (pre-validation) model answer per case as rows[].raw_answers")
     args = parser.parse_args()
     try:
         result = run(args.corpus, args.cases, provider=args.provider,
-                     temperature=args.temperature, max_cases=args.max_cases, retrieval=args.retrieval)
+                     temperature=args.temperature, max_cases=args.max_cases, retrieval=args.retrieval, save_raw=args.save_raw)
         args.output.parent.mkdir(parents=True, exist_ok=True)
         args.output.write_text(json.dumps(result, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     except FixtureValidationError as exc:

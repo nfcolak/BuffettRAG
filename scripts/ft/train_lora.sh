@@ -15,9 +15,24 @@ PROGRESS="$OUT/progress.json"
 
 DONE=0
 RESUME=()
-if [ -f "$OUT/adapters/adapters.safetensors" ] && [ -f "$PROGRESS" ]; then
-  DONE=$(env -u PYTHONPATH "$PY" -c "import json;print(json.load(open('$PROGRESS')).get('completed_iters',0))")
-  RESUME=(--resume-adapter-file "$OUT/adapters/adapters.safetensors")
+if [ -f "$OUT/adapters/adapters.safetensors" ]; then
+  # completed iters: progress.json, else the newest absolute checkpoint copy (abs_<iter>.safetensors)
+  DONE=$(env -u PYTHONPATH "$PY" - "$PROGRESS" "$OUT/adapters" <<'EOF2'
+import glob, json, os, re, sys
+done = 0
+if os.path.exists(sys.argv[1]):
+    done = json.load(open(sys.argv[1])).get('completed_iters', 0)
+absolute = glob.glob(sys.argv[2] + '/abs_*.safetensors')
+for f in absolute:
+    done = max(done, int(re.search(r'abs_(\d+)', f).group(1)))
+if not done and not absolute:
+    # first run of this round (never resumed): mlx_lm checkpoint numbers are already absolute
+    for f in glob.glob(sys.argv[2] + '/0*_adapters.safetensors'):
+        done = max(done, int(re.match(r'(\d+)_', os.path.basename(f)).group(1)))
+print(done)
+EOF2
+)
+  [ "$DONE" -gt 0 ] && RESUME=(--resume-adapter-file "$OUT/adapters/adapters.safetensors")
 fi
 REMAIN=$(( TOTAL - DONE ))
 if [ "$REMAIN" -le 0 ]; then echo "nothing to do: $DONE/$TOTAL iters complete"; echo 0 > "$OUT/train_exit.txt"; exit 0; fi
@@ -28,8 +43,8 @@ echo "round=$ROUND total=$TOTAL done=$DONE remaining=$REMAIN train_n=$TRAIN_N $(
   env -u PYTHONPATH PYTHON_DOTENV_DISABLED=1 HF_HUB_OFFLINE=1 PYTHONUNBUFFERED=1 "$PY" -m mlx_lm lora \
     -c scripts/ft/lora_config.yaml --iters "$REMAIN" --adapter-path "$OUT/adapters" ${RESUME[@]+"${RESUME[@]}"} 2>&1
   echo "EXIT:$?"
-) | tee -a "$OUT/train.log" | env -u PYTHONPATH "$PY" scripts/ft/track_progress.py "$PROGRESS" "$TOTAL" "$DONE"
-RC=$(grep -o 'EXIT:[0-9]*' "$OUT/train.log" | tail -1 | cut -d: -f2)
+) | tee -a "$OUT/train.log" | env -u PYTHONPATH "$PY" scripts/ft/track_progress.py "$PROGRESS" "$TOTAL" "$DONE" "$OUT/adapters"
+RC=$(grep -a -o 'EXIT:[0-9]*' "$OUT/train.log" | tail -1 | cut -d: -f2)
 RC="${RC:-1}"
 echo "$RC" > "$OUT/train_exit.txt"
 # final state: a clean exit means all iters done
