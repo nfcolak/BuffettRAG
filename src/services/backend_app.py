@@ -49,6 +49,7 @@ from config import (
     DEFAULT_TOP_K,
     EMBEDDING_DEVICE,
     EMBEDDING_MODEL_PRIMARY,
+    EXPANSION_MODE,
     EXPOSE_DEBUG_STATUS,
     FAISS_DIR,
     MAX_REQUEST_BODY_BYTES,
@@ -434,14 +435,16 @@ def ask(req: AskRequest) -> AskResponse:
         raise HTTPException(status_code=503, detail="Service not ready")
 
     try:
-        llm, hits, used_filter, reranked, context_hits, prompt = _prepare_ask(req)
+        llm, hits, used_filter, reranked, context_hits, prompt, expanded = _prepare_ask(req)
     except ValueError as exc:
         raise HTTPException(status_code=400, detail="Invalid retrieval configuration") from exc
 
     answer: Optional[str] = None
     citations: List[Dict[str, Any]] = []
     if hits:
-        answer, citations = _generate_answer(llm, prompt, context_hits, req.max_new_tokens, req.query)
+        answer, citations = _generate_answer(
+            llm, prompt, context_hits, req.max_new_tokens, req.query, _extra_queries(req, expanded)
+        )
 
     return AskResponse(
         query=req.query,
@@ -455,24 +458,42 @@ def ask(req: AskRequest) -> AskResponse:
     )
 
 
-def _prepare_ask(req: AskRequest):
-    """Shared /ask preparation: expansion, retrieval, context and prompt."""
+def _extra_queries(req: AskRequest, expanded: Optional[str]) -> List[str]:
+    """History user turns and the expanded query count toward the evidence terms."""
+    extras = [turn.content for turn in req.history if turn.role == "user"]
+    if expanded:
+        extras.append(expanded)
+    return extras
+
+
+def _prepare_ask_steps(req: AskRequest):
+    """Generator: yields stage names, returns the prepared tuple (via StopIteration.value)."""
     llm = _llm_for_request(req)
     history_dicts = [turn.model_dump() for turn in req.history]
+    history_text = format_history_block(history_dicts)
 
+    def _expand() -> Optional[str]:
+        structured = expand_query_structured(req.query, llm, history_text=history_text)
+        result = structured.retrieval_query if structured else expand_query(
+            req.query, llm, history_text=history_text
+        )
+        if result and EXPOSE_DEBUG_STATUS:
+            print(f"[backend] expanded query: {result!r}", flush=True)
+        return result
+
+    mode = EXPANSION_MODE if req.expand_query else "off"
     expanded = None
-    if req.expand_query:
-        structured = expand_query_structured(
-            req.query, llm, history_text=format_history_block(history_dicts)
-        )
-        expanded = structured.retrieval_query if structured else expand_query(
-            req.query, llm, history_text=format_history_block(history_dicts)
-        )
-        if expanded:
-            if EXPOSE_DEBUG_STATUS:
-                print(f"[backend] expanded query: {expanded!r}", flush=True)
-
+    if mode == "always":
+        yield "expanding"
+        expanded = _expand()
+    yield "retrieving"
     hits, used_filter, reranked = _do_search(req, retrieval_query=expanded)
+    if mode == "auto" and assess_evidence(req.query, hits).best_overlap < 0.5:
+        yield "expanding"
+        expanded = _expand()
+        if expanded:
+            yield "retrieving"
+            hits, used_filter, reranked = _do_search(req, retrieval_query=expanded)
 
     context_hits: List[Any] = []
     prompt = ""
@@ -485,7 +506,17 @@ def _prepare_ask(req: AskRequest):
         )
         prompt = build_cited_prompt(query=req.query, hits=context_hits, history=history_dicts)
 
-    return llm, hits, used_filter, reranked, context_hits, prompt
+    return llm, hits, used_filter, reranked, context_hits, prompt, expanded
+
+
+def _prepare_ask(req: AskRequest):
+    """Shared /ask preparation: expansion, retrieval, context and prompt."""
+    steps = _prepare_ask_steps(req)
+    while True:
+        try:
+            next(steps)
+        except StopIteration as stop:
+            return stop.value
 
 
 def _finalize_answer(llm, prompt: str, context_hits, raw_answer: str, max_new_tokens: int):
@@ -502,8 +533,9 @@ def _finalize_answer(llm, prompt: str, context_hits, raw_answer: str, max_new_to
     return answer, parse_citations(answer, context_hits)
 
 
-def _generate_answer(llm, prompt: str, context_hits, max_new_tokens: int, query: Optional[str] = None):
-    if query and not assess_evidence(query, context_hits).sufficient:
+def _generate_answer(llm, prompt: str, context_hits, max_new_tokens: int, query: Optional[str] = None,
+                     extra_queries=()):
+    if query and not assess_evidence(query, context_hits, extra_queries=extra_queries).sufficient:
         return REFUSAL_LINE, []
     try:
         raw_answer = llm.generate(prompt, max_new_tokens=max_new_tokens)
@@ -520,16 +552,24 @@ def _sse(event: str, data: Dict[str, Any]) -> str:
 
 @app.post("/ask/stream")
 def ask_stream(req: AskRequest) -> StreamingResponse:
-    """Streaming variant of /ask: SSE with meta, delta and done events."""
+    """Streaming variant of /ask: SSE with status, meta and done events."""
     if not _state:
         raise HTTPException(status_code=503, detail="Service not ready")
 
-    try:
-        llm, hits, used_filter, reranked, context_hits, prompt = _prepare_ask(req)
-    except ValueError as exc:
-        raise HTTPException(status_code=400, detail="Invalid retrieval configuration") from exc
-
     def event_source():
+        steps = _prepare_ask_steps(req)
+        try:
+            while True:
+                try:
+                    yield _sse("status", {"stage": next(steps)})
+                except StopIteration as stop:
+                    prepared = stop.value
+                    break
+        except ValueError:
+            yield _sse("error", {"detail": "Invalid retrieval configuration"})
+            return
+        llm, hits, used_filter, reranked, context_hits, prompt, expanded = prepared
+        extras = _extra_queries(req, expanded)
         yield _sse(
             "meta",
             {
@@ -544,10 +584,11 @@ def ask_stream(req: AskRequest) -> StreamingResponse:
         if not hits:
             yield _sse("done", {"answer": None, "citations": []})
             return
-        if not assess_evidence(req.query, context_hits).sufficient:
+        if not assess_evidence(req.query, context_hits, extra_queries=extras).sufficient:
             yield _sse("done", {"answer": REFUSAL_LINE, "citations": []})
             return
 
+        yield _sse("status", {"stage": "generating"})
         raw_answer = ""
         try:
             if hasattr(llm, "generate_stream"):
@@ -561,10 +602,11 @@ def ask_stream(req: AskRequest) -> StreamingResponse:
             if EXPOSE_DEBUG_STATUS:
                 print(f"[backend] stream failed, falling back: {exc}", flush=True)
             # The non-streaming path carries the full retry/fallback logic.
-            answer, citations = _generate_answer(llm, prompt, context_hits, req.max_new_tokens, req.query)
+            answer, citations = _generate_answer(llm, prompt, context_hits, req.max_new_tokens, req.query, extras)
             yield _sse("done", {"answer": answer, "citations": citations})
             return
 
+        yield _sse("status", {"stage": "validating"})
         answer, citations = _finalize_answer(llm, prompt, context_hits, raw_answer, req.max_new_tokens)
         yield _sse("done", {"answer": answer, "citations": citations})
 

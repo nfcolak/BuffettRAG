@@ -167,7 +167,7 @@ def test_backend_returns_prompt_passages_in_citation_order(monkeypatch):
     raw = SearchHit('1977_0', 'anchor', {'year': 1977}, 1.0)
     expanded = SearchHit('1977_0', 'before anchor after', {'year': 1977}, 1.0)
     monkeypatch.setitem(backend._state, 'test_ready', True)
-    monkeypatch.setattr(backend, '_prepare_ask', lambda req: (None, [raw], None, False, [expanded], 'prompt'))
+    monkeypatch.setattr(backend, '_prepare_ask', lambda req: (None, [raw], None, False, [expanded], 'prompt', None))
     monkeypatch.setattr(backend, '_generate_answer', lambda *args: ('Evidence. [1]', []))
     result = backend.ask(backend.AskRequest(query='Earnings?'))
     assert result.hits[0].text == expanded.text
@@ -223,6 +223,7 @@ def test_http_and_streaming_use_the_same_real_evidence(monkeypatch):
     stream = client.post('/ask/stream', json=payload)
     assert stream.status_code == 200
     events = [json.loads(line[6:]) for line in stream.text.splitlines() if line.startswith('data: ')]
+    events = [e for e in events if 'stage' not in e]
     assert events[0]['hits'] == result['hits']
     assert events[-1]['answer'] == result['answer']
     assert events[-1]['citations'] == result['citations']

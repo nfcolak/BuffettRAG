@@ -149,7 +149,7 @@ class BuffettRAGPipeline:
                 "reranked": result.reranked,
             }
 
-        evidence = assess_evidence(query, result.hits)
+        evidence = assess_evidence(query, result.hits, extra_queries=())
         if not evidence.sufficient:
             return {
                 "query": query,

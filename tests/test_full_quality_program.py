@@ -35,7 +35,7 @@ def test_claim_validator_splits_compound_claim_and_blocks_unsupported_part():
     answer = "Berkshire bought preferred shares and guaranteed moon cheese. [1]"
     result = validate_and_filter_answer(answer, [_hit("p1", "Berkshire bought preferred shares.")])
     assert result.blocked_claims == ["guaranteed moon cheese"]
-    assert result.safe_answer == "Berkshire bought preferred shares. [1]"
+    assert result.safe_answer == ""  # a sentence passes only if every split claim passes
 
 
 def test_paragraph_chunking_records_source_provenance_and_stable_ids(tmp_path):
@@ -316,8 +316,13 @@ def test_backend_prefers_structured_expansion_without_replacing_original_query(m
         provider_name = "local"
     monkeypatch.setattr(backend, "_state", {"retriever": FixedRetriever(), "docs_by_id": {}, "llm": Local()})
     monkeypatch.setattr(backend, "expand_query_structured", lambda *_args, **_kwargs: SimpleNamespace(retrieval_query="What did Apple do in 2020? investment Apple 2020"))
+    monkeypatch.setattr(backend, "EXPANSION_MODE", "always")
     backend._prepare_ask(backend.AskRequest(query="What did Apple do in 2020?"))
     assert seen == ["What did Apple do in 2020? investment Apple 2020"]
+    seen.clear()
+    monkeypatch.setattr(backend, "EXPANSION_MODE", "auto")  # strong first pass: no expansion
+    backend._prepare_ask(backend.AskRequest(query="What did Apple do in 2020?"))
+    assert seen == [None]
 
 
 def test_demo_security_rejects_private_backend_and_enforces_request_budget(monkeypatch):
@@ -531,3 +536,24 @@ def test_demo_evidence_html_escapes_backend_supplied_text():
     assert "<script>" not in rendered
     assert "&lt;script&gt;" in rendered
     assert "<img" not in rendered
+
+
+def test_validator_accepts_attributed_paraphrase_and_blocks_changes():
+    from src.evaluation.claim_validator import validate_and_filter_answer
+
+    hits = [_hit("p", "Our favorite holding period is forever. Revenue was $10 million.")]
+    ok = validate_and_filter_answer("- **Buffett said** his favorite holding period is forever [1].", hits)
+    assert ok.safe_answer == "- **Buffett said** his favorite holding period is forever [1]."
+    assert not validate_and_filter_answer("Buffett said his favorite holding period is not forever [1].", hits).safe_answer
+    assert not validate_and_filter_answer("Revenue was $12 million [1].", hits).safe_answer
+    mixed = validate_and_filter_answer("Revenue was $10 million [1]\nThe moon is cheese [1]", hits)
+    assert mixed.safe_answer == "Revenue was $10 million [1]"
+
+
+def test_followup_is_sufficient_with_history_terms():
+    from src.generation.evidence_gate import assess_evidence
+
+    hits = [_hit("p", "Insurance float grew sharply in 1990.")]
+    assert not assess_evidence("What about after that?", hits).sufficient
+    history = ["How did Buffett view float in 1990?"]
+    assert assess_evidence("What about after that?", hits, extra_queries=history).sufficient

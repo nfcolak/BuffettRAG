@@ -129,6 +129,7 @@ EXPANSION_MODE = os.getenv("EXPANSION_MODE", "auto").strip().lower()
 
 # Reranker
 RERANKER_MODEL = "BAAI/bge-reranker-v2-m3"
+RERANK_TOP_K = 8
 
 # -----------------------------------------------------------------------------
 # Generation
