@@ -23,15 +23,16 @@ def check():
     overlapping = set()
     near_duplicates = sum(near_frozen(row['question'], frozen) for row in questions)
     for row in questions:
-        if row['source_id'] in excluded:
-            overlapping.add(row['source_id'])
+        for ident in [row['source_id']] + row.get('source_ids', []):
+            if ident in excluded:
+                overlapping.add(ident)
     expected = defaultdict(list)
     for row in metadata:
         full = examples[row['id']]
         expected[row['split']].append(full)
         used[row['split']].update(row['context_passage_ids'])
         if row['source_id']:
-            used[row['split']].add(row['source_id'])
+            used[row['split']].update([row['source_id']] + row.get('source_ids', []))
         overlapping.update(set(row['context_passage_ids']) & excluded)
     cross_split = used['train'] & used['valid']
     for split in ('train', 'valid'):
@@ -48,14 +49,17 @@ def check():
                 local_lookup = {ident: doc for ident, doc in lookup.items() if ident != full['source_id']}
             hits = expand_hits_with_neighbors(anchors, local_lookup, neighbors=1, max_chars=1800)
             assert all(len(hit.text) <= 1800 for hit in hits)
-            user = build_cited_prompt(question, hits)[len(SYSTEM_PROMPT + '\n\n'):]
+            user = build_cited_prompt(question, hits, full.get('history'))[len(SYSTEM_PROMPT + '\n\n'):]
             assert user == sample['messages'][1]['content'], 'Serving prompt drift'
             answer = sample['messages'][2]['content']
             if full['type'] == 'answerable':
                 result = validate_and_filter_answer(answer, hits)
                 assert not result.blocked_claims, f'Blocked claims in {full["id"]}'
                 cited = {ident for citation in parse_citations(answer, hits) for ident in citation['passage_ids']}
-                assert full['source_id'] in cited
+                if full.get('kind') == 'temporal':
+                    assert {int(lookup[i].metadata['year']) for i in full['source_ids']} <= {int(lookup[i].metadata['year']) for i in cited}
+                else:
+                    assert full['source_id'] in cited
                 for line in answer.splitlines():
                     for sentence in _split_original(line):
                         citations = parse_citations(sentence, hits)

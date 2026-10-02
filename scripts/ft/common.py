@@ -21,7 +21,9 @@ from src.retrieval.bm25 import _SEARCH_STOPWORDS, _search_tokens
 
 SEED = 13
 CORPUS = ROOT / 'data/processed/chunks_v3_paragraph.jsonl'
-OUT = ROOT / 'data/ft'
+# Round 2 (style v2) writes to data/ft_v2; set FT_DATA_DIR=data/ft to reproduce round 1 (style v1).
+OUT = ROOT / os.environ.get('FT_DATA_DIR', 'data/ft_v2')
+V1_DIR = ROOT / 'data/ft'
 TEACHER = Path('/Users/necatifurkancolak/AI-Workplace/Projects/done/BuffettRAG/models/teacher-qwen2.5-7b-mlx4')
 DEV = 'data/evaluation/answer_quality_program/answer_benchmark_v3.json'
 HELDOUT = 'agent/fix-eval:data/evaluation/heldout_v1/answer_benchmark_heldout_v1.json'
