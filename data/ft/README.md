@@ -1,6 +1,6 @@
 # BuffettRAG offline MLX fine-tuning data
 Teacher: local Qwen2.5-7B-Instruct, MLX 4-bit, Apache-2.0; models/ is ignored; no weights or external API calls.
-Counts: train=141, valid=15; types={"train": {"answerable": 127, "unanswerable": 14}, "valid": {"answerable": 14, "unanswerable": 1}}; train refusal share=9.9%.
+Counts: train=193, valid=13; types={"train": {"answerable": 164, "distractor": 2, "unanswerable": 27}, "valid": {"answerable": 11, "unanswerable": 2}}; train refusal share=15.0%.
 Sampling: seed 13; 900 source passages stratified across all 48 letters; two teacher questions/source; 200 unavailable-fact templates paraphrased locally.
 Retrieval: repository BM25 top 5, explicit query-year filtering, anchor + immediate neighbors, max 1800 chars; build_cited_prompt serving system/user split.
 Filters: zero blocked claims, every sentence validly cited, source cited; refusal line is a stop sequence, not a rewritten target (replacement only with <2 shared non-stopwords/passage).

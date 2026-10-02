@@ -231,8 +231,18 @@ def main():
     parser.add_argument('--resume', action='store_true')
     parser.add_argument('--pilot', type=int, help='Run only this many new teacher answers; do not synthesize more questions')
     parser.add_argument('--prompt-revision', type=int, default=1, choices=(0, 1))
+    parser.add_argument('--split-only', action='store_true', help='Rewrite train/valid/split_metadata/manifest from existing examples.jsonl; no generation')
     args = parser.parse_args()
     OUT.mkdir(parents=True, exist_ok=True)
+    if args.split_only:
+        builder = Builder(None)
+        builder.finish()
+        from check_leakage import check
+        check()
+        valid = len(read_jsonl(OUT / 'valid.jsonl'))
+        total = valid + len(read_jsonl(OUT / 'train.jsonl'))
+        assert valid >= .05 * total, f'valid split too small: {valid}/{total}'
+        return
     # The lock file is harmless and local; prevents two writers corrupting append logs.
     lock = (OUT / 'generation.lock').open('w')
     fcntl.flock(lock.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
