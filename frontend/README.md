@@ -10,8 +10,9 @@ npm run dev
 ```
 
 The app defaults to `http://localhost:8000` for the backend.
-Use the Settings button in the top bar to choose OpenAI, Anthropic, or
-OpenRouter and enter the provider API key for answer generation.
+The LLM provider is configured on the backend. For local bring-your-own-key,
+set `ALLOW_LLM_REQUEST_OVERRIDES=1` on the backend and build with
+`VITE_ALLOW_LLM_OVERRIDES=1` to enable the provider settings dialog.
 
 To point at another backend:
 
@@ -28,7 +29,9 @@ VECTOR_BACKEND=chroma \
 
 ## Backend endpoints used
 
+- `GET /ready`
 - `GET /health`
 - `POST /search`
 - `POST /ask`
+- `POST /ask/stream`
 

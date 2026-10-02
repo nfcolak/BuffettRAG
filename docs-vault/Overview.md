@@ -6,7 +6,7 @@ repo: nfcolak/BuffettRAG
 tier: A
 bucket: done
 corebrain_pointer: /Users/necatifurkancolak/Library/Mobile Documents/iCloud~md~obsidian/Documents/CoreBrain/🏰 300-Projects/done/buffettrag.md
-project_path: /Users/necatifurkancolak/Projects/done/BuffettRAG
+project_path: /Users/necatifurkancolak/AI-Workplace/Projects/done/BuffettRAG
 ---
 # BuffettRAG
 
@@ -17,4 +17,6 @@ Warren Buffett hissedar mektupları üzerinde RAG sistemi (hibrit arama, reranki
 
 ## Status
 
-_(not written yet)_
+Done project (bucket: done), maintained only for hardening fixes.
+V3 hardening completed: auth, rate limiting, claim validation, index identity checks.
+2026-10 fix batch: LLM override lockdown, status-streaming UI, /ready counts, retrieval perf knobs, refreshed docs.

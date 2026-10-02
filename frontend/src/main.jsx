@@ -9,6 +9,22 @@ const BACKEND_API_KEY = import.meta.env.VITE_BACKEND_API_KEY || "";
 const HISTORY_KEY = "buffettrag.messages.v1";
 const LLM_SETTINGS_KEY = "buffettrag.llmSettings.v1";
 const SETUP_KEY = "buffettrag.setup.v1";
+const ALLOW_LLM_OVERRIDES = import.meta.env.VITE_ALLOW_LLM_OVERRIDES === "1";
+const STAGE_LABELS = {
+  expanding: "Expanding query…",
+  retrieving: "Searching letters…",
+  generating: "Writing answer…",
+  validating: "Checking citations…",
+};
+
+if (!ALLOW_LLM_OVERRIDES) {
+  try {
+    localStorage.removeItem(LLM_SETTINGS_KEY);
+    localStorage.removeItem(SETUP_KEY);
+  } catch {
+    // storage unavailable
+  }
+}
 
 const LLM_PROVIDERS = [
   { value: "openai", label: "OpenAI", defaultModel: "gpt-4.1-mini" },
@@ -94,6 +110,9 @@ function labelForProvider(provider) {
 }
 
 function readLlmSettings() {
+  if (!ALLOW_LLM_OVERRIDES) {
+    return { llmProvider: "openrouter", llmModel: "", llmApiKey: "", rememberLlmSettings: false };
+  }
   try {
     const raw = localStorage.getItem(LLM_SETTINGS_KEY);
     const parsed = raw ? JSON.parse(raw) : {};
@@ -115,6 +134,7 @@ function readLlmSettings() {
 }
 
 function isSetupComplete() {
+  if (!ALLOW_LLM_OVERRIDES) return true;
   try {
     return Boolean(localStorage.getItem(SETUP_KEY));
   } catch {
@@ -169,9 +189,10 @@ function buildAskPayload(query, config, history) {
     rerank: config.rerank,
     where: buildWhere(config),
     auto_year_filter: true,
-    ...(config.useLlm ? { llm_provider: config.llmProvider, history } : {}),
-    ...(config.useLlm && config.llmApiKey ? { llm_api_key: config.llmApiKey } : {}),
-    ...(config.useLlm && config.llmModel ? { llm_model: config.llmModel } : {}),
+    ...(config.useLlm ? { history } : {}),
+    ...(ALLOW_LLM_OVERRIDES && config.useLlm ? { llm_provider: config.llmProvider } : {}),
+    ...(ALLOW_LLM_OVERRIDES && config.useLlm && config.llmApiKey ? { llm_api_key: config.llmApiKey } : {}),
+    ...(ALLOW_LLM_OVERRIDES && config.useLlm && config.llmModel ? { llm_model: config.llmModel } : {}),
   };
 }
 
@@ -223,8 +244,8 @@ async function askBackendStream(query, config, history, handlers) {
     if (event === "meta") {
       result.meta = parsed;
       handlers.onMeta?.(parsed);
-    } else if (event === "delta") {
-      handlers.onDelta?.(parsed.text || "");
+    } else if (event === "status") {
+      handlers.onStatus?.(parsed.stage);
     } else if (event === "done") {
       result.done = parsed;
     }
@@ -246,11 +267,21 @@ async function askBackendStream(query, config, history, handlers) {
 
 async function getBackendHealth() {
   try {
-    const response = await fetch(`${BACKEND_URL}/health`);
-    if (!response.ok) throw new Error("offline");
-    return response.json();
+    const response = await fetch(`${BACKEND_URL}/ready`);
+    if (response.ok) {
+      const data = await response.json().catch(() => ({}));
+      return { online: true, indexed_count: data.indexed_count ?? null };
+    }
+    const data = await response.json().catch(() => ({}));
+    const alive = await fetch(`${BACKEND_URL}/health`).then((r) => r.ok).catch(() => false);
+    return alive ? { online: true, indexed_count: data.indexed_count ?? null } : null;
   } catch {
-    return null;
+    try {
+      const alive = await fetch(`${BACKEND_URL}/health`);
+      return alive.ok ? { online: true, indexed_count: null } : null;
+    } catch {
+      return null;
+    }
   }
 }
 
@@ -342,9 +373,9 @@ function TopBar({ health, provider, onOpenSettings }) {
 
       <div className="status-cluster">
         <span className="status-chip">
-          <span className={`dot ${health ? "" : "idle"}`} />
+          <span className={`dot ${health?.online ? "" : "idle"}`} />
           <span>backend</span>
-          <strong>{health ? "online" : "offline"}</strong>
+          <strong>{health?.online ? "online" : "offline"}</strong>
         </span>
         <span className="status-chip">
           <span>chunks</span>
@@ -354,10 +385,12 @@ function TopBar({ health, provider, onOpenSettings }) {
           <span>embed</span>
           <strong>bge-base</strong>
         </span>
-        <span className="status-chip">
-          <span>llm</span>
-          <strong>{labelForProvider(provider)}</strong>
-        </span>
+        {ALLOW_LLM_OVERRIDES && (
+          <span className="status-chip">
+            <span>llm</span>
+            <strong>{labelForProvider(provider)}</strong>
+          </span>
+        )}
         <button className="icon-btn" title="Settings" onClick={onOpenSettings}>
           <Settings />
         </button>
@@ -541,6 +574,8 @@ function LlmSettingsModal({ open, config, setConfig, onClose }) {
           <button className="icon-btn" onClick={onClose} title="Close">x</button>
         </div>
 
+        {ALLOW_LLM_OVERRIDES ? (
+          <>
         <div className="field">
           <div className="field-label">Provider</div>
           <div className="segmented cols-3">
@@ -583,6 +618,11 @@ function LlmSettingsModal({ open, config, setConfig, onClose }) {
           on={draft.rememberLlmSettings}
           onChange={(value) => setDraftKey("rememberLlmSettings", value)}
         />
+
+          </>
+        ) : (
+          <div className="modal-kicker">The answer engine is configured on the backend.</div>
+        )}
 
         <div className="modal-actions">
           <button className="clear-btn" onClick={clearKey}>Clear key</button>
@@ -647,6 +687,7 @@ function Message({ msg, isSelected, onSelectSources }) {
         </div>
         <div className={`msg-bubble${isLlmError ? " llm-error" : ""}`}>
           {blocks.length ? blocks.map((block, index) => renderBlock(block, index)) : <p />}
+          {msg.pending && msg.stage && <div className="stage-line">{STAGE_LABELS[msg.stage] || ""}</div>}
         </div>
 
         {!isUser && (
@@ -670,7 +711,7 @@ function Message({ msg, isSelected, onSelectSources }) {
   );
 }
 
-function TypingMessage() {
+function TypingMessage({ stage }) {
   return (
     <div className="msg assistant">
       <div className="msg-avatar"><img src={`${import.meta.env.BASE_URL}assets/assistant_avatar.png`} alt="assistant" /></div>
@@ -683,6 +724,7 @@ function TypingMessage() {
           <span className="typing-dot" />
           <span className="typing-dot" />
           <span className="typing-dot" />
+          {stage && <span className="stage-line">{STAGE_LABELS[stage] || ""}</span>}
         </div>
       </div>
     </div>
@@ -721,6 +763,7 @@ function Stat({ value, label }) {
 function ChatColumn({
   messages,
   isTyping,
+  stage,
   selectedId,
   onSelectSources,
   onSend,
@@ -761,7 +804,7 @@ function ChatColumn({
                 onSelectSources={onSelectSources}
               />
             ))}
-            {isTyping && <TypingMessage />}
+            {isTyping && <TypingMessage stage={stage} />}
           </>
         )}
       </div>
@@ -920,6 +963,7 @@ function App() {
   });
   const [draft, setDraft] = React.useState("");
   const [isTyping, setIsTyping] = React.useState(false);
+  const [stage, setStage] = React.useState("");
   const [error, setError] = React.useState("");
   const [health, setHealth] = React.useState(null);
   const [settingsOpen, setSettingsOpen] = React.useState(false);
@@ -973,6 +1017,7 @@ function App() {
     setMessages((current) => [...current, userMessage]);
     setDraft("");
     setIsTyping(true);
+    setStage("");
 
     const appendFromResponse = (response) => {
       const assistantMessage = {
@@ -993,8 +1038,8 @@ function App() {
       setSelectedId(assistantMessage.id);
     };
 
-    // Streamed answers: sources render as soon as retrieval finishes, the
-    // answer text grows token by token.
+    // Streamed endpoint: sources render after retrieval; the validated answer
+    // arrives in one piece with status stages in between.
     if (config.useLlm) {
       const assistantId = makeId("a");
       let started = false;
@@ -1010,6 +1055,8 @@ function App() {
                 role: "assistant",
                 created_at: nowLabel(),
                 content: "",
+                pending: true,
+                stage: "generating",
                 sources: m.hits || [],
                 citations: [],
                 meta: {
@@ -1022,11 +1069,10 @@ function App() {
             ]);
             setSelectedId(assistantId);
           },
-          onDelta: (text) => {
+          onStatus: (st) => {
+            setStage(st);
             setMessages((current) =>
-              current.map((msg) =>
-                msg.id === assistantId ? { ...msg, content: msg.content + text } : msg
-              )
+              current.map((msg) => (msg.id === assistantId ? { ...msg, stage: st } : msg))
             );
           },
         });
@@ -1036,13 +1082,14 @@ function App() {
         setMessages((current) =>
           current.map((msg) =>
             msg.id === assistantId
-              ? { ...msg, content: finalAnswer, citations: done?.citations || [] }
+              ? { ...msg, content: finalAnswer, citations: done?.citations || [], pending: false, stage: "" }
               : msg
           )
         );
         return;
       } catch (err) {
         if (started) {
+          setMessages((current) => current.filter((msg) => msg.id !== assistantId || msg.content));
           const message = err instanceof Error ? err.message : String(err);
           setError(`Backend did not respond: ${message}`);
           setIsTyping(false);
@@ -1109,6 +1156,7 @@ function App() {
         <ChatColumn
           messages={messages}
           isTyping={isTyping}
+          stage={stage}
           selectedId={selectedId}
           onSelectSources={setSelectedId}
           onSend={send}
