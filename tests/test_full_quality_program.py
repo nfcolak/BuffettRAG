@@ -571,7 +571,7 @@ def test_live_runner_smoke_uses_backend_ask_and_restores_state(monkeypatch):
         return real_ask(req)
     monkeypatch.setattr(backend, "ask", capture)
     result = run(provider="local", retrieval="bm25", max_cases=1)
-    assert len(calls) == 1 and not calls[0].llm_provider
+    assert len(calls) == 1 and not hasattr(calls[0], "llm_provider")
     assert backend._state is old_state
     assert result["summary"]["cases_run"] == 1
     assert result["summary"]["scored_answers"] == 1
@@ -616,20 +616,17 @@ def test_live_runner_separates_provider_failure_without_leaking_error(monkeypatc
     assert "containing a secret" not in json.dumps(result)
 
 
-def test_live_runner_temperature_reaches_all_provider_sdk_endpoints():
-    from types import SimpleNamespace
-    from scripts.run_live_benchmark import _TemperatureClient
+def test_live_runner_temperature_goes_through_config(monkeypatch):
+    import config
+    from scripts import run_live_benchmark as runner
 
-    calls, requests = [], []
-    def create(**kwargs):
-        calls.append(kwargs)
-        return "ok"
-    endpoint = SimpleNamespace(create=create)
-    client = _TemperatureClient(SimpleNamespace(responses=endpoint, messages=endpoint,
-                                                chat=SimpleNamespace(completions=endpoint)), 0.0, requests)
-    assert client.responses.create(model="openai-test", input="prompt") == "ok"
-    assert client.messages.create(model="anthropic-test", messages=[]) == "ok"
-    assert client.chat.completions.create(model="openrouter-test", messages=[]) == "ok"
-    assert all(call["temperature"] == 0.0 for call in calls)
-    assert requests == [{"model": name, "temperature": 0.0}
-                        for name in ("openai-test", "anthropic-test", "openrouter-test")]
+    seen = {}
+    class Stub:
+        provider_name, model, temperature = "llama", "stub", None
+        def generate(self, *_a, **_k):
+            seen["t"] = config.LLM_TEMPERATURE
+            raise RuntimeError("x")
+    monkeypatch.setattr(runner, "create_llm_provider", lambda **_k: Stub())
+    result = runner.run(provider="llama", retrieval="bm25", max_cases=1, temperature=0.3)
+    assert seen["t"] == 0.3
+    assert result["answer_engine"]["temperature"] == 0.3

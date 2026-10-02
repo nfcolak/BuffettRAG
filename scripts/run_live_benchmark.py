@@ -1,6 +1,7 @@
 """Run the real /ask path in-process; BM25 mode needs no downloaded models.
 
-The local provider is extractive, not a live LLM. Scores are the existing
+The `local` provider is extractive, not a live LLM; `llama` is the embedded GGUF model
+(prompts are fitted by backend_app via fit_context_to_llm, as in the server). Scores are the existing
 claim-term/number/polarity and claim-specific citation checks, not an LLM judge.
 Provider failures are unscored and never enter the answer-quality denominator.
 """
@@ -16,7 +17,6 @@ import time
 from pathlib import Path
 from typing import Any, Dict, Optional
 
-# Credentials must come from the process environment, never a dotenv file.
 os.environ["PYTHON_DOTENV_DISABLED"] = "1"
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
@@ -59,32 +59,6 @@ class BM25OnlyRetriever(Retriever):
         raise RuntimeError("Vector retrieval is disabled in BM25 mode")
 
 
-class _TemperatureClient:
-    """Inject temperature at the SDK boundary, including OpenRouter fallback.
-
-    Existing production provider signatures have no temperature parameter.
-    This wrapper leaves their generation/retry logic intact and records only
-    model identifiers and temperature, never request bodies or credentials.
-    """
-
-    def __init__(self, target, temperature, requests):
-        self._target = target
-        self._temperature = temperature
-        self._requests = requests
-
-    def __getattr__(self, name) -> Any:
-        target = getattr(self._target, name)
-        if name == "create":
-            def create(*args, **kwargs):
-                kwargs["temperature"] = self._temperature
-                self._requests.append({"model": kwargs.get("model"), "temperature": self._temperature})
-                return target(*args, **kwargs)
-            return create
-        if name in {"responses", "chat", "completions", "messages"}:
-            return _TemperatureClient(target, self._temperature, self._requests)
-        return target
-
-
 class _TrackedProvider:
     """Capture provider errors even when /ask or query expansion swallows them."""
 
@@ -95,12 +69,12 @@ class _TrackedProvider:
         self.failures = []
         self.requests = []
         self.call_count = 0
-        if hasattr(provider, "_client"):
-            provider._client = _TemperatureClient(provider._client, temperature, self.requests)
+        self.temperature = temperature
 
     def generate(self, prompt, max_new_tokens=None):
         self.call_count += 1
         stage = "expanding" if prompt.startswith(("Return JSON only:", "You expand search queries")) else "generating"
+        self.requests.append({"model": self.model, "temperature": self.temperature})
         try:
             return self._provider.generate(prompt, max_new_tokens=max_new_tokens)
         except Exception as exc:
@@ -122,7 +96,6 @@ def run(
     cases_path: Path = DEFAULT_CASES,
     *,
     provider: str = DEFAULT_LLM_PROVIDER,
-    model: Optional[str] = None,
     temperature: float = 0.0,
     max_cases: Optional[int] = None,
     retrieval: str = "hybrid",
@@ -153,8 +126,14 @@ def run(
     initialization_failure = None
     setup_start = time.perf_counter()
     try:
-        # The factory obtains credentials only from env-backed configuration.
-        llm = _TrackedProvider(create_llm_provider(provider=provider, model=model), temperature)
+        # Temperature goes through config LLM_TEMPERATURE (env + attr) before creation.
+        os.environ["LLM_TEMPERATURE"] = repr(temperature)
+        import config
+        config.LLM_TEMPERATURE = temperature
+        created = create_llm_provider(provider=provider)
+        if hasattr(created, "temperature"):
+            created.temperature = temperature  # default arg was bound at import time
+        llm = _TrackedProvider(created, temperature)
     except Exception as exc:
         initialization_failure = {"stage": "initializing_provider", "error_type": type(exc).__name__}
 
@@ -223,14 +202,15 @@ def run(
     unanswerable_qids = {case["qid"] for case in selected_cases if is_unanswerable_case(case)}
     return {
         "schema_version": 1,
-        "mode": "offline_bm25_extractive_not_live_llm_quality" if provider == "local" and retrieval == "bm25" else "in_process_ask_benchmark",
+        "mode": "offline_bm25_extractive_not_live_llm_quality" if provider == "local" and retrieval == "bm25" else "offline_bm25_embedded_llama" if provider == "llama" and retrieval == "bm25" else "in_process_ask_benchmark",
         "execution_path": "src.services.backend_app.ask (no HTTP server)",
-        "live_provider_run": provider != "local" and any(row["model_requests"] for row in rows),
+        "live_provider_run": llm is not None and llm.provider_name == "llama" and any(row["model_requests"] for row in rows),
         "corpus": _relative_or_absolute(corpus), "corpus_sha256": corpus_hash,
         "cases": _relative_or_absolute(cases_path), "cases_sha256": hashlib.sha256(cases_path.read_bytes()).hexdigest(),
         "frozen": bool(payload.get("frozen", False)),
-        "answer_engine": {"provider": provider, "model": llm.model if llm is not None else model,
-                          "temperature": temperature, "temperature_applies": provider != "local"},
+        "answer_engine": {"provider": provider, "model": llm.model if llm is not None else None,
+                          "resolved_provider": llm.provider_name if llm is not None else None,
+                          "temperature": temperature, "temperature_applies": provider == "llama"},
         "retrieval": retrieval, "setup_latency_ms": round(setup_latency_ms, 3),
         "fixture_validation": fixture_check,
         "summary": {"fixture_cases": len(cases), "cases_run": len(rows),
@@ -255,15 +235,14 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--cases", type=Path, default=DEFAULT_CASES)
     parser.add_argument("--corpus", type=Path, default=CHUNKS_V3_FILE)
-    parser.add_argument("--provider", choices=("local", "openrouter", "openai", "anthropic"), default=DEFAULT_LLM_PROVIDER)
-    parser.add_argument("--model", default=None)
+    parser.add_argument("--provider", choices=("llama", "local"), default=DEFAULT_LLM_PROVIDER)
     parser.add_argument("--temperature", type=float, default=0.0)
     parser.add_argument("--max-cases", type=int, default=None)
     parser.add_argument("--retrieval", choices=("bm25", "hybrid"), default="hybrid")
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
     try:
-        result = run(args.corpus, args.cases, provider=args.provider, model=args.model,
+        result = run(args.corpus, args.cases, provider=args.provider,
                      temperature=args.temperature, max_cases=args.max_cases, retrieval=args.retrieval)
         args.output.parent.mkdir(parents=True, exist_ok=True)
         args.output.write_text(json.dumps(result, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
