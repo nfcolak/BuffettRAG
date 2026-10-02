@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Optional, Protocol
+from typing import Iterator, Optional, Protocol
 
 
 class LLMProvider(Protocol):
@@ -13,4 +13,8 @@ class LLMProvider(Protocol):
 
     def generate(self, prompt: str, max_new_tokens: Optional[int] = None) -> str:
         """Generate a grounded answer from a fully-built prompt."""
+        ...
+
+    def generate_stream(self, prompt: str, max_new_tokens: Optional[int] = None) -> Iterator[str]:
+        """Optional: yield answer text deltas."""
         ...

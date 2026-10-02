@@ -82,8 +82,7 @@ def evaluate_answers(
     gold = get_gold_queries()
     out: List[Dict] = []
     for g in gold:
-        # Free-tier providers rate-limit under sustained load: never let a
-        # single failed query kill the whole run, and pace the calls.
+        # Never let a single failed query kill the whole run.
         try:
             result = pipeline.ask(
                 g.query, strategy=strategy, top_k=top_k, rerank=rerank
@@ -91,9 +90,7 @@ def evaluate_answers(
         except Exception as exc:
             print(f"    !! {g.qid} failed: {exc}")
             out.append({"qid": g.qid, "query": g.query, "error": str(exc)[:300]})
-            time.sleep(10)
             continue
-        time.sleep(3)
         report = evaluate_faithfulness(result["answer"] or "", _hits_from_passages(result["passages"]))
         # Crude answer-correctness signal: do gold answer keywords appear?
         ak = [k.lower() for k in g.answer_keywords]
@@ -186,6 +183,8 @@ def parse_args() -> argparse.Namespace:
                    help="Also run end-to-end answer generation + faithfulness")
     p.add_argument("--answers-only", action="store_true",
                    help="Skip the retrieval matrix; only run answer faithfulness (implies --with-llm)")
+    p.add_argument("--provider", choices=["llama", "local"], default=None,
+                   help="Answer engine for --with-llm (default: config)")
     p.add_argument("--top-k", type=int, default=10)
     return p.parse_args()
 
@@ -193,7 +192,8 @@ def parse_args() -> argparse.Namespace:
 def main() -> None:
     args = parse_args()
     with_llm = args.with_llm or args.answers_only
-    cfg = PipelineConfig(use_llm=with_llm, use_reranker=True)
+    cfg_kwargs = {"llm_provider": args.provider} if args.provider else {}
+    cfg = PipelineConfig(use_llm=with_llm, use_reranker=True, **cfg_kwargs)
     pipeline = BuffettRAGPipeline.build(cfg)
 
     rerank_options = [False] if args.no_rerank else [False, True]

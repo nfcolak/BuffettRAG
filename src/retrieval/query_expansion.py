@@ -2,7 +2,8 @@
 
 Meta-questions and topical shorthand often miss the corpus vocabulary
 ("Middle East" never appears in the letters, but ISCAR/Israel/OPEC do).
-Before retrieval we ask the configured LLM for a handful of extra search
+Before retrieval we ask the configured LLM (EXPANSION_MODE defaults to "off":
+small embedded models expand unreliably) for a handful of extra search
 keywords and append them to the query used for BM25 + embedding search.
 The original question is still what the answer model sees.
 """

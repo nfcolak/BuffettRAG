@@ -361,27 +361,9 @@ def test_backend_request_validation_rejects_unsafe_payloads(monkeypatch):
     else:
         raise AssertionError("oversized metadata filter must be rejected")
 
-    monkeypatch.setattr(backend, "PUBLIC_DEMO_MODE", True)
-    monkeypatch.setattr(backend, "ALLOW_LLM_REQUEST_OVERRIDES", True)
-    for field, value in (("llm_provider", "openai"), ("llm_model", "expensive"),
-                         ("llm_api_key", "visitor-key")):
-        try:
-            backend.AskRequest.model_validate({"query": "evidence", field: value})
-        except ValidationError:
-            pass
-        else:
-            raise AssertionError(f"public demo must reject {field}")
-
-    monkeypatch.setattr(backend, "PUBLIC_DEMO_MODE", False)
-    monkeypatch.setattr(backend, "ALLOW_LLM_REQUEST_OVERRIDES", False)
-    for field, value in (("llm_provider", "openai"), ("llm_model", "expensive"),
-                         ("llm_api_key", "visitor-key")):
-        try:
-            backend.AskRequest.model_validate({"query": "evidence", field: value})
-        except ValidationError:
-            pass
-        else:
-            raise AssertionError(f"disabled request overrides must reject {field}")
+    assert "llm_provider" not in backend.AskRequest.model_fields
+    assert "llm_api_key" not in backend.AskRequest.model_fields
+    assert "llm_model" not in backend.AskRequest.model_fields
 
 
 def test_public_backend_requires_auth_and_reports_readiness(monkeypatch):
@@ -417,16 +399,6 @@ def test_public_security_configuration_fails_closed_without_key():
         assert "trusted proxy" in str(exc)
     else:
         raise AssertionError("public backend must not trust forwarding headers")
-
-    try:
-        validate_deployment_security(
-            public_demo=True, api_keys=("key",), cors_origins=(), debug=False,
-            allow_llm_request_overrides=True,
-        )
-    except RuntimeError as exc:
-        assert "LLM request overrides" in str(exc)
-    else:
-        raise AssertionError("public backend must not allow LLM request overrides")
 
 
 def test_backend_rejects_oversized_body_before_endpoint(monkeypatch):

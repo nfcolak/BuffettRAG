@@ -1,14 +1,14 @@
+import importlib
 import unittest
+from unittest import mock
 
-from src.generation.openai_llm import OpenAILLM
-from src.generation.providers import (
-    AnthropicProvider,
-    LocalProvider,
-    OpenAIProvider,
-    OpenRouterProvider,
-    create_llm_provider,
-)
-from src.generation.providers.local_provider import REFUSAL_LINE
+import pytest
+
+import config
+from src.generation.prompt import REFUSAL_LINE, build_cited_prompt
+from src.generation.providers import LlamaCppProvider, LocalProvider, create_llm_provider
+from src.generation.providers import factory
+from src.vector_store import SearchHit
 
 
 def _build_prompt(question: str) -> str:
@@ -30,50 +30,41 @@ def _build_prompt(question: str) -> str:
 
 
 class LLMProviderTests(unittest.TestCase):
-    def test_factory_creates_openai_provider(self) -> None:
-        provider = create_llm_provider(
-            provider="openai",
-            api_key="sk-test",
-            model="gpt-test",
-        )
-        self.assertIsInstance(provider, OpenAIProvider)
-        self.assertEqual(provider.provider_name, "openai")
-        self.assertEqual(provider.model, "gpt-test")
+    def test_factory_falls_back_to_local_when_model_missing(self) -> None:
+        with mock.patch.object(factory, "LLM_MODEL_PATH", config.BASE_DIR / "models" / "missing.gguf"):
+            provider = create_llm_provider(provider="llama")
+        self.assertIsInstance(provider, LocalProvider)
 
-    def test_legacy_openai_llm_import_still_works(self) -> None:
-        provider = OpenAILLM(api_key="sk-test", model="gpt-test")
-        self.assertIsInstance(provider, OpenAIProvider)
-        self.assertEqual(provider.provider_name, "openai")
+    def test_factory_falls_back_to_local_when_llama_cpp_missing(self) -> None:
+        with mock.patch.object(factory, "LLM_MODEL_PATH", config.BASE_DIR / "config.py"), \
+                mock.patch.object(factory.importlib.util, "find_spec", return_value=None):
+            provider = create_llm_provider(provider="llama")
+        self.assertIsInstance(provider, LocalProvider)
 
-    def test_factory_creates_openrouter_provider(self) -> None:
-        provider = create_llm_provider(
-            provider="openrouter",
-            api_key="sk-or-test",
-            model="openrouter/free",
-        )
-        self.assertIsInstance(provider, OpenRouterProvider)
-        self.assertEqual(provider.provider_name, "openrouter")
-        self.assertEqual(provider.model, "openrouter/free")
-
-    def test_factory_creates_anthropic_provider(self) -> None:
-        provider = create_llm_provider(
-            provider="anthropic",
-            api_key="sk-ant-test",
-            model="claude-test",
-        )
-        self.assertIsInstance(provider, AnthropicProvider)
-        self.assertEqual(provider.provider_name, "anthropic")
-        self.assertEqual(provider.model, "claude-test")
-
-    def test_factory_rejects_unknown_provider(self) -> None:
-        with self.assertRaisesRegex(ValueError, "Unsupported LLM provider"):
-            create_llm_provider(provider="unknown")
-
-    def test_factory_creates_local_provider_and_ignores_api_key(self) -> None:
-        provider = create_llm_provider(provider="local", api_key="unused-key")
+    def test_factory_creates_local_provider(self) -> None:
+        provider = create_llm_provider(provider="local")
         self.assertIsInstance(provider, LocalProvider)
         self.assertEqual(provider.provider_name, "local")
         self.assertEqual(provider.model, "embedded-extractive-v1")
+
+    def test_factory_has_no_api_key_or_model_parameters(self) -> None:
+        with self.assertRaises(TypeError):
+            create_llm_provider(provider="local", api_key="x")  # type: ignore[call-arg]
+
+    def test_factory_rejects_external_and_unknown_providers(self) -> None:
+        for name in ("openai", "anthropic", "openrouter", "unknown"):
+            with self.assertRaisesRegex(ValueError, "Unsupported LLM provider"):
+                create_llm_provider(provider=name)
+
+    def test_external_provider_modules_are_gone(self) -> None:
+        for name in ("openai_provider", "openrouter_provider", "anthropic_provider"):
+            with self.assertRaises(ImportError):
+                importlib.import_module(f"src.generation.providers.{name}")
+        with self.assertRaises(ImportError):
+            importlib.import_module("src.generation.openai_llm")
+
+    def test_default_provider_is_llama(self) -> None:
+        self.assertEqual(config.DEFAULT_LLM_PROVIDER, "llama")
 
     def test_local_provider_extracts_cited_sentences(self) -> None:
         provider = LocalProvider()
@@ -86,6 +77,21 @@ class LLMProviderTests(unittest.TestCase):
         provider = LocalProvider()
         answer = provider.generate(_build_prompt("What is the meaning of quantum entanglement?"))
         self.assertEqual(answer, REFUSAL_LINE)
+
+
+@pytest.mark.skipif(not config.LLM_MODEL_PATH.is_file(), reason="GGUF model file not present")
+def test_llama_provider_real_grounded_answer():
+    hits = [
+        SearchHit(id="a", score=1.0, metadata={"year": 2002, "source_file": "buffet_2002.txt"},
+                  text="Derivatives are financial weapons of mass destruction, carrying dangers that, "
+                       "while now latent, are potentially lethal."),
+        SearchHit(id="b", score=0.9, metadata={"year": 1989, "source_file": "buffet_1989.txt"},
+                  text="We made good progress on compounding rates this year."),
+    ]
+    provider = LlamaCppProvider()
+    answer = provider.generate(build_cited_prompt("What did Buffett say about derivatives?", hits),
+                               max_new_tokens=120)
+    assert "[1]" in answer or REFUSAL_LINE in answer
 
 
 if __name__ == "__main__":
