@@ -83,3 +83,78 @@ def evaluate_answer(answer: str, hits: Sequence[Any], case: Dict[str, Any]) -> D
     return {"qid": case["qid"], "accepted": accepted, "claim_coverage": coverage,
             "claims": claims, "cited_passage_ids": sorted(cited_ids),
             "has_gold_citation": valid_citation, "forbidden_terms_found": forbidden}
+
+
+def is_unanswerable_case(case: Dict[str, Any]) -> bool:
+    """Explicit abstention fixtures have no invented gold passage or claim."""
+    return case.get("answerable") is False or case.get("question_type") == "unanswerable"
+
+
+def validate_live_benchmark_case(case: Dict[str, Any]) -> None:
+    """Validate the existing schema plus its additive exact-refusal extension."""
+    from src.generation.prompt import REFUSAL_LINE
+
+    if is_unanswerable_case(case):
+        required = {"qid", "query", "gold_passage_ids", "gold_claims", "accept", "reject", "expected_answer"}
+        if required - set(case) or not case.get("qid") or not case.get("query"):
+            raise ValueError("Invalid unanswerable benchmark case")
+        if case["gold_passage_ids"] != [] or case["gold_claims"] != [] or case.get("relevant_ids", []) != []:
+            raise ValueError("Unanswerable cases must not invent gold evidence")
+        if case["expected_answer"] != REFUSAL_LINE or not case["accept"].get("require_exact_refusal"):
+            raise ValueError("Unanswerable cases require the exact refusal line")
+        if case["accept"].get("require_valid_citation"):
+            raise ValueError("Refusals must not require citations")
+        return
+    validate_benchmark_case(case)
+    gold_ids = set(case["gold_passage_ids"])
+    for claim in case["gold_claims"]:
+        accepted_ids = claim.get("gold_passage_ids")
+        if not isinstance(accepted_ids, list) or not accepted_ids or not set(accepted_ids).issubset(gold_ids):
+            raise ValueError("Each live-benchmark claim needs its own accepted gold_passage_ids")
+    if not case["accept"].get("require_valid_citation"):
+        raise ValueError("Scored answers require claim-level gold citations")
+
+
+def validate_fixture_ids(cases: Sequence[Dict[str, Any]], docs: Sequence[Any]) -> Dict[str, Any]:
+    """Check the entire fixture before limiting cases or initializing any models."""
+    corpus_ids = {doc.id for doc in docs}
+    if len(corpus_ids) != len(docs):
+        raise ValueError("Corpus contains duplicate passage IDs")
+    fixture_ids = set()
+    qids = set()
+    for case in cases:
+        validate_live_benchmark_case(case)
+        if case["qid"] in qids:
+            raise ValueError("Duplicate benchmark qid")
+        qids.add(case["qid"])
+        fixture_ids.update(case["gold_passage_ids"])
+        fixture_ids.update(case.get("relevant_ids", []))
+        for claim in case["gold_claims"]:
+            fixture_ids.update(claim["gold_passage_ids"])
+    missing = sorted(fixture_ids - corpus_ids)
+    if missing:
+        raise ValueError(f"Missing fixture passage IDs: {', '.join(missing)}")
+    return {"checked_fixture_ids": len(fixture_ids), "missing_fixture_ids": [], "missing_fixture_id_count": 0}
+
+
+def evaluate_live_answer(answer: str, hits: Sequence[Any], case: Dict[str, Any]) -> Dict[str, Any]:
+    """Reuse development scoring, reporting accepted evidence for every claim."""
+    from src.generation.prompt import REFUSAL_LINE
+
+    validate_live_benchmark_case(case)
+    if is_unanswerable_case(case):
+        correct = answer == REFUSAL_LINE and not _CITATION_RE.search(answer)
+        return {"qid": case["qid"], "accepted": correct, "claim_coverage": None,
+                "claims": [], "cited_passage_ids": [], "has_gold_citation": False,
+                "forbidden_terms_found": [], "refusal_correct": correct}
+    score = evaluate_answer(answer, hits, case)
+    for row, claim in zip(score["claims"], case["gold_claims"]):
+        accepted_ids = set(claim["gold_passage_ids"])
+        supporting_ids = set()
+        for sentence in row["supporting_sentences"]:
+            supporting_ids.update(_sentence_cited_ids(sentence, hits) & accepted_ids)
+        row.update({"required_terms": claim["required_terms"],
+                    "accepted_passage_ids": sorted(accepted_ids),
+                    "supporting_passage_ids": sorted(supporting_ids)})
+    score["refusal_correct"] = None
+    return score
