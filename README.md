@@ -4,11 +4,11 @@ BuffettRAG answers questions about Warren Buffett's Berkshire Hathaway sharehold
 
 ## How a question is answered
 
-The backend first expands the query. The configured LLM proposes up to eight extra search keywords (companies, people, events, financial terms) so that questions phrased outside the corpus vocabulary still land, for example "Middle East" maps to ISCAR and Israel. Expansion failures are swallowed and retrieval falls back to the original query.
+The backend can expand the query (`EXPANSION_MODE`: `auto` expands only when first-pass evidence is weak, `always`, or `off`). The configured LLM proposes up to eight extra search keywords (companies, people, events, financial terms) so that questions phrased outside the corpus vocabulary still land, for example "Middle East" maps to ISCAR and Israel. Expansion failures are swallowed and retrieval falls back to the original query.
 
-Retrieval is hybrid. The expanded query runs through BM25 and through vector search over bge-base-en-v1.5 embeddings, and the two rankings are merged with reciprocal rank fusion. The original query and expanded variant contribute candidate rankings; temporal interpretation and cross-encoder reranking always use the original question. Normal hybrid retrieval sends thirty fused candidates to bge-reranker-v2-m3; temporal comparison can retain up to thirty per period before reranking. Near-duplicate passages are dropped by token-overlap comparison, since overlapping chunk windows would otherwise fill the context with repeats. The top passages are then widened with their neighboring chunks (the chunk file stores previous and next chunk ids) so the LLM sees full paragraphs while retrieval stays precise over compact chunks.
+Retrieval is hybrid. The expanded query runs through BM25 and through vector search over bge-base-en-v1.5 embeddings, and the two rankings are merged with reciprocal rank fusion. The original query and expanded variant contribute candidate rankings; temporal interpretation and cross-encoder reranking always use the original question. Normal hybrid retrieval sends up to `RERANK_CANDIDATES` (default 15) fused candidates to bge-reranker-v2-m3; temporal comparison can retain up to thirty per period before reranking. Near-duplicate passages are dropped by token-overlap comparison, since overlapping chunk windows would otherwise fill the context with repeats. The top passages are then widened with their neighboring chunks (the chunk file stores previous and next chunk ids) so the LLM sees full paragraphs while retrieval stays precise over compact chunks.
 
-Generation is grounded by contract. The system prompt requires the model to test each passage against the question, answer only from passages that pass, cite every sentence as [n], and output a fixed refusal line when nothing is relevant. Citation references are resolved server-side, with invalid numbers reported explicitly. This validates reference existence, not whether a claim is true or entailed. Answer responses expose the exact expanded passage text used in the prompt; original retrieval chunks remain available separately. Both a blocking endpoint and a server-sent-events streaming endpoint are available.
+Generation is grounded by contract. The system prompt requires the model to test each passage against the question, answer only from passages that pass, cite every sentence as [n], and output a fixed refusal line when nothing is relevant. Citation references are resolved server-side, with invalid numbers reported explicitly. This validates reference existence, not whether a claim is true or entailed. Answer responses expose the exact expanded passage text used in the prompt; original retrieval chunks remain available separately. The claim validator keeps a sentence only when its cited passage covers most of the sentence's content words with matching numbers and negation; this is deterministic lexical checking, not semantic entailment. Both a blocking endpoint and a server-sent-events streaming endpoint are available.
 
 ## Retrieval design choices
 
@@ -16,7 +16,7 @@ Year handling treats detected years as a hint rather than a constraint. When a q
 
 Questions that compare two periods ("How did his view on technology change from the 1990s to the 2020s?") are detected by pattern and decomposed into one search per period. Each sub-search keeps the full original query so the embedding stays on topic while only the year filter changes, and the final selection reserves a top candidate from each nonempty period when at least two passage slots are available. This preserves coverage, but does not itself establish relevance or a change of opinion.
 
-Three vector backends share one interface. pgvector is the production store, Chroma and FAISS remain available for local work and comparison runs, selected with `VECTOR_BACKEND` (see configuration). Metadata filters are validated against a field whitelist and built as parameterized SQL, and the table name is checked against a strict identifier pattern.
+Three vector backends share one interface, and each persists an index identity manifest (corpus, model, dimension) that is checked at startup. pgvector is the production store, Chroma and FAISS remain available for local work and comparison runs, selected with `VECTOR_BACKEND` (see configuration). Metadata filters are validated against a field whitelist and built as parameterized SQL, and the table name is checked against a strict identifier pattern.
 
 ## Evaluation
 
@@ -24,7 +24,10 @@ The evaluation pipeline scores retrieval strategies against a 50-query gold set 
 
 ## Quick start
 
+Python 3.10+ is recommended.
+
 ```bash
+python3 -m venv .venv && . .venv/bin/activate
 pip install -r requirements.txt
 
 # build chunks from the letters in data/raw/
@@ -41,7 +44,7 @@ VITE_BACKEND_URL=http://localhost:8000 npm run dev
 
 The first backend start downloads the embedding model (~440MB) and the reranker (~2.3GB). On CPU the reranker adds noticeable latency per query; a GPU removes most of it.
 
-The frontend has a settings dialog for choosing the LLM provider per browser. A provider API key entered there is sent only with `/ask` requests, and "remember on this device" keeps it in that browser's local storage.
+Per-request LLM overrides are off by default: the server rejects `llm_provider`, `llm_api_key` and `llm_model`, and the frontend neither sends them nor shows provider settings. For local bring-your-own-key use, set `ALLOW_LLM_REQUEST_OVERRIDES=1` on the backend and build the frontend with `VITE_ALLOW_LLM_OVERRIDES=1`.
 
 ## Configuration
 
@@ -57,6 +60,8 @@ Everything is set through environment variables, read in `config.py`.
 | `PGHOST`, `PGPORT`, `PGUSER`, `PGPASSWORD`, `PGDATABASE`, `PG_TABLE` | localhost defaults | Postgres connection for pgvector |
 | `EMBEDDING_MODEL` | `BAAI/bge-base-en-v1.5` | Embedding model id |
 | `EMBEDDING_DEVICE` | auto | `cuda` when available, otherwise `cpu` |
+| `RERANK_CANDIDATES` | `15` | Max candidates sent to the cross-encoder |
+| `EXPANSION_MODE` | `auto` | `auto`, `always`, or `off` for the LLM query-expansion call |
 
 For shared or public deployments there are separate hardening knobs.
 
@@ -66,17 +71,21 @@ For shared or public deployments there are separate hardening knobs.
 | `CORS_ORIGINS` | localhost ports | Allowed browser origins |
 | `RATE_LIMIT_REQUESTS`, `RATE_LIMIT_WINDOW_SECONDS` | 60, 60 | Fixed-window rate limit per client and path |
 | `TRUST_PROXY_HEADERS` | `0` | Set to `1` only behind a reverse proxy, so rate limiting keys on `X-Forwarded-For` |
-| `EXPOSE_DEBUG_STATUS` | `0` | Include internal paths and model names in `/health` and `/stats` |
+| `EXPOSE_DEBUG_STATUS` | `0` | Include internal paths and model names in `/ready` and `/stats` |
+| `PUBLIC_DEMO_MODE` | `0` | Public-demo hardening (see `config.py`) |
+| `ALLOW_LLM_REQUEST_OVERRIDES` | `0` | Accept per-request `llm_provider`, `llm_api_key`, `llm_model` |
+| `MAX_REQUEST_BODY_BYTES` | see `config.py` | Reject request bodies larger than this |
 
 ## API
 
-- `GET /health` reports index count, no auth required
+- `GET /health` returns liveness only (`{"status": "alive"}`), no auth required
+- `GET /ready` reports `indexed_count` and `document_count` (503 when the index is not ready), no auth required
 - `GET /stats` reports corpus statistics
 - `POST /search` runs retrieval only and returns scored passages
 - `POST /ask` runs retrieval plus generation and returns the answer with parsed citations
-- `POST /ask/stream` streams the answer as server-sent events (meta, delta, done)
+- `POST /ask/stream` streams the answer as server-sent events (meta, status, done); the answer is validated before it is sent, so there is no token streaming
 
-`/ask` accepts an optional `llm_provider`, `llm_api_key` and `llm_model`, so a caller can bring their own key per request instead of configuring one on the server.
+`/ask` rejects `llm_provider`, `llm_api_key` and `llm_model` unless `ALLOW_LLM_REQUEST_OVERRIDES=1`.
 
 ## Project layout
 
