@@ -21,6 +21,14 @@ _STOPWORDS = frozenset(
     "a an and are as at be been but by did do does for from had has have in into is it its of on or that the their then these they this to was were with would".split()
 )
 
+_IGNORE = frozenset(
+    "buffett warren berkshire hathaway said says wrote writes argued noted explained according "
+    "letter letters shareholders he his him".split()
+)
+_SPLIT_RE = re.compile(r"([.!?](?:[ \t]*\[\d+(?:\s*,\s*\d+)*\])*)[ \t]+(?=[A-Z0-9\"'])")
+_MIN_COVERAGE = 0.6
+
+
 @dataclass
 class ClaimValidationResult:
     safe_answer: str
@@ -35,28 +43,30 @@ def split_claims(text: str) -> List[str]:
 
 
 def _deterministic_agreement(claim: str, passage: str) -> tuple[bool, float]:
-    """Conservative approval: wording, polarity, quantities and entities must agree."""
-    claim_tokens = [token.lower() for token in _TOKEN_RE.findall(claim)]
-    claim_content = {token for token in claim_tokens if token not in _STOPWORDS}
+    """Approve when content coverage >= 0.6 and polarity, numbers and entities agree."""
+    raw_tokens = _TOKEN_RE.findall(claim)
+    claim_content = {t.lower() for t in raw_tokens if t.lower() not in _STOPWORDS and t.lower() not in _IGNORE}
     claim_numbers = {value.lower().replace(",", "") for value in _NUMBER_RE.findall(claim)}
     claim_entities = {
-        token.lower() for token in _TOKEN_RE.findall(claim)
-        if (token[:1].isupper() or token.isupper()) and token.lower() not in _STOPWORDS
+        t.lower() for t in raw_tokens[1:]
+        if (t[:1].isupper() or t.isupper()) and t.lower() not in _STOPWORDS and t.lower() not in _IGNORE
+        and not t[:1].isdigit()
     }
+    # Very short claims have too little content for partial coverage.
+    needed = 1.0 if len(claim_content) <= 3 else _MIN_COVERAGE
     best_score = 0.0
     normalized_passage = re.sub(r"\s+", " ", passage).strip()
     for sentence in sentence_units(normalized_passage):
         evidence_tokens = [token.lower() for token in _TOKEN_RE.findall(sentence)]
         evidence_set = set(evidence_tokens)
-        evidence_content = {token for token in evidence_tokens if token not in _STOPWORDS}
-        coverage = len(claim_content & evidence_content) / len(claim_content) if claim_content else 0.0
-        best_score = max(best_score, lexical_support_score(claim, sentence))
+        coverage = len(claim_content & evidence_set) / len(claim_content) if claim_content else 0.0
+        best_score = max(best_score, lexical_support_score(claim, sentence), coverage)
         evidence_numbers = {value.lower().replace(",", "") for value in _NUMBER_RE.findall(sentence)}
         same_polarity = bool(_PREDICATE_NEGATION_RE.search(claim)) == bool(
             _PREDICATE_NEGATION_RE.search(sentence)
         )
         if (
-            coverage == 1.0
+            coverage >= needed
             and same_polarity
             and claim_numbers.issubset(evidence_numbers)
             and claim_entities.issubset(evidence_set)
@@ -65,37 +75,51 @@ def _deterministic_agreement(claim: str, passage: str) -> tuple[bool, float]:
     return False, best_score
 
 
+def _split_original(line: str) -> List[str]:
+    """Split a line into sentences keeping the original text (bullets, bold, markers)."""
+    return [part for part in _SPLIT_RE.sub(r"\1\n", line).split("\n") if part.strip()]
+
+
 def validate_and_filter_answer(answer: str, hits: Sequence[Any], *, nli_scorer: Callable[[str, str], float] | None = None,
                                threshold: float = 0.2) -> ClaimValidationResult:
-    """Remove claims without cited textual/NLI support; never invent replacements."""
-    kept_sentences, blocked, validations = [], [], []
-    # Keep terminal citations attached to line/bullet sentence units.
-    for raw_sentence in sentence_units(answer):
-        if not raw_sentence:
+    """Drop sentences without cited textual/NLI support; kept sentences stay verbatim."""
+    out_lines: List[str] = []
+    blocked, validations = [], []
+    for line in answer.split("\n"):
+        if not line.strip():
+            out_lines.append("")
             continue
-        marker_values = list(dict.fromkeys(_CITATION_RE.findall(raw_sentence)))
-        marker_numbers = [int(n.strip()) - 1 for marker in marker_values
-                          for n in marker.split(",") if n.strip().isdigit()]
-        marker_text = ", ".join(marker_values)
-        valid = [i for i in marker_numbers if 0 <= i < len(hits)]
-        for claim in split_claims(raw_sentence):
-            scores = []
-            agreements = []
-            for index in valid:
-                if nli_scorer:
-                    score = float(nli_scorer(hits[index].text, claim))
-                    agreement = score >= max(0.5, threshold)
-                else:
-                    agreement, score = _deterministic_agreement(claim, hits[index].text)
-                scores.append(score)
-                agreements.append(agreement)
-            support = max(scores, default=0.0)
-            supported = bool(valid) and any(agreements)
-            validations.append({"claim": claim, "cited_indexes": valid, "support": support,
-                                "method": "nli" if nli_scorer else "deterministic_agreement", "supported": supported})
-            if supported:
-                citation = f" [{marker_text}]" if marker_text else ""
-                kept_sentences.append(f"{claim}.{citation}")
+        kept = []
+        for sentence in _split_original(line):
+            marker_values = list(dict.fromkeys(_CITATION_RE.findall(sentence)))
+            marker_numbers = [int(n.strip()) - 1 for marker in marker_values
+                              for n in marker.split(",") if n.strip().isdigit()]
+            valid = [i for i in marker_numbers if 0 <= i < len(hits)]
+            sentence_ok = bool(valid)
+            failed = []
+            body = re.sub(r"^\s*(?:[-*]|\d+\.)\s+", "", sentence)
+            for claim in split_claims(body):
+                scores, agreements = [], []
+                for index in valid:
+                    if nli_scorer:
+                        score = float(nli_scorer(hits[index].text, claim))
+                        agreement = score >= max(0.5, threshold)
+                    else:
+                        agreement, score = _deterministic_agreement(claim, hits[index].text)
+                    scores.append(score)
+                    agreements.append(agreement)
+                supported = bool(valid) and any(agreements)
+                validations.append({"claim": claim, "cited_indexes": valid, "support": max(scores, default=0.0),
+                                    "method": "nli" if nli_scorer else "deterministic_agreement",
+                                    "supported": supported})
+                if not supported:
+                    sentence_ok = False
+                    failed.append(claim)
+            if sentence_ok:
+                kept.append(sentence.strip())
             else:
-                blocked.append(claim)
-    return ClaimValidationResult(" ".join(kept_sentences).strip(), blocked, validations, nli_scorer is not None)
+                blocked.extend(failed or [body.strip()])
+        if kept:
+            out_lines.append(" ".join(kept))
+    text = re.sub(r"\n{3,}", "\n\n", "\n".join(out_lines)).strip()
+    return ClaimValidationResult(text, blocked, validations, nli_scorer is not None)

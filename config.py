@@ -130,6 +130,7 @@ ANSWER_CONTEXT_MAX_CHARS = int(os.getenv("ANSWER_CONTEXT_MAX_CHARS", "9000"))
 # Reranker
 RERANKER_MODEL = "BAAI/bge-reranker-v2-m3"
 RERANK_TOP_K = 8
+EXPANSION_MODE = os.getenv("EXPANSION_MODE", "auto").strip().lower()
 
 # -----------------------------------------------------------------------------
 # Generation

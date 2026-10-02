@@ -15,11 +15,13 @@ class EvidenceAssessment:
 
 
 def _terms(text: str) -> set[str]:
-    return {token for token in re.findall(r"[a-z0-9']+", text.lower()) if len(token) > 2 and token not in _STOP}
+    return {token for token in re.findall(r"[^\W_]+", text.lower(), re.UNICODE) if len(token) > 2 and token not in _STOP}
 
 
-def assess_evidence(query: str, hits: Sequence[object], *, min_overlap: float = 0.2) -> EvidenceAssessment:
+def assess_evidence(query: str, hits: Sequence[object], *, extra_queries: Sequence[str] = (), min_overlap: float = 0.2) -> EvidenceAssessment:
     terms = _terms(query)
+    for extra in extra_queries:
+        terms |= _terms(extra)
     if not hits:
         return EvidenceAssessment(False, "no_retrieved_passages", 0.0)
     if not terms:
