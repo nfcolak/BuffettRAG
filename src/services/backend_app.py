@@ -22,6 +22,7 @@ Run:
 from __future__ import annotations
 
 import sys
+from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import Any, Dict, List, Literal, Optional
 
@@ -70,7 +71,7 @@ from src.generation.prompt import (
 from src.generation.evidence_gate import assess_evidence
 from src.evaluation.claim_validator import validate_and_filter_answer
 from src.generation.providers import create_llm_provider
-from src.index_manifest import load_and_validate_index_manifest, write_index_manifest
+from src.index_manifest import ensure_index_identity, write_index_identity
 from src.retrieval.context import build_doc_lookup, expand_hits_with_neighbors
 from src.retrieval.query_expansion import expand_query, expand_query_structured
 from src.retrieval.reranker import CrossEncoderReranker
@@ -184,7 +185,13 @@ class AskResponse(SearchResponse):
 # App + global state
 # -----------------------------------------------------------------------------
 
-app = FastAPI(title="BuffettRAG Backend", version="1.0.0")
+@asynccontextmanager
+async def _lifespan(_app: FastAPI):
+    await startup()
+    yield
+
+
+app = FastAPI(title="BuffettRAG Backend", version="1.0.0", lifespan=_lifespan)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=list(CORS_ORIGINS),
@@ -261,7 +268,6 @@ def _resolve_chunks_path() -> Path:
     return CHUNKS_V3_FILE
 
 
-@app.on_event("startup")
 async def startup() -> None:
     validate_deployment_security(
         public_demo=PUBLIC_DEMO_MODE,
@@ -280,30 +286,17 @@ async def startup() -> None:
     embedder = BGEEmbedder(model_name=EMBEDDING_MODEL_PRIMARY, device=EMBEDDING_DEVICE)
     docs = load_chunks_as_docs(chunks_path)
 
-    if VECTOR_BACKEND == "faiss" and (FAISS_DIR / FaissStore.INDEX_FILE).exists():
-        load_and_validate_index_manifest(
-            FAISS_DIR,
-            corpus=chunks_path,
-            docs=docs,
-            backend="faiss",
-            model_name=embedder.model_name,
-            dimension=embedder.dimension,
-        )
     vs = get_vector_store(backend=VECTOR_BACKEND, dim=embedder.dimension)
+    identity = dict(
+        backend=VECTOR_BACKEND, corpus=chunks_path, docs=docs,
+        model_name=embedder.model_name, dimension=embedder.dimension,
+    )
     if len(vs) == 0:
         embeddings = embedder.embed_documents([d.text for d in docs])
         vs.add(docs, embeddings)
-        if isinstance(vs, FaissStore):
-            write_index_manifest(
-                Path(vs.persist_dir), corpus=chunks_path, docs=docs, backend="faiss",
-                model_name=embedder.model_name, dimension=embedder.dimension,
-                artifact_names=(vs.INDEX_FILE, vs.META_JSON_FILE),
-            )
-    elif len(vs) != len(docs):
-        raise RuntimeError(
-            f"Vector store has {len(vs)} rows but active corpus has {len(docs)}; "
-            "rebuild the index for the active corpus"
-        )
+        write_index_identity(vs, **identity)
+    else:
+        ensure_index_identity(vs, **identity)
 
     reranker = CrossEncoderReranker()
     retriever = Retriever(vector_store=vs, embedder=embedder, docs=docs, reranker=reranker)

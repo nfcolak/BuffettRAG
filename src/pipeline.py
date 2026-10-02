@@ -39,7 +39,7 @@ from src.generation.prompt import (
 from src.generation.evidence_gate import assess_evidence
 from src.evaluation.claim_validator import validate_and_filter_answer
 from src.generation.providers import LLMProvider, create_llm_provider
-from src.index_manifest import load_and_validate_index_manifest, write_index_manifest
+from src.index_manifest import ensure_index_identity, write_index_identity
 from src.retrieval import CrossEncoderReranker, Retriever
 from src.retrieval.context import build_doc_lookup, expand_hits_with_neighbors
 from src.vector_store import (
@@ -91,28 +91,18 @@ class BuffettRAGPipeline:
 
         embedder = BGEEmbedder(model_name=cfg.embedding_model, device=cfg.device)
 
-        if cfg.vector_backend == "faiss" and (FAISS_DIR / FaissStore.INDEX_FILE).exists():
-            load_and_validate_index_manifest(
-                FAISS_DIR, corpus=chunks_path, docs=docs, backend="faiss",
-                model_name=embedder.model_name, dimension=embedder.dimension,
-            )
         store = get_vector_store(backend=cfg.vector_backend, dim=embedder.dimension)
+        identity = dict(
+            backend=cfg.vector_backend, corpus=chunks_path, docs=docs,
+            model_name=embedder.model_name, dimension=embedder.dimension,
+        )
         if len(store) == 0:
             print(f"Vector store empty -- building index ({cfg.vector_backend})")
-            texts = [d.text for d in docs]
-            embeddings = embedder.embed_documents(texts)
+            embeddings = embedder.embed_documents([d.text for d in docs])
             store.add(docs, embeddings)
-            if isinstance(store, FaissStore):
-                write_index_manifest(
-                    Path(store.persist_dir), corpus=chunks_path, docs=docs, backend="faiss",
-                    model_name=embedder.model_name, dimension=embedder.dimension,
-                    artifact_names=(store.INDEX_FILE, store.META_JSON_FILE),
-                )
+            write_index_identity(store, **identity)
         else:
-            if len(store) != len(docs):
-                raise RuntimeError(
-                    f"Vector store has {len(store)} rows but active corpus has {len(docs)}"
-                )
+            ensure_index_identity(store, **identity)
             print(f"Vector store already populated: {len(store)} vectors")
 
         reranker = CrossEncoderReranker(device=cfg.device) if cfg.use_reranker else None
@@ -202,19 +192,6 @@ class BuffettRAGPipeline:
                                      "validations": validation.validations,
                                      "nli_available": validation.nli_available},
         }
-
-    def compare_decades(
-        self,
-        query: str,
-        decades=(1980, 1990, 2000, 2010, 2020),
-        per_decade_k: int = 3,
-        rerank: bool = True,
-    ) -> Dict[int, List[Dict]]:
-        """Cross-decade retrieval -- one bucket per decade."""
-        per_decade = self.retriever.cross_decade_compare(
-            query, decades=decades, per_decade_k=per_decade_k, rerank=rerank
-        )
-        return {d: [_hit_to_dict(h) for h in hits] for d, hits in per_decade.items()}
 
 
 def _hit_to_dict(hit: SearchHit) -> Dict[str, Any]:

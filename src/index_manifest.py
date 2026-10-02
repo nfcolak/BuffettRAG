@@ -103,3 +103,78 @@ def load_and_validate_index_manifest(
         model_name=model_name, dimension=dimension, persist_dir=Path(persist_dir),
     )
     return manifest
+
+
+# ---------------------------------------------------------------------------
+# Backend-agnostic identity (faiss artifacts, or sidecar JSON for chroma/pgvector)
+# ---------------------------------------------------------------------------
+MANIFEST_SIDECAR_DIR = Path(__file__).resolve().parent.parent / "data" / "indices" / "manifests"
+_REBUILD = "rebuild the index for the active corpus"
+
+
+def _store_label(store: Any) -> str:
+    label = (
+        getattr(store, "table", None)
+        or getattr(store, "collection_name", None)
+        or getattr(getattr(store, "_collection", None), "name", None)
+        or "default"
+    )
+    return "".join(c if c.isalnum() or c in "-_" else "_" for c in str(label))
+
+
+def sidecar_manifest_path(store: Any, backend: str) -> Path:
+    return MANIFEST_SIDECAR_DIR / f"{backend}_{_store_label(store)}.json"
+
+
+def write_index_identity(
+    store: Any, *, backend: str, corpus: Path, docs: Sequence[StoredDoc],
+    model_name: str, dimension: int,
+) -> dict[str, Any]:
+    """Persist the identity of a freshly built index."""
+    if backend == "faiss" and hasattr(store, "persist_dir"):
+        return write_index_manifest(
+            Path(store.persist_dir), corpus=corpus, docs=docs, backend=backend,
+            model_name=model_name, dimension=dimension,
+            artifact_names=(store.INDEX_FILE, store.META_JSON_FILE),
+        )
+    manifest = build_index_manifest(
+        corpus=corpus, docs=docs, backend=backend, model_name=model_name, dimension=dimension,
+    )
+    manifest["row_count"] = len(store)
+    path = sidecar_manifest_path(store, backend)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(manifest, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    return manifest
+
+
+def ensure_index_identity(
+    store: Any, *, backend: str, corpus: Path, docs: Sequence[StoredDoc],
+    model_name: str, dimension: int,
+) -> None:
+    """Raise RuntimeError unless a non-empty store matches the active corpus/model."""
+    rows = len(store)
+    if rows == 0:
+        return
+    if rows != len(docs):
+        raise RuntimeError(
+            f"Vector store has {rows} rows but active corpus has {len(docs)}; {_REBUILD}"
+        )
+    try:
+        if backend == "faiss" and hasattr(store, "persist_dir"):
+            load_and_validate_index_manifest(
+                Path(store.persist_dir), corpus=corpus, docs=docs, backend=backend,
+                model_name=model_name, dimension=dimension,
+            )
+            return
+        path = sidecar_manifest_path(store, backend)
+        if not path.exists():
+            raise ValueError(f"missing index manifest: {path}")
+        manifest = json.loads(path.read_text(encoding="utf-8"))
+        validate_index_manifest(
+            manifest, corpus=corpus, docs=docs, backend=backend,
+            model_name=model_name, dimension=dimension,
+        )
+        if int(manifest.get("row_count", -1)) != rows:
+            raise ValueError("index row count does not match manifest")
+    except (ValueError, OSError) as exc:
+        raise RuntimeError(f"Index identity check failed ({exc}); {_REBUILD}") from exc
