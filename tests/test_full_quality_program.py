@@ -531,3 +531,107 @@ def test_demo_evidence_html_escapes_backend_supplied_text():
     assert "<script>" not in rendered
     assert "&lt;script&gt;" in rendered
     assert "<img" not in rendered
+
+
+def test_frozen_heldout_fixture_has_verified_disjoint_evidence():
+    import hashlib
+    from collections import Counter
+    from src.evaluation.answer_benchmark import validate_fixture_ids
+
+    directory = ROOT / "data/evaluation/heldout_v1"
+    payload = json.loads((directory / "answer_benchmark_heldout_v1.json").read_text())
+    corpus = ROOT / "data/processed/chunks_v3_paragraph.jsonl"
+    docs = load_chunks_as_docs(corpus)
+    cases = payload["cases"]
+    assert payload["frozen"] is True and payload["created"] == "2026-10-02"
+    assert payload["corpus_sha256"] == hashlib.sha256(corpus.read_bytes()).hexdigest()
+    assert len(cases) == 24 and all(case["verification_note"] for case in cases)
+    check = validate_fixture_ids(cases, docs)
+    assert check["missing_fixture_id_count"] == 0
+    assert check["checked_fixture_ids"] == 25
+    kinds = Counter(case["question_type"] for case in cases)
+    assert kinds["temporal_comparison"] == 3
+    assert kinds["follow_up"] == 2 and kinds["unanswerable"] == 2
+    assert sum(bool(case.get("history")) for case in cases) == 2
+    assert min(year for case in cases for year in case["years"]) == 1977
+    assert max(year for case in cases for year in case["years"]) == 2024
+    dev = json.loads((ROOT / "data/evaluation/answer_quality_program/answer_benchmark_v3.json").read_text())["cases"]
+    assert not {case["query"] for case in cases} & {case["query"] for case in dev}
+    assert not {pid for case in cases for pid in case["gold_passage_ids"]} & {
+        pid for case in dev for pid in case["gold_passage_ids"]}
+
+
+def test_live_runner_smoke_uses_backend_ask_and_restores_state(monkeypatch):
+    from scripts.run_live_benchmark import run
+    from src.services import backend_app as backend
+
+    old_state = backend._state
+    calls = []
+    real_ask = backend.ask
+    def capture(req):
+        calls.append(req)
+        return real_ask(req)
+    monkeypatch.setattr(backend, "ask", capture)
+    result = run(provider="local", retrieval="bm25", max_cases=1)
+    assert len(calls) == 1 and not calls[0].llm_provider
+    assert backend._state is old_state
+    assert result["summary"]["cases_run"] == 1
+    assert result["summary"]["scored_answers"] == 1
+    assert result["summary"]["provider_failures"] == 0
+    assert result["fixture_validation"]["missing_fixture_id_count"] == 0
+    assert result["live_provider_run"] is False
+    row = result["rows"][0]
+    assert row["answer"] and row["passage_ids"] and row["latency_ms"] >= 0
+    for claim in row["required_claim_hits"]:
+        assert set(claim["supporting_passage_ids"]).issubset(claim["accepted_passage_ids"])
+
+
+def test_live_runner_checks_unselected_fixture_ids_before_provider(monkeypatch):
+    import pytest
+    from scripts import run_live_benchmark as runner
+
+    docs = load_chunks_as_docs(ROOT / "data/processed/chunks_v3_paragraph.jsonl")
+    monkeypatch.setattr(runner, "load_chunks_as_docs", lambda _: [doc for doc in docs if doc.id != "2022_p0021"])
+    def forbidden_factory(**_kwargs):
+        raise AssertionError("Missing fixtures must fail before provider initialization")
+    monkeypatch.setattr(runner, "create_llm_provider", forbidden_factory)
+    with pytest.raises(ValueError, match="Missing fixture passage IDs: 2022_p0021"):
+        runner.run(provider="local", retrieval="bm25", max_cases=1)
+
+
+def test_live_runner_separates_provider_failure_without_leaking_error(monkeypatch):
+    from scripts import run_live_benchmark as runner
+
+    class FailingProvider:
+        provider_name = "local"
+        model = "unit-failure"
+        def generate(self, *_args, **_kwargs):
+            raise RuntimeError("provider body containing a secret must not be persisted")
+    monkeypatch.setattr(runner, "create_llm_provider", lambda **_kwargs: FailingProvider())
+    result = runner.run(provider="local", retrieval="bm25", max_cases=1)
+    assert result["summary"]["provider_failures"] == 1
+    assert result["summary"]["scored_answers"] == 0
+    assert result["summary"]["acceptance_rate"] is None
+    row = result["rows"][0]
+    assert row["score"] is None and row["answer"] is None
+    assert row["provider_failures"] == [{"stage": "generating", "error_type": "RuntimeError"}]
+    assert "containing a secret" not in json.dumps(result)
+
+
+def test_live_runner_temperature_reaches_all_provider_sdk_endpoints():
+    from types import SimpleNamespace
+    from scripts.run_live_benchmark import _TemperatureClient
+
+    calls, requests = [], []
+    def create(**kwargs):
+        calls.append(kwargs)
+        return "ok"
+    endpoint = SimpleNamespace(create=create)
+    client = _TemperatureClient(SimpleNamespace(responses=endpoint, messages=endpoint,
+                                                chat=SimpleNamespace(completions=endpoint)), 0.0, requests)
+    assert client.responses.create(model="openai-test", input="prompt") == "ok"
+    assert client.messages.create(model="anthropic-test", messages=[]) == "ok"
+    assert client.chat.completions.create(model="openrouter-test", messages=[]) == "ok"
+    assert all(call["temperature"] == 0.0 for call in calls)
+    assert requests == [{"model": name, "temperature": 0.0}
+                        for name in ("openai-test", "anthropic-test", "openrouter-test")]
