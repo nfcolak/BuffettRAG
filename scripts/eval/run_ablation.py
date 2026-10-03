@@ -6,7 +6,7 @@ import json
 import sys
 from time import perf_counter
 from pathlib import Path
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 from config import EMBEDDING_MODEL_PRIMARY, RERANKER_MODEL
 from src.storage.embeddings import BGEEmbedder

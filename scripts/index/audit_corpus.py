@@ -5,7 +5,7 @@ import hashlib
 import json
 import sys
 from pathlib import Path
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 from config import CHUNKS_V3_FILE
 from src.ingestion.pdf_extractor import extract_text_from_pdf, load_text_file

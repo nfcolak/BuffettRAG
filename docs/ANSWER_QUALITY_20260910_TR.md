@@ -58,11 +58,11 @@ Bu nedenle bu değişikliklerden sonra "answer quality X puan arttı" iddiası y
 
 Bu ek çalışma önceki hardening'i korur; eski `chunks_v2.jsonl` ve önceki raporlar değiştirilmedi. Yeni artefact'lar `data/evaluation/answer_quality_program/` altındadır.
 
-1. **Gerçek cevap benchmark'ı:** `answer_benchmark.json`, 8 insan-kürasyonlu soru için gold passage ID, gerekli claim, kabul eşiği ve açık red ifadelerini saklar. `scripts/run_answer_benchmark.py` answer + citation'ı bu kurallarla deterministik olarak değerlendirir.
+1. **Gerçek cevap benchmark'ı:** `answer_benchmark.json`, 8 insan-kürasyonlu soru için gold passage ID, gerekli claim, kabul eşiği ve açık red ifadelerini saklar. `scripts/eval/run_answer_benchmark.py` answer + citation'ı bu kurallarla deterministik olarak değerlendirir.
 2. **Citation sonrası claim kapısı:** `claim_validator.py` citation'lı cümleleri satır/cümle sınırlarında ayırır ve marker'ı claim ile birlikte tutar. NLI yokken lexical overlap tek başına onay vermez: yüksek token kapsamı, polarity, sayı ve entity uyumu birlikte gerekir. Enjekte edilmiş NLI scorer ayrı bir onay yoludur; desteklenmeyen claim cevapta bloklanır.
-3. **PDF + paragraph corpus:** `scripts/rebuild_paragraph_index.py` 48 ham kaynağı tekrar extract edip `chunks_v3_paragraph.jsonl` üretti. Her kayıt source SHA-256, extractor, paragraph sayısı ve `paragraph_v3` chunker kaynağını taşır. Eski ID'ler sessizce kaybolmadı: `chunk_id_map_v2_to_v3.jsonl` her v2 ID için en çok üç v3 aday ve token-Jaccard skorunu saklar.
+3. **PDF + paragraph corpus:** `scripts/index/rebuild_paragraph_index.py` 48 ham kaynağı tekrar extract edip `chunks_v3_paragraph.jsonl` üretti. Her kayıt source SHA-256, extractor, paragraph sayısı ve `paragraph_v3` chunker kaynağını taşır. Eski ID'ler sessizce kaybolmadı: `chunk_id_map_v2_to_v3.jsonl` her v2 ID için en çok üç v3 aday ve token-Jaccard skorunu saklar.
 4. **Hard negatives:** `hard_negatives_v3.json` 8 yakın/yanıltıcı decoy içerir; yalnız relevant passage named decoy'dan önce gelirse geçer.
-5. **Ablation:** `scripts/run_ablation.py`, corpus/model/document-ID ve FAISS artifact hash'lerini doğruladıktan sonra BM25, BGE embedding ve BGE reranker yollarını aynı V3 case setinde çalıştırır.
+5. **Ablation:** `scripts/eval/run_ablation.py`, corpus/model/document-ID ve FAISS artifact hash'lerini doğruladıktan sonra BM25, BGE embedding ve BGE reranker yollarını aynı V3 case setinde çalıştırır.
 6. **Structured expansion:** JSON tabanlı terms/entities/years genişletmesi eklendi. Orijinal soru ilk bileşen olarak kalır; yıl ve adlandırılmış entity'ler korunur. Parse hatasında eski comma-list yolu ya da orijinal sorgu kullanılır.
 7. **Generation öncesi evidence gate:** pipeline, `/ask` ve `/ask/stream` prompt/LLM çağrısından önce lexical evidence kontrolü yapar. Kanıt yoksa sabit refusal döner; streaming path provider'ı hiç açmaz.
 8. **Güvenli Streamlit demo:** `streamlit_app.py`, yalnız `st.secrets` ile HTTPS backend URL ve server-side backend anahtarı okur; kullanıcıdan anahtar istemez. Public backend modu auth, request boyutu, model override, CORS, debug, readiness ve proxy-header güvenini fail-closed doğrular. Şema ve altyapı sınırları: `docs/STREAMLIT_DEPLOYMENT_TR.md`.
@@ -93,19 +93,19 @@ Kalan retrieval vakası: reranked BGE yolu `aq05_index` gold passage'ını Recal
 PYTHON_DOTENV_DISABLED=1 python3 -m pytest tests -q
 
 # 2. Paragraph corpus + deterministic eski->yeni ID map
-PYTHON_DOTENV_DISABLED=1 python3 scripts/rebuild_paragraph_index.py
+PYTHON_DOTENV_DISABLED=1 python3 scripts/index/rebuild_paragraph_index.py
 
 # 3. V3 corpus integrity/provenance kontrolleri
-PYTHON_DOTENV_DISABLED=1 python3 scripts/audit_corpus.py --corpus data/processed/chunks_v3_paragraph.jsonl
+PYTHON_DOTENV_DISABLED=1 python3 scripts/index/audit_corpus.py --corpus data/processed/chunks_v3_paragraph.jsonl
 
 # 4. Curated V3 offline answer benchmark (cloud çağrısı yok)
-PYTHON_DOTENV_DISABLED=1 python3 scripts/run_answer_benchmark.py --corpus data/processed/chunks_v3_paragraph.jsonl --cases data/evaluation/answer_quality_program/answer_benchmark_v3.json --output data/evaluation/answer_quality_program/answer_benchmark_v3_bm25_local.json
+PYTHON_DOTENV_DISABLED=1 python3 scripts/eval/run_answer_benchmark.py --corpus data/processed/chunks_v3_paragraph.jsonl --cases data/evaluation/answer_quality_program/answer_benchmark_v3.json --output data/evaluation/answer_quality_program/answer_benchmark_v3_bm25_local.json
 
 # 5. Hard-negative BM25
-PYTHON_DOTENV_DISABLED=1 python3 scripts/eval_hard_negatives.py --corpus data/processed/chunks_v3_paragraph.jsonl --cases data/evaluation/answer_quality_program/hard_negatives_v3.json --output data/evaluation/answer_quality_program/hard_negatives_v3_bm25.json
+PYTHON_DOTENV_DISABLED=1 python3 scripts/eval/eval_hard_negatives.py --corpus data/processed/chunks_v3_paragraph.jsonl --cases data/evaluation/answer_quality_program/hard_negatives_v3.json --output data/evaluation/answer_quality_program/hard_negatives_v3_bm25.json
 
 # 6. Offline V3 embedding/reranker ablation (önceden cache'lenmiş modeller)
-PYTHON_DOTENV_DISABLED=1 HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 python3 scripts/run_ablation.py --corpus data/processed/chunks_v3_paragraph.jsonl --cases data/evaluation/answer_quality_program/answer_benchmark_v3.json --faiss-dir data/indices/faiss_v3 --device cpu --output data/evaluation/answer_quality_program/ablation_v3.json
+PYTHON_DOTENV_DISABLED=1 HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 python3 scripts/eval/run_ablation.py --corpus data/processed/chunks_v3_paragraph.jsonl --cases data/evaluation/answer_quality_program/answer_benchmark_v3.json --faiss-dir data/indices/faiss_v3 --device cpu --output data/evaluation/answer_quality_program/ablation_v3.json
 
 # 7. Streamlit syntax/safe-no-secrets smoke
 PYTHON_DOTENV_DISABLED=1 python3 -m py_compile streamlit_app.py

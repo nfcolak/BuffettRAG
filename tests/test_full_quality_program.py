@@ -88,7 +88,7 @@ def test_runtime_defaults_to_v3_corpus():
 
 
 def test_index_manifest_binds_corpus_model_and_document_ids(tmp_path):
-    from scripts.build_index import build_index_manifest
+    from scripts.index.build_index import build_index_manifest
     from src.storage import StoredDoc
 
     corpus = tmp_path / "chunks.jsonl"
@@ -141,7 +141,7 @@ def test_index_manifest_rejects_tampered_or_extra_artifacts(tmp_path):
 
 
 def test_ablation_rejects_index_built_for_different_corpus(tmp_path):
-    from scripts.run_ablation import validate_index_manifest
+    from scripts.eval.run_ablation import validate_index_manifest
 
     corpus = tmp_path / "chunks.jsonl"
     corpus.write_text('{"id":"a","text":"evidence"}\n', encoding="utf-8")
@@ -289,7 +289,7 @@ def test_streaming_never_emits_raw_unvalidated_llm_deltas(monkeypatch):
 
 
 def test_v3_offline_answer_benchmark_accepts_all_curated_cases():
-    from scripts.run_answer_benchmark import run
+    from scripts.eval.run_answer_benchmark import run
 
     result = run(
         Path("data/processed/chunks_v3_paragraph.jsonl"),
@@ -560,7 +560,7 @@ def test_frozen_heldout_fixture_has_verified_disjoint_evidence():
 
 
 def test_live_runner_smoke_uses_backend_ask_and_restores_state(monkeypatch):
-    from scripts.run_live_benchmark import run
+    from scripts.eval.run_live_benchmark import run
     from src.services import backend_app as backend, ask_flow
 
     old_state = ask_flow._state
@@ -586,7 +586,7 @@ def test_live_runner_smoke_uses_backend_ask_and_restores_state(monkeypatch):
 
 def test_live_runner_checks_unselected_fixture_ids_before_provider(monkeypatch):
     import pytest
-    from scripts import run_live_benchmark as runner
+    from scripts.eval import run_live_benchmark as runner
 
     docs = load_chunks_as_docs(ROOT / "data/processed/chunks_v3_paragraph.jsonl")
     monkeypatch.setattr(runner, "load_chunks_as_docs", lambda _: [doc for doc in docs if doc.id != "2022_p0021"])
@@ -598,7 +598,7 @@ def test_live_runner_checks_unselected_fixture_ids_before_provider(monkeypatch):
 
 
 def test_live_runner_separates_provider_failure_without_leaking_error(monkeypatch):
-    from scripts import run_live_benchmark as runner
+    from scripts.eval import run_live_benchmark as runner
 
     class FailingProvider:
         provider_name = "local"
@@ -618,7 +618,7 @@ def test_live_runner_separates_provider_failure_without_leaking_error(monkeypatc
 
 def test_live_runner_temperature_goes_through_config(monkeypatch):
     import config
-    from scripts import run_live_benchmark as runner
+    from scripts.eval import run_live_benchmark as runner
 
     seen = {}
     class Stub:

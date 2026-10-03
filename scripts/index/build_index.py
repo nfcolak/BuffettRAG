@@ -2,9 +2,9 @@
 """Build the vector index from a chunks JSONL.
 
 Usage:
-    python scripts/build_index.py
-    python scripts/build_index.py --chunks data/processed/chunks_v2.jsonl --backend faiss
-    python scripts/build_index.py --embedder base --device cuda
+    python scripts/index/build_index.py
+    python scripts/index/build_index.py --chunks data/processed/chunks_v2.jsonl --backend faiss
+    python scripts/index/build_index.py --embedder base --device cuda
 """
 
 from __future__ import annotations
@@ -13,7 +13,7 @@ import argparse
 import sys
 from pathlib import Path
 
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 

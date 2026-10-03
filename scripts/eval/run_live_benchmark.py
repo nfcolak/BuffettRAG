@@ -18,7 +18,7 @@ from pathlib import Path
 from typing import Any, Dict, Optional
 
 os.environ["PYTHON_DOTENV_DISABLED"] = "1"
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 
 from config import CHUNKS_V3_FILE, DEFAULT_LLM_PROVIDER

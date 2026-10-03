@@ -3,9 +3,9 @@
 Validation and exploration script for processed chunks.
 
 Usage:
-    python scripts/validate_chunks.py                    # Show summary
-    python scripts/validate_chunks.py --sample 5         # Show 5 random chunks
-    python scripts/validate_chunks.py --year 1977        # Show chunks from specific year
+    python scripts/index/validate_chunks.py                    # Show summary
+    python scripts/index/validate_chunks.py --sample 5         # Show 5 random chunks
+    python scripts/index/validate_chunks.py --year 1977        # Show chunks from specific year
 """
 
 import json
@@ -15,7 +15,7 @@ import sys
 from pathlib import Path
 from collections import defaultdict
 
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
@@ -36,7 +36,7 @@ def load_metadata() -> dict:
     """Load metadata JSON."""
     metadata_file = resolve_metadata_file()
     if not metadata_file.exists():
-        print("Error: metadata.json not found. Run scripts/ingestion_pipeline.py first.")
+        print("Error: metadata.json not found. Run scripts/index/ingestion_pipeline.py first.")
         return None
     
     with open(metadata_file, 'r') as f:
@@ -48,7 +48,7 @@ def load_chunks_by_year(target_year: int = None) -> list:
     chunks = []
     chunks_file = resolve_chunks_file()
     if not chunks_file.exists():
-        print("Error: no chunks file found. Run scripts/ingestion_pipeline.py first.")
+        print("Error: no chunks file found. Run scripts/index/ingestion_pipeline.py first.")
         return None
     
     with open(chunks_file, 'r') as f:

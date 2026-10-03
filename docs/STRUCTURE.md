@@ -22,7 +22,6 @@ This project now follows a source-first layout with generated data and historica
 ## Documentation and Archive
 
 - `docs/reference/`: Older notes and project references.
-- `archive/frontend-prototype/`: Superseded frontend prototype files.
 
 ## Root Files
 

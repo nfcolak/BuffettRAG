@@ -129,8 +129,8 @@ Tests run without a database (the llama smoke test runs only if the GGUF file ex
 
 ```bash
 PYTHON_DOTENV_DISABLED=1 python -m pytest tests -q
-PYTHON_DOTENV_DISABLED=1 python scripts/eval_offline_quality.py --output data/evaluation/offline.json
-PYTHON_DOTENV_DISABLED=1 python scripts/audit_corpus.py
+PYTHON_DOTENV_DISABLED=1 python scripts/eval/eval_offline_quality.py --output data/evaluation/offline.json
+PYTHON_DOTENV_DISABLED=1 python scripts/index/audit_corpus.py
 ```
 
 ## Limitations

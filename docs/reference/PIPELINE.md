@@ -18,8 +18,8 @@ This pipeline:
 /
 ├── config.py                 # Pipeline configuration and paths
 ├── utils.py                  # Utility functions for text extraction and chunking
-├── ingestion_pipeline.py     # Main pipeline script
-├── validate_chunks.py        # Validation and exploration script
+├── scripts/index/ingestion_pipeline.py     # Main pipeline script
+├── scripts/index/validate_chunks.py        # Validation and exploration script
 ├── requirements.txt          # Python dependencies
 ├── data/raw/                 # Source files
 │   ├── buffet_1977.txt       # Text files (1977-1997)
@@ -49,7 +49,7 @@ This pipeline:
 ### Run the Pipeline
 
 ```bash
-python scripts/ingestion_pipeline.py
+python scripts/index/ingestion_pipeline.py
 ```
 
 **Output:**
@@ -85,17 +85,17 @@ Output files:
 
 **View summary statistics:**
 ```bash
-python scripts/validate_chunks.py
+python scripts/index/validate_chunks.py
 ```
 
 **Show random samples (5 chunks):**
 ```bash
-python scripts/validate_chunks.py --sample 5
+python scripts/index/validate_chunks.py --sample 5
 ```
 
 **Show all chunks from a specific year:**
 ```bash
-python scripts/validate_chunks.py --year 1977
+python scripts/index/validate_chunks.py --year 1977
 ```
 
 ## Output Format
