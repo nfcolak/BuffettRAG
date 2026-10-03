@@ -1,0 +1,2989 @@
+{
+  "schema_version": 1,
+  "mode": "offline_bm25_embedded_llama",
+  "execution_path": "src.services.backend_app.ask (no HTTP server)",
+  "live_provider_run": true,
+  "corpus": "data/processed/chunks_v3_paragraph.jsonl",
+  "corpus_sha256": "8263f08958729a77febf0922e7bbc4161bedd5fdb3e9a8b3fc9a64ab681ab5f0",
+  "cases": "data/evaluation/heldout_v1/answer_benchmark_heldout_v1.json",
+  "cases_sha256": "deea734a5b50816283aa671f9c461ce4a16d707cb41e4487c2bdd7935a5ce718",
+  "frozen": true,
+  "answer_engine": {
+    "provider": "llama",
+    "model": "buffett-qwen2.5-1.5b-ft-r2-q4_k_m.gguf",
+    "resolved_provider": "llama",
+    "temperature": 0.0,
+    "temperature_applies": true
+  },
+  "retrieval": "bm25",
+  "setup_latency_ms": 186.683,
+  "fixture_validation": {
+    "checked_fixture_ids": 25,
+    "missing_fixture_ids": [],
+    "missing_fixture_id_count": 0
+  },
+  "summary": {
+    "fixture_cases": 24,
+    "cases_run": 24,
+    "cases_skipped": 0,
+    "scored_answers": 24,
+    "provider_failures": 0,
+    "provider_error_events": 0,
+    "accepted": 10,
+    "rejected": 14,
+    "acceptance_rate": 0.4166666666666667,
+    "unanswerable_cases": 2,
+    "unanswerable_scored": 2,
+    "correct_refusals": 2,
+    "unexpected_refusals": 3,
+    "required_claims": 31,
+    "required_claims_met": 10,
+    "missing_fixture_ids": 0,
+    "mean_latency_ms": 1139.95
+  },
+  "rows": [
+    {
+      "qid": "ho01_1977_operating_earnings",
+      "query": "What were Berkshire's total operating earnings and operating earnings per share in 1977?",
+      "history": [],
+      "question_type": "fact_number",
+      "answer": "In 1977 Berkshire Hathaway Inc. had operating earnings of $21,904,000, or $22.54 per share, were moderately better than anticipated a year ago. [1] Of these earnings, $1.43 per share resulted from substantial realized capital gains by Blue Chip Stamps which, to the extent of our proportional interest in that company, are included in our operating earnings figure. [1]",
+      "citations": [
+        {
+          "marker": "[1]",
+          "passage_indices": [
+            0
+          ],
+          "raw_numbers": [
+            1
+          ],
+          "invalid_numbers": [],
+          "passage_ids": [
+            "1977_p0000"
+          ],
+          "years": [
+            1977
+          ],
+          "sources": [
+            "buffet_1977.txt"
+          ]
+        },
+        {
+          "marker": "[1]",
+          "passage_indices": [
+            0
+          ],
+          "raw_numbers": [
+            1
+          ],
+          "invalid_numbers": [],
+          "passage_ids": [
+            "1977_p0000"
+          ],
+          "years": [
+            1977
+          ],
+          "sources": [
+            "buffet_1977.txt"
+          ]
+        }
+      ],
+      "passage_ids": [
+        "1977_p0000",
+        "1977_p0003",
+        "1977_p0030",
+        "1977_p0004",
+        "1977_p0002"
+      ],
+      "retrieved_passage_ids": [
+        "1977_p0000",
+        "1977_p0003",
+        "1977_p0030",
+        "1977_p0004",
+        "1977_p0002",
+        "1977_p0034",
+        "1977_p0018",
+        "1977_p0032"
+      ],
+      "required_claim_hits": [
+        {
+          "claim": "Operating earnings were $21,904,000.",
+          "met": true,
+          "supporting_sentences": [
+            "In 1977 Berkshire Hathaway Inc. had operating earnings of $21,904,000, or $22.54 per share, were moderately better than anticipated a year ago. [1]"
+          ],
+          "required_terms": [
+            "operating earnings",
+            "$21,904,000"
+          ],
+          "accepted_passage_ids": [
+            "1977_p0000"
+          ],
+          "supporting_passage_ids": [
+            "1977_p0000"
+          ]
+        },
+        {
+          "claim": "Operating earnings were $22.54 per share.",
+          "met": true,
+          "supporting_sentences": [
+            "In 1977 Berkshire Hathaway Inc. had operating earnings of $21,904,000, or $22.54 per share, were moderately better than anticipated a year ago. [1]"
+          ],
+          "required_terms": [
+            "$22.54",
+            "share"
+          ],
+          "accepted_passage_ids": [
+            "1977_p0000"
+          ],
+          "supporting_passage_ids": [
+            "1977_p0000"
+          ]
+        }
+      ],
+      "refusal_correct": null,
+      "score": {
+        "qid": "ho01_1977_operating_earnings",
+        "accepted": true,
+        "claim_coverage": 1.0,
+        "claims": [
+          {
+            "claim": "Operating earnings were $21,904,000.",
+            "met": true,
+            "supporting_sentences": [
+              "In 1977 Berkshire Hathaway Inc. had operating earnings of $21,904,000, or $22.54 per share, were moderately better than anticipated a year ago. [1]"
+            ],
+            "required_terms": [
+              "operating earnings",
+              "$21,904,000"
+            ],
+            "accepted_passage_ids": [
+              "1977_p0000"
+            ],
+            "supporting_passage_ids": [
+              "1977_p0000"
+            ]
+          },
+          {
+            "claim": "Operating earnings were $22.54 per share.",
+            "met": true,
+            "supporting_sentences": [
+              "In 1977 Berkshire Hathaway Inc. had operating earnings of $21,904,000, or $22.54 per share, were moderately better than anticipated a year ago. [1]"
+            ],
+            "required_terms": [
+              "$22.54",
+              "share"
+            ],
+            "accepted_passage_ids": [
+              "1977_p0000"
+            ],
+            "supporting_passage_ids": [
+              "1977_p0000"
+            ]
+          }
+        ],
+        "cited_passage_ids": [
+          "1977_p0000"
+        ],
+        "has_gold_citation": true,
+        "forbidden_terms_found": [],
+        "refusal_correct": null
+      },
+      "provider_failures": [],
+      "provider_calls": 1,
+      "model_requests": [
+        {
+          "model": "buffett-qwen2.5-1.5b-ft-r2-q4_k_m.gguf",
+          "temperature": 0.0
+        }
+      ],
+      "used_filter": {
+        "year": 1977
+      },
+      "reranked": false,
+      "raw_answers": [
+        "In 1977 Berkshire Hathaway Inc. had operating earnings of $21,904,000, or $22.54 per share, were moderately better than anticipated a year ago. [1] Of these earnings, $1.43 per share resulted from substantial realized capital gains by Blue Chip Stamps which, to the extent of our proportional interest in that company, are included in our operating earnings figure. [1]"
+      ],
+      "status": "scored",
+      "latency_ms": 1676.827
+    },
+    {
+      "qid": "ho02_1979_inflation_real_returns",
+      "query": "In the 1979 letter, could a business earning 20% on capital still give its owners a negative real return, and why?",
+      "history": [],
+      "question_type": "opinion",
+      "answer": "For the inflation rate, coupled with individual tax rates, will be the ultimate determinant as to whether our internal operating performance produces successful investment results - i.e., a reasonable gain in purchasing power from funds committed - for you as shareholders. [1] Now such an outcome seems less certain. [1]",
+      "citations": [
+        {
+          "marker": "[1]",
+          "passage_indices": [
+            0
+          ],
+          "raw_numbers": [
+            1
+          ],
+          "invalid_numbers": [],
+          "passage_ids": [
+            "1979_p0011"
+          ],
+          "years": [
+            1979
+          ],
+          "sources": [
+            "buffet_1979.txt"
+          ]
+        },
+        {
+          "marker": "[1]",
+          "passage_indices": [
+            0
+          ],
+          "raw_numbers": [
+            1
+          ],
+          "invalid_numbers": [],
+          "passage_ids": [
+            "1979_p0011"
+          ],
+          "years": [
+            1979
+          ],
+          "sources": [
+            "buffet_1979.txt"
+          ]
+        }
+      ],
+      "passage_ids": [
+        "1979_p0011",
+        "1979_p0013",
+        "1979_p0004",
+        "1979_p0010",
+        "1979_p0023"
+      ],
+      "retrieved_passage_ids": [
+        "1979_p0011",
+        "1979_p0013",
+        "1979_p0004",
+        "1979_p0010",
+        "1979_p0023",
+        "1979_p0017",
+        "1979_p0007",
+        "1979_p0069"
+      ],
+      "required_claim_hits": [
+        {
+          "claim": "A business earning 20% on capital can produce a negative real return under inflationary conditions.",
+          "met": false,
+          "supporting_sentences": [],
+          "required_terms": [
+            "20%",
+            "negative real return",
+            "inflation"
+          ],
+          "accepted_passage_ids": [
+            "1979_p0011"
+          ],
+          "supporting_passage_ids": []
+        }
+      ],
+      "refusal_correct": null,
+      "score": {
+        "qid": "ho02_1979_inflation_real_returns",
+        "accepted": false,
+        "claim_coverage": 0.0,
+        "claims": [
+          {
+            "claim": "A business earning 20% on capital can produce a negative real return under inflationary conditions.",
+            "met": false,
+            "supporting_sentences": [],
+            "required_terms": [
+              "20%",
+              "negative real return",
+              "inflation"
+            ],
+            "accepted_passage_ids": [
+              "1979_p0011"
+            ],
+            "supporting_passage_ids": []
+          }
+        ],
+        "cited_passage_ids": [
+          "1979_p0011"
+        ],
+        "has_gold_citation": false,
+        "forbidden_terms_found": [],
+        "refusal_correct": null
+      },
+      "provider_failures": [],
+      "provider_calls": 1,
+      "model_requests": [
+        {
+          "model": "buffett-qwen2.5-1.5b-ft-r2-q4_k_m.gguf",
+          "temperature": 0.0
+        }
+      ],
+      "used_filter": {
+        "year": 1979
+      },
+      "reranked": false,
+      "raw_answers": [
+        "For the inflation rate, coupled with individual tax rates, will be the ultimate determinant as to whether our internal operating performance produces successful investment results - i.e., a reasonable gain in purchasing power from funds committed - for you as shareholders. [1] Now such an outcome seems less certain. [1]"
+      ],
+      "status": "scored",
+      "latency_ms": 890.304
+    },
+    {
+      "qid": "ho03_1982_price_discipline",
+      "query": "What warning did Buffett give in 1982 about paying too high a purchase price for an excellent company's stock?",
+      "history": [],
+      "question_type": "opinion",
+      "answer": "For the investor, a too-high purchase price for the stock of an excellent company can undo the effects of a subsequent decade of favorable business developments. [1] If the purchase price is too high, the too-high purchase price for the stock of an excellent company can undo the effects of a subsequent decade of favorable business developments. [1]",
+      "citations": [
+        {
+          "marker": "[1]",
+          "passage_indices": [
+            0
+          ],
+          "raw_numbers": [
+            1
+          ],
+          "invalid_numbers": [],
+          "passage_ids": [
+            "1982_p0016"
+          ],
+          "years": [
+            1982
+          ],
+          "sources": [
+            "buffet_1982.txt"
+          ]
+        },
+        {
+          "marker": "[1]",
+          "passage_indices": [
+            0
+          ],
+          "raw_numbers": [
+            1
+          ],
+          "invalid_numbers": [],
+          "passage_ids": [
+            "1982_p0016"
+          ],
+          "years": [
+            1982
+          ],
+          "sources": [
+            "buffet_1982.txt"
+          ]
+        }
+      ],
+      "passage_ids": [
+        "1982_p0016",
+        "1982_p0015",
+        "1982_p0017",
+        "1982_p0020",
+        "1982_p0063"
+      ],
+      "retrieved_passage_ids": [
+        "1982_p0016",
+        "1982_p0015",
+        "1982_p0017",
+        "1982_p0020",
+        "1982_p0063",
+        "1982_p0004",
+        "1982_p0061",
+        "1982_p0080"
+      ],
+      "required_claim_hits": [
+        {
+          "claim": "A too-high purchase price can undo a subsequent decade of favorable business developments.",
+          "met": true,
+          "supporting_sentences": [
+            "For the investor, a too-high purchase price for the stock of an excellent company can undo the effects of a subsequent decade of favorable business developments. [1]",
+            "If the purchase price is too high, the too-high purchase price for the stock of an excellent company can undo the effects of a subsequent decade of favorable business developments. [1]"
+          ],
+          "required_terms": [
+            "purchase price",
+            "undo",
+            "decade"
+          ],
+          "accepted_passage_ids": [
+            "1982_p0016"
+          ],
+          "supporting_passage_ids": [
+            "1982_p0016"
+          ]
+        }
+      ],
+      "refusal_correct": null,
+      "score": {
+        "qid": "ho03_1982_price_discipline",
+        "accepted": true,
+        "claim_coverage": 1.0,
+        "claims": [
+          {
+            "claim": "A too-high purchase price can undo a subsequent decade of favorable business developments.",
+            "met": true,
+            "supporting_sentences": [
+              "For the investor, a too-high purchase price for the stock of an excellent company can undo the effects of a subsequent decade of favorable business developments. [1]",
+              "If the purchase price is too high, the too-high purchase price for the stock of an excellent company can undo the effects of a subsequent decade of favorable business developments. [1]"
+            ],
+            "required_terms": [
+              "purchase price",
+              "undo",
+              "decade"
+            ],
+            "accepted_passage_ids": [
+              "1982_p0016"
+            ],
+            "supporting_passage_ids": [
+              "1982_p0016"
+            ]
+          }
+        ],
+        "cited_passage_ids": [
+          "1982_p0016"
+        ],
+        "has_gold_citation": true,
+        "forbidden_terms_found": [],
+        "refusal_correct": null
+      },
+      "provider_failures": [],
+      "provider_calls": 1,
+      "model_requests": [
+        {
+          "model": "buffett-qwen2.5-1.5b-ft-r2-q4_k_m.gguf",
+          "temperature": 0.0
+        }
+      ],
+      "used_filter": {
+        "year": 1982
+      },
+      "reranked": false,
+      "raw_answers": [
+        "For the investor, a too-high purchase price for the stock of an excellent company can undo the effects of a subsequent decade of favorable business developments. [1] If the purchase price is too high, the too-high purchase price for the stock of an excellent company can undo the effects of a subsequent decade of favorable business developments. [1]"
+      ],
+      "status": "scored",
+      "latency_ms": 912.909
+    },
+    {
+      "qid": "ho04_1983_goodwill_preference",
+      "query": "By 1983, what combination of enduring Goodwill and tangible assets had Buffett come to prefer in businesses?",
+      "history": [],
+      "question_type": "opinion",
+      "answer": "My own thinking has changed drastically from 35 years ago when I was taught to favor tangible assets and to shun businesses whose value depended largely upon economic Goodwill. [2] This bias caused me to make many important business mistakes of omission, although relatively few of commission. [2]",
+      "citations": [
+        {
+          "marker": "[2]",
+          "passage_indices": [
+            1
+          ],
+          "raw_numbers": [
+            2
+          ],
+          "invalid_numbers": [],
+          "passage_ids": [
+            "1983_p0029"
+          ],
+          "years": [
+            1983
+          ],
+          "sources": [
+            "buffet_1983.txt"
+          ]
+        },
+        {
+          "marker": "[2]",
+          "passage_indices": [
+            1
+          ],
+          "raw_numbers": [
+            2
+          ],
+          "invalid_numbers": [],
+          "passage_ids": [
+            "1983_p0029"
+          ],
+          "years": [
+            1983
+          ],
+          "sources": [
+            "buffet_1983.txt"
+          ]
+        }
+      ],
+      "passage_ids": [
+        "1983_p0122",
+        "1983_p0029",
+        "1983_p0115",
+        "1983_p0109",
+        "1983_p0106"
+      ],
+      "retrieved_passage_ids": [
+        "1983_p0122",
+        "1983_p0029",
+        "1983_p0115",
+        "1983_p0109",
+        "1983_p0106",
+        "1983_p0126",
+        "1983_p0107",
+        "1983_p0028"
+      ],
+      "required_claim_hits": [
+        {
+          "claim": "He preferred businesses with large amounts of enduring Goodwill and a minimum of tangible assets.",
+          "met": false,
+          "supporting_sentences": [],
+          "required_terms": [
+            "enduring goodwill",
+            "minimum",
+            "tangible assets"
+          ],
+          "accepted_passage_ids": [
+            "1983_p0029"
+          ],
+          "supporting_passage_ids": []
+        }
+      ],
+      "refusal_correct": null,
+      "score": {
+        "qid": "ho04_1983_goodwill_preference",
+        "accepted": false,
+        "claim_coverage": 0.0,
+        "claims": [
+          {
+            "claim": "He preferred businesses with large amounts of enduring Goodwill and a minimum of tangible assets.",
+            "met": false,
+            "supporting_sentences": [],
+            "required_terms": [
+              "enduring goodwill",
+              "minimum",
+              "tangible assets"
+            ],
+            "accepted_passage_ids": [
+              "1983_p0029"
+            ],
+            "supporting_passage_ids": []
+          }
+        ],
+        "cited_passage_ids": [
+          "1983_p0029"
+        ],
+        "has_gold_citation": false,
+        "forbidden_terms_found": [],
+        "refusal_correct": null
+      },
+      "provider_failures": [],
+      "provider_calls": 1,
+      "model_requests": [
+        {
+          "model": "buffett-qwen2.5-1.5b-ft-r2-q4_k_m.gguf",
+          "temperature": 0.0
+        }
+      ],
+      "used_filter": {
+        "year": 1983
+      },
+      "reranked": false,
+      "raw_answers": [
+        "My own thinking has changed drastically from 35 years ago when I was taught to favor tangible assets and to shun businesses whose value depended largely upon economic Goodwill. [2] This bias caused me to make many important business mistakes of omission, although relatively few of commission. [2]"
+      ],
+      "status": "scored",
+      "latency_ms": 783.767
+    },
+    {
+      "qid": "ho05_1987_mr_market",
+      "query": "In the 1987 letter, should an investor let Mr. Market guide decisions or use him as a servant?",
+      "history": [],
+      "question_type": "opinion",
+      "answer": "If his quotation is uninteresting to you today, he will be back with a new one tomorrow. [1]",
+      "citations": [
+        {
+          "marker": "[1]",
+          "passage_indices": [
+            0
+          ],
+          "raw_numbers": [
+            1
+          ],
+          "invalid_numbers": [],
+          "passage_ids": [
+            "1987_p0069"
+          ],
+          "years": [
+            1987
+          ],
+          "sources": [
+            "buffet_1987.txt"
+          ]
+        }
+      ],
+      "passage_ids": [
+        "1987_p0069",
+        "1987_p0005",
+        "1987_p0066",
+        "1987_p0092",
+        "1987_p0098"
+      ],
+      "retrieved_passage_ids": [
+        "1987_p0069",
+        "1987_p0005",
+        "1987_p0066",
+        "1987_p0092",
+        "1987_p0098",
+        "1987_p0067",
+        "1987_p0071",
+        "1987_p0086"
+      ],
+      "required_claim_hits": [
+        {
+          "claim": "Mr. Market is there to serve you, not to guide you.",
+          "met": false,
+          "supporting_sentences": [],
+          "required_terms": [
+            "mr. market",
+            "serve",
+            "not",
+            "guide"
+          ],
+          "accepted_passage_ids": [
+            "1987_p0069"
+          ],
+          "supporting_passage_ids": []
+        }
+      ],
+      "refusal_correct": null,
+      "score": {
+        "qid": "ho05_1987_mr_market",
+        "accepted": false,
+        "claim_coverage": 0.0,
+        "claims": [
+          {
+            "claim": "Mr. Market is there to serve you, not to guide you.",
+            "met": false,
+            "supporting_sentences": [],
+            "required_terms": [
+              "mr. market",
+              "serve",
+              "not",
+              "guide"
+            ],
+            "accepted_passage_ids": [
+              "1987_p0069"
+            ],
+            "supporting_passage_ids": []
+          }
+        ],
+        "cited_passage_ids": [
+          "1987_p0069"
+        ],
+        "has_gold_citation": false,
+        "forbidden_terms_found": [],
+        "refusal_correct": null
+      },
+      "provider_failures": [],
+      "provider_calls": 1,
+      "model_requests": [
+        {
+          "model": "buffett-qwen2.5-1.5b-ft-r2-q4_k_m.gguf",
+          "temperature": 0.0
+        }
+      ],
+      "used_filter": {
+        "year": 1987
+      },
+      "reranked": false,
+      "raw_answers": [
+        "If Mr. Market is not interested in you today, he will be back with a new one tomorrow. [1] If his quotation is uninteresting to you today, he will be back with a new one tomorrow. [1]"
+      ],
+      "status": "scored",
+      "latency_ms": 773.155
+    },
+    {
+      "qid": "ho06_1991_salomon_role",
+      "query": "What position at Salomon was Buffett elected to on August 18, as reported in the 1991 letter?",
+      "history": [],
+      "question_type": "company",
+      "answer": "On August 18 of last year, when I was elected Interim Chairman of Salomon Inc, it was a different story: I put my mouth where our money was. [1]",
+      "citations": [
+        {
+          "marker": "[1]",
+          "passage_indices": [
+            0
+          ],
+          "raw_numbers": [
+            1
+          ],
+          "invalid_numbers": [],
+          "passage_ids": [
+            "1991_p0004"
+          ],
+          "years": [
+            1991
+          ],
+          "sources": [
+            "buffet_1991.txt"
+          ]
+        }
+      ],
+      "passage_ids": [
+        "1991_p0004",
+        "1991_p0087",
+        "1991_p0018",
+        "1991_p0007",
+        "1991_p0010"
+      ],
+      "retrieved_passage_ids": [
+        "1991_p0004",
+        "1991_p0087",
+        "1991_p0018",
+        "1991_p0007",
+        "1991_p0010",
+        "1991_p0082",
+        "1991_p0081",
+        "1991_p0066"
+      ],
+      "required_claim_hits": [
+        {
+          "claim": "Buffett was elected Interim Chairman of Salomon.",
+          "met": true,
+          "supporting_sentences": [
+            "On August 18 of last year, when I was elected Interim Chairman of Salomon Inc, it was a different story: I put my mouth where our money was. [1]"
+          ],
+          "required_terms": [
+            "interim chairman",
+            "salomon"
+          ],
+          "accepted_passage_ids": [
+            "1991_p0004"
+          ],
+          "supporting_passage_ids": [
+            "1991_p0004"
+          ]
+        }
+      ],
+      "refusal_correct": null,
+      "score": {
+        "qid": "ho06_1991_salomon_role",
+        "accepted": true,
+        "claim_coverage": 1.0,
+        "claims": [
+          {
+            "claim": "Buffett was elected Interim Chairman of Salomon.",
+            "met": true,
+            "supporting_sentences": [
+              "On August 18 of last year, when I was elected Interim Chairman of Salomon Inc, it was a different story: I put my mouth where our money was. [1]"
+            ],
+            "required_terms": [
+              "interim chairman",
+              "salomon"
+            ],
+            "accepted_passage_ids": [
+              "1991_p0004"
+            ],
+            "supporting_passage_ids": [
+              "1991_p0004"
+            ]
+          }
+        ],
+        "cited_passage_ids": [
+          "1991_p0004"
+        ],
+        "has_gold_citation": true,
+        "forbidden_terms_found": [],
+        "refusal_correct": null
+      },
+      "provider_failures": [],
+      "provider_calls": 1,
+      "model_requests": [
+        {
+          "model": "buffett-qwen2.5-1.5b-ft-r2-q4_k_m.gguf",
+          "temperature": 0.0
+        }
+      ],
+      "used_filter": {
+        "year": 1991
+      },
+      "reranked": false,
+      "raw_answers": [
+        "On August 18 of last year, when I was elected Interim Chairman of Salomon Inc, it was a different story: I put my mouth where our money was. [1] The Blumkins, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman family, Mike Goldberg, the Friedman"
+      ],
+      "status": "scored",
+      "latency_ms": 7234.808
+    },
+    {
+      "qid": "ho07_1994_usair_mistake",
+      "query": "How large was Berkshire's USAir preferred-stock purchase, and how did Buffett characterize his analytical mistake in the 1994 letter?",
+      "history": [],
+      "question_type": "company",
+      "answer": "The accounting effects of our USAir writedown are complicated. [2]",
+      "citations": [
+        {
+          "marker": "[2]",
+          "passage_indices": [
+            1
+          ],
+          "raw_numbers": [
+            2
+          ],
+          "invalid_numbers": [],
+          "passage_ids": [
+            "1994_p0089"
+          ],
+          "years": [
+            1994
+          ],
+          "sources": [
+            "buffet_1994.txt"
+          ]
+        }
+      ],
+      "passage_ids": [
+        "1994_p0085",
+        "1994_p0089",
+        "1994_p0090",
+        "1994_p0095",
+        "1994_p0083"
+      ],
+      "retrieved_passage_ids": [
+        "1994_p0085",
+        "1994_p0089",
+        "1994_p0090",
+        "1994_p0095",
+        "1994_p0083",
+        "1994_p0050",
+        "1994_p0048",
+        "1994_p0009"
+      ],
+      "required_claim_hits": [
+        {
+          "claim": "Berkshire purchased $358 million of USAir preferred stock.",
+          "met": false,
+          "supporting_sentences": [],
+          "required_terms": [
+            "$358 million",
+            "usair",
+            "preferred stock"
+          ],
+          "accepted_passage_ids": [
+            "1994_p0085"
+          ],
+          "supporting_passage_ids": []
+        },
+        {
+          "claim": "Buffett described the mistake as sloppy analysis.",
+          "met": false,
+          "supporting_sentences": [],
+          "required_terms": [
+            "sloppy analysis"
+          ],
+          "accepted_passage_ids": [
+            "1994_p0085"
+          ],
+          "supporting_passage_ids": []
+        }
+      ],
+      "refusal_correct": null,
+      "score": {
+        "qid": "ho07_1994_usair_mistake",
+        "accepted": false,
+        "claim_coverage": 0.0,
+        "claims": [
+          {
+            "claim": "Berkshire purchased $358 million of USAir preferred stock.",
+            "met": false,
+            "supporting_sentences": [],
+            "required_terms": [
+              "$358 million",
+              "usair",
+              "preferred stock"
+            ],
+            "accepted_passage_ids": [
+              "1994_p0085"
+            ],
+            "supporting_passage_ids": []
+          },
+          {
+            "claim": "Buffett described the mistake as sloppy analysis.",
+            "met": false,
+            "supporting_sentences": [],
+            "required_terms": [
+              "sloppy analysis"
+            ],
+            "accepted_passage_ids": [
+              "1994_p0085"
+            ],
+            "supporting_passage_ids": []
+          }
+        ],
+        "cited_passage_ids": [
+          "1994_p0089"
+        ],
+        "has_gold_citation": false,
+        "forbidden_terms_found": [],
+        "refusal_correct": null
+      },
+      "provider_failures": [],
+      "provider_calls": 1,
+      "model_requests": [
+        {
+          "model": "buffett-qwen2.5-1.5b-ft-r2-q4_k_m.gguf",
+          "temperature": 0.0
+        }
+      ],
+      "used_filter": {
+        "year": 1994
+      },
+      "reranked": false,
+      "raw_answers": [
+        "The accounting effects of our USAir writedown are complicated. [2] This valuation reflects both a possibility that our preferred will have its value fully or largely restored and an opposite possibility that the stock will eventually become worthless. [1]"
+      ],
+      "status": "scored",
+      "latency_ms": 839.828
+    },
+    {
+      "qid": "ho08_1995_geico_distribution",
+      "query": "According to the 1995 letter, what method of selling gave GEICO an enormous cost advantage over competitors selling through agents?",
+      "history": [],
+      "question_type": "company",
+      "answer": "GEICO's method of selling - direct marketing - gave it an enormous cost advantage over competitors that sold through agents, a form of distribution so ingrained in the business of these insurers that it was impossible for them to give it up. [1] After my session with Davy, I was more excited about GEICO than I have ever been about a stock. [1]",
+      "citations": [
+        {
+          "marker": "[1]",
+          "passage_indices": [
+            0
+          ],
+          "raw_numbers": [
+            1
+          ],
+          "invalid_numbers": [],
+          "passage_ids": [
+            "1995_p0031"
+          ],
+          "years": [
+            1995
+          ],
+          "sources": [
+            "buffet_1995.txt"
+          ]
+        },
+        {
+          "marker": "[1]",
+          "passage_indices": [
+            0
+          ],
+          "raw_numbers": [
+            1
+          ],
+          "invalid_numbers": [],
+          "passage_ids": [
+            "1995_p0031"
+          ],
+          "years": [
+            1995
+          ],
+          "sources": [
+            "buffet_1995.txt"
+          ]
+        }
+      ],
+      "passage_ids": [
+        "1995_p0031",
+        "1995_p0039",
+        "1995_p0035",
+        "1995_p0038",
+        "1995_p0049"
+      ],
+      "retrieved_passage_ids": [
+        "1995_p0031",
+        "1995_p0039",
+        "1995_p0035",
+        "1995_p0038",
+        "1995_p0049",
+        "1995_p0033",
+        "1995_p0083",
+        "1995_p0032"
+      ],
+      "required_claim_hits": [
+        {
+          "claim": "GEICO's direct marketing gave it an enormous cost advantage over competitors selling through agents.",
+          "met": true,
+          "supporting_sentences": [
+            "GEICO's method of selling - direct marketing - gave it an enormous cost advantage over competitors that sold through agents, a form of distribution so ingrained in the business of these insurers that it was impossible for them to give it up. [1]"
+          ],
+          "required_terms": [
+            "direct marketing",
+            "cost advantage",
+            "agents"
+          ],
+          "accepted_passage_ids": [
+            "1995_p0031"
+          ],
+          "supporting_passage_ids": [
+            "1995_p0031"
+          ]
+        }
+      ],
+      "refusal_correct": null,
+      "score": {
+        "qid": "ho08_1995_geico_distribution",
+        "accepted": true,
+        "claim_coverage": 1.0,
+        "claims": [
+          {
+            "claim": "GEICO's direct marketing gave it an enormous cost advantage over competitors selling through agents.",
+            "met": true,
+            "supporting_sentences": [
+              "GEICO's method of selling - direct marketing - gave it an enormous cost advantage over competitors that sold through agents, a form of distribution so ingrained in the business of these insurers that it was impossible for them to give it up. [1]"
+            ],
+            "required_terms": [
+              "direct marketing",
+              "cost advantage",
+              "agents"
+            ],
+            "accepted_passage_ids": [
+              "1995_p0031"
+            ],
+            "supporting_passage_ids": [
+              "1995_p0031"
+            ]
+          }
+        ],
+        "cited_passage_ids": [
+          "1995_p0031"
+        ],
+        "has_gold_citation": true,
+        "forbidden_terms_found": [],
+        "refusal_correct": null
+      },
+      "provider_failures": [],
+      "provider_calls": 1,
+      "model_requests": [
+        {
+          "model": "buffett-qwen2.5-1.5b-ft-r2-q4_k_m.gguf",
+          "temperature": 0.0
+        }
+      ],
+      "used_filter": {
+        "year": 1995
+      },
+      "reranked": false,
+      "raw_answers": [
+        "GEICO's method of selling - direct marketing - gave it an enormous cost advantage over competitors that sold through agents, a form of distribution so ingrained in the business of these insurers that it was impossible for them to give it up. [1] After my session with Davy, I was more excited about GEICO than I have ever been about a stock. [1]"
+      ],
+      "status": "scored",
+      "latency_ms": 1066.262
+    },
+    {
+      "qid": "ho09_1999_tech_competence",
+      "query": "What insight into tech companies did Buffett say he and Charlie lacked in the 1999 letter?",
+      "history": [],
+      "question_type": "opinion",
+      "answer": "Our lack of tech insights, we should add, does not distress us. [1] This attribute, which makes for good long-term investment results, is one Charlie and I occasionally believe we can identify. [1]",
+      "citations": [
+        {
+          "marker": "[1]",
+          "passage_indices": [
+            0
+          ],
+          "raw_numbers": [
+            1
+          ],
+          "invalid_numbers": [],
+          "passage_ids": [
+            "1999_p0091"
+          ],
+          "years": [
+            1999
+          ],
+          "sources": [
+            "buffet_1999.pdf"
+          ]
+        },
+        {
+          "marker": "[1]",
+          "passage_indices": [
+            0
+          ],
+          "raw_numbers": [
+            1
+          ],
+          "invalid_numbers": [],
+          "passage_ids": [
+            "1999_p0091"
+          ],
+          "years": [
+            1999
+          ],
+          "sources": [
+            "buffet_1999.pdf"
+          ]
+        }
+      ],
+      "passage_ids": [
+        "1999_p0091",
+        "1999_p0090",
+        "1999_p0031",
+        "1999_p0010",
+        "1999_p0052"
+      ],
+      "retrieved_passage_ids": [
+        "1999_p0091",
+        "1999_p0090",
+        "1999_p0031",
+        "1999_p0010",
+        "1999_p0052",
+        "1999_p0089",
+        "1999_p0078",
+        "1999_p0118"
+      ],
+      "required_claim_hits": [
+        {
+          "claim": "They had no insights into which tech participants possess a truly durable competitive advantage.",
+          "met": false,
+          "supporting_sentences": [],
+          "required_terms": [
+            "no insights",
+            "tech",
+            "durable competitive advantage"
+          ],
+          "accepted_passage_ids": [
+            "1999_p0091"
+          ],
+          "supporting_passage_ids": []
+        }
+      ],
+      "refusal_correct": null,
+      "score": {
+        "qid": "ho09_1999_tech_competence",
+        "accepted": false,
+        "claim_coverage": 0.0,
+        "claims": [
+          {
+            "claim": "They had no insights into which tech participants possess a truly durable competitive advantage.",
+            "met": false,
+            "supporting_sentences": [],
+            "required_terms": [
+              "no insights",
+              "tech",
+              "durable competitive advantage"
+            ],
+            "accepted_passage_ids": [
+              "1999_p0091"
+            ],
+            "supporting_passage_ids": []
+          }
+        ],
+        "cited_passage_ids": [
+          "1999_p0091"
+        ],
+        "has_gold_citation": false,
+        "forbidden_terms_found": [],
+        "refusal_correct": null
+      },
+      "provider_failures": [],
+      "provider_calls": 1,
+      "model_requests": [
+        {
+          "model": "buffett-qwen2.5-1.5b-ft-r2-q4_k_m.gguf",
+          "temperature": 0.0
+        }
+      ],
+      "used_filter": {
+        "year": 1999
+      },
+      "reranked": false,
+      "raw_answers": [
+        "Our lack of tech insights, we should add, does not distress us. [1] This attribute, which makes for good long-term investment results, is one Charlie and I occasionally believe we can identify. [1]"
+      ],
+      "status": "scored",
+      "latency_ms": 976.177
+    },
+    {
+      "qid": "ho10_2001_float_cost",
+      "query": "What cost of insurance float did Berkshire report in 2001 after the September 11 catastrophe?",
+      "history": [],
+      "question_type": "fact_number",
+      "answer": "Our float cost came in at a staggering 12.8%. [1] It was our worst year in float cost since 1984, and a result that to a significant degree, as I will explain in the next section, we brought upon ourselves. [1]",
+      "citations": [
+        {
+          "marker": "[1]",
+          "passage_indices": [
+            0
+          ],
+          "raw_numbers": [
+            1
+          ],
+          "invalid_numbers": [],
+          "passage_ids": [
+            "2001_p0037"
+          ],
+          "years": [
+            2001
+          ],
+          "sources": [
+            "buffet_2001.pdf"
+          ]
+        },
+        {
+          "marker": "[1]",
+          "passage_indices": [
+            0
+          ],
+          "raw_numbers": [
+            1
+          ],
+          "invalid_numbers": [],
+          "passage_ids": [
+            "2001_p0037"
+          ],
+          "years": [
+            2001
+          ],
+          "sources": [
+            "buffet_2001.pdf"
+          ]
+        }
+      ],
+      "passage_ids": [
+        "2001_p0037",
+        "2001_p0004",
+        "2001_p0036",
+        "2001_p0035",
+        "2001_p0100"
+      ],
+      "retrieved_passage_ids": [
+        "2001_p0037",
+        "2001_p0004",
+        "2001_p0036",
+        "2001_p0035",
+        "2001_p0100",
+        "2001_p0034",
+        "2001_p0077",
+        "2001_p0075"
+      ],
+      "required_claim_hits": [
+        {
+          "claim": "The float cost came in at 12.8%.",
+          "met": true,
+          "supporting_sentences": [
+            "Our float cost came in at a staggering 12.8%. [1]"
+          ],
+          "required_terms": [
+            "float cost",
+            "12.8%"
+          ],
+          "accepted_passage_ids": [
+            "2001_p0037"
+          ],
+          "supporting_passage_ids": [
+            "2001_p0037"
+          ]
+        }
+      ],
+      "refusal_correct": null,
+      "score": {
+        "qid": "ho10_2001_float_cost",
+        "accepted": true,
+        "claim_coverage": 1.0,
+        "claims": [
+          {
+            "claim": "The float cost came in at 12.8%.",
+            "met": true,
+            "supporting_sentences": [
+              "Our float cost came in at a staggering 12.8%. [1]"
+            ],
+            "required_terms": [
+              "float cost",
+              "12.8%"
+            ],
+            "accepted_passage_ids": [
+              "2001_p0037"
+            ],
+            "supporting_passage_ids": [
+              "2001_p0037"
+            ]
+          }
+        ],
+        "cited_passage_ids": [
+          "2001_p0037"
+        ],
+        "has_gold_citation": true,
+        "forbidden_terms_found": [],
+        "refusal_correct": null
+      },
+      "provider_failures": [],
+      "provider_calls": 1,
+      "model_requests": [
+        {
+          "model": "buffett-qwen2.5-1.5b-ft-r2-q4_k_m.gguf",
+          "temperature": 0.0
+        }
+      ],
+      "used_filter": {
+        "year": 2001
+      },
+      "reranked": false,
+      "raw_answers": [
+        "Our float cost came in at a staggering 12.8%. [1] It was our worst year in float cost since 1984, and a result that to a significant degree, as I will explain in the next section, we brought upon ourselves. [1]"
+      ],
+      "status": "scored",
+      "latency_ms": 1785.053
+    },
+    {
+      "qid": "ho11_2004_currency_contracts",
+      "query": "How much did Berkshire own in foreign exchange contracts at yearend 2004, and across how many currencies?",
+      "history": [],
+      "question_type": "fact_number",
+      "answer": "As I mentioned last year, holdings of this kind are a decided change for us. [1]",
+      "citations": [
+        {
+          "marker": "[1]",
+          "passage_indices": [
+            0
+          ],
+          "raw_numbers": [
+            1
+          ],
+          "invalid_numbers": [],
+          "passage_ids": [
+            "2004_p0116"
+          ],
+          "years": [
+            2004
+          ],
+          "sources": [
+            "buffet_2004.pdf"
+          ]
+        }
+      ],
+      "passage_ids": [
+        "2004_p0116",
+        "2004_p0108",
+        "2004_p0107",
+        "2004_p0133",
+        "2004_p0106"
+      ],
+      "retrieved_passage_ids": [
+        "2004_p0116",
+        "2004_p0108",
+        "2004_p0107",
+        "2004_p0133",
+        "2004_p0106",
+        "2004_p0115",
+        "2004_p0136",
+        "2004_p0096"
+      ],
+      "required_claim_hits": [
+        {
+          "claim": "Berkshire owned about $21.4 billion of foreign exchange contracts spread among 12 currencies.",
+          "met": false,
+          "supporting_sentences": [],
+          "required_terms": [
+            "$21.4 billion",
+            "12 currencies"
+          ],
+          "accepted_passage_ids": [
+            "2004_p0116"
+          ],
+          "supporting_passage_ids": []
+        }
+      ],
+      "refusal_correct": null,
+      "score": {
+        "qid": "ho11_2004_currency_contracts",
+        "accepted": false,
+        "claim_coverage": 0.0,
+        "claims": [
+          {
+            "claim": "Berkshire owned about $21.4 billion of foreign exchange contracts spread among 12 currencies.",
+            "met": false,
+            "supporting_sentences": [],
+            "required_terms": [
+              "$21.4 billion",
+              "12 currencies"
+            ],
+            "accepted_passage_ids": [
+              "2004_p0116"
+            ],
+            "supporting_passage_ids": []
+          }
+        ],
+        "cited_passage_ids": [
+          "2004_p0116"
+        ],
+        "has_gold_citation": false,
+        "forbidden_terms_found": [],
+        "refusal_correct": null
+      },
+      "provider_failures": [],
+      "provider_calls": 1,
+      "model_requests": [
+        {
+          "model": "buffett-qwen2.5-1.5b-ft-r2-q4_k_m.gguf",
+          "temperature": 0.0
+        }
+      ],
+      "used_filter": {
+        "year": 2004
+      },
+      "reranked": false,
+      "raw_answers": [
+        "Berkshire owned about $21.4 billion of foreign exchange contracts at yearend 2004, spread among 12 currencies. [1] As I mentioned last year, holdings of this kind are a decided change for us. [1]"
+      ],
+      "status": "scored",
+      "latency_ms": 793.922
+    },
+    {
+      "qid": "ho12_2006_iscar_ownership",
+      "query": "What percentage of ISCAR did Berkshire buy in 2006, what did it pay, and who retained the rest?",
+      "history": [],
+      "question_type": "company",
+      "answer": "The remaining 20% stays in the hands of the Wertheimer family, making it our valued partner. [5] The remaining 20% stays in the hands of the Wertheimer family, making it our valued partner. [5]",
+      "citations": [
+        {
+          "marker": "[5]",
+          "passage_indices": [
+            4
+          ],
+          "raw_numbers": [
+            5
+          ],
+          "invalid_numbers": [],
+          "passage_ids": [
+            "2006_p0027"
+          ],
+          "years": [
+            2006
+          ],
+          "sources": [
+            "buffet_2006.pdf"
+          ]
+        },
+        {
+          "marker": "[5]",
+          "passage_indices": [
+            4
+          ],
+          "raw_numbers": [
+            5
+          ],
+          "invalid_numbers": [],
+          "passage_ids": [
+            "2006_p0027"
+          ],
+          "years": [
+            2006
+          ],
+          "sources": [
+            "buffet_2006.pdf"
+          ]
+        }
+      ],
+      "passage_ids": [
+        "2006_p0024",
+        "2006_p0092",
+        "2006_p0028",
+        "2006_p0023",
+        "2006_p0027"
+      ],
+      "retrieved_passage_ids": [
+        "2006_p0024",
+        "2006_p0092",
+        "2006_p0028",
+        "2006_p0023",
+        "2006_p0027",
+        "2006_p0119",
+        "2006_p0026",
+        "2006_p0140"
+      ],
+      "required_claim_hits": [
+        {
+          "claim": "Berkshire purchased 80% of ISCAR for $4 billion.",
+          "met": false,
+          "supporting_sentences": [],
+          "required_terms": [
+            "80%",
+            "iscar",
+            "$4 billion"
+          ],
+          "accepted_passage_ids": [
+            "2006_p0026"
+          ],
+          "supporting_passage_ids": []
+        },
+        {
+          "claim": "The Wertheimer family retained the remaining 20%.",
+          "met": false,
+          "supporting_sentences": [],
+          "required_terms": [
+            "wertheimer family",
+            "20%"
+          ],
+          "accepted_passage_ids": [
+            "2006_p0026"
+          ],
+          "supporting_passage_ids": []
+        }
+      ],
+      "refusal_correct": null,
+      "score": {
+        "qid": "ho12_2006_iscar_ownership",
+        "accepted": false,
+        "claim_coverage": 0.0,
+        "claims": [
+          {
+            "claim": "Berkshire purchased 80% of ISCAR for $4 billion.",
+            "met": false,
+            "supporting_sentences": [],
+            "required_terms": [
+              "80%",
+              "iscar",
+              "$4 billion"
+            ],
+            "accepted_passage_ids": [
+              "2006_p0026"
+            ],
+            "supporting_passage_ids": []
+          },
+          {
+            "claim": "The Wertheimer family retained the remaining 20%.",
+            "met": false,
+            "supporting_sentences": [],
+            "required_terms": [
+              "wertheimer family",
+              "20%"
+            ],
+            "accepted_passage_ids": [
+              "2006_p0026"
+            ],
+            "supporting_passage_ids": []
+          }
+        ],
+        "cited_passage_ids": [
+          "2006_p0027"
+        ],
+        "has_gold_citation": false,
+        "forbidden_terms_found": [],
+        "refusal_correct": null
+      },
+      "provider_failures": [],
+      "provider_calls": 1,
+      "model_requests": [
+        {
+          "model": "buffett-qwen2.5-1.5b-ft-r2-q4_k_m.gguf",
+          "temperature": 0.0
+        }
+      ],
+      "used_filter": {
+        "year": 2006
+      },
+      "reranked": false,
+      "raw_answers": [
+        "The remaining 20% stays in the hands of the Wertheimer family, making it our valued partner. [5] The remaining 20% stays in the hands of the Wertheimer family, making it our valued partner. [5]"
+      ],
+      "status": "scored",
+      "latency_ms": 796.412
+    },
+    {
+      "qid": "ho13_2007_petrochina_sale",
+      "query": "What did Berkshire originally pay for its PetroChina holding, and how much did it receive when selling it in 2007?",
+      "history": [],
+      "question_type": "company",
+      "answer": "The retrieved passages do not provide enough evidence to answer this question.",
+      "citations": [],
+      "passage_ids": [
+        "2007_p0086",
+        "2007_p0098",
+        "2007_p0093",
+        "2007_p0118",
+        "2007_p0087"
+      ],
+      "retrieved_passage_ids": [
+        "2007_p0086",
+        "2007_p0098",
+        "2007_p0093",
+        "2007_p0118",
+        "2007_p0087",
+        "2007_p0062",
+        "2007_p0097",
+        "2007_p0078"
+      ],
+      "required_claim_hits": [
+        {
+          "claim": "Berkshire bought its PetroChina holding for $488 million.",
+          "met": false,
+          "supporting_sentences": [],
+          "required_terms": [
+            "petrochina",
+            "$488 million"
+          ],
+          "accepted_passage_ids": [
+            "2007_p0086"
+          ],
+          "supporting_passage_ids": []
+        },
+        {
+          "claim": "Berkshire sold its holdings for $4 billion.",
+          "met": false,
+          "supporting_sentences": [],
+          "required_terms": [
+            "sold",
+            "$4 billion"
+          ],
+          "accepted_passage_ids": [
+            "2007_p0086"
+          ],
+          "supporting_passage_ids": []
+        }
+      ],
+      "refusal_correct": null,
+      "score": {
+        "qid": "ho13_2007_petrochina_sale",
+        "accepted": false,
+        "claim_coverage": 0.0,
+        "claims": [
+          {
+            "claim": "Berkshire bought its PetroChina holding for $488 million.",
+            "met": false,
+            "supporting_sentences": [],
+            "required_terms": [
+              "petrochina",
+              "$488 million"
+            ],
+            "accepted_passage_ids": [
+              "2007_p0086"
+            ],
+            "supporting_passage_ids": []
+          },
+          {
+            "claim": "Berkshire sold its holdings for $4 billion.",
+            "met": false,
+            "supporting_sentences": [],
+            "required_terms": [
+              "sold",
+              "$4 billion"
+            ],
+            "accepted_passage_ids": [
+              "2007_p0086"
+            ],
+            "supporting_passage_ids": []
+          }
+        ],
+        "cited_passage_ids": [],
+        "has_gold_citation": false,
+        "forbidden_terms_found": [],
+        "refusal_correct": null
+      },
+      "provider_failures": [],
+      "provider_calls": 1,
+      "model_requests": [
+        {
+          "model": "buffett-qwen2.5-1.5b-ft-r2-q4_k_m.gguf",
+          "temperature": 0.0
+        }
+      ],
+      "used_filter": {
+        "year": 2007
+      },
+      "reranked": false,
+      "raw_answers": [
+        "By 2007, Berkshire bought 1.3% of PetroChina for $488 million, a price that valued the entire business at about $37 billion. [1] In 2007, Berkshire sold $4 billion for $4 billion. [1]"
+      ],
+      "status": "scored",
+      "latency_ms": 919.096
+    },
+    {
+      "qid": "ho14_2013_nv_energy",
+      "query": "What price did MidAmerican pay for NV Energy in 2013, and approximately what share of Nevada's population did it supply with electricity?",
+      "history": [],
+      "question_type": "company",
+      "answer": "NV Energy, purchased for $5.6 billion by MidAmerican Energy, our utility subsidiary, supplies electricity to about 88% of Nevada’s population. [1] This acquisition fits nicely into our existing electric-utility operation and offers many possibilities for large investments in renewable energy. [1]",
+      "citations": [
+        {
+          "marker": "[1]",
+          "passage_indices": [
+            0
+          ],
+          "raw_numbers": [
+            1
+          ],
+          "invalid_numbers": [],
+          "passage_ids": [
+            "2013_p0018"
+          ],
+          "years": [
+            2013
+          ],
+          "sources": [
+            "buffet_2013.pdf"
+          ]
+        },
+        {
+          "marker": "[1]",
+          "passage_indices": [
+            0
+          ],
+          "raw_numbers": [
+            1
+          ],
+          "invalid_numbers": [],
+          "passage_ids": [
+            "2013_p0018"
+          ],
+          "years": [
+            2013
+          ],
+          "sources": [
+            "buffet_2013.pdf"
+          ]
+        }
+      ],
+      "passage_ids": [
+        "2013_p0018",
+        "2013_p0014",
+        "2013_p0059",
+        "2013_p0015",
+        "2013_p0066"
+      ],
+      "retrieved_passage_ids": [
+        "2013_p0018",
+        "2013_p0014",
+        "2013_p0059",
+        "2013_p0015",
+        "2013_p0066",
+        "2013_p0087",
+        "2013_p0013",
+        "2013_p0057"
+      ],
+      "required_claim_hits": [
+        {
+          "claim": "NV Energy was purchased for $5.6 billion and supplied electricity to about 88% of Nevada's population.",
+          "met": true,
+          "supporting_sentences": [
+            "NV Energy, purchased for $5.6 billion by MidAmerican Energy, our utility subsidiary, supplies electricity to about 88% of Nevada’s population. [1]"
+          ],
+          "required_terms": [
+            "nv energy",
+            "$5.6 billion",
+            "88%"
+          ],
+          "accepted_passage_ids": [
+            "2013_p0018"
+          ],
+          "supporting_passage_ids": [
+            "2013_p0018"
+          ]
+        }
+      ],
+      "refusal_correct": null,
+      "score": {
+        "qid": "ho14_2013_nv_energy",
+        "accepted": true,
+        "claim_coverage": 1.0,
+        "claims": [
+          {
+            "claim": "NV Energy was purchased for $5.6 billion and supplied electricity to about 88% of Nevada's population.",
+            "met": true,
+            "supporting_sentences": [
+              "NV Energy, purchased for $5.6 billion by MidAmerican Energy, our utility subsidiary, supplies electricity to about 88% of Nevada’s population. [1]"
+            ],
+            "required_terms": [
+              "nv energy",
+              "$5.6 billion",
+              "88%"
+            ],
+            "accepted_passage_ids": [
+              "2013_p0018"
+            ],
+            "supporting_passage_ids": [
+              "2013_p0018"
+            ]
+          }
+        ],
+        "cited_passage_ids": [
+          "2013_p0018"
+        ],
+        "has_gold_citation": true,
+        "forbidden_terms_found": [],
+        "refusal_correct": null
+      },
+      "provider_failures": [],
+      "provider_calls": 1,
+      "model_requests": [
+        {
+          "model": "buffett-qwen2.5-1.5b-ft-r2-q4_k_m.gguf",
+          "temperature": 0.0
+        }
+      ],
+      "used_filter": {
+        "year": 2013
+      },
+      "reranked": false,
+      "raw_answers": [
+        "NV Energy, purchased for $5.6 billion by MidAmerican Energy, our utility subsidiary, supplies electricity to about 88% of Nevada’s population. [1] This acquisition fits nicely into our existing electric-utility operation and offers many possibilities for large investments in renewable energy. [1]"
+      ],
+      "status": "scored",
+      "latency_ms": 1052.33
+    },
+    {
+      "qid": "ho15_2014_dealership_followup",
+      "query": "What was the name of that dealership group, and how many automobile dealerships did it have?",
+      "history": [
+        {
+          "role": "user",
+          "content": "Let's discuss the automobile dealership acquisition described in Berkshire's 2014 letter."
+        },
+        {
+          "role": "assistant",
+          "content": "Which detail of the acquisition would you like to examine?"
+        }
+      ],
+      "question_type": "follow_up",
+      "answer": "The retrieved passages do not provide enough evidence to answer this question.",
+      "citations": [],
+      "passage_ids": [
+        "2014_p0027",
+        "2014_p0026",
+        "2014_p0028",
+        "2014_p0025",
+        "2014_p0029"
+      ],
+      "retrieved_passage_ids": [
+        "2014_p0027",
+        "2014_p0026",
+        "2014_p0028",
+        "2014_p0018",
+        "2014_p0063",
+        "2014_p0023",
+        "2014_p0019",
+        "2014_p0215"
+      ],
+      "required_claim_hits": [
+        {
+          "claim": "The group was Van Tuyl Automotive with 78 automobile dealerships.",
+          "met": false,
+          "supporting_sentences": [],
+          "required_terms": [
+            "van tuyl",
+            "78",
+            "dealerships"
+          ],
+          "accepted_passage_ids": [
+            "2014_p0026"
+          ],
+          "supporting_passage_ids": []
+        }
+      ],
+      "refusal_correct": null,
+      "score": {
+        "qid": "ho15_2014_dealership_followup",
+        "accepted": false,
+        "claim_coverage": 0.0,
+        "claims": [
+          {
+            "claim": "The group was Van Tuyl Automotive with 78 automobile dealerships.",
+            "met": false,
+            "supporting_sentences": [],
+            "required_terms": [
+              "van tuyl",
+              "78",
+              "dealerships"
+            ],
+            "accepted_passage_ids": [
+              "2014_p0026"
+            ],
+            "supporting_passage_ids": []
+          }
+        ],
+        "cited_passage_ids": [],
+        "has_gold_citation": false,
+        "forbidden_terms_found": [],
+        "refusal_correct": null
+      },
+      "provider_failures": [],
+      "provider_calls": 1,
+      "model_requests": [
+        {
+          "model": "buffett-qwen2.5-1.5b-ft-r2-q4_k_m.gguf",
+          "temperature": 0.0
+        }
+      ],
+      "used_filter": {
+        "year": 2014
+      },
+      "reranked": false,
+      "raw_answers": [
+        "The retrieved passages do not provide enough evidence to answer this question."
+      ],
+      "status": "scored",
+      "latency_ms": 342.206
+    },
+    {
+      "qid": "ho16_2017_hurricane_loss",
+      "query": "What did Berkshire estimate its losses from the three 2017 hurricanes to be before and after tax?",
+      "history": [],
+      "question_type": "fact_number",
+      "answer": "We currently estimate Berkshire’s losses from the three hurricanes to be $3 billion (or about $2 billion after tax). [1] If both that estimate and my industry estimate of $100 billion are close to accurate, our share of the industry loss was about 3%. [1]",
+      "citations": [
+        {
+          "marker": "[1]",
+          "passage_indices": [
+            0
+          ],
+          "raw_numbers": [
+            1
+          ],
+          "invalid_numbers": [],
+          "passage_ids": [
+            "2017_p0039"
+          ],
+          "years": [
+            2017
+          ],
+          "sources": [
+            "buffet_2017.pdf"
+          ]
+        },
+        {
+          "marker": "[1]",
+          "passage_indices": [
+            0
+          ],
+          "raw_numbers": [
+            1
+          ],
+          "invalid_numbers": [],
+          "passage_ids": [
+            "2017_p0039"
+          ],
+          "years": [
+            2017
+          ],
+          "sources": [
+            "buffet_2017.pdf"
+          ]
+        }
+      ],
+      "passage_ids": [
+        "2017_p0039",
+        "2017_p0038",
+        "2017_p0042",
+        "2017_p0040",
+        "2017_p0072"
+      ],
+      "retrieved_passage_ids": [
+        "2017_p0039",
+        "2017_p0038",
+        "2017_p0042",
+        "2017_p0040",
+        "2017_p0072",
+        "2017_p0023",
+        "2017_p0027",
+        "2017_p0011"
+      ],
+      "required_claim_hits": [
+        {
+          "claim": "Berkshire estimated hurricane losses of $3 billion, or about $2 billion after tax.",
+          "met": true,
+          "supporting_sentences": [
+            "We currently estimate Berkshire’s losses from the three hurricanes to be $3 billion (or about $2 billion after tax). [1]"
+          ],
+          "required_terms": [
+            "$3 billion",
+            "$2 billion",
+            "after tax"
+          ],
+          "accepted_passage_ids": [
+            "2017_p0039"
+          ],
+          "supporting_passage_ids": [
+            "2017_p0039"
+          ]
+        }
+      ],
+      "refusal_correct": null,
+      "score": {
+        "qid": "ho16_2017_hurricane_loss",
+        "accepted": true,
+        "claim_coverage": 1.0,
+        "claims": [
+          {
+            "claim": "Berkshire estimated hurricane losses of $3 billion, or about $2 billion after tax.",
+            "met": true,
+            "supporting_sentences": [
+              "We currently estimate Berkshire’s losses from the three hurricanes to be $3 billion (or about $2 billion after tax). [1]"
+            ],
+            "required_terms": [
+              "$3 billion",
+              "$2 billion",
+              "after tax"
+            ],
+            "accepted_passage_ids": [
+              "2017_p0039"
+            ],
+            "supporting_passage_ids": [
+              "2017_p0039"
+            ]
+          }
+        ],
+        "cited_passage_ids": [
+          "2017_p0039"
+        ],
+        "has_gold_citation": true,
+        "forbidden_terms_found": [],
+        "refusal_correct": null
+      },
+      "provider_failures": [],
+      "provider_calls": 1,
+      "model_requests": [
+        {
+          "model": "buffett-qwen2.5-1.5b-ft-r2-q4_k_m.gguf",
+          "temperature": 0.0
+        }
+      ],
+      "used_filter": {
+        "year": 2017
+      },
+      "reranked": false,
+      "raw_answers": [
+        "We currently estimate Berkshire’s losses from the three hurricanes to be $3 billion (or about $2 billion after tax). [1] If both that estimate and my industry estimate of $100 billion are close to accurate, our share of the industry loss was about 3%. [1]"
+      ],
+      "status": "scored",
+      "latency_ms": 924.276
+    },
+    {
+      "qid": "ho17_2019_reinvestment_priority",
+      "query": "In the 2019 letter, what did Buffett identify as Berkshire's top priority when deploying retained earnings?",
+      "history": [],
+      "question_type": "opinion",
+      "answer": "During the past decade, Berkshire’s depreciation charges have aggregated $65 billion whereas the company’s internal investments in property, plant and equipment have totaled $121 billion. [1] Reinvestment in productive operational assets will forever remain our top priority. [1]",
+      "citations": [
+        {
+          "marker": "[1]",
+          "passage_indices": [
+            0
+          ],
+          "raw_numbers": [
+            1
+          ],
+          "invalid_numbers": [],
+          "passage_ids": [
+            "2019_p0020"
+          ],
+          "years": [
+            2019
+          ],
+          "sources": [
+            "buffet_2019.pdf"
+          ]
+        },
+        {
+          "marker": "[1]",
+          "passage_indices": [
+            0
+          ],
+          "raw_numbers": [
+            1
+          ],
+          "invalid_numbers": [],
+          "passage_ids": [
+            "2019_p0020"
+          ],
+          "years": [
+            2019
+          ],
+          "sources": [
+            "buffet_2019.pdf"
+          ]
+        }
+      ],
+      "passage_ids": [
+        "2019_p0020",
+        "2019_p0025",
+        "2019_p0011",
+        "2019_p0033",
+        "2019_p0079"
+      ],
+      "retrieved_passage_ids": [
+        "2019_p0020",
+        "2019_p0025",
+        "2019_p0011",
+        "2019_p0033",
+        "2019_p0079",
+        "2019_p0014",
+        "2019_p0032",
+        "2019_p0024"
+      ],
+      "required_claim_hits": [
+        {
+          "claim": "Reinvestment in productive operational assets remains the top priority.",
+          "met": true,
+          "supporting_sentences": [
+            "Reinvestment in productive operational assets will forever remain our top priority. [1]"
+          ],
+          "required_terms": [
+            "reinvestment",
+            "productive operational assets",
+            "top priority"
+          ],
+          "accepted_passage_ids": [
+            "2019_p0020"
+          ],
+          "supporting_passage_ids": [
+            "2019_p0020"
+          ]
+        }
+      ],
+      "refusal_correct": null,
+      "score": {
+        "qid": "ho17_2019_reinvestment_priority",
+        "accepted": true,
+        "claim_coverage": 1.0,
+        "claims": [
+          {
+            "claim": "Reinvestment in productive operational assets remains the top priority.",
+            "met": true,
+            "supporting_sentences": [
+              "Reinvestment in productive operational assets will forever remain our top priority. [1]"
+            ],
+            "required_terms": [
+              "reinvestment",
+              "productive operational assets",
+              "top priority"
+            ],
+            "accepted_passage_ids": [
+              "2019_p0020"
+            ],
+            "supporting_passage_ids": [
+              "2019_p0020"
+            ]
+          }
+        ],
+        "cited_passage_ids": [
+          "2019_p0020"
+        ],
+        "has_gold_citation": true,
+        "forbidden_terms_found": [],
+        "refusal_correct": null
+      },
+      "provider_failures": [],
+      "provider_calls": 1,
+      "model_requests": [
+        {
+          "model": "buffett-qwen2.5-1.5b-ft-r2-q4_k_m.gguf",
+          "temperature": 0.0
+        }
+      ],
+      "used_filter": {
+        "year": 2019
+      },
+      "reranked": false,
+      "raw_answers": [
+        "During the past decade, Berkshire’s depreciation charges have aggregated $65 billion whereas the company’s internal investments in property, plant and equipment have totaled $121 billion. [1] Reinvestment in productive operational assets will forever remain our top priority. [1]"
+      ],
+      "status": "scored",
+      "latency_ms": 1040.11
+    },
+    {
+      "qid": "ho18_2023_munger_architect",
+      "query": "In the 2023 tribute, how did Buffett distinguish Charlie Munger's role as architect from his own role at Berkshire?",
+      "history": [],
+      "question_type": "opinion",
+      "answer": "When you find a truly wonderful business, stick with it. [4]",
+      "citations": [
+        {
+          "marker": "[4]",
+          "passage_indices": [
+            3
+          ],
+          "raw_numbers": [
+            4
+          ],
+          "invalid_numbers": [],
+          "passage_ids": [
+            "2023_p0028"
+          ],
+          "years": [
+            2023
+          ],
+          "sources": [
+            "buffet_2023.pdf"
+          ]
+        }
+      ],
+      "passage_ids": [
+        "2023_p0002",
+        "2023_p0000",
+        "2023_p0003",
+        "2023_p0028",
+        "2023_p0075"
+      ],
+      "retrieved_passage_ids": [
+        "2023_p0002",
+        "2023_p0000",
+        "2023_p0003",
+        "2023_p0028",
+        "2023_p0075",
+        "2023_p0039",
+        "2023_p0030",
+        "2023_p0001"
+      ],
+      "required_claim_hits": [
+        {
+          "claim": "Charlie was the architect and Buffett acted as the general contractor.",
+          "met": false,
+          "supporting_sentences": [],
+          "required_terms": [
+            "charlie",
+            "architect",
+            "general contractor"
+          ],
+          "accepted_passage_ids": [
+            "2023_p0002"
+          ],
+          "supporting_passage_ids": []
+        }
+      ],
+      "refusal_correct": null,
+      "score": {
+        "qid": "ho18_2023_munger_architect",
+        "accepted": false,
+        "claim_coverage": 0.0,
+        "claims": [
+          {
+            "claim": "Charlie was the architect and Buffett acted as the general contractor.",
+            "met": false,
+            "supporting_sentences": [],
+            "required_terms": [
+              "charlie",
+              "architect",
+              "general contractor"
+            ],
+            "accepted_passage_ids": [
+              "2023_p0002"
+            ],
+            "supporting_passage_ids": []
+          }
+        ],
+        "cited_passage_ids": [
+          "2023_p0028"
+        ],
+        "has_gold_citation": false,
+        "forbidden_terms_found": [],
+        "refusal_correct": null
+      },
+      "provider_failures": [],
+      "provider_calls": 1,
+      "model_requests": [
+        {
+          "model": "buffett-qwen2.5-1.5b-ft-r2-q4_k_m.gguf",
+          "temperature": 0.0
+        }
+      ],
+      "used_filter": {
+        "year": 2023
+      },
+      "reranked": false,
+      "raw_answers": [
+        "The lesson from Coke and AMEX? When you find a truly wonderful business, stick with it. [4] Patience pays, and one wonderful business can offset the many mediocre decisions that are inevitable. [5]"
+      ],
+      "status": "scored",
+      "latency_ms": 856.855
+    },
+    {
+      "qid": "ho19_2024_tax_followup",
+      "query": "How much did it pay, and roughly what share of corporate America's payments was that?",
+      "history": [
+        {
+          "role": "user",
+          "content": "Let's discuss Berkshire's federal corporate income-tax payments to the IRS as reported in the 2024 letter."
+        },
+        {
+          "role": "assistant",
+          "content": "Which aspect of those tax payments would you like to examine?"
+        }
+      ],
+      "question_type": "follow_up",
+      "answer": "The retrieved passages do not provide enough evidence to answer this question.",
+      "citations": [],
+      "passage_ids": [
+        "2024_p0019",
+        "2024_p0018",
+        "2024_p0020",
+        "2024_p0021",
+        "2024_p0022"
+      ],
+      "retrieved_passage_ids": [
+        "2024_p0019",
+        "2024_p0020",
+        "2024_p0021",
+        "2024_p0031",
+        "2024_p0018",
+        "2024_p0033",
+        "2024_p0013",
+        "2024_p0012"
+      ],
+      "required_claim_hits": [
+        {
+          "claim": "Berkshire made payments to the IRS totaling $26.8 billion.",
+          "met": false,
+          "supporting_sentences": [],
+          "required_terms": [
+            "irs",
+            "$26.8 billion"
+          ],
+          "accepted_passage_ids": [
+            "2024_p0019"
+          ],
+          "supporting_passage_ids": []
+        },
+        {
+          "claim": "That was about 5% of what all of corporate America paid.",
+          "met": false,
+          "supporting_sentences": [],
+          "required_terms": [
+            "5%",
+            "corporate america"
+          ],
+          "accepted_passage_ids": [
+            "2024_p0019"
+          ],
+          "supporting_passage_ids": []
+        }
+      ],
+      "refusal_correct": null,
+      "score": {
+        "qid": "ho19_2024_tax_followup",
+        "accepted": false,
+        "claim_coverage": 0.0,
+        "claims": [
+          {
+            "claim": "Berkshire made payments to the IRS totaling $26.8 billion.",
+            "met": false,
+            "supporting_sentences": [],
+            "required_terms": [
+              "irs",
+              "$26.8 billion"
+            ],
+            "accepted_passage_ids": [
+              "2024_p0019"
+            ],
+            "supporting_passage_ids": []
+          },
+          {
+            "claim": "That was about 5% of what all of corporate America paid.",
+            "met": false,
+            "supporting_sentences": [],
+            "required_terms": [
+              "5%",
+              "corporate america"
+            ],
+            "accepted_passage_ids": [
+              "2024_p0019"
+            ],
+            "supporting_passage_ids": []
+          }
+        ],
+        "cited_passage_ids": [],
+        "has_gold_citation": false,
+        "forbidden_terms_found": [],
+        "refusal_correct": null
+      },
+      "provider_failures": [],
+      "provider_calls": 1,
+      "model_requests": [
+        {
+          "model": "buffett-qwen2.5-1.5b-ft-r2-q4_k_m.gguf",
+          "temperature": 0.0
+        }
+      ],
+      "used_filter": {
+        "year": 2024
+      },
+      "reranked": false,
+      "raw_answers": [
+        "The U.S. Treasury, of all places, had already received silent warnings of Berkshire’s destiny. [1] In 1965, the company did not pay a dime of income tax, an embarrassment that had generally prevailed at the company for a decade. [1]"
+      ],
+      "status": "scored",
+      "latency_ms": 622.959
+    },
+    {
+      "qid": "ho20_1977_1985_textile_comparison",
+      "query": "Compare Berkshire's stance toward its textile operation in 1977 and 1985: what employment consideration favored staying, and what shutdown decision followed?",
+      "history": [],
+      "question_type": "temporal_comparison",
+      "answer": "In 1977: The retrieved passages for this period do not cover this question.\n\nIn 1985: The retrieved passages for this period do not cover this question.",
+      "citations": [],
+      "passage_ids": [
+        "1977_p0005",
+        "1977_p0004",
+        "1977_p0006",
+        "1977_p0025",
+        "1977_p0024",
+        "1985_p0029",
+        "1985_p0028",
+        "1985_p0030",
+        "1985_p0045",
+        "1985_p0044"
+      ],
+      "retrieved_passage_ids": [
+        "1977_p0005",
+        "1985_p0029",
+        "1977_p0025",
+        "1985_p0045",
+        "1977_p0004",
+        "1985_p0028",
+        "1977_p0007",
+        "1985_p0088"
+      ],
+      "required_claim_hits": [
+        {
+          "claim": "The mills were among the largest employers in each town with workers of high average age.",
+          "met": false,
+          "supporting_sentences": [],
+          "required_terms": [
+            "largest employers",
+            "high average age"
+          ],
+          "accepted_passage_ids": [
+            "1977_p0006"
+          ],
+          "supporting_passage_ids": []
+        },
+        {
+          "claim": "In July Berkshire decided to close its textile operation.",
+          "met": false,
+          "supporting_sentences": [],
+          "required_terms": [
+            "july",
+            "close",
+            "textile operation"
+          ],
+          "accepted_passage_ids": [
+            "1985_p0029"
+          ],
+          "supporting_passage_ids": []
+        }
+      ],
+      "refusal_correct": null,
+      "score": {
+        "qid": "ho20_1977_1985_textile_comparison",
+        "accepted": false,
+        "claim_coverage": 0.0,
+        "claims": [
+          {
+            "claim": "The mills were among the largest employers in each town with workers of high average age.",
+            "met": false,
+            "supporting_sentences": [],
+            "required_terms": [
+              "largest employers",
+              "high average age"
+            ],
+            "accepted_passage_ids": [
+              "1977_p0006"
+            ],
+            "supporting_passage_ids": []
+          },
+          {
+            "claim": "In July Berkshire decided to close its textile operation.",
+            "met": false,
+            "supporting_sentences": [],
+            "required_terms": [
+              "july",
+              "close",
+              "textile operation"
+            ],
+            "accepted_passage_ids": [
+              "1985_p0029"
+            ],
+            "supporting_passage_ids": []
+          }
+        ],
+        "cited_passage_ids": [],
+        "has_gold_citation": false,
+        "forbidden_terms_found": [],
+        "refusal_correct": null
+      },
+      "provider_failures": [],
+      "provider_calls": 2,
+      "model_requests": [
+        {
+          "model": "buffett-qwen2.5-1.5b-ft-r2-q4_k_m.gguf",
+          "temperature": 0.0
+        },
+        {
+          "model": "buffett-qwen2.5-1.5b-ft-r2-q4_k_m.gguf",
+          "temperature": 0.0
+        }
+      ],
+      "used_filter": {
+        "multi_subquery": [
+          {
+            "year": 1977
+          },
+          {
+            "year": 1985
+          }
+        ]
+      },
+      "reranked": false,
+      "raw_answers": [
+        "The retrieved passages do not provide enough evidence to answer this question.",
+        "The retrieved passages do not provide enough evidence to answer this question."
+      ],
+      "status": "scored",
+      "latency_ms": 522.725
+    },
+    {
+      "qid": "ho21_1993_2010_float_comparison",
+      "query": "Compare how the 1993 and 2010 letters related the cost of insurance float to underwriting results: what happens with an underwriting profit, and with breakeven underwriting?",
+      "history": [],
+      "question_type": "temporal_comparison",
+      "answer": "In 1993: In those years when we have had an underwriting profit, which includes 1993, our cost of float has been negative, and we have determined our insurance earnings by adding underwriting profit to float income. [1] In those years when we have had an underwriting profit, which includes 1993, our cost of float has been negative, and we have determined our insurance earnings by adding underwriting profit to float income. [1]\n\nIn 2010: If we do that, all of our investments – those funded both by float and by retained earnings – can be viewed as an element of value for Berkshire shareholders. [9]",
+      "citations": [
+        {
+          "marker": "[1]",
+          "passage_indices": [
+            0
+          ],
+          "raw_numbers": [
+            1
+          ],
+          "invalid_numbers": [],
+          "passage_ids": [
+            "1993_p0045"
+          ],
+          "years": [
+            1993
+          ],
+          "sources": [
+            "buffet_1993.txt"
+          ]
+        },
+        {
+          "marker": "[1]",
+          "passage_indices": [
+            0
+          ],
+          "raw_numbers": [
+            1
+          ],
+          "invalid_numbers": [],
+          "passage_ids": [
+            "1993_p0045"
+          ],
+          "years": [
+            1993
+          ],
+          "sources": [
+            "buffet_1993.txt"
+          ]
+        },
+        {
+          "marker": "[9]",
+          "passage_indices": [
+            8
+          ],
+          "raw_numbers": [
+            9
+          ],
+          "invalid_numbers": [],
+          "passage_ids": [
+            "2010_p0031"
+          ],
+          "years": [
+            2010
+          ],
+          "sources": [
+            "buffet_2010.pdf"
+          ]
+        }
+      ],
+      "passage_ids": [
+        "1993_p0045",
+        "1993_p0044",
+        "1993_p0046",
+        "1993_p0047",
+        "1993_p0055",
+        "2010_p0066",
+        "2010_p0065",
+        "2010_p0067",
+        "2010_p0031",
+        "2010_p0030"
+      ],
+      "retrieved_passage_ids": [
+        "1993_p0045",
+        "2010_p0066",
+        "1993_p0046",
+        "2010_p0031",
+        "1993_p0055",
+        "2010_p0059",
+        "1993_p0049",
+        "2010_p0060"
+      ],
+      "required_claim_hits": [
+        {
+          "claim": "With an underwriting profit, the cost of float has been negative.",
+          "met": true,
+          "supporting_sentences": [
+            "In 1993: In those years when we have had an underwriting profit, which includes 1993, our cost of float has been negative, and we have determined our insurance earnings by adding underwriting profit to float income. [1]",
+            "In those years when we have had an underwriting profit, which includes 1993, our cost of float has been negative, and we have determined our insurance earnings by adding underwriting profit to float income. [1]"
+          ],
+          "required_terms": [
+            "underwriting profit",
+            "cost of float",
+            "negative"
+          ],
+          "accepted_passage_ids": [
+            "1993_p0045"
+          ],
+          "supporting_passage_ids": [
+            "1993_p0045"
+          ]
+        },
+        {
+          "claim": "Float is free as long as insurance underwriting breaks even.",
+          "met": false,
+          "supporting_sentences": [],
+          "required_terms": [
+            "float",
+            "free",
+            "breaks even"
+          ],
+          "accepted_passage_ids": [
+            "2010_p0030"
+          ],
+          "supporting_passage_ids": []
+        }
+      ],
+      "refusal_correct": null,
+      "score": {
+        "qid": "ho21_1993_2010_float_comparison",
+        "accepted": false,
+        "claim_coverage": 0.5,
+        "claims": [
+          {
+            "claim": "With an underwriting profit, the cost of float has been negative.",
+            "met": true,
+            "supporting_sentences": [
+              "In 1993: In those years when we have had an underwriting profit, which includes 1993, our cost of float has been negative, and we have determined our insurance earnings by adding underwriting profit to float income. [1]",
+              "In those years when we have had an underwriting profit, which includes 1993, our cost of float has been negative, and we have determined our insurance earnings by adding underwriting profit to float income. [1]"
+            ],
+            "required_terms": [
+              "underwriting profit",
+              "cost of float",
+              "negative"
+            ],
+            "accepted_passage_ids": [
+              "1993_p0045"
+            ],
+            "supporting_passage_ids": [
+              "1993_p0045"
+            ]
+          },
+          {
+            "claim": "Float is free as long as insurance underwriting breaks even.",
+            "met": false,
+            "supporting_sentences": [],
+            "required_terms": [
+              "float",
+              "free",
+              "breaks even"
+            ],
+            "accepted_passage_ids": [
+              "2010_p0030"
+            ],
+            "supporting_passage_ids": []
+          }
+        ],
+        "cited_passage_ids": [
+          "1993_p0045",
+          "2010_p0031"
+        ],
+        "has_gold_citation": false,
+        "forbidden_terms_found": [],
+        "refusal_correct": null
+      },
+      "provider_failures": [],
+      "provider_calls": 2,
+      "model_requests": [
+        {
+          "model": "buffett-qwen2.5-1.5b-ft-r2-q4_k_m.gguf",
+          "temperature": 0.0
+        },
+        {
+          "model": "buffett-qwen2.5-1.5b-ft-r2-q4_k_m.gguf",
+          "temperature": 0.0
+        }
+      ],
+      "used_filter": {
+        "multi_subquery": [
+          {
+            "year": 1993
+          },
+          {
+            "year": 2010
+          }
+        ]
+      },
+      "reranked": false,
+      "raw_answers": [
+        "In those years when we have had an underwriting profit, which includes 1993, our cost of float has been negative, and we have determined our insurance earnings by adding underwriting profit to float income. [1] In those years when we have had an underwriting profit, which includes 1993, our cost of float has been negative, and we have determined our insurance earnings by adding underwriting profit to float income. [1]",
+        "If we do that, all of our investments – those funded both by float and by retained earnings – can be viewed as an element of value for Berkshire shareholders. [4] This is evidenced by the fact that Berkshire’s second component of value is earnings that come from sources other than investments and insurance underwriting. [5]"
+      ],
+      "status": "scored",
+      "latency_ms": 1589.416
+    },
+    {
+      "qid": "ho22_1988_2022_coca_cola_comparison",
+      "query": "Compare Buffett's stated holding horizon for Coca-Cola in 1988 with the cash-dividend outcome reported in 2022: how long did he favor holding outstanding businesses, and what dividends did Coke pay Berkshire in 1994 and 2022?",
+      "history": [],
+      "question_type": "temporal_comparison",
+      "answer": "In 1988: The retrieved passages for this period do not cover this question.\n\nIn 2022: The retrieved passages for this period do not cover this question.\n\nIn 1994: The retrieved passages for this period do not cover this question.",
+      "citations": [],
+      "passage_ids": [
+        "1988_p0068",
+        "1988_p0067",
+        "1988_p0069",
+        "1988_p0077",
+        "1988_p0076",
+        "2022_p0021",
+        "2022_p0020",
+        "2022_p0022",
+        "2022_p0023",
+        "2022_p0024",
+        "1994_p0078",
+        "1994_p0077",
+        "1994_p0079",
+        "1994_p0009",
+        "1994_p0008"
+      ],
+      "retrieved_passage_ids": [
+        "1988_p0068",
+        "2022_p0021",
+        "1994_p0078",
+        "1988_p0077",
+        "2022_p0023",
+        "1994_p0009",
+        "1988_p0099",
+        "2022_p0014"
+      ],
+      "required_claim_hits": [
+        {
+          "claim": "The favorite holding period for outstanding businesses is forever.",
+          "met": false,
+          "supporting_sentences": [],
+          "required_terms": [
+            "holding period",
+            "forever"
+          ],
+          "accepted_passage_ids": [
+            "1988_p0068"
+          ],
+          "supporting_passage_ids": []
+        },
+        {
+          "claim": "The cash dividend from Coke was $75 million.",
+          "met": false,
+          "supporting_sentences": [],
+          "required_terms": [
+            "dividend",
+            "$75 million"
+          ],
+          "accepted_passage_ids": [
+            "2022_p0021"
+          ],
+          "supporting_passage_ids": []
+        },
+        {
+          "claim": "The dividend increased to $704 million.",
+          "met": false,
+          "supporting_sentences": [],
+          "required_terms": [
+            "dividend",
+            "$704 million"
+          ],
+          "accepted_passage_ids": [
+            "2022_p0021"
+          ],
+          "supporting_passage_ids": []
+        }
+      ],
+      "refusal_correct": null,
+      "score": {
+        "qid": "ho22_1988_2022_coca_cola_comparison",
+        "accepted": false,
+        "claim_coverage": 0.0,
+        "claims": [
+          {
+            "claim": "The favorite holding period for outstanding businesses is forever.",
+            "met": false,
+            "supporting_sentences": [],
+            "required_terms": [
+              "holding period",
+              "forever"
+            ],
+            "accepted_passage_ids": [
+              "1988_p0068"
+            ],
+            "supporting_passage_ids": []
+          },
+          {
+            "claim": "The cash dividend from Coke was $75 million.",
+            "met": false,
+            "supporting_sentences": [],
+            "required_terms": [
+              "dividend",
+              "$75 million"
+            ],
+            "accepted_passage_ids": [
+              "2022_p0021"
+            ],
+            "supporting_passage_ids": []
+          },
+          {
+            "claim": "The dividend increased to $704 million.",
+            "met": false,
+            "supporting_sentences": [],
+            "required_terms": [
+              "dividend",
+              "$704 million"
+            ],
+            "accepted_passage_ids": [
+              "2022_p0021"
+            ],
+            "supporting_passage_ids": []
+          }
+        ],
+        "cited_passage_ids": [],
+        "has_gold_citation": false,
+        "forbidden_terms_found": [],
+        "refusal_correct": null
+      },
+      "provider_failures": [],
+      "provider_calls": 2,
+      "model_requests": [
+        {
+          "model": "buffett-qwen2.5-1.5b-ft-r2-q4_k_m.gguf",
+          "temperature": 0.0
+        },
+        {
+          "model": "buffett-qwen2.5-1.5b-ft-r2-q4_k_m.gguf",
+          "temperature": 0.0
+        }
+      ],
+      "used_filter": {
+        "multi_subquery": [
+          {
+            "year": 1988
+          },
+          {
+            "year": 2022
+          },
+          {
+            "year": 1994
+          }
+        ]
+      },
+      "reranked": false,
+      "raw_answers": [
+        "We favor holding outstanding businesses for a long time, as evidenced by our favoring the maximum allowed by law for our holdings of Freddie Mac. [1] The dividends paid by Coke in 1994 and 2022 are $19.9 million and $19.9 million, respectively. [2]",
+        "The retrieved passages do not provide enough evidence to answer this question."
+      ],
+      "status": "scored",
+      "latency_ms": 926.987
+    },
+    {
+      "qid": "ho23_unanswerable_quantum",
+      "query": "What exact quantum error-correction code and qubit architecture does Buffett recommend for building a quantum computer?",
+      "history": [],
+      "question_type": "unanswerable",
+      "answer": "The retrieved passages do not provide enough evidence to answer this question.",
+      "citations": [],
+      "passage_ids": [
+        "1990_p0101",
+        "2014_p0152",
+        "2024_p0002",
+        "1981_p0014",
+        "2016_p0115"
+      ],
+      "retrieved_passage_ids": [
+        "1990_p0101",
+        "2014_p0152",
+        "2024_p0002",
+        "1981_p0014",
+        "2016_p0115",
+        "2001_p0067",
+        "1996_p0043",
+        "1987_p0019"
+      ],
+      "required_claim_hits": [],
+      "refusal_correct": true,
+      "score": {
+        "qid": "ho23_unanswerable_quantum",
+        "accepted": true,
+        "claim_coverage": null,
+        "claims": [],
+        "cited_passage_ids": [],
+        "has_gold_citation": false,
+        "forbidden_terms_found": [],
+        "refusal_correct": true
+      },
+      "provider_failures": [],
+      "provider_calls": 0,
+      "model_requests": [],
+      "used_filter": null,
+      "reranked": false,
+      "raw_answers": [],
+      "status": "scored",
+      "latency_ms": 17.785
+    },
+    {
+      "qid": "ho24_unanswerable_sourdough",
+      "query": "What is Buffett's exact sourdough-starter feeding schedule and bread recipe, including flour-to-water ratios?",
+      "history": [],
+      "question_type": "unanswerable",
+      "answer": "The retrieved passages do not provide enough evidence to answer this question.",
+      "citations": [],
+      "passage_ids": [
+        "1993_p0014",
+        "1981_p0058",
+        "1984_p0053",
+        "1988_p0083",
+        "1982_p0037"
+      ],
+      "retrieved_passage_ids": [
+        "1993_p0014",
+        "1981_p0058",
+        "1984_p0053",
+        "1988_p0083",
+        "1982_p0037",
+        "2005_p0040",
+        "1984_p0057",
+        "1983_p0068"
+      ],
+      "required_claim_hits": [],
+      "refusal_correct": true,
+      "score": {
+        "qid": "ho24_unanswerable_sourdough",
+        "accepted": true,
+        "claim_coverage": null,
+        "claims": [],
+        "cited_passage_ids": [],
+        "has_gold_citation": false,
+        "forbidden_terms_found": [],
+        "refusal_correct": true
+      },
+      "provider_failures": [],
+      "provider_calls": 0,
+      "model_requests": [],
+      "used_filter": null,
+      "reranked": false,
+      "raw_answers": [],
+      "status": "scored",
+      "latency_ms": 14.641
+    }
+  ]
+}
