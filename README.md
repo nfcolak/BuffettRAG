@@ -22,6 +22,27 @@ Three vector backends share one interface, and each persists an index identity m
 
 The evaluation pipeline scores retrieval strategies against a 50-query gold set with year-labeled relevance judgments. On that set, hybrid retrieval with reranking reaches MRR 0.739, recall@1 0.60 and recall@10 0.98. The historical answer run attempted 50 questions: 39 were scored and 11 failed at the provider. Its citation coverage was 0.912 and lexical support proxy 0.254; neither is a measured faithfulness rate, and the old artifact did not save passage text. Raw reports live in `data/evaluation/`. The offline baseline/after audit and limitations are documented in [the answer-quality report](docs/ANSWER_QUALITY_20260910_TR.md).
 
+## Held-out answer benchmark
+
+The frozen 24-question set in `data/evaluation/heldout_v1/` tests cited answers, required claims and refusals through the backend answer flow. These runs use BM25 retrieval and temperature 0. Scoring uses deterministic lexical claim checks, not an LLM judge; it does not establish semantic entailment.
+
+The final results are recorded in [`comparison.md`](data/evaluation/heldout_v1/final/comparison.md):
+
+| System | Accepted | Required claims met | Correct refusals | Unexpected refusals | Provider failures | Mean latency ms |
+| --- | --- | --- | --- | --- | --- | --- |
+| Extractive local | 18/24 | 23/31 | 2/2 | 0 | 0 | 43.578 |
+| Base Qwen2.5-1.5B | 3/24 | 2/31 | 2/2 | 18 | 0 | 1171.486 |
+| Fine-tuned round 1 | 5/24 | 4/31 | 2/2 | 7 | 0 | 652.433 |
+| Fine-tuned round 2 | 10/24 | 10/31 | 2/2 | 3 | 0 | 1139.950 |
+
+The extractive engine's fixes were diagnosed partly on this held-out set, so its 18/24 is optimistic. The LLM rows were not tuned on it. Latencies are measurements from these runs, not deployment guarantees.
+
+To rerun the extractive baseline without a model or database:
+
+```bash
+PYTHON_DOTENV_DISABLED=1 python scripts/eval/run_live_benchmark.py --provider local --retrieval bm25 --temperature 0 --cases data/evaluation/heldout_v1/answer_benchmark_heldout_v1.json --output data/evaluation/heldout_v1/local_bm25_rerun.json
+```
+
 ## Quick start
 
 Python 3.10+ is recommended.
@@ -59,6 +80,26 @@ Providers: `llama` (default) and `local` (the extractive engine, no model needed
 Latency: with Metal (`LLM_GPU_LAYERS=-1`) an answer takes a few seconds. On a CPU-only server (`LLM_GPU_LAYERS=0`) expect roughly 10 to 40 seconds per answer depending on cores. To keep the prompt inside what a 1.5B model handles, the prompt uses only the first `LLM_CONTEXT_PASSAGES` expanded passages, each cut around its anchor chunk to `LLM_PASSAGE_MAX_CHARS`, and trailing passages are dropped until the prompt fits `LLM_N_CTX` minus the answer budget (4 chars per token estimate). Citation numbers always match the passages shown.
 
 Query expansion is off by default (`EXPANSION_MODE=off`): a 1.5B model proposes unreliable keywords. Set `auto` or `always` only if you accept that.
+
+## Fine-tuning (LoRA)
+
+The teacher, Qwen2.5-7B running in MLX 4-bit, generated cited answers from the corpus. Leakage checks exclude held-out evidence and its neighbors, reject questions that overlap the frozen set, and check that training and validation passages remain separate. Qwen2.5-1.5B was then fine-tuned with LoRA through `mlx-lm`.
+
+Round 1 used 193 single-sentence training examples and 13 validation examples, stored in `data/ft/`. Round 2 used answers of 2–4 cited sentences, including comparison, multi-part and follow-up questions; `data/ft_v2/` contains 560 training examples and 70 validation examples. These split counts come from each directory's `manifest.json`. Training records for round 2 are in `data/ft_v2/round2_metrics/`; the held-out table above uses the final comparison, not the earlier metrics snapshot.
+
+The resumable pipeline generates examples, splits and checks leakage, trains LoRA, exports a GGUF model and evaluates it:
+
+```bash
+bash scripts/ft/run_round.sh <round> <target_examples> <max_gen_minutes>
+```
+
+The current runner uses `data/ft_v2/` and stores stage markers and model artifacts under `models/ft/round<round>/`. It needs the local teacher and student weights, MLX/`mlx-lm`, and the llama.cpp conversion and quantization tools; it is not part of the backend quick start.
+
+The fine-tuned GGUF files are not published: they are git-ignored under `models/ft/`. To serve a locally generated round-2 model:
+
+```bash
+LLM_MODEL_PATH=models/ft/round2/buffett-qwen2.5-1.5b-ft-r2-q4_k_m.gguf uvicorn src.services.backend_app:app --host 0.0.0.0 --port 8000
+```
 
 ## Configuration
 
@@ -104,6 +145,20 @@ For shared or public deployments there are separate hardening knobs.
 
 `/ask` takes no provider, key or model fields; it always uses the server's embedded provider.
 
+## Code layout
+
+- `src/ingestion/`: PDF/text extraction, paragraph-aware chunking and topic tagging.
+- `src/retrieval/`: BM25, vector retrieval, rank fusion, reranking and context expansion.
+- `src/storage/`: Vector stores, embeddings and index identity manifests.
+- `src/generation/`: Prompt contract, evidence gate, comparison and answer providers.
+- `src/evaluation/`: Retrieval metrics, answer benchmarks and lexical claim validation.
+- `src/services/`: `backend_app` routes, `ask_flow`, request/response schemas and security.
+- `scripts/index/`: Index building, corpus audits and chunk validation.
+- `scripts/eval/`: Offline quality checks, ablations and answer/live benchmarks.
+- `scripts/ft/`: Teacher-data generation, leakage checks, LoRA training and GGUF export/evaluation.
+- `frontend/`: React/Vite answer and cited-passage interface.
+- `tests/`: Unit, regression and end-to-end smoke tests.
+
 ## Project layout
 
 ```text
@@ -113,15 +168,22 @@ For shared or public deployments there are separate hardening knobs.
 │   ├── raw/                # source shareholder letters
 │   ├── processed/          # chunk files and metadata
 │   ├── indices/            # local vector-store persistence
-│   └── evaluation/         # evaluation reports
+│   ├── evaluation/         # retrieval and answer reports, frozen held-out set
+│   ├── ft/                 # round-1 data and manifest
+│   └── ft_v2/              # round-2 data, manifest and training metrics
 ├── frontend/               # React/Vite frontend
-├── scripts/                # CLI utilities (build_index, ask, validation)
+├── scripts/
+│   ├── index/              # index building and corpus validation
+│   ├── eval/               # quality checks, ablations and benchmarks
+│   ├── ft/                 # fine-tuning pipeline
+│   └── ask.py              # question CLI
 ├── src/
 │   ├── ingestion/          # PDF/text extraction, chunking, topic tagging
 │   ├── retrieval/          # BM25, vector search, RRF, reranking, dedup
-│   ├── generation/         # prompt contract and LLM provider wrappers
+│   ├── storage/            # vector stores, embeddings, index manifests
+│   ├── generation/         # prompt, evidence gate, comparison, providers
 │   ├── evaluation/         # gold set and metrics pipeline
-│   └── services/           # FastAPI backend and security helpers
+│   └── services/           # backend routes, answer flow, schemas, security
 └── tests/                  # unit and end-to-end smoke tests
 ```
 
