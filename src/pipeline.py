@@ -40,7 +40,9 @@ from src.generation.prompt import (
     parse_citations,
     strip_chat_artifacts,
 )
+from src.generation.compare import comparison_periods, generate_comparison_answer, prepare_answer_context
 from src.generation.evidence_gate import assess_evidence
+from src.retrieval.query_expansion import build_followup_retrieval_query
 from src.evaluation.claim_validator import validate_and_filter_answer
 from src.generation.providers import LLMProvider, create_llm_provider
 from src.index_manifest import ensure_index_identity, write_index_identity
@@ -131,10 +133,13 @@ class BuffettRAGPipeline:
         fetch_k: int = RETRIEVAL_FETCH_K,
         rerank: bool = True,
         where: Optional[Dict[str, Any]] = None,
+        history: Optional[List[Dict[str, str]]] = None,
     ) -> Dict[str, Any]:
-        """Run a single query end-to-end."""
+        """Run a query end-to-end; history resolves retrieval intent, not facts."""
+        history = history or []
+        retrieval_query = build_followup_retrieval_query(query, history)
         result = self.retriever.search(
-            query,
+            retrieval_query,
             strategy=strategy,
             top_k=top_k,
             fetch_k=fetch_k,
@@ -153,8 +158,10 @@ class BuffettRAGPipeline:
                 "reranked": result.reranked,
             }
 
-        evidence = assess_evidence(query, result.hits, extra_queries=())
-        if not evidence.sufficient:
+        extras = [turn["content"] for turn in history if turn.get("role") == "user"]
+        periods = comparison_periods(query)
+        evidence = assess_evidence(query, result.hits, extra_queries=extras)
+        if not evidence.sufficient and not periods:
             return {
                 "query": query,
                 "strategy": strategy,
@@ -168,24 +175,26 @@ class BuffettRAGPipeline:
                              "best_overlap": evidence.best_overlap},
             }
 
-        context_hits = expand_hits_with_neighbors(
-            result.hits,
-            self.docs_by_id,
-            neighbors=ANSWER_CONTEXT_NEIGHBORS,
-            max_chars=ANSWER_CONTEXT_MAX_CHARS,
+        context_hits = prepare_answer_context(
+            self.llm, result.hits, self.docs_by_id, query, history=history,
+            followup=retrieval_query != query,
+            neighbors=ANSWER_CONTEXT_NEIGHBORS, max_chars=ANSWER_CONTEXT_MAX_CHARS,
+            max_new_tokens=LLM_MAX_NEW_TOKENS, n_ctx=LLM_N_CTX,
+            max_passages=LLM_CONTEXT_PASSAGES, passage_max_chars=LLM_PASSAGE_MAX_CHARS,
         )
-        if getattr(self.llm, "provider_name", "") == "llama":
-            context_hits = fit_context_to_llm(
-                context_hits, result.hits, query,
-                max_new_tokens=LLM_MAX_NEW_TOKENS, n_ctx=LLM_N_CTX,
-                max_passages=LLM_CONTEXT_PASSAGES, passage_max_chars=LLM_PASSAGE_MAX_CHARS,
+        if periods:
+            comparison = generate_comparison_answer(
+                self.llm, query, context_hits, history=history,
+                max_new_tokens=LLM_MAX_NEW_TOKENS, extra_queries=extras,
             )
-        prompt = build_cited_prompt(query, context_hits)
-        raw_answer = self.llm.generate(prompt)
-        answer = strip_chat_artifacts(raw_answer)
-        validation = validate_and_filter_answer(answer, context_hits)
-        answer = validation.safe_answer or REFUSAL_LINE
-        citations = parse_citations(answer, context_hits)
+            answer, citations, validation = comparison.answer, comparison.citations, comparison.validation
+        else:
+            prompt = build_cited_prompt(query, context_hits, history=history)
+            raw_answer = self.llm.generate(prompt)
+            answer = strip_chat_artifacts(raw_answer)
+            validation = validate_and_filter_answer(answer, context_hits)
+            answer = validation.safe_answer or REFUSAL_LINE
+            citations = parse_citations(answer, context_hits)
 
         return {
             "query": query,

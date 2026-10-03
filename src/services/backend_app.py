@@ -71,12 +71,13 @@ from src.generation.prompt import (
     parse_citations,
     strip_chat_artifacts,
 )
+from src.generation.compare import comparison_periods, generate_comparison_answer, prepare_answer_context
 from src.generation.evidence_gate import assess_evidence
 from src.evaluation.claim_validator import validate_and_filter_answer
 from src.generation.providers import create_llm_provider
 from src.index_manifest import ensure_index_identity, write_index_identity
 from src.retrieval.context import build_doc_lookup, expand_hits_with_neighbors, fit_context_to_llm
-from src.retrieval.query_expansion import expand_query, expand_query_structured
+from src.retrieval.query_expansion import build_followup_retrieval_query, expand_query, expand_query_structured
 from src.retrieval.reranker import CrossEncoderReranker
 from src.retrieval.retriever import Retriever
 from src.services.security import FixedWindowRateLimiter, client_key, is_authorized
@@ -325,8 +326,10 @@ def _llm_error_message(exc: Exception) -> str:
 
 def _do_search(req: SearchRequest, retrieval_query: Optional[str] = None):
     retriever: Retriever = _state["retriever"]
+    history = [turn.model_dump() for turn in req.history] if isinstance(req, AskRequest) else []
+    resolved = build_followup_retrieval_query(req.query, history)
     result = retriever.search(
-        query=req.query,
+        query=resolved,
         strategy=req.strategy,
         top_k=req.top_k,
         fetch_k=req.fetch_k,
@@ -414,9 +417,10 @@ def ask(req: AskRequest) -> AskResponse:
 
     answer: Optional[str] = None
     citations: List[Dict[str, Any]] = []
-    if hits:
+    if hits or comparison_periods(req.query):
         answer, citations = _generate_answer(
-            llm, prompt, context_hits, req.max_new_tokens, req.query, _extra_queries(req, expanded)
+            llm, prompt, context_hits, req.max_new_tokens, req.query, _extra_queries(req, expanded),
+            [turn.model_dump() for turn in req.history],
         )
 
     return AskResponse(
@@ -471,18 +475,13 @@ def _prepare_ask_steps(req: AskRequest):
     context_hits: List[Any] = []
     prompt = ""
     if hits:
-        context_hits = expand_hits_with_neighbors(
-            hits,
-            _state.get("docs_by_id", {}),
-            neighbors=ANSWER_CONTEXT_NEIGHBORS,
-            max_chars=ANSWER_CONTEXT_MAX_CHARS,
+        context_hits = prepare_answer_context(
+            llm, hits, _state.get("docs_by_id", {}), req.query, history=history_dicts,
+            followup=build_followup_retrieval_query(req.query, history_dicts) != req.query,
+            neighbors=ANSWER_CONTEXT_NEIGHBORS, max_chars=ANSWER_CONTEXT_MAX_CHARS,
+            max_new_tokens=req.max_new_tokens, n_ctx=LLM_N_CTX,
+            max_passages=LLM_CONTEXT_PASSAGES, passage_max_chars=LLM_PASSAGE_MAX_CHARS,
         )
-        if getattr(llm, "provider_name", "") == "llama":
-            context_hits = fit_context_to_llm(
-                context_hits, hits, req.query, history=history_dicts,
-                max_new_tokens=req.max_new_tokens, n_ctx=LLM_N_CTX,
-                max_passages=LLM_CONTEXT_PASSAGES, passage_max_chars=LLM_PASSAGE_MAX_CHARS,
-            )
         prompt = build_cited_prompt(query=req.query, hits=context_hits, history=history_dicts)
 
     return llm, hits, used_filter, reranked, context_hits, prompt, expanded
@@ -513,10 +512,17 @@ def _finalize_answer(llm, prompt: str, context_hits, raw_answer: str, max_new_to
 
 
 def _generate_answer(llm, prompt: str, context_hits, max_new_tokens: int, query: Optional[str] = None,
-                     extra_queries=()):
-    if query and not assess_evidence(query, context_hits, extra_queries=extra_queries).sufficient:
+                     extra_queries=(), history=None):
+    is_comparison = bool(query and comparison_periods(query))
+    if query and not is_comparison and not assess_evidence(query, context_hits, extra_queries=extra_queries).sufficient:
         return REFUSAL_LINE, []
     try:
+        if is_comparison and query is not None:
+            comparison = generate_comparison_answer(
+                llm, query, context_hits, history=history, max_new_tokens=max_new_tokens,
+                extra_queries=extra_queries,
+            )
+            return comparison.answer, comparison.citations
         raw_answer = llm.generate(prompt, max_new_tokens=max_new_tokens)
     except Exception as exc:
         if EXPOSE_DEBUG_STATUS:
@@ -560,6 +566,14 @@ def ask_stream(req: AskRequest) -> StreamingResponse:
                 "retrieved_hits": [h.model_dump() for h in _hits_to_out(hits)],
             },
         )
+        if comparison_periods(req.query):
+            yield _sse("status", {"stage": "generating"})
+            answer, citations = _generate_answer(
+                llm, prompt, context_hits, req.max_new_tokens, req.query, extras,
+                [turn.model_dump() for turn in req.history],
+            )
+            yield _sse("done", {"answer": answer, "citations": citations})
+            return
         if not hits:
             yield _sse("done", {"answer": None, "citations": []})
             return
