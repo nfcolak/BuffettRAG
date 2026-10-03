@@ -4,7 +4,7 @@ import argparse
 import json
 import sys
 from pathlib import Path
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 from src.evaluation.hard_negatives import score_hard_negative_case
 from src.retrieval.bm25 import BM25Retriever

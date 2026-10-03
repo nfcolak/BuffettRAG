@@ -7,5 +7,5 @@ All 25 distinct gold/relevant IDs exist; 0 missing fixture IDs and 0 provider fa
 This is an extractive smoke benchmark, NOT live LLM quality; claim-term/citation scoring is deterministic, not semantic judging.
 Embedded-LLM run needs no API keys; provider failures remain unscored and return exit 1.
 From the repository root (the GGUF model must exist under models/; hybrid also needs embedding/reranker weights and the vector backend):
-env -u PYTHONPATH PYTHON_DOTENV_DISABLED=1 HF_HUB_OFFLINE=1 python3 scripts/run_live_benchmark.py --provider llama --retrieval bm25 --temperature 0 --cases data/evaluation/heldout_v1/answer_benchmark_heldout_v1.json --output data/evaluation/heldout_v1/heldout_v1_llama_base_bm25.json
+env -u PYTHONPATH PYTHON_DOTENV_DISABLED=1 HF_HUB_OFFLINE=1 python3 scripts/eval/run_live_benchmark.py --provider llama --retrieval bm25 --temperature 0 --cases data/evaluation/heldout_v1/answer_benchmark_heldout_v1.json --output data/evaluation/heldout_v1/heldout_v1_llama_base_bm25.json
 # hybrid: use --retrieval hybrid

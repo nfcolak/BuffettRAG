@@ -13,7 +13,7 @@ import re
 import sys
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 from src.ingestion.legacy_utils import get_all_letters_sorted
 from src.ingestion.paragraph_index import build_paragraph_records

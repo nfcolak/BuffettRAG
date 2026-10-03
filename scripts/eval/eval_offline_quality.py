@@ -1,6 +1,6 @@
 """Reproducible OFFLINE diagnostics, not a cloud answer-quality benchmark.
 
-Run with PYTHON_DOTENV_DISABLED=1 python3 scripts/eval_offline_quality.py --output PATH
+Run with PYTHON_DOTENV_DISABLED=1 python3 scripts/eval/eval_offline_quality.py --output PATH
 Uses the real corpus, existing 50-query gold set, BM25 and local extractive answers.
 No embedding/reranker model downloads, database connections or provider calls.
 """
@@ -13,7 +13,7 @@ import sys
 from dataclasses import asdict
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 from src.evaluation.gold_set import get_gold_queries
 from src.evaluation.retrieval_metrics import aggregate_metrics, per_query_metrics

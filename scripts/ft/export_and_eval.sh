@@ -77,9 +77,10 @@ ls -la "$GGUF"
 BENCH="$OUT/bench_tree"
 rm -rf "$BENCH"; mkdir -p "$BENCH"
 git archive main | tar -x -C "$BENCH"
-cp scripts/run_live_benchmark.py "$BENCH/scripts/run_live_benchmark.py"
+mkdir -p "$BENCH/scripts/eval"
+cp scripts/eval/run_live_benchmark.py "$BENCH/scripts/eval/run_live_benchmark.py"
 mkdir -p "$ROOT/$HELD"
-LLM_MODEL_PATH="$GGUF" run "$BENCH/scripts/run_live_benchmark.py" --provider llama --retrieval bm25 \
+LLM_MODEL_PATH="$GGUF" run "$BENCH/scripts/eval/run_live_benchmark.py" --provider llama --retrieval bm25 \
   --cases "$ROOT/$HELD/answer_benchmark_heldout_v1.json" --output "$RESULT" --save-raw \
   || echo "runner exit $? (non-zero = some provider failures; see summary)"
 
