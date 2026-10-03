@@ -13,14 +13,17 @@ import re
 from typing import List, Optional, Tuple
 
 from src.generation.prompt import REFUSAL_LINE
+from src.evaluation.claim_validator import evidence_sentences
 
 _PASSAGE_RE = re.compile(
     r"\[(\d+)\]\s*\(year=[^)]*\)\n(.*?)(?=\n\n\[\d+\]\s*\(year=|\n+END UNTRUSTED PASSAGES)",
     re.DOTALL,
 )
 _QUESTION_RE = re.compile(r"BEGIN USER QUESTION\s*\nQuestion:\s*(.+)")
-_SENTENCE_RE = re.compile(r"(?<=[.!?])\s+(?=[A-Z\"'(])")
 _WORD_RE = re.compile(r"[a-z']+")
+_SALUTATION_RE = re.compile(r"\bTo the (?:Stockholders|Shareholders) of [^:\n]+:\s*", re.I)
+_QUANTITY_QUESTION_RE = re.compile(r"\b(?:how much|how many|what percent(?:age)?|what (?:was|were|is|are).{0,50}(?:earnings|cost|amount|total))\b", re.I)
+_NUMBER_RE = re.compile(r"\$?\d[\d,]*(?:\.\d+)?%?")
 
 _STOPWORDS = frozenset(
     """a about after all also an and any are as at be because been but buffett buffetts by can
@@ -34,15 +37,36 @@ _MAX_ANCHORS = 3
 _MAX_SENTENCES = 6
 _CONTEXT_RADIUS = 2
 _CHARS_PER_TOKEN = 4
+# Dev answerable minimum: 0.40; incidental off-topic probes: at most 0.25.
+_MIN_QUESTION_OVERLAP = 0.30
 
 
 def _content_words(text: str) -> List[str]:
-    return [w for w in _WORD_RE.findall(text.lower()) if w not in _STOPWORDS and len(w) > 2]
+    text = text.lower().replace("’", "'")
+    text = re.sub(r"\b([a-z]+)'s\b", r"\1", text)
+    return [w for w in _WORD_RE.findall(text) if w not in _STOPWORDS and len(w) > 2]
+
+
+def _is_header(line: str) -> bool:
+    line = line.strip()
+    if not line:
+        return False
+    if re.fullmatch(r"[\d\s*•Š-]+", line):
+        return True
+    if re.match(r"^(?:Chairman of the Board|Vice Chairman|Page\s+\d+)\b", line, re.I):
+        return True
+    # Standalone signatures, including middle initials.
+    if re.fullmatch(r"[A-Z][a-z]+\s+(?:[A-Z]\.\s+)?[A-Z][a-z]+", line):
+        return True
+    words = line.split()
+    return (len(line) <= 80 and len(words) <= 8 and not re.search(r"[.!?:\d]", line)
+            and all(w[:1].isupper() or w.lower() in {"of", "the", "and", "to", "a"} for w in words))
 
 
 def _split_sentences(text: str) -> List[str]:
-    normalized = re.sub(r"\s+", " ", text).strip()
-    return [s.strip() for s in _SENTENCE_RE.split(normalized) if len(s.strip()) >= 40]
+    text = _SALUTATION_RE.sub("", text)
+    prose = "\n".join(line for line in text.splitlines() if not _is_header(line))
+    return [s.strip() for s in evidence_sentences(prose) if len(s.strip()) >= 20 and not _is_header(s)]
 
 
 class LocalProvider:
@@ -59,7 +83,10 @@ class LocalProvider:
         if not question_match or not passages:
             return REFUSAL_LINE
 
-        query_words = set(_content_words(question_match.group(1)))
+        question = question_match.group(1)
+        query_words = set(_content_words(question))
+        asks_quantity = bool(_QUANTITY_QUESTION_RE.search(question))
+        question_numbers = set(_NUMBER_RE.findall(question))
         if not query_words:
             return REFUSAL_LINE
 
@@ -68,17 +95,23 @@ class LocalProvider:
         # quantity or consequence often follow the sentence that names the event.
         passage_sentences: List[List[str]] = []
         scored: List[Tuple[float, int, int, int, str]] = []
+        best_overlap = 0.0
         for rank, (number, text) in enumerate(passages):
             sentences = _split_sentences(text)
             passage_sentences.append(sentences)
             for position, sentence in enumerate(sentences):
                 overlap = len(query_words & set(_content_words(sentence)))
+                best_overlap = max(best_overlap, overlap / len(query_words))
                 if overlap == 0:
                     continue
-                score = overlap + (len(passages) - rank) * 0.01
+                quantities = set(_NUMBER_RE.findall(sentence))
+                # Quantities complement relevance, never substitute for it.
+                numeric_bonus = 0.75 if asks_quantity and quantities else 0.0
+                number_bonus = 0.25 * len(question_numbers & quantities)
+                score = overlap + numeric_bonus + number_bonus + (len(passages) - rank) * 0.01
                 scored.append((score, rank, int(number), position, sentence))
 
-        if not scored:
+        if not scored or best_overlap < _MIN_QUESTION_OVERLAP:
             return REFUSAL_LINE
 
         scored.sort(key=lambda item: item[0], reverse=True)
@@ -95,14 +128,17 @@ class LocalProvider:
             if len(anchors) >= _MAX_ANCHORS:
                 break
 
-        candidates: List[Tuple[float, int, int, int]] = list(anchors)
+        # Rank relevant sentences while retaining passage diversity. Necessary
+        # context often supplies a quantity without repeating the query nouns.
+        candidates: List[Tuple[float, int, int, int]] = [item[:4] for item in scored]
         for score, rank, number, position in anchors:
             sentences = passage_sentences[rank]
             for distance in range(1, _CONTEXT_RADIUS + 1):
                 for neighbor in (position - distance, position + distance):
                     if 0 <= neighbor < len(sentences):
-                        candidates.append((score - distance * 0.1, rank, number, neighbor))
-        candidates.sort(key=lambda item: item[0], reverse=True)
+                        candidates.append((score * 0.6 - distance * 0.1, rank, number, neighbor))
+        anchor_locations = {(rank, position) for _, rank, _, position in anchors}
+        candidates.sort(key=lambda item: ((item[1], item[3]) in anchor_locations, item[0]), reverse=True)
 
         budget = (max_new_tokens or 300) * _CHARS_PER_TOKEN
         picked: List[Tuple[int, int, str]] = []

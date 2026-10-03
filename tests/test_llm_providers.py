@@ -94,5 +94,48 @@ def test_llama_provider_real_grounded_answer():
     assert "[1]" in answer or REFUSAL_LINE in answer
 
 
+def test_local_splitter_joins_numeric_fragments_and_preserves_honorifics():
+    from src.generation.providers.local_provider import _split_sentences
+    text = "In 1998. 1999 the firm bought 2% of a supplier. Mr. Market is there to serve you, not to guide you."
+    sentences = _split_sentences(text)
+    assert sentences == ["In 1998. 1999 the firm bought 2% of a supplier.",
+                         "Mr. Market is there to serve you, not to guide you."]
+    assert not any(s == "In 1998." or s[:1].isdigit() for s in sentences)
+    from src.evaluation.claim_validator import validate_and_filter_answer
+    hits = [SearchHit("p", text, {}, 1.0)]
+    answer = "\n\n".join(s + " [1]" for s in sentences)
+    assert validate_and_filter_answer(answer, hits).safe_answer == answer
+
+
+def test_local_skips_salutations_headers_and_signatures():
+    from src.generation.providers.local_provider import _split_sentences
+    text = ("To the Stockholders of Example Industries Inc.:\n\n"
+            "Operating Earnings\n\nOperating earnings were $250 million this year.\n\n"
+            "Warren E. Buffett\nChairman of the Board\nPage 12\nEXAMPLE INDUSTRIES\n")
+    assert _split_sentences(text) == ["Operating earnings were $250 million this year."]
+
+
+def test_local_quantity_question_prefers_relevant_numeric_sentence():
+    hits = [SearchHit("p", "The cost of float was an important issue for our insurance operations. "
+                     "The cost of float was 8% of the funds held.", {}, 1.0)]
+    prompt = build_cited_prompt("What percent was the cost of float?", hits)
+    answer = LocalProvider().generate(prompt, max_new_tokens=18)
+    assert answer == "The cost of float was 8% of the funds held. [1]"
+
+
+def test_offtopic_incidental_keyword_refuses_before_both_engines(monkeypatch):
+    from src.services.backend_app import _generate_answer
+    hits = [SearchHit("p", "We use computer models to estimate the cost of insurance operations.", {}, 1.0)]
+    question = "How do I configure a firewall to protect a computer?"
+    prompt = build_cited_prompt(question, hits)
+    assert LocalProvider().generate(prompt) == REFUSAL_LINE
+    for name in ("local", "llama"):
+        provider = mock.Mock(provider_name=name)
+        answer, citations = _generate_answer(provider, prompt, hits, 100, query=question)
+        assert answer == REFUSAL_LINE
+        assert citations == []
+        provider.generate.assert_not_called()
+
+
 if __name__ == "__main__":
     unittest.main()
