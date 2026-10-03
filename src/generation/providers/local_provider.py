@@ -157,19 +157,33 @@ class LocalProvider:
             if len(anchors) >= _MAX_ANCHORS:
                 break
 
-        # Rank relevant sentences while retaining passage diversity. Necessary
-        # context often supplies a quantity without repeating the query nouns.
+        # Reserve the best local explanation from the highest-ranked retrieved
+        # anchor passage before global fill. One reservation prevents crowding
+        # without spending all remaining slots on lower-ranked passages' context.
         candidates: List[Tuple[float, int, int, int]] = [item[:4] for item in scored]
+        sentence_scores = {(rank, position): score for score, rank, _, position, _ in scored}
+        context_locations = set()
+        top_anchor_rank = min(rank for _, rank, _, _ in anchors)
         for score, rank, number, position in anchors:
             sentences = passage_sentences[rank]
+            neighbors = []
             for distance in range(1, _CONTEXT_RADIUS + 1):
                 for neighbor in (position - distance, position + distance):
                     if 0 <= neighbor < len(sentences):
-                        # Preserve the anchor's immediate explanation before
-                        # lower-ranked keyword matches consume the answer budget.
                         candidates.append((score - distance * 0.1, rank, number, neighbor))
+                        # Use the neighbor's own relevance, not the anchor's
+                        # inherited score; prefer nearer context on ties.
+                        neighbors.append((sentence_scores.get((rank, neighbor), 0.0),
+                                          -distance, -neighbor, neighbor))
+            if neighbors and rank == top_anchor_rank:
+                context_locations.add((rank, max(neighbors)[3]))
         anchor_locations = {(rank, position) for _, rank, _, position in anchors}
-        candidates.sort(key=lambda item: ((item[1], item[3]) in anchor_locations, item[0]), reverse=True)
+        candidates.sort(key=lambda item: (
+            2 if (item[1], item[3]) in anchor_locations else
+            1 if (item[1], item[3]) in context_locations else 0,
+            -item[1] if (item[1], item[3]) in context_locations else item[0],
+            item[0],
+        ), reverse=True)
 
         budget = (max_new_tokens or 300) * _CHARS_PER_TOKEN
         picked: List[Tuple[int, int, str]] = []

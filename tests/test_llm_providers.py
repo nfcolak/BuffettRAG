@@ -170,5 +170,36 @@ def test_relevance_normalizes_inflection_and_percent_notation():
     assert citations
 
 
+@pytest.mark.parametrize("context, required", [
+    ("These changes reduced idle handling. Storage capacity reached 47 crates.",
+     "Storage capacity reached 47 crates."),
+    ("No shipments went to local customers. The delivery schedule remained unchanged.",
+     "No shipments went to local customers."),
+])
+def test_local_reserves_ranked_context_for_top_retrieved_anchor(context, required):
+    hits = [
+        SearchHit("primary", "Orchard exports expanded storage capacity. " + context, {}, 1.0),
+        SearchHit("secondary", "Exports expanded storage capacity at the depot. "
+                  "The loading crew used reinforced containers. "
+                  "The warehouse opened before dawn.", {}, 0.9),
+        SearchHit("high_overlap", "Orchard exports improve storage capacity. "
+                  "The road network served distant farms. "
+                  "The packaging crew worked overnight. "
+                  "Freight vehicles followed the coast.", {}, 0.8),
+        SearchHit("global_match", "Exports require storage capacity elsewhere.", {}, 0.7),
+    ]
+    question = "How did orchard exports improve storage capacity?"
+    answer = LocalProvider().generate(build_cited_prompt(question, hits))
+    assert required + " [1]" in answer
+    assert "Orchard exports expanded storage capacity. [1]" in answer
+    assert "Exports expanded storage capacity at the depot. [2]" in answer
+    assert "Orchard exports improve storage capacity. [3]" in answer
+    assert "[4]" not in answer
+    assert len(answer.split("\n\n")) == 6
+    assert len(answer) <= 300 * 4
+    from src.evaluation.claim_validator import validate_and_filter_answer
+    assert validate_and_filter_answer(answer, hits).safe_answer == answer
+
+
 if __name__ == "__main__":
     unittest.main()
