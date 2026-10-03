@@ -26,7 +26,7 @@ from src.ingestion.topic_tagger import tag_topics
 from src.retrieval.context import build_doc_lookup, expand_hits_with_neighbors
 from src.retrieval.bm25 import BM25Retriever, tokenize
 from src.retrieval.retriever import detect_year_filter, reciprocal_rank_fusion
-from src.vector_store import SearchHit, StoredDoc, load_chunks_as_docs
+from src.storage import SearchHit, StoredDoc, load_chunks_as_docs
 
 
 class TestIngestion(unittest.TestCase):
@@ -76,7 +76,7 @@ class TestPgWhereClause(unittest.TestCase):
     """Unit-test the pgvector WHERE-clause builder without needing a running DB."""
 
     def setUp(self) -> None:
-        from src.vector_store import _pg_build_where_clause
+        from src.storage.pgvector_store import _pg_build_where_clause
         self._build = _pg_build_where_clause
 
     def test_empty(self) -> None:

@@ -17,7 +17,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from src.ingestion.legacy_utils import get_all_letters_sorted
 from src.ingestion.paragraph_index import build_paragraph_records
-from src.vector_store import load_chunks_as_docs
+from src.storage import load_chunks_as_docs
 
 
 def _tokens(text: str) -> set[str]:

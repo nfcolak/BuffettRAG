@@ -17,7 +17,7 @@ from typing import List, Sequence
 import numpy as np
 
 from config import EMBEDDING_DEVICE, RERANKER_MODEL
-from src.vector_store import SearchHit
+from src.storage import SearchHit
 
 
 class CrossEncoderReranker:

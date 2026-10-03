@@ -18,7 +18,7 @@ from dataclasses import dataclass, field
 from typing import Dict, List, Sequence
 
 from src.evaluation.gold_set import GoldQuery
-from src.vector_store import SearchHit
+from src.storage import SearchHit
 
 
 def _is_relevant(hit: SearchHit, gold: GoldQuery) -> bool:

@@ -9,7 +9,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from config import CHUNKS_V3_FILE
 from src.ingestion.pdf_extractor import extract_text_from_pdf, load_text_file
-from src.vector_store import load_chunks_as_docs
+from src.storage import load_chunks_as_docs
 
 
 def audit(corpus: Path = CHUNKS_V3_FILE):

@@ -11,7 +11,7 @@ from typing import Any, Dict, List, Optional, Sequence
 
 from rank_bm25 import BM25Okapi
 
-from src.vector_store import SearchHit, StoredDoc
+from src.storage import SearchHit, StoredDoc
 
 
 _TOKEN = re.compile(r"[A-Za-z0-9']+")

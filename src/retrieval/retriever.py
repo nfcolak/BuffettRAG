@@ -34,10 +34,10 @@ from typing import TYPE_CHECKING, Any, Dict, List, Optional, Sequence
 
 from config import DEFAULT_TOP_K, RERANK_CANDIDATES, RETRIEVAL_FETCH_K, RRF_K
 from src.retrieval.bm25 import BM25Retriever, _meta_matches
-from src.vector_store import SearchHit, StoredDoc
+from src.storage import SearchHit, StoredDoc
 
 if TYPE_CHECKING:
-    from src.embeddings import BGEEmbedder
+    from src.storage.embeddings import BGEEmbedder
     from src.retrieval.reranker import CrossEncoderReranker
 
 

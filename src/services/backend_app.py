@@ -62,7 +62,7 @@ from config import (
     TRUST_PROXY_HEADERS,
     VECTOR_BACKEND,
 )
-from src.embeddings import BGEEmbedder
+from src.storage.embeddings import BGEEmbedder
 from src.generation.prompt import (
     REFUSAL_LINE,
     build_cited_prompt,
@@ -75,13 +75,14 @@ from src.generation.compare import comparison_periods, generate_comparison_answe
 from src.generation.evidence_gate import assess_evidence
 from src.evaluation.claim_validator import validate_and_filter_answer
 from src.generation.providers import create_llm_provider
-from src.index_manifest import ensure_index_identity, write_index_identity
+from src.storage.index_manifest import ensure_index_identity, write_index_identity
 from src.retrieval.context import build_doc_lookup, expand_hits_with_neighbors, fit_context_to_llm
 from src.retrieval.query_expansion import build_followup_retrieval_query, expand_query, expand_query_structured
 from src.retrieval.reranker import CrossEncoderReranker
 from src.retrieval.retriever import Retriever
 from src.services.security import FixedWindowRateLimiter, client_key, is_authorized
-from src.vector_store import FaissStore, SearchHit, get_vector_store, load_chunks_as_docs
+from src.storage import SearchHit, get_vector_store, load_chunks_as_docs
+from src.storage.faiss_store import FaissStore
 
 
 # -----------------------------------------------------------------------------

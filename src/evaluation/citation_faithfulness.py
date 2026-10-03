@@ -28,7 +28,7 @@ import re
 from dataclasses import dataclass
 from typing import Callable, Dict, List, Optional, Sequence
 
-from src.vector_store import SearchHit
+from src.storage import SearchHit
 
 
 def split_sentences(text: str) -> List[str]:

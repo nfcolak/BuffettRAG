@@ -3,7 +3,7 @@ import json
 from pathlib import Path
 
 from src.evaluation.claim_validator import validate_and_filter_answer
-from src.vector_store import SearchHit
+from src.storage import SearchHit
 
 FIXTURE = Path(__file__).parent / "fixtures" / "validator_cases.json"
 

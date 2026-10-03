@@ -9,12 +9,13 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from config import EMBEDDING_MODEL_PRIMARY, RERANKER_MODEL
-from src.embeddings import BGEEmbedder
+from src.storage.embeddings import BGEEmbedder
 from src.evaluation.ablation import benchmark_configurations
-from src.index_manifest import load_and_validate_index_manifest
+from src.storage.index_manifest import load_and_validate_index_manifest
 from src.retrieval.bm25 import BM25Retriever
 from src.retrieval.reranker import CrossEncoderReranker
-from src.vector_store import FaissStore, load_chunks_as_docs
+from src.storage import load_chunks_as_docs
+from src.storage.faiss_store import FaissStore
 
 
 def _sha256(path: Path) -> str:

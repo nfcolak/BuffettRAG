@@ -6,7 +6,7 @@ import json
 from pathlib import Path
 from typing import Any, Mapping, Sequence
 
-from src.vector_store import StoredDoc
+from src.storage.types import StoredDoc
 
 MANIFEST_FILE = "index_manifest.json"
 
@@ -108,7 +108,7 @@ def load_and_validate_index_manifest(
 # ---------------------------------------------------------------------------
 # Backend-agnostic identity (faiss artifacts, or sidecar JSON for chroma/pgvector)
 # ---------------------------------------------------------------------------
-MANIFEST_SIDECAR_DIR = Path(__file__).resolve().parent.parent / "data" / "indices" / "manifests"
+MANIFEST_SIDECAR_DIR = Path(__file__).resolve().parent.parent.parent / "data" / "indices" / "manifests"
 _REBUILD = "rebuild the index for the active corpus"
 
 

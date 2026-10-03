@@ -21,7 +21,7 @@ from src.generation.prompt import build_cited_prompt
 from src.generation.providers.local_provider import LocalProvider
 from src.retrieval.bm25 import BM25Retriever
 from src.retrieval.context import build_doc_lookup, expand_hits_with_neighbors
-from src.vector_store import load_chunks_as_docs
+from src.storage import load_chunks_as_docs
 
 
 def evaluate():

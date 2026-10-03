@@ -1,7 +1,7 @@
 import unittest
 
 from src.services.security import FixedWindowRateLimiter
-from src.vector_store import _validate_pg_identifier
+from src.storage.pgvector_store import _validate_pg_identifier
 
 
 class SecurityHardeningTests(unittest.TestCase):

@@ -4,7 +4,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from src.vector_store import SearchHit, load_chunks_as_docs
+from src.storage import SearchHit, load_chunks_as_docs
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -89,7 +89,7 @@ def test_runtime_defaults_to_v3_corpus():
 
 def test_index_manifest_binds_corpus_model_and_document_ids(tmp_path):
     from scripts.build_index import build_index_manifest
-    from src.vector_store import StoredDoc
+    from src.storage import StoredDoc
 
     corpus = tmp_path / "chunks.jsonl"
     corpus.write_text('{"id":"a","text":"evidence","year":2024}\n', encoding="utf-8")
@@ -110,8 +110,8 @@ def test_index_manifest_binds_corpus_model_and_document_ids(tmp_path):
 
 
 def test_index_manifest_rejects_tampered_or_extra_artifacts(tmp_path):
-    from src.index_manifest import load_and_validate_index_manifest, write_index_manifest
-    from src.vector_store import StoredDoc
+    from src.storage.index_manifest import load_and_validate_index_manifest, write_index_manifest
+    from src.storage import StoredDoc
 
     corpus = tmp_path / "chunks.jsonl"
     corpus.write_text('{"id":"a"}\n', encoding="utf-8")
@@ -232,7 +232,7 @@ def test_pipeline_post_validation_blocks_unsupported_cited_claim():
 
 def test_backend_generation_gate_blocks_provider_before_generation():
     from src.services.backend_app import _generate_answer
-    from src.vector_store import SearchHit
+    from src.storage import SearchHit
 
     class ShouldNotRun:
         def generate(self, *_args, **_kwargs):
