@@ -33,7 +33,7 @@ from config import (
     ANSWER_CONTEXT_NEIGHBORS,
     VECTOR_BACKEND,
 )
-from src.embeddings import BGEEmbedder
+from src.storage.embeddings import BGEEmbedder
 from src.generation.prompt import (
     REFUSAL_LINE,
     build_cited_prompt,
@@ -45,16 +45,16 @@ from src.generation.evidence_gate import assess_evidence
 from src.retrieval.query_expansion import build_followup_retrieval_query
 from src.evaluation.claim_validator import validate_and_filter_answer
 from src.generation.providers import LLMProvider, create_llm_provider
-from src.index_manifest import ensure_index_identity, write_index_identity
+from src.storage.index_manifest import ensure_index_identity, write_index_identity
 from src.retrieval import CrossEncoderReranker, Retriever
 from src.retrieval.context import build_doc_lookup, expand_hits_with_neighbors, fit_context_to_llm
-from src.vector_store import (
-    FaissStore,
+from src.storage import (
     SearchHit,
     StoredDoc,
     get_vector_store,
     load_chunks_as_docs,
 )
+from src.storage.faiss_store import FaissStore
 
 
 @dataclass

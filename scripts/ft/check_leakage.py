@@ -8,7 +8,7 @@ from src.evaluation.claim_validator import validate_and_filter_answer, _split_or
 from src.generation.evidence_gate import assess_evidence
 from src.generation.prompt import REFUSAL_LINE, SYSTEM_PROMPT, build_cited_prompt, parse_citations
 from src.retrieval.context import expand_hits_with_neighbors
-from src.vector_store import SearchHit
+from src.storage import SearchHit
 
 
 def check():

@@ -10,7 +10,7 @@ from src.generation.prompt import REFUSAL_LINE, build_cited_prompt
 from src.retrieval.context import build_doc_lookup, expand_hits_with_neighbors, fit_context_to_llm
 from src.retrieval.query_expansion import build_followup_retrieval_query
 from src.retrieval.retriever import Retriever, detect_temporal_comparison
-from src.vector_store import SearchHit, StoredDoc
+from src.storage import SearchHit, StoredDoc
 
 
 def hit(name, text, year):

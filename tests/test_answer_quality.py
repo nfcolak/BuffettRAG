@@ -2,7 +2,7 @@
 from pathlib import Path
 
 from src.retrieval.bm25 import BM25Retriever
-from src.vector_store import load_chunks_as_docs
+from src.storage import load_chunks_as_docs
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -28,7 +28,7 @@ def test_context_budget_preserves_anchor_without_repeating_real_overlap():
 
 def test_context_never_crosses_letter_boundary():
     from src.retrieval.context import build_doc_lookup, expand_hits_with_neighbors
-    from src.vector_store import SearchHit, StoredDoc
+    from src.storage import SearchHit, StoredDoc
     a = StoredDoc('a', 'Original evidence', {'year': 2008, 'source_file': '2008.pdf', 'next_chunk_id': 'b'})
     b = StoredDoc('b', 'Unrelated later letter', {'year': 2009, 'source_file': '2009.pdf'})
     hit = SearchHit(a.id, a.text, a.metadata, 1.0)
@@ -38,7 +38,7 @@ def test_context_never_crosses_letter_boundary():
 
 def test_comparison_retains_both_periods_after_one_sided_reranking():
     from src.retrieval.retriever import Retriever
-    from src.vector_store import SearchHit
+    from src.storage import SearchHit
     docs = load_chunks_as_docs(ROOT / 'data/processed/chunks_v2.jsonl')
     period_docs = {y: [d for d in docs if d.metadata['year'] == y][:5] for y in (1990, 2020)}
 
@@ -68,7 +68,7 @@ def test_explicit_year_comparison_uses_requested_years_not_intervening_decades()
 
 def test_expansion_does_not_change_temporal_intent_or_reranker_question():
     from src.retrieval.retriever import Retriever
-    from src.vector_store import SearchHit
+    from src.storage import SearchHit
     docs = load_chunks_as_docs(ROOT / 'data/processed/chunks_v2.jsonl')[:10]
     calls = []
 
@@ -92,7 +92,7 @@ def test_expansion_does_not_change_temporal_intent_or_reranker_question():
 
 def test_citation_at_end_does_not_cover_next_uncited_claim():
     from src.evaluation.citation_faithfulness import evaluate_faithfulness
-    from src.vector_store import SearchHit
+    from src.storage import SearchHit
     passage = SearchHit('real', 'Operating earnings increased.', {'year': 1977}, 1.0)
     report = evaluate_faithfulness('Operating earnings increased. [1] The moon is cheese.', [passage])
     assert report.n_sentences == 2
@@ -105,7 +105,7 @@ def test_pipeline_exposes_exact_prompt_evidence_and_citation_ids():
     from src.pipeline import BuffettRAGPipeline
     from src.retrieval.retriever import RetrievalResult
     from src.retrieval.context import build_doc_lookup
-    from src.vector_store import SearchHit
+    from src.storage import SearchHit
     docs = load_chunks_as_docs(ROOT / 'data/processed/chunks_v2.jsonl')[:3]
     hit = SearchHit(docs[1].id, docs[1].text, docs[1].metadata, 1.0)
 
@@ -163,7 +163,7 @@ def test_backend_refusal_is_not_retried_until_it_hallucinates():
 
 def test_backend_returns_prompt_passages_in_citation_order(monkeypatch):
     from src.services import backend_app as backend
-    from src.vector_store import SearchHit
+    from src.storage import SearchHit
     raw = SearchHit('1977_0', 'anchor', {'year': 1977}, 1.0)
     expanded = SearchHit('1977_0', 'before anchor after', {'year': 1977}, 1.0)
     monkeypatch.setitem(backend._state, 'test_ready', True)
@@ -176,7 +176,7 @@ def test_backend_returns_prompt_passages_in_citation_order(monkeypatch):
 
 def test_dedup_retains_different_years_numbers_and_negation():
     from src.retrieval.retriever import deduplicate_hits
-    from src.vector_store import SearchHit
+    from src.storage import SearchHit
     docs = load_chunks_as_docs(ROOT / 'data/processed/chunks_v2.jsonl')
     original = docs[0].text
     a = SearchHit('a', original, {'year': 1977}, 1.0)
@@ -187,7 +187,7 @@ def test_dedup_retains_different_years_numbers_and_negation():
 
 
 def test_bm25_retains_real_matches_even_when_idf_is_negative():
-    from src.vector_store import StoredDoc
+    from src.storage import StoredDoc
     docs = [StoredDoc(str(i), 'insurance float', {}) for i in range(3)]
     assert len(BM25Retriever(docs).search('insurance')) == 3
 
@@ -204,7 +204,7 @@ def test_http_and_streaming_use_the_same_real_evidence(monkeypatch):
     from src.generation.providers.local_provider import LocalProvider
     from src.retrieval.context import build_doc_lookup
     from src.retrieval.retriever import RetrievalResult
-    from src.vector_store import SearchHit
+    from src.storage import SearchHit
     docs = load_chunks_as_docs(ROOT / 'data/processed/chunks_v2.jsonl')[:3]
     hit = SearchHit(docs[1].id, docs[1].text, docs[1].metadata, 1.0)
     class FixedRetriever:

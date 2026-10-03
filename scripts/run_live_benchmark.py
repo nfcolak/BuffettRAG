@@ -31,7 +31,7 @@ from src.generation.providers import create_llm_provider
 from src.generation.prompt import REFUSAL_LINE
 from src.retrieval.context import build_doc_lookup
 from src.retrieval.retriever import Retriever
-from src.vector_store import SearchHit, load_chunks_as_docs
+from src.storage import SearchHit, load_chunks_as_docs
 
 DEFAULT_CASES = ROOT / "data/evaluation/heldout_v1/answer_benchmark_heldout_v1.json"
 

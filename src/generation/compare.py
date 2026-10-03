@@ -13,7 +13,7 @@ from src.generation.prompt import (
 from src.retrieval.bm25 import _meta_matches
 from src.retrieval.context import expand_hits_with_neighbors, fit_context_to_llm
 from src.retrieval.retriever import detect_temporal_comparison
-from src.vector_store import SearchHit
+from src.storage import SearchHit
 
 _CITATIONS = re.compile(r"\[(\d+(?:\s*,\s*\d+)*)\]")
 

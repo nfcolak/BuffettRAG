@@ -16,7 +16,7 @@ sys.path.insert(0, str(ROOT))
 os.environ['PYTHON_DOTENV_DISABLED'] = '1'
 os.environ['HF_HUB_OFFLINE'] = '1'
 os.environ['TRANSFORMERS_OFFLINE'] = '1'
-from src.vector_store import load_chunks_as_docs
+from src.storage import load_chunks_as_docs
 from src.retrieval.bm25 import _SEARCH_STOPWORDS, _search_tokens
 
 SEED = 13

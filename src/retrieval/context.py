@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Dict, Iterable, List, Optional, Sequence
 
-from src.vector_store import SearchHit, StoredDoc
+from src.storage import SearchHit, StoredDoc
 
 
 def build_doc_lookup(docs: Iterable[StoredDoc]) -> Dict[str, StoredDoc]:

@@ -8,7 +8,7 @@ import config
 from src.generation.prompt import REFUSAL_LINE, build_cited_prompt
 from src.generation.providers import LlamaCppProvider, LocalProvider, create_llm_provider
 from src.generation.providers import factory
-from src.vector_store import SearchHit
+from src.storage import SearchHit
 
 
 def _build_prompt(question: str) -> str:

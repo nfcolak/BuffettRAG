@@ -2,7 +2,7 @@ import unittest
 
 from src.retrieval.query_expansion import expand_query, parse_expansion_keywords
 from src.retrieval.retriever import deduplicate_hits
-from src.vector_store import SearchHit
+from src.storage import SearchHit
 
 
 def _hit(hid: str, text: str, score: float = 1.0) -> SearchHit:

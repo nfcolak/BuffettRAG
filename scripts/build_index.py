@@ -24,9 +24,10 @@ from config import (
     EMBEDDING_DEVICE,
     VECTOR_BACKEND,
 )
-from src.embeddings import get_embedder
-from src.index_manifest import build_index_manifest, write_index_manifest
-from src.vector_store import FaissStore, get_vector_store, load_chunks_as_docs
+from src.storage.embeddings import get_embedder
+from src.storage.index_manifest import build_index_manifest, write_index_manifest
+from src.storage import get_vector_store, load_chunks_as_docs
+from src.storage.faiss_store import FaissStore
 
 
 def main() -> None:

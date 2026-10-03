@@ -10,7 +10,7 @@ from __future__ import annotations
 import re
 from typing import Dict, List, Optional, Sequence
 
-from src.vector_store import SearchHit
+from src.storage import SearchHit
 
 
 REFUSAL_LINE = "The retrieved passages do not provide enough evidence to answer this question."

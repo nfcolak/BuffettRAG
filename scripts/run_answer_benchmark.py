@@ -12,7 +12,7 @@ from src.evaluation.answer_benchmark import evaluate_answer, validate_benchmark_
 from src.generation.prompt import build_cited_prompt
 from src.generation.providers.local_provider import LocalProvider
 from src.retrieval.bm25 import BM25Retriever
-from src.vector_store import load_chunks_as_docs
+from src.storage import load_chunks_as_docs
 
 
 def _load_cases(path: Path):

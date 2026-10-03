@@ -8,7 +8,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from src.evaluation.hard_negatives import score_hard_negative_case
 from src.retrieval.bm25 import BM25Retriever
-from src.vector_store import load_chunks_as_docs
+from src.storage import load_chunks_as_docs
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)

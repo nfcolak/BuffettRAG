@@ -3,8 +3,8 @@ from pathlib import Path
 
 import pytest
 
-from src import index_manifest as im
-from src.vector_store import StoredDoc
+from src.storage import index_manifest as im
+from src.storage import StoredDoc
 
 
 class FakePg:
