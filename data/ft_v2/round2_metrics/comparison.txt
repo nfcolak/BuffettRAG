@@ -1,0 +1,5 @@
+system                       accepted  unexp.refusals  correct.refusals  provider.fail  claims met
+extractive local             12/24                  0         1/2                    0    17/31   
+base llama (untuned)          3/24                 19         2/2                    0     2/31   
+fine-tuned round 1            5/24                  7         2/2                    0     4/31   
+fine-tuned round 2           10/24                  4         2/2                    0    10/31   
