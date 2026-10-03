@@ -17,6 +17,7 @@ def expand_hits_with_neighbors(
     *,
     neighbors: int = 1,
     max_chars: int = 2600,
+    separate_neighbors: bool = False,
 ) -> List[SearchHit]:
     """Return hits with adjacent chunks included in text for LLM context.
 
@@ -37,6 +38,17 @@ def expand_hits_with_neighbors(
         before_docs = _walk_neighbors(doc, docs_by_id, "previous_chunk_id", neighbors)
         after_docs = _walk_neighbors(doc, docs_by_id, "next_chunk_id", neighbors)
         before_docs.reverse()
+
+        if separate_neighbors:
+            # Evidence from a neighbor must retain that neighbor's identity.
+            # Interleave its own text after the anchor, rather than attributing
+            # every adjacent claim to the anchor's citation number.
+            existing = {item.id for item in expanded}
+            for item in (doc, *before_docs, *after_docs):
+                if item.id not in existing:
+                    expanded.append(SearchHit(item.id, item.text, dict(item.metadata), hit.score))
+                    existing.add(item.id)
+            continue
 
         context_text = _compose_context(
             before=[d.text for d in before_docs],
@@ -153,6 +165,7 @@ def fit_context_to_llm(
     n_ctx: int,
     max_passages: int,
     passage_max_chars: int,
+    periods: Optional[Sequence[Dict]] = None,
 ) -> List[SearchHit]:
     """Shrink answer context for a small-window model.
 
@@ -162,14 +175,31 @@ def fit_context_to_llm(
     the [n] numbering of the returned list is the numbering the model sees.
     """
     from src.generation.prompt import build_cited_prompt
+    from src.retrieval.retriever import reserve_period_hits
 
+    periods = list(periods or [])
+    selected = reserve_period_hits(expanded, periods, max(1, max_passages))
+    protected = {hit.id for hit in reserve_period_hits(expanded, periods, 0)}
     anchor_text = {a.id: a.text for a in anchors}
     kept: List[SearchHit] = []
-    for hit in list(expanded)[: max(1, max_passages)]:
+    for hit in selected:
         text = truncate_around_anchor(hit.text, anchor_text.get(hit.id, ""), passage_max_chars)
         kept.append(SearchHit(id=hit.id, text=text, metadata=dict(hit.metadata), score=hit.score))
 
     budget_chars = max(0, n_ctx - max_new_tokens) * _CHARS_PER_TOKEN
-    while len(kept) > 1 and len(build_cited_prompt(query, kept, history)) > budget_chars:
-        kept.pop()
+    while kept and len(build_cited_prompt(query, kept, history)) > budget_chars:
+        drop = next((i for i in reversed(range(len(kept))) if kept[i].id not in protected), None)
+        if len(kept) > max(1, len(protected)) and drop is not None:
+            kept.pop(drop)
+            continue
+        # Once only reserved passages remain, trim text, never a period slot.
+        # Fail explicitly when even empty passages cannot fit the fixed prompt.
+        lengths = [len(hit.text) for hit in kept]
+        index = max(range(len(kept)), key=lambda i: lengths[i])
+        if lengths[index] <= 1:
+            raise ValueError("LLM context is too small for the grounded prompt")
+        hit = kept[index]
+        cap = max(1, lengths[index] // 2)
+        kept[index] = SearchHit(hit.id, truncate_around_anchor(hit.text, anchor_text.get(hit.id, ""), cap),
+                                hit.metadata, hit.score)
     return kept

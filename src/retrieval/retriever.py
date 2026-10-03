@@ -56,7 +56,7 @@ _DECADE_WORD_RE = re.compile(
     re.IGNORECASE,
 )
 _DECADE_WORD_TO_RANGE = {
-    "1970s": (1977, 1979), "seventies": (1977, 1979),
+    "1970s": (1970, 1979), "seventies": (1970, 1979),
     "1980s": (1980, 1989), "eighties": (1980, 1989),
     "1990s": (1990, 1999), "nineties": (1990, 1999),
     "2000s": (2000, 2009),
@@ -80,55 +80,53 @@ _TEMPORAL_COMPARISON_RE = re.compile(
 
 
 def detect_temporal_comparison(query: str) -> Optional[List[Dict[str, Any]]]:
-    """Detect whether a query compares two distinct time periods.
+    """Detect two or more explicit time periods in question order.
 
-    Returns a list of two year-filter dicts (one per period) when a temporal
-    comparison pattern is found, or None otherwise.
-
-    Examples that trigger this:
-        "How has Buffett's view on technology changed from the 1990s to the 2020s?"
-        "Compare Buffett's inflation views in the 1970s vs the 2000s"
-        "How did Berkshire evolve from 1980 to 2010?"
+    Years and decades are kept distinct; aliases of the same decade collapse.
+    The caller isolates retrieval and answer generation for every period.
     """
-    q = query.strip()
+    # Explicit periods, not comparison verbs, determine the decomposition.
+    # Keep all distinct periods in question order, including mixed years/decades;
+    # do not silently replace distant explicit years with intervening ranges.
+    period_re = re.compile(
+        r"\b(?:((?:19|20)\d0)s|((?:19|20)\d{2})|"
+        r"(seventies|eighties|nineties))\b", re.IGNORECASE
+    )
+    periods: List[Dict[str, Any]] = []
+    for match in period_re.finditer(query):
+        decade, year, word = match.groups()
+        if decade:
+            start = int(decade)
+            filt = {"year": {"$gte": start, "$lte": start + 9}}
+        elif word:
+            start, end = _DECADE_WORD_TO_RANGE[word.lower()]
+            filt = {"year": {"$gte": start, "$lte": end}}
+        else:
+            filt = {"year": int(year)}
+        if filt not in periods:
+            periods.append(filt)
+    return periods if len(periods) >= 2 else None
 
-    if not _TEMPORAL_COMPARISON_RE.search(q):
-        return None
 
-    decades_found = _DECADE_WORD_RE.findall(q)
-    if len(decades_found) >= 2:
-        seen: List[str] = []
-        for d in decades_found:
-            key = d.lower()
-            if key not in seen:
-                seen.append(key)
-            if len(seen) == 2:
-                break
-        if len(seen) < 2:
-            return None
-        a1, b1 = _DECADE_WORD_TO_RANGE[seen[0]]
-        a2, b2 = _DECADE_WORD_TO_RANGE[seen[1]]
-        if (a1, b1) == (a2, b2):
-            return None
-        return [
-            {"year": {"$gte": a1, "$lte": b1}},
-            {"year": {"$gte": a2, "$lte": b2}},
-        ]
-
-    m = re.search(r"(?:from|between)\s+(\d{4})\s+(?:to|and)\s+(\d{4})", q, re.IGNORECASE)
-    if m:
-        y1, y2 = sorted([int(m.group(1)), int(m.group(2))])
-        if y2 - y1 >= 10:
-            mid = (y1 + y2) // 2
-            return [
-                {"year": {"$gte": y1, "$lte": mid}},
-                {"year": {"$gte": mid + 1, "$lte": y2}},
-            ]
-
-    years = list(dict.fromkeys(int(y) for y in _YEAR_RE.findall(q)))
-    if len(years) == 2:
-        return [{"year": year} for year in years]
-    return None
+def reserve_period_hits(
+    hits: Sequence[SearchHit], periods: Sequence[Dict[str, Any]], top_k: int,
+) -> List[SearchHit]:
+    """Reserve each nonempty period's best hit before the global relevance cut."""
+    reserved: List[SearchHit] = []
+    seen = set()
+    for period in periods:
+        best = next((hit for hit in hits if _meta_matches(hit.metadata, period)), None)
+        if best is not None and best.id not in seen:
+            reserved.append(best)
+            seen.add(best.id)
+    limit = max(top_k, len(reserved))
+    for hit in hits:
+        if len(reserved) >= limit:
+            break
+        if hit.id not in seen:
+            reserved.append(hit)
+            seen.add(hit.id)
+    return reserved
 
 
 def detect_year_filter(query: str) -> Optional[Dict[str, Any]]:
@@ -269,17 +267,17 @@ class Retriever:
         top_k: int,
         fetch_k: int,
         rerank: bool,
+        retrieval_query: Optional[str] = None,
+        strategy: str = "hybrid",
     ) -> "RetrievalResult":
-        """Run hybrid search once per time-period filter, then merge with RRF.
-
-        Each sub-search uses the full original query so the embedding stays
-        semantically grounded; only the year filter changes per period.
-        Results from all periods are fused together so the final ranking
-        represents the whole temporal span of the question.
-        """
+        """Search each explicit period independently, then reserve its best hit."""
         sub_rankings: List[List[SearchHit]] = []
         for filt in subquery_filters:
-            hits = self._hybrid_for_filter(query, fetch_k, filt)
+            search = self._bm25_search if strategy == "bm25" else self._hybrid_for_filter
+            hits = search(query, fetch_k, filt)
+            if retrieval_query and retrieval_query != query:
+                expanded = search(retrieval_query, fetch_k, filt)
+                hits = reciprocal_rank_fusion([hits, expanded], top_k=fetch_k)
             sub_rankings.append(hits)
 
         # Keep every period's candidate pool until after reranking. Global
@@ -306,25 +304,15 @@ class Retriever:
         # remainder by relevance. Dedupe within periods, never across years.
         buckets = [deduplicate_hits([h for h in candidates if _meta_matches(h.metadata, filt)])
                    for filt in subquery_filters]
-        selected = []
-        seen_ids = set()
-        for bucket in buckets:
-            if bucket and len(selected) < top_k and bucket[0].id not in seen_ids:
-                selected.append(bucket[0])
-                seen_ids.add(bucket[0].id)
         eligible = {h.id for bucket in buckets for h in bucket}
-        for hit in candidates:
-            if len(selected) >= top_k:
-                break
-            if hit.id in eligible and hit.id not in seen_ids:
-                selected.append(hit)
-                seen_ids.add(hit.id)
-        candidates = selected
+        candidates = reserve_period_hits(
+            [h for h in candidates if h.id in eligible], subquery_filters, top_k
+        )
 
         filter_summary = {"multi_subquery": subquery_filters}
         return RetrievalResult(
             query=query,
-            strategy="hybrid_multi",
+            strategy="bm25_multi" if strategy == "bm25" else "hybrid_multi",
             hits=candidates,
             used_filter=filter_summary,
             reranked=reranked,
@@ -343,18 +331,16 @@ class Retriever:
     ) -> "RetrievalResult":
         applied_filter: Optional[Dict[str, Any]] = dict(where) if where else None
 
-        # Temporal comparison detection: "changed from 1990s to 2020s" type queries.
-        # Only applies to hybrid (the strategy that benefits from period isolation)
-        # and only when the caller hasn't pinned a specific year filter via `where`.
-        if strategy in ("hybrid", "hybrid_multi") and auto_year_filter and not where:
+        # The lexical path uses the same per-period reservation as hybrid.
+        if strategy in ("hybrid", "hybrid_multi", "bm25") and auto_year_filter and not where:
             subquery_filters = detect_temporal_comparison(query)
             if subquery_filters:
                 return self._multi_subquery_search(
-                    query, subquery_filters, top_k, fetch_k, rerank
+                    query, subquery_filters, top_k, fetch_k, rerank, retrieval_query, strategy
                 )
 
         auto_applied = False
-        if strategy in ("metadata", "hybrid", "vector") and auto_year_filter and not where:
+        if strategy in ("metadata", "hybrid", "vector", "bm25") and auto_year_filter and not where:
             auto = detect_year_filter(query)
             if auto:
                 applied_filter = {**(applied_filter or {}), **auto}
@@ -362,6 +348,11 @@ class Retriever:
 
         if strategy == "naive":
             candidates = self._vector_search(query, top_k=fetch_k)
+        elif strategy == "bm25":
+            candidates = self._bm25_search(query, top_k=fetch_k, where=applied_filter)
+            if retrieval_query and retrieval_query != query:
+                expanded = self._bm25_search(retrieval_query, top_k=fetch_k, where=applied_filter)
+                candidates = reciprocal_rank_fusion([candidates, expanded], top_k=fetch_k)
         elif strategy == "vector":
             candidates = self._vector_search(query, top_k=fetch_k, where=applied_filter)
         elif strategy == "metadata":
