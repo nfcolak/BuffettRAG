@@ -1,11 +1,13 @@
 """Evidence sufficiency gate run before any answer generation."""
 from __future__ import annotations
 
-import re
 from dataclasses import dataclass
 from typing import Sequence
 
-_STOP = {"what", "did", "does", "the", "and", "about", "with", "from", "that", "this", "buffett", "berkshire", "say", "write", "his", "her", "their", "how", "why", "are", "was", "were", "in", "on", "of", "to", "a", "an"}
+from src.generation.providers.local_provider import (
+    _MIN_QUESTION_OVERLAP, _best_question_overlap, _relevance_words, _split_sentences,
+)
+
 
 @dataclass(frozen=True)
 class EvidenceAssessment:
@@ -15,10 +17,11 @@ class EvidenceAssessment:
 
 
 def _terms(text: str) -> set[str]:
-    return {token for token in re.findall(r"[^\W_]+", text.lower(), re.UNICODE) if len(token) > 2 and token not in _STOP}
+    return _relevance_words(text)
 
 
-def assess_evidence(query: str, hits: Sequence[object], *, extra_queries: Sequence[str] = (), min_overlap: float = 0.2) -> EvidenceAssessment:
+def assess_evidence(query: str, hits: Sequence[object], *, extra_queries: Sequence[str] = (),
+                    min_overlap: float = _MIN_QUESTION_OVERLAP) -> EvidenceAssessment:
     terms = _terms(query)
     for extra in extra_queries:
         terms |= _terms(extra)
@@ -26,5 +29,9 @@ def assess_evidence(query: str, hits: Sequence[object], *, extra_queries: Sequen
         return EvidenceAssessment(False, "no_retrieved_passages", 0.0)
     if not terms:
         return EvidenceAssessment(False, "query_has_no_checkable_terms", 0.0)
-    overlap = max((len(terms & _terms(hit.text)) / len(terms) for hit in hits), default=0.0)
-    return EvidenceAssessment(overlap >= min_overlap, "sufficient" if overlap >= min_overlap else "no_lexical_evidence", overlap)
+    # Topic, action and quantity may span adjacent source sentences. Share
+    # the bounded-window relevance check with the extractive engine.
+    overlap = max((_best_question_overlap(terms, _split_sentences(hit.text))
+                   for hit in hits), default=0.0)
+    sufficient = overlap >= min_overlap
+    return EvidenceAssessment(sufficient, "sufficient" if sufficient else "no_lexical_evidence", overlap)

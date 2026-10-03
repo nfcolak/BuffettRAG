@@ -94,5 +94,112 @@ def test_llama_provider_real_grounded_answer():
     assert "[1]" in answer or REFUSAL_LINE in answer
 
 
+def test_local_splitter_joins_numeric_fragments_and_preserves_honorifics():
+    from src.generation.providers.local_provider import _split_sentences
+    text = "In 1998. 1999 the firm bought 2% of a supplier. Mr. Market is there to serve you, not to guide you."
+    sentences = _split_sentences(text)
+    assert sentences == ["In 1998. 1999 the firm bought 2% of a supplier.",
+                         "Mr. Market is there to serve you, not to guide you."]
+    assert not any(s == "In 1998." or s[:1].isdigit() for s in sentences)
+    from src.evaluation.claim_validator import validate_and_filter_answer
+    hits = [SearchHit("p", text, {}, 1.0)]
+    answer = "\n\n".join(s + " [1]" for s in sentences)
+    assert validate_and_filter_answer(answer, hits).safe_answer == answer
+
+
+def test_local_skips_salutations_headers_and_signatures():
+    from src.generation.providers.local_provider import _split_sentences
+    text = ("To the Stockholders of Example Industries Inc.:\n\n"
+            "Operating Earnings\n\nOperating earnings were $250 million this year.\n\n"
+            "Warren E. Buffett\nChairman of the Board\nPage 12\nEXAMPLE INDUSTRIES\n")
+    assert _split_sentences(text) == ["Operating earnings were $250 million this year."]
+
+
+def test_local_quantity_question_prefers_relevant_numeric_sentence():
+    hits = [SearchHit("p", "The cost of float was an important issue for our insurance operations. "
+                     "The cost of float was 8% of the funds held.", {}, 1.0)]
+    prompt = build_cited_prompt("What percent was the cost of float?", hits)
+    answer = LocalProvider().generate(prompt, max_new_tokens=18)
+    assert answer == "The cost of float was 8% of the funds held. [1]"
+
+
+def test_offtopic_incidental_keyword_refuses_before_both_engines(monkeypatch):
+    from src.services.backend_app import _generate_answer
+    hits = [SearchHit("p", "We use computer models to estimate the cost of insurance operations.", {}, 1.0)]
+    question = "How do I configure a firewall to protect a computer?"
+    prompt = build_cited_prompt(question, hits)
+    assert LocalProvider().generate(prompt) == REFUSAL_LINE
+    for name in ("local", "llama"):
+        provider = mock.Mock(provider_name=name)
+        answer, citations = _generate_answer(provider, prompt, hits, 100, query=question)
+        assert answer == REFUSAL_LINE
+        assert citations == []
+        provider.generate.assert_not_called()
+
+
+def test_relevance_uses_adjacent_evidence_not_unrelated_passages():
+    from src.generation.evidence_gate import assess_evidence
+    from src.generation.providers.local_provider import _content_words, _split_sentences
+
+    question = "Describe orchard harvest equipment acreage irrigation staffing exports storage."
+    passage = ("Orchard yields improved substantially. Harvest volumes exceeded expectations. "
+               "Equipment upgrades reduced maintenance costs.")
+    terms = set(_content_words(question))
+    assert all(len(terms & set(_content_words(s))) / len(terms) < 0.30
+               for s in _split_sentences(passage))
+    hit = SearchHit("p", passage, {}, 1.0)
+    assert assess_evidence(question, [hit]).sufficient
+    assert LocalProvider().generate(build_cited_prompt(question, [hit])) != REFUSAL_LINE
+    separate_hits = [SearchHit(str(i), s, {}, 1.0)
+                     for i, s in enumerate(_split_sentences(passage))]
+    assert not assess_evidence(question, separate_hits).sufficient
+    assert LocalProvider().generate(build_cited_prompt(question, separate_hits)) == REFUSAL_LINE
+
+
+def test_relevance_normalizes_inflection_and_percent_notation():
+    from src.generation.evidence_gate import assess_evidence
+    from src.services.backend_app import _generate_answer
+
+    question = "What percentage did the orchards own?"
+    text = "The orchard owns 35% of a distributor."
+    hits = [SearchHit("p", text, {}, 1.0)]
+    assert assess_evidence(question, hits).sufficient
+    answer, citations = _generate_answer(LocalProvider(), build_cited_prompt(question, hits),
+                                        hits, 100, query=question)
+    assert answer == text + " [1]"
+    assert citations
+
+
+@pytest.mark.parametrize("context, required", [
+    ("These changes reduced idle handling. Storage capacity reached 47 crates.",
+     "Storage capacity reached 47 crates."),
+    ("No shipments went to local customers. The delivery schedule remained unchanged.",
+     "No shipments went to local customers."),
+])
+def test_local_reserves_ranked_context_for_top_retrieved_anchor(context, required):
+    hits = [
+        SearchHit("primary", "Orchard exports expanded storage capacity. " + context, {}, 1.0),
+        SearchHit("secondary", "Exports expanded storage capacity at the depot. "
+                  "The loading crew used reinforced containers. "
+                  "The warehouse opened before dawn.", {}, 0.9),
+        SearchHit("high_overlap", "Orchard exports improve storage capacity. "
+                  "The road network served distant farms. "
+                  "The packaging crew worked overnight. "
+                  "Freight vehicles followed the coast.", {}, 0.8),
+        SearchHit("global_match", "Exports require storage capacity elsewhere.", {}, 0.7),
+    ]
+    question = "How did orchard exports improve storage capacity?"
+    answer = LocalProvider().generate(build_cited_prompt(question, hits))
+    assert required + " [1]" in answer
+    assert "Orchard exports expanded storage capacity. [1]" in answer
+    assert "Exports expanded storage capacity at the depot. [2]" in answer
+    assert "Orchard exports improve storage capacity. [3]" in answer
+    assert "[4]" not in answer
+    assert len(answer.split("\n\n")) == 6
+    assert len(answer) <= 300 * 4
+    from src.evaluation.claim_validator import validate_and_filter_answer
+    assert validate_and_filter_answer(answer, hits).safe_answer == answer
+
+
 if __name__ == "__main__":
     unittest.main()

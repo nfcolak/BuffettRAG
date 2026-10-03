@@ -1,0 +1,298 @@
+{
+  "schema_version": 1,
+  "label_policy": "A supported sentence must be stated by its cited text, not merely true elsewhere in the letters. Labels were assigned by reading the round-1 fitted cited context and dev gold passages. Passage text is a verbatim evidence excerpt unless passage_is_excerpt is false; excerpts preserve relevant qualifications and conflicting quantities. Mutations are explicitly identified, not model outputs.",
+  "sources": {
+    "round1": ".worktrees/ft-r1b/data/evaluation/heldout_v1/heldout_v1_llama_ft_r1_bm25.json, rows[].raw_answers",
+    "dev": "data/evaluation/answer_quality_program/answer_benchmark_v3.json"
+  },
+  "cases": [
+    {
+      "id": "raw_missing_quantity_context",
+      "source": "round1",
+      "sentence": "Berkshire’s operating earnings per share were up 37% from the year before, and above both our own long-term average and that of our equity interest in Blue Chip Stamps. [1]",
+      "label": "unsupported",
+      "reason": "The cited fitted passage gives earnings amounts but never states the 37% increase or the long-term comparison. Truth elsewhere is insufficient.",
+      "passage_is_excerpt": false,
+      "cited_passages": [{"id": "1977_p0000", "text": "To the Stockholders of Berkshire Hathaway Inc.:\n\nOperating earnings in 1977 of $21,904,000, or $22.54 per\nshare, were moderately better than anticipated a year ago. Of\nthese earnings, $1.43 per share resulted from substantial\nrealized capital gains by Blue Chip Stamps which, to the extent\nof our proportional interest in that company, are included in our\noperating earnings figure. Capital gains or losses realized\ndirectly by Berkshire Hathaway Inc. or its insurance subsidiaries\nare not included in our calculation of operating earnings. While\ntoo much attention should not be paid to the figure for any\nsingle year, over the longer term the record regarding aggregate\ncapital gains or losses obviously is of significance.\n\nTextile operations came in well below forecast, while the\nresults of the Illinois National Bank as well as the operating\nearnings attributable to our equity interest in Blue Chip Stamps\nwere about as anticipated. However, insurance operations, led\nagain by the truly outstanding results of Phil Liesche’s\nmanagerial group at National Indemnity Company, were even better\nthan our optimistic expectations."}]
+    },
+    {
+      "id": "raw_inflation_percent",
+      "source": "round1",
+      "sentence": "A business earning 20% on capital can produce a negative real return for its owners under inflationary conditions not much more severe than presently prevail. [1]",
+      "label": "supported",
+      "reason": "The passage states this conditional outcome verbatim; negative real return is not a negated predicate.",
+      "passage_is_excerpt": true,
+      "cited_passages": [{"id": "1979_p0011", "text": "Just as the original 3% savings bond, a 5% passbook savings\naccount or an 8% U.S. Treasury Note have, in turn, been\ntransformed by inflation into financial instruments that chew up,\nrather than enhance, purchasing power over their investment\nlives, a business earning 20% on capital can produce a negative\nreal return for its owners under inflationary conditions not much\nmore severe than presently prevail."}]
+    },
+    {
+      "id": "raw_conjunction",
+      "source": "round1",
+      "sentence": "Had it come off, this transaction would have consumed extraordinary amounts of time and energy, all for a most uncertain payoff. [1]",
+      "label": "supported",
+      "reason": "Both conjoined objects are stated in the same sentence.",
+      "passage_is_excerpt": true,
+      "cited_passages": [{"id": "1982_p0016", "text": "Had it come\noff, this transaction would have consumed extraordinary amounts\nof time and energy, all for a most uncertain payoff."}]
+    },
+    {
+      "id": "raw_added_year",
+      "source": "round1",
+      "sentence": "In 1983, during inflation, Goodwill is the gift that keeps giving. [1]",
+      "label": "unsupported",
+      "reason": "The cited text makes a general statement during inflation, not a claim limited to the added year.",
+      "passage_is_excerpt": true,
+      "cited_passages": [{"id": "1983_p0122", "text": "In contrast, a disproportionate number of the great business fortunes built up during the inflationary years arose from ownership of operations that combined intangibles of lasting value with relatively minor requirements for tangible assets. In such cases earnings have bounded upward in nominal dollars, and these dollars have been largely available for the acquisition of additional businesses. This phenomenon has been particularly evident in the communications business. That business has required little in the way of tangible investment – yet its franchises have endured. During inflation, Goodwill is the gift that keeps giving."}]
+    },
+    {
+      "id": "raw_honorific_boundary",
+      "source": "round1",
+      "sentence": "Mr. Market is there to serve you, not to guide you. [1]",
+      "label": "supported",
+      "reason": "Exact stated contrast; the honorific is not a sentence boundary.",
+      "passage_is_excerpt": true,
+      "cited_passages": [{"id": "1987_p0069", "text": "But, like Cinderella at the ball, you must heed one warning\nor everything will turn into pumpkins and mice: Mr. Market is\nthere to serve you, not to guide you. It is his pocketbook, not\nhis wisdom, that you will find useful."}]
+    },
+    {
+      "id": "raw_currency_amount",
+      "source": "round1",
+      "sentence": "Our $358 million purchase of USAir preferred stock, on which the dividend was suspended in September. [1]",
+      "label": "supported",
+      "reason": "The amount, security and dividend suspension are all stated.",
+      "passage_is_excerpt": true,
+      "cited_passages": [{"id": "1994_p0085", "text": "Top honors go to a mistake I made five years ago\nthat fully ripened in 1994: Our $358 million purchase of USAir\npreferred stock, on which the dividend was suspended in September."}]
+    },
+    {
+      "id": "raw_possessive_acronym",
+      "source": "round1",
+      "sentence": "GEICO's method of selling - direct marketing - gave it an enormous cost advantage over competitors that sold through agents. [1]",
+      "label": "supported",
+      "reason": "Direct marketing and its cost advantage are stated explicitly.",
+      "passage_is_excerpt": true,
+      "cited_passages": [{"id": "1995_p0031", "text": "As Davy made clear, GEICO's method\nof selling - direct marketing - gave it an enormous cost\nadvantage over competitors that sold through agents, a form of\ndistribution so ingrained in the business of these insurers that\nit was impossible for them to give it up."}]
+    },
+    {
+      "id": "raw_currency_percent_confusion",
+      "source": "round1",
+      "sentence": "Berkshire reported $12.8 billion in float cost in 2001. [1]",
+      "label": "unsupported",
+      "reason": "The cited float cost is 12.8%, not a dollar amount; a matching decimal is not numeric support.",
+      "passage_is_excerpt": true,
+      "cited_passages": [{"id": "2001_p0037", "text": "2001\n4,251\n19,310\n11,262\n\n35,508\nLast year I told you that, barring a mega-catastrophe, our cost of float would probably drop from its 2000\nlevel of 6%. I had in mind natural catastrophes when I said that, but instead we were hit by a man-made catastrophe\non September 11th – an event that delivered the insurance industry its largest loss in history. Our float cost therefore\ncame in at a staggering 12.8%. It was our worst year in float cost since 1984, and a result that to a significant\ndegree, as I will explain in the next section, we brought upon ourselves."}]
+    },
+    {
+      "id": "raw_decimal_and_count",
+      "source": "round1",
+      "sentence": "Berkshire owned about $21.4 billion of foreign exchange contracts at yearend, spread among 12 currencies. [1]",
+      "label": "supported",
+      "reason": "Both the dollar amount and currency count are explicitly in the same sentence.",
+      "passage_is_excerpt": true,
+      "cited_passages": [{"id": "2004_p0116", "text": "Berkshire owned about $21.4 billion of foreign exchange contracts at yearend, spread among 12\ncurrencies. As I mentioned last year, holdings of this kind are a decided change for us."}]
+    },
+    {
+      "id": "raw_wrong_purchase_object",
+      "source": "round1",
+      "sentence": "Berkshire purchased 80% of the retrieved passages in 2006. [1]",
+      "label": "unsupported",
+      "reason": "The excerpt concerns buying a business and ends mid-clause. It does not state that retrieved passages were purchased.",
+      "passage_is_excerpt": true,
+      "cited_passages": [{"id": "2006_p0024", "text": "However, having never\nbought a business based outside of the U.S. (though I had bought a number of foreign stocks), I needed to\nget educated on some tax and jurisdictional matters. With that task completed, Berkshire purchased 80% of"}]
+    },
+    {
+      "id": "raw_curly_possessive_negation",
+      "source": "round1",
+      "sentence": "NV Energy will not be MidAmerican’s last major acquisition. [1]",
+      "label": "supported",
+      "reason": "The negation and possessive are stated verbatim.",
+      "passage_is_excerpt": true,
+      "cited_passages": [{"id": "2013_p0018", "text": "NV Energy, purchased for $5.6 billion by MidAmerican Energy, our utility subsidiary, supplies electricity\nto about 88% of Nevada’s population. This acquisition fits nicely into our existing electric-utility\noperation and offers many possibilities for large investments in renewable energy. NV Energy will not be\nMidAmerican’s last major acquisition."}]
+    },
+    {
+      "id": "raw_missing_characterization",
+      "source": "round1",
+      "sentence": "Berkshire’s insurance managers are conservative and careful underwriters, who operate in a culture that has long prioritized those qualities. [1]",
+      "label": "unsupported",
+      "reason": "This citation gives hurricane-loss estimates and warns about inaccurate reserves; it does not characterize the managers as claimed.",
+      "passage_is_excerpt": true,
+      "cited_passages": [{"id": "2017_p0039", "text": "As well-known analyst V.J. Dowling has pointed out, the loss reserves of an insurer are similar to a self-graded\nexam. Ignorance, wishful thinking or, occasionally, downright fraud can deliver inaccurate figures about an insurer’s\nfinancial condition for a very long time.\nWe currently estimate Berkshire’s losses from the three hurricanes to be $3 billion (or about $2 billion after\ntax). If both that estimate and my industry estimate of $100 billion are close to accurate, our share of the industry loss\n\nwas about 3%. I believe that percentage is also what we may reasonably expect to be our share of losses in future\nAmerican mega-cats."}]
+    },
+    {
+      "id": "raw_short_stated_claim",
+      "source": "round1",
+      "sentence": "Berkshire has become a great company. [1]",
+      "label": "supported",
+      "reason": "The passage explicitly states the short claim.",
+      "passage_is_excerpt": true,
+      "cited_passages": [{"id": "2023_p0002", "text": "In the physical world, great buildings are linked to their architect while those\nwho had poured the concrete or installed the windows are soon forgotten. Berkshire\nhas become a great company. Though I have long been in charge of the construction\ncrew; Charlie should forever be credited with being the architect."}]
+    },
+    {
+      "id": "raw_incompatible_periods",
+      "source": "round1",
+      "sentence": "Berkshire paid $132 million in federal income taxes, and all corporations paid $132 billion. [1]",
+      "label": "unsupported",
+      "reason": "This paired tax comparison splices Berkshire's 1985 amount with all corporations' 2003 amount; the actual corresponding 1985 aggregate was $61 billion.",
+      "passage_is_excerpt": true,
+      "cited_passages": [{"id": "2003_p0037", "text": "In 1985, Berkshire paid $132 million in federal income taxes, and all corporations paid $61\nbillion. The comparable amounts in 1995 were $286 million and $157 billion respectively. And, as\n\nmentioned, we will pay about $3.3 billion for 2003, a year when all corporations paid $132 billion."}]
+    },
+    {
+      "id": "raw_hyphenation",
+      "source": "round1",
+      "sentence": "The value of float funds - in effect, their transfer price as they move from the insurance operation to the investment operation - should be determined simply by the risk-free, long-term rate of interest. [1]",
+      "label": "supported",
+      "reason": "The same valuation rule is stated, with a source extraction artifact in riskfree.",
+      "passage_is_excerpt": true,
+      "cited_passages": [{"id": "1993_p0045", "text": "The value of float funds - in effect,\ntheir transfer price as they move from the insurance operation to\nthe investment operation - should be determined simply by the riskfree, long-term rate of interest."}]
+    },
+    {
+      "id": "dev_attributed_derivatives",
+      "source": "dev",
+      "sentence": "Buffett called derivatives financial weapons of mass destruction. [1]",
+      "label": "supported",
+      "reason": "The author explicitly describes derivatives using those terms.",
+      "passage_is_excerpt": true,
+      "cited_passages": [{"id": "2002_p0086", "text": "In our view,\nhowever, derivatives are financial weapons of mass destruction, carrying dangers that, while now latent, are\npotentially lethal."}]
+    },
+    {
+      "id": "dev_liquidity_and_capital",
+      "source": "dev",
+      "sentence": "Berkshire was a supplier of liquidity and capital to the system, not a supplicant. [1]",
+      "label": "supported",
+      "reason": "The two supplied resources and the contrast are stated together.",
+      "passage_is_excerpt": true,
+      "cited_passages": [{"id": "2009_p0021", "text": "When the financial system went into cardiac arrest in September 2008, Berkshire was a supplier\nof liquidity and capital to the system, not a supplicant."}]
+    },
+    {
+      "id": "dev_cash_scale",
+      "source": "dev",
+      "sentence": "We poured $15.5 billion into a business world that could otherwise look only to the federal government for help. [1]",
+      "label": "supported",
+      "reason": "The exact expenditure and destination are stated.",
+      "passage_is_excerpt": true,
+      "cited_passages": [{"id": "2009_p0021", "text": "At the very peak of the crisis, we poured\n$15.5 billion into a business world that could otherwise look only to the federal government for\nhelp."}]
+    },
+    {
+      "id": "dev_shared_subject_conjunction",
+      "source": "dev",
+      "sentence": "Berkshire and BNSF announced a firm deal. [1]",
+      "label": "supported",
+      "reason": "The conjoined subjects and announcement are explicit.",
+      "passage_is_excerpt": true,
+      "cited_passages": [{"id": "2021_p0056", "text": "Eleven busy days later, Berkshire and BNSF announced\na firm deal."}]
+    },
+    {
+      "id": "dev_prediction",
+      "source": "dev",
+      "sentence": "Buffett predicted BNSF would be a key asset for Berkshire and our country a century from now. [1]",
+      "label": "supported",
+      "reason": "The author introduces the statement as a prediction and states the asset's future importance.",
+      "passage_is_excerpt": true,
+      "cited_passages": [{"id": "2021_p0056", "text": "And here I’ll venture a rare prediction: BNSF will be a key asset for Berkshire and our country a century\nfrom now."}]
+    },
+    {
+      "id": "dev_curly_straight_possessive",
+      "source": "dev",
+      "sentence": "Berkshire's share of Apple's earnings amounted to $5.6 billion. [1]",
+      "label": "supported",
+      "reason": "The source's our share and curly possessive refer to the same company and earnings.",
+      "passage_is_excerpt": true,
+      "cited_passages": [{"id": "2021_p0030", "text": "Yet our “share” of Apple’s earnings amounted\nto a staggering $5.6 billion."}]
+    },
+    {
+      "id": "dev_repurchases",
+      "source": "dev",
+      "sentence": "At Apple and Amex, repurchases increased Berkshire’s ownership a bit without any cost to us. [1]",
+      "label": "supported",
+      "reason": "The sentence is stated verbatim and includes the no-cost qualification.",
+      "passage_is_excerpt": true,
+      "cited_passages": [{"id": "2022_p0028", "text": "At Apple and Amex, repurchases\nincreased Berkshire’s ownership a bit without any cost to us."}]
+    },
+    {
+      "id": "dev_minimal_fees",
+      "source": "dev",
+      "sentence": "Most individual investors will find that the best way to own common stocks is through an index fund that charges minimal fees. [1]",
+      "label": "supported",
+      "reason": "The source explicitly includes individual investors in its recommendation.",
+      "passage_is_excerpt": true,
+      "cited_passages": [{"id": "1996_p0092", "text": "Most\ninvestors, both institutional and individual, will find that the best way\nto own common stocks is through an index fund that charges minimal fees."}]
+    },
+    {
+      "id": "dev_dividend_desire",
+      "source": "dev",
+      "sentence": "A number of Berkshire shareholders would like Berkshire to pay a cash dividend. [1]",
+      "label": "supported",
+      "reason": "The source states this desire; removing the parenthetical does not change it.",
+      "passage_is_excerpt": true,
+      "cited_passages": [{"id": "2012_p0109", "text": "A number of Berkshire shareholders – including some of my good friends – would like Berkshire to pay a\ncash dividend."}]
+    },
+    {
+      "id": "dev_percent_possessive",
+      "source": "dev",
+      "sentence": "See’s Candies had an 8% increase in pounds sold. [1]",
+      "label": "supported",
+      "reason": "The change, unit and business are explicit; straight and curly possessives are equivalent.",
+      "passage_is_excerpt": true,
+      "cited_passages": [{"id": "1989_p0033", "text": "o At See's Candies we had an 8% increase in pounds sold, even\nthough 1988 was itself a record year."}]
+    },
+    {
+      "id": "dev_vice_chairman",
+      "source": "dev",
+      "sentence": "Greg Abel, one of Berkshire’s Vice Chairmen, joined Buffett on stage. [1]",
+      "label": "supported",
+      "reason": "The named vice chairman joined the author on stage.",
+      "passage_is_excerpt": true,
+      "cited_passages": [{"id": "2020_p0081", "text": "Greg Abel, one of Berkshire’s Vice Chairmen, joined me on stage facing\na dark arena, 18,000 empty seats and a camera."}]
+    },
+    {
+      "id": "dev_wrong_percentage",
+      "source": "dev_mutation",
+      "sentence": "See's Candies had an 18% increase in pounds sold. [1]",
+      "label": "unsupported",
+      "reason": "The source states 8%, not 18%.",
+      "passage_is_excerpt": true,
+      "cited_passages": [{"id": "1989_p0033", "text": "o At See's Candies we had an 8% increase in pounds sold, even\nthough 1988 was itself a record year."}]
+    },
+    {
+      "id": "dev_wrong_money",
+      "source": "dev_mutation",
+      "sentence": "Berkshire's share of Apple's earnings amounted to $6.5 billion. [1]",
+      "label": "unsupported",
+      "reason": "The source states $5.6 billion, not $6.5 billion.",
+      "passage_is_excerpt": true,
+      "cited_passages": [{"id": "2021_p0030", "text": "Yet our “share” of Apple’s earnings amounted\nto a staggering $5.6 billion."}]
+    },
+    {
+      "id": "dev_currency_is_not_percent",
+      "source": "dev_mutation",
+      "sentence": "Berkshire's share of Apple's earnings amounted to 5.6%. [1]",
+      "label": "unsupported",
+      "reason": "Money is not a percentage, even with the same decimal digits.",
+      "passage_is_excerpt": true,
+      "cited_passages": [{"id": "2021_p0030", "text": "Yet our “share” of Apple’s earnings amounted\nto a staggering $5.6 billion."}]
+    },
+    {
+      "id": "dev_reversed_prediction",
+      "source": "dev_mutation",
+      "sentence": "BNSF will not be a key asset for Berkshire. [1]",
+      "label": "unsupported",
+      "reason": "The source predicts the opposite polarity.",
+      "passage_is_excerpt": true,
+      "cited_passages": [{"id": "2021_p0056", "text": "And here I’ll venture a rare prediction: BNSF will be a key asset for Berkshire and our country a century\nfrom now."}]
+    },
+    {
+      "id": "dev_wrong_object",
+      "source": "dev_mutation",
+      "sentence": "Apple's repurchases increased BNSF's ownership. [1]",
+      "label": "unsupported",
+      "reason": "BNSF is not the beneficiary named in this passage.",
+      "passage_is_excerpt": true,
+      "cited_passages": [{"id": "2022_p0028", "text": "At Apple and Amex, repurchases\nincreased Berkshire’s ownership a bit without any cost to us."}]
+    },
+    {
+      "id": "dev_currency_count_confusion",
+      "source": "dev_mutation",
+      "sentence": "Berkshire's share of Apple's earnings amounted to 5.6 billion shares. [1]",
+      "label": "unsupported",
+      "reason": "The source specifies dollar earnings, not a count of shares.",
+      "passage_is_excerpt": true,
+      "cited_passages": [{"id": "2021_p0030", "text": "Yet our “share” of Apple’s earnings amounted\nto a staggering $5.6 billion."}]
+    }
+  ]
+}
