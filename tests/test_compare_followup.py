@@ -123,13 +123,13 @@ def test_http_stream_and_pipeline_share_comparison_answers(monkeypatch):
     from src.generation.providers.local_provider import LocalProvider
     from src.pipeline import BuffettRAGPipeline
     from src.retrieval.retriever import RetrievalResult
-    from src.services import backend_app as backend
+    from src.services import backend_app as backend, ask_flow
     passages = [hit("early", EARLY, 2041), hit("late", LATE, 2053)]
     class Fixed:
         def search(self, *args, **kwargs):
             return RetrievalResult(QUERY, "hybrid", passages)
     llm = LocalProvider()
-    monkeypatch.setattr(backend, "_state", {"retriever": Fixed(), "llm": llm, "docs_by_id": {}})
+    monkeypatch.setattr(ask_flow, "_state", {"retriever": Fixed(), "llm": llm, "docs_by_id": {}})
     monkeypatch.setattr(backend, "API_KEYS", ())
     payload = {"query": QUERY, "expand_query": False}
     client = TestClient(backend.app)
@@ -145,7 +145,7 @@ def test_http_stream_and_pipeline_share_comparison_answers(monkeypatch):
 def test_backend_and_pipeline_followup_preserve_original_prompt(monkeypatch):
     from src.pipeline import BuffettRAGPipeline
     from src.retrieval.retriever import RetrievalResult
-    from src.services import backend_app as backend
+    from src.services import backend_app as backend, ask_flow
     history = [{"role": "user", "content": "Discuss insurance float costs in 2009."}]
     query = "What about that?"
     calls, prompts = [], []
@@ -158,7 +158,7 @@ def test_backend_and_pipeline_followup_preserve_original_prompt(monkeypatch):
             prompts.append(prompt)
             return EARLY + " [1]"
     llm = Capture()
-    monkeypatch.setattr(backend, "_state", {"retriever": Fixed(), "llm": llm, "docs_by_id": {}})
+    monkeypatch.setattr(ask_flow, "_state", {"retriever": Fixed(), "llm": llm, "docs_by_id": {}})
     backend.ask(backend.AskRequest(query=query, history=history, expand_query=False))
     BuffettRAGPipeline(Fixed(), {}, llm).ask(query, history=history)
     assert calls[0] == calls[1] == build_followup_retrieval_query(query, history)

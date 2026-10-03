@@ -147,7 +147,7 @@ def test_answer_evaluation_persists_evidence_and_scoring_method(monkeypatch):
 
 
 def test_backend_refusal_is_not_retried_until_it_hallucinates():
-    from src.services.backend_app import _finalize_answer
+    from src.services.ask_flow import _finalize_answer
     from src.generation.prompt import REFUSAL_LINE
     # Catch swallowed retry exceptions too.
     calls = []
@@ -162,13 +162,13 @@ def test_backend_refusal_is_not_retried_until_it_hallucinates():
 
 
 def test_backend_returns_prompt_passages_in_citation_order(monkeypatch):
-    from src.services import backend_app as backend
+    from src.services import backend_app as backend, ask_flow
     from src.vector_store import SearchHit
     raw = SearchHit('1977_0', 'anchor', {'year': 1977}, 1.0)
     expanded = SearchHit('1977_0', 'before anchor after', {'year': 1977}, 1.0)
-    monkeypatch.setitem(backend._state, 'test_ready', True)
-    monkeypatch.setattr(backend, '_prepare_ask', lambda req: (None, [raw], None, False, [expanded], 'prompt', None))
-    monkeypatch.setattr(backend, '_generate_answer', lambda *args: ('Evidence. [1]', []))
+    monkeypatch.setitem(ask_flow._state, 'test_ready', True)
+    monkeypatch.setattr(ask_flow, '_prepare_ask', lambda req: (None, [raw], None, False, [expanded], 'prompt', None))
+    monkeypatch.setattr(ask_flow, '_generate_answer', lambda *args: ('Evidence. [1]', []))
     result = backend.ask(backend.AskRequest(query='Earnings?'))
     assert result.hits[0].text == expanded.text
     assert result.retrieved_hits[0].text == raw.text
@@ -200,7 +200,7 @@ def test_decade_aliases_are_one_period():
 def test_http_and_streaming_use_the_same_real_evidence(monkeypatch):
     import json
     from fastapi.testclient import TestClient
-    from src.services import backend_app as backend
+    from src.services import backend_app as backend, ask_flow
     from src.generation.providers.local_provider import LocalProvider
     from src.retrieval.context import build_doc_lookup
     from src.retrieval.retriever import RetrievalResult
@@ -210,7 +210,7 @@ def test_http_and_streaming_use_the_same_real_evidence(monkeypatch):
     class FixedRetriever:
         def search(self, **kwargs):
             return RetrievalResult(kwargs['query'], 'hybrid', [hit])
-    monkeypatch.setattr(backend, '_state', {'retriever': FixedRetriever(),
+    monkeypatch.setattr(ask_flow, '_state', {'retriever': FixedRetriever(),
                         'docs_by_id': build_doc_lookup(docs), 'llm': LocalProvider()})
     monkeypatch.setattr(backend, 'API_KEYS', ())
     # No lifespan context: startup would load models/DB. HTTP serialization,

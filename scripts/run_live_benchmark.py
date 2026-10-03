@@ -124,7 +124,7 @@ def run(
         raise FixtureValidationError("Fixture corpus SHA256 does not match the active corpus")
     selected_cases = cases[:max_cases] if max_cases is not None else cases
 
-    from src.services import backend_app as backend
+    from src.services import backend_app as backend, ask_flow
 
     llm = None
     initialization_failure = None
@@ -151,9 +151,9 @@ def run(
             retriever = pipeline.retriever
     setup_latency_ms = (time.perf_counter() - setup_start) * 1000
 
-    old_state, old_debug = backend._state, backend.EXPOSE_DEBUG_STATUS
-    backend._state = {"retriever": retriever, "docs": docs, "docs_by_id": build_doc_lookup(docs), "llm": llm}
-    backend.EXPOSE_DEBUG_STATUS = False
+    old_state, old_debug = ask_flow._state, ask_flow.EXPOSE_DEBUG_STATUS
+    ask_flow._state = {"retriever": retriever, "docs": docs, "docs_by_id": build_doc_lookup(docs), "llm": llm}
+    ask_flow.EXPOSE_DEBUG_STATUS = False
     rows = []
     try:
         for case in selected_cases:
@@ -202,7 +202,7 @@ def run(
             row["latency_ms"] = round((time.perf_counter() - start) * 1000, 3)
             rows.append(row)
     finally:
-        backend._state, backend.EXPOSE_DEBUG_STATUS = old_state, old_debug
+        ask_flow._state, ask_flow.EXPOSE_DEBUG_STATUS = old_state, old_debug
 
     scored = [row for row in rows if row["status"] == "scored"]
     accepted = sum(row["score"]["accepted"] for row in scored)

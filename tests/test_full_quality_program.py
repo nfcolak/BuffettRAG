@@ -79,7 +79,7 @@ def test_v3_bm25_ranks_every_curated_passage_ahead_of_its_decoy():
 def test_runtime_defaults_to_v3_corpus():
     from config import CHUNKS_V3_FILE, FAISS_DIR
     from src.pipeline import PipelineConfig
-    from src.services.backend_app import _resolve_chunks_path
+    from src.services.ask_flow import _resolve_chunks_path
 
     assert CHUNKS_V3_FILE.name == "chunks_v3_paragraph.jsonl"
     assert FAISS_DIR.name == "faiss_v3"
@@ -231,7 +231,7 @@ def test_pipeline_post_validation_blocks_unsupported_cited_claim():
 
 
 def test_backend_generation_gate_blocks_provider_before_generation():
-    from src.services.backend_app import _generate_answer
+    from src.services.ask_flow import _generate_answer
     from src.vector_store import SearchHit
 
     class ShouldNotRun:
@@ -247,7 +247,7 @@ def test_backend_generation_gate_blocks_provider_before_generation():
 def test_streaming_gate_does_not_open_provider_when_evidence_is_insufficient(monkeypatch):
     import json
     from fastapi.testclient import TestClient
-    from src.services import backend_app as backend
+    from src.services import backend_app as backend, ask_flow
     from src.retrieval.retriever import RetrievalResult
 
     calls = []
@@ -259,7 +259,7 @@ def test_streaming_gate_does_not_open_provider_when_evidence_is_insufficient(mon
             calls.append(True)
             return "Moon cheese. [1]"
 
-    monkeypatch.setattr(backend, "_state", {"retriever": FixedRetriever(), "docs_by_id": {}, "llm": CaptureLLM()})
+    monkeypatch.setattr(ask_flow, "_state", {"retriever": FixedRetriever(), "docs_by_id": {}, "llm": CaptureLLM()})
     monkeypatch.setattr(backend, "API_KEYS", ())
     response = TestClient(backend.app).post("/ask/stream", json={"query": "moon cheese", "expand_query": False})
     assert response.status_code == 200
@@ -271,7 +271,7 @@ def test_streaming_gate_does_not_open_provider_when_evidence_is_insufficient(mon
 def test_streaming_never_emits_raw_unvalidated_llm_deltas(monkeypatch):
     import json
     from fastapi.testclient import TestClient
-    from src.services import backend_app as backend
+    from src.services import backend_app as backend, ask_flow
     from src.retrieval.retriever import RetrievalResult
 
     class FixedRetriever:
@@ -281,7 +281,7 @@ def test_streaming_never_emits_raw_unvalidated_llm_deltas(monkeypatch):
         def generate_stream(self, *_args, **_kwargs):
             yield "Berkshire bought preferred shares and guaranteed moon cheese. [1]"
 
-    monkeypatch.setattr(backend, "_state", {"retriever": FixedRetriever(), "docs_by_id": {}, "llm": RawStreamingLLM()})
+    monkeypatch.setattr(ask_flow, "_state", {"retriever": FixedRetriever(), "docs_by_id": {}, "llm": RawStreamingLLM()})
     monkeypatch.setattr(backend, "API_KEYS", ())
     response = TestClient(backend.app).post("/ask/stream", json={"query": "preferred shares", "expand_query": False})
     assert "moon cheese" not in response.text
@@ -304,7 +304,7 @@ def test_v3_offline_answer_benchmark_accepts_all_curated_cases():
 
 def test_backend_prefers_structured_expansion_without_replacing_original_query(monkeypatch):
     from types import SimpleNamespace
-    from src.services import backend_app as backend
+    from src.services import ask_flow as backend
     from src.retrieval.retriever import RetrievalResult
 
     seen = []
@@ -344,7 +344,7 @@ def test_demo_security_rejects_private_backend_and_enforces_request_budget(monke
 
 def test_backend_request_validation_rejects_unsafe_payloads(monkeypatch):
     from pydantic import ValidationError
-    from src.services import backend_app as backend
+    from src.services import schemas as backend
 
     for query in (" ", "\n\t"):
         try:
@@ -368,11 +368,11 @@ def test_backend_request_validation_rejects_unsafe_payloads(monkeypatch):
 
 def test_public_backend_requires_auth_and_reports_readiness(monkeypatch):
     from fastapi.testclient import TestClient
-    from src.services import backend_app as backend
+    from src.services import backend_app as backend, ask_flow
 
     monkeypatch.setattr(backend, "PUBLIC_DEMO_MODE", True)
     monkeypatch.setattr(backend, "API_KEYS", ())
-    monkeypatch.setattr(backend, "_state", {})
+    monkeypatch.setattr(ask_flow, "_state", {})
     client = TestClient(backend.app)
 
     assert client.get("/health").status_code == 200
@@ -561,9 +561,9 @@ def test_frozen_heldout_fixture_has_verified_disjoint_evidence():
 
 def test_live_runner_smoke_uses_backend_ask_and_restores_state(monkeypatch):
     from scripts.run_live_benchmark import run
-    from src.services import backend_app as backend
+    from src.services import backend_app as backend, ask_flow
 
-    old_state = backend._state
+    old_state = ask_flow._state
     calls = []
     real_ask = backend.ask
     def capture(req):
@@ -572,7 +572,7 @@ def test_live_runner_smoke_uses_backend_ask_and_restores_state(monkeypatch):
     monkeypatch.setattr(backend, "ask", capture)
     result = run(provider="local", retrieval="bm25", max_cases=1)
     assert len(calls) == 1 and not hasattr(calls[0], "llm_provider")
-    assert backend._state is old_state
+    assert ask_flow._state is old_state
     assert result["summary"]["cases_run"] == 1
     assert result["summary"]["scored_answers"] == 1
     assert result["summary"]["provider_failures"] == 0

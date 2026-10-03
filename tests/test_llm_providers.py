@@ -124,7 +124,7 @@ def test_local_quantity_question_prefers_relevant_numeric_sentence():
 
 
 def test_offtopic_incidental_keyword_refuses_before_both_engines(monkeypatch):
-    from src.services.backend_app import _generate_answer
+    from src.services.ask_flow import _generate_answer
     hits = [SearchHit("p", "We use computer models to estimate the cost of insurance operations.", {}, 1.0)]
     question = "How do I configure a firewall to protect a computer?"
     prompt = build_cited_prompt(question, hits)
@@ -158,7 +158,7 @@ def test_relevance_uses_adjacent_evidence_not_unrelated_passages():
 
 def test_relevance_normalizes_inflection_and_percent_notation():
     from src.generation.evidence_gate import assess_evidence
-    from src.services.backend_app import _generate_answer
+    from src.services.ask_flow import _generate_answer
 
     question = "What percentage did the orchards own?"
     text = "The orchard owns 35% of a distributor."

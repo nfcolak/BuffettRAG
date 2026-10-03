@@ -24,14 +24,13 @@ from __future__ import annotations
 import sys
 from contextlib import asynccontextmanager
 from pathlib import Path
-from typing import Any, Dict, List, Literal, Optional
+from typing import Any, Dict, List, Optional
 
 import json
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.responses import JSONResponse, StreamingResponse
-from pydantic import BaseModel, Field, field_validator, model_validator
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 if str(PROJECT_ROOT) not in sys.path:
@@ -39,143 +38,29 @@ if str(PROJECT_ROOT) not in sys.path:
 
 from config import (
     API_KEYS,
-    ANSWER_CONTEXT_MAX_CHARS,
-    ANSWER_CONTEXT_NEIGHBORS,
-    CHUNKS_FILE,
-    CHUNKS_V2_FILE,
-    CHUNKS_V3_FILE,
     CORS_ORIGINS,
-    DEFAULT_TOP_K,
     EMBEDDING_DEVICE,
     EMBEDDING_MODEL_PRIMARY,
-    EXPANSION_MODE,
     EXPOSE_DEBUG_STATUS,
-    FAISS_DIR,
-    LLM_CONTEXT_PASSAGES,
-    LLM_N_CTX,
-    LLM_PASSAGE_MAX_CHARS,
     MAX_REQUEST_BODY_BYTES,
     PUBLIC_DEMO_MODE,
     RATE_LIMIT_REQUESTS,
     RATE_LIMIT_WINDOW_SECONDS,
-    RETRIEVAL_FETCH_K,
     TRUST_PROXY_HEADERS,
     VECTOR_BACKEND,
 )
 from src.embeddings import BGEEmbedder
-from src.generation.prompt import (
-    REFUSAL_LINE,
-    build_cited_prompt,
-    format_answer_markdown,
-    format_history_block,
-    parse_citations,
-    strip_chat_artifacts,
-)
-from src.generation.compare import comparison_periods, generate_comparison_answer, prepare_answer_context
+from src.generation.prompt import REFUSAL_LINE
+from src.generation.compare import comparison_periods
 from src.generation.evidence_gate import assess_evidence
-from src.evaluation.claim_validator import validate_and_filter_answer
-from src.generation.providers import create_llm_provider
 from src.index_manifest import ensure_index_identity, write_index_identity
-from src.retrieval.context import build_doc_lookup, expand_hits_with_neighbors, fit_context_to_llm
-from src.retrieval.query_expansion import build_followup_retrieval_query, expand_query, expand_query_structured
+from src.retrieval.context import build_doc_lookup
 from src.retrieval.reranker import CrossEncoderReranker
 from src.retrieval.retriever import Retriever
+from src.services import ask_flow
+from src.services.schemas import AskRequest, AskResponse, SearchRequest, SearchResponse
 from src.services.security import FixedWindowRateLimiter, client_key, is_authorized
-from src.vector_store import FaissStore, SearchHit, get_vector_store, load_chunks_as_docs
-
-
-# -----------------------------------------------------------------------------
-# Pydantic schemas
-# -----------------------------------------------------------------------------
-
-class SearchRequest(BaseModel):
-    query: str = Field(min_length=1, max_length=2000)
-    strategy: Literal["hybrid", "vector", "metadata", "naive"] = "hybrid"
-    top_k: int = Field(default=DEFAULT_TOP_K, ge=1, le=20)
-    fetch_k: int = Field(default=RETRIEVAL_FETCH_K, ge=1, le=100)
-    rerank: bool = True
-    where: Optional[Dict[str, Any]] = None
-    auto_year_filter: bool = True
-
-    @field_validator("query")
-    @classmethod
-    def validate_query(cls, value: str) -> str:
-        value = value.strip()
-        if not value:
-            raise ValueError("query must contain non-whitespace characters")
-        return value
-
-    @field_validator("where")
-    @classmethod
-    def validate_where(cls, value: Optional[Dict[str, Any]]) -> Optional[Dict[str, Any]]:
-        if value is None:
-            return None
-        allowed_fields = {"year", "decade", "source_file", "chunk_index", "topics"}
-        allowed_ops = {"$eq", "$gte", "$lte", "$gt", "$lt", "$in"}
-        if len(value) > len(allowed_fields) or set(value) - allowed_fields:
-            raise ValueError("unsupported metadata filter field")
-        for field, condition in value.items():
-            if isinstance(condition, dict):
-                if not condition or set(condition) - allowed_ops:
-                    raise ValueError("unsupported metadata filter operator")
-                for operator, target in condition.items():
-                    if operator == "$in":
-                        if not isinstance(target, list) or not target or len(target) > 50:
-                            raise ValueError("metadata $in requires 1 to 50 scalar values")
-                        targets = target
-                    else:
-                        targets = [target]
-                    if any(isinstance(item, (dict, list)) or item is None for item in targets):
-                        raise ValueError("metadata filters require scalar values")
-            elif isinstance(condition, (dict, list)) or condition is None:
-                raise ValueError("metadata filters require scalar values")
-            if field in {"year", "decade", "chunk_index"}:
-                raw_values = condition.values() if isinstance(condition, dict) else [condition]
-                for raw in raw_values:
-                    values = raw if isinstance(raw, list) else [raw]
-                    if any(not isinstance(item, int) or isinstance(item, bool) for item in values):
-                        raise ValueError(f"{field} filters require integers")
-        return value
-
-
-class HistoryTurn(BaseModel):
-    role: Literal["user", "assistant"]
-    content: str = Field(min_length=1, max_length=2000)
-
-
-class AskRequest(SearchRequest):
-    max_new_tokens: int = Field(default=900, ge=1, le=2000)
-    expand_query: bool = True
-    history: List[HistoryTurn] = Field(default_factory=list, max_length=12)
-
-    @model_validator(mode="after")
-    def validate_ask(self):
-        if sum(len(turn.content) for turn in self.history) > 8000:
-            raise ValueError("conversation history is too large")
-        return self
-
-
-class HitOut(BaseModel):
-    id: str
-    score: float
-    year: Optional[int] = None
-    source_file: Optional[str] = None
-    topics: str = ""
-    text: str
-
-
-class SearchResponse(BaseModel):
-    query: str
-    strategy: str
-    reranked: bool
-    used_filter: Optional[Dict[str, Any]] = None
-    hits: List[HitOut]
-
-
-class AskResponse(SearchResponse):
-    retrieved_hits: List[HitOut] = Field(default_factory=list)
-    answer: Optional[str] = None
-    citations: List[Dict[str, Any]] = Field(default_factory=list)
+from src.vector_store import get_vector_store, load_chunks_as_docs
 
 
 # -----------------------------------------------------------------------------
@@ -197,7 +82,6 @@ app.add_middleware(
     allow_headers=["Content-Type", "Authorization", "X-API-Key"],
 )
 
-_state: Dict[str, Any] = {}
 _rate_limiter = FixedWindowRateLimiter(
     max_requests=RATE_LIMIT_REQUESTS,
     window_seconds=RATE_LIMIT_WINDOW_SECONDS,
@@ -256,13 +140,6 @@ async def security_middleware(request: Request, call_next):
     return await call_next(request)
 
 
-def _resolve_chunks_path() -> Path:
-    for candidate in (CHUNKS_V3_FILE, CHUNKS_V2_FILE, CHUNKS_FILE):
-        if candidate.exists():
-            return candidate
-    return CHUNKS_V3_FILE
-
-
 async def startup() -> None:
     validate_deployment_security(
         public_demo=PUBLIC_DEMO_MODE,
@@ -271,7 +148,7 @@ async def startup() -> None:
         debug=EXPOSE_DEBUG_STATUS,
         trust_proxy_headers=TRUST_PROXY_HEADERS,
     )
-    chunks_path = _resolve_chunks_path()
+    chunks_path = ask_flow._resolve_chunks_path()
     if not chunks_path.exists():
         raise RuntimeError(
             "No chunks file found. Run `python -m src.ingestion.pipeline_v2` first."
@@ -295,56 +172,11 @@ async def startup() -> None:
     reranker = CrossEncoderReranker()
     retriever = Retriever(vector_store=vs, embedder=embedder, docs=docs, reranker=reranker)
 
-    _state["vector_store"] = vs
-    _state["retriever"] = retriever
-    _state["docs"] = docs
-    _state["docs_by_id"] = build_doc_lookup(docs)
-    _state["chunks_path"] = str(chunks_path)
-
-
-# -----------------------------------------------------------------------------
-# Helpers
-# -----------------------------------------------------------------------------
-
-def _hits_to_out(hits: List[SearchHit]) -> List[HitOut]:
-    return [
-        HitOut(
-            id=h.id,
-            score=h.score,
-            year=h.metadata.get("year"),
-            source_file=h.metadata.get("source_file"),
-            topics=h.metadata.get("topics", ""),
-            text=h.text,
-        )
-        for h in hits
-    ]
-
-
-def _llm_error_message(exc: Exception) -> str:
-    return "[LLM unavailable: the embedded model failed to generate an answer]"
-
-
-def _do_search(req: SearchRequest, retrieval_query: Optional[str] = None):
-    retriever: Retriever = _state["retriever"]
-    history = [turn.model_dump() for turn in req.history] if isinstance(req, AskRequest) else []
-    resolved = build_followup_retrieval_query(req.query, history)
-    result = retriever.search(
-        query=resolved,
-        strategy=req.strategy,
-        top_k=req.top_k,
-        fetch_k=req.fetch_k,
-        rerank=req.rerank,
-        where=req.where,
-        auto_year_filter=req.auto_year_filter,
-        retrieval_query=retrieval_query,
-    )
-    return result.hits, result.used_filter, result.reranked
-
-
-def _server_llm():
-    if "llm" not in _state:
-        _state["llm"] = create_llm_provider()
-    return _state["llm"]
+    ask_flow._state["vector_store"] = vs
+    ask_flow._state["retriever"] = retriever
+    ask_flow._state["docs"] = docs
+    ask_flow._state["docs_by_id"] = build_doc_lookup(docs)
+    ask_flow._state["chunks_path"] = str(chunks_path)
 
 
 # -----------------------------------------------------------------------------
@@ -358,9 +190,9 @@ def health() -> Dict[str, str]:
 
 @app.get("/ready")
 def readiness():
-    vs = _state.get("vector_store")
-    docs = _state.get("docs")
-    retriever = _state.get("retriever")
+    vs = ask_flow._state.get("vector_store")
+    docs = ask_flow._state.get("docs")
+    retriever = ask_flow._state.get("retriever")
     indexed_count = len(vs) if vs is not None else 0
     document_count = len(docs) if docs is not None else 0
     ready = retriever is not None and indexed_count > 0 and indexed_count == document_count
@@ -370,30 +202,30 @@ def readiness():
         "document_count": document_count,
     }
     if EXPOSE_DEBUG_STATUS:
-        payload["chunks_path"] = _state.get("chunks_path")
+        payload["chunks_path"] = ask_flow._state.get("chunks_path")
     return JSONResponse(payload, status_code=200 if ready else 503)
 
 
 @app.get("/stats")
 def stats() -> Dict[str, Any]:
-    vs = _state.get("vector_store")
-    docs = _state.get("docs", [])
+    vs = ask_flow._state.get("vector_store")
+    docs = ask_flow._state.get("docs", [])
     years = sorted({d.metadata.get("year") for d in docs if d.metadata.get("year")})
     return {
         "total_chunks": len(docs),
         "indexed_count": len(vs) if vs else 0,
         "year_range": [years[0], years[-1]] if years else [],
         "embedding_model": EMBEDDING_MODEL_PRIMARY if EXPOSE_DEBUG_STATUS else "configured",
-        "chunks_path": _state.get("chunks_path") if EXPOSE_DEBUG_STATUS else None,
+        "chunks_path": ask_flow._state.get("chunks_path") if EXPOSE_DEBUG_STATUS else None,
     }
 
 
 @app.post("/search", response_model=SearchResponse)
 def search(req: SearchRequest) -> SearchResponse:
-    if not _state:
+    if not ask_flow._state:
         raise HTTPException(status_code=503, detail="Service not ready")
     try:
-        hits, used_filter, reranked = _do_search(req)
+        hits, used_filter, reranked = ask_flow._do_search(req)
     except ValueError as exc:
         raise HTTPException(status_code=400, detail="Invalid retrieval configuration") from exc
     return SearchResponse(
@@ -401,25 +233,25 @@ def search(req: SearchRequest) -> SearchResponse:
         strategy=req.strategy,
         reranked=reranked,
         used_filter=used_filter,
-        hits=_hits_to_out(hits),
+        hits=ask_flow._hits_to_out(hits),
     )
 
 
 @app.post("/ask", response_model=AskResponse)
 def ask(req: AskRequest) -> AskResponse:
-    if not _state:
+    if not ask_flow._state:
         raise HTTPException(status_code=503, detail="Service not ready")
 
     try:
-        llm, hits, used_filter, reranked, context_hits, prompt, expanded = _prepare_ask(req)
+        llm, hits, used_filter, reranked, context_hits, prompt, expanded = ask_flow._prepare_ask(req)
     except ValueError as exc:
         raise HTTPException(status_code=400, detail="Invalid retrieval configuration") from exc
 
     answer: Optional[str] = None
     citations: List[Dict[str, Any]] = []
     if hits or comparison_periods(req.query):
-        answer, citations = _generate_answer(
-            llm, prompt, context_hits, req.max_new_tokens, req.query, _extra_queries(req, expanded),
+        answer, citations = ask_flow._generate_answer(
+            llm, prompt, context_hits, req.max_new_tokens, req.query, ask_flow._extra_queries(req, expanded),
             [turn.model_dump() for turn in req.history],
         )
 
@@ -428,107 +260,11 @@ def ask(req: AskRequest) -> AskResponse:
         strategy=req.strategy,
         reranked=reranked,
         used_filter=used_filter,
-        hits=_hits_to_out(context_hits),
-        retrieved_hits=_hits_to_out(hits),
+        hits=ask_flow._hits_to_out(context_hits),
+        retrieved_hits=ask_flow._hits_to_out(hits),
         answer=answer,
         citations=citations,
     )
-
-
-def _extra_queries(req: AskRequest, expanded: Optional[str]) -> List[str]:
-    """History user turns and the expanded query count toward the evidence terms."""
-    extras = [turn.content for turn in req.history if turn.role == "user"]
-    if expanded:
-        extras.append(expanded)
-    return extras
-
-
-def _prepare_ask_steps(req: AskRequest):
-    """Generator: yields stage names, returns the prepared tuple (via StopIteration.value)."""
-    llm = _server_llm()
-    history_dicts = [turn.model_dump() for turn in req.history]
-    history_text = format_history_block(history_dicts)
-
-    def _expand() -> Optional[str]:
-        structured = expand_query_structured(req.query, llm, history_text=history_text)
-        result = structured.retrieval_query if structured else expand_query(
-            req.query, llm, history_text=history_text
-        )
-        if result and EXPOSE_DEBUG_STATUS:
-            print(f"[backend] expanded query: {result!r}", flush=True)
-        return result
-
-    mode = EXPANSION_MODE if req.expand_query else "off"
-    expanded = None
-    if mode == "always":
-        yield "expanding"
-        expanded = _expand()
-    yield "retrieving"
-    hits, used_filter, reranked = _do_search(req, retrieval_query=expanded)
-    if mode == "auto" and assess_evidence(req.query, hits).best_overlap < 0.5:
-        yield "expanding"
-        expanded = _expand()
-        if expanded:
-            yield "retrieving"
-            hits, used_filter, reranked = _do_search(req, retrieval_query=expanded)
-
-    context_hits: List[Any] = []
-    prompt = ""
-    if hits:
-        context_hits = prepare_answer_context(
-            llm, hits, _state.get("docs_by_id", {}), req.query, history=history_dicts,
-            followup=build_followup_retrieval_query(req.query, history_dicts) != req.query,
-            neighbors=ANSWER_CONTEXT_NEIGHBORS, max_chars=ANSWER_CONTEXT_MAX_CHARS,
-            max_new_tokens=req.max_new_tokens, n_ctx=LLM_N_CTX,
-            max_passages=LLM_CONTEXT_PASSAGES, passage_max_chars=LLM_PASSAGE_MAX_CHARS,
-        )
-        prompt = build_cited_prompt(query=req.query, hits=context_hits, history=history_dicts)
-
-    return llm, hits, used_filter, reranked, context_hits, prompt, expanded
-
-
-def _prepare_ask(req: AskRequest):
-    """Shared /ask preparation: expansion, retrieval, context and prompt."""
-    steps = _prepare_ask_steps(req)
-    while True:
-        try:
-            next(steps)
-        except StopIteration as stop:
-            return stop.value
-
-
-def _finalize_answer(llm, prompt: str, context_hits, raw_answer: str, max_new_tokens: int):
-    """Format and resolve citation references; this is not entailment validation.
-
-    A refusal is not a provider error. Repeating the same prompt until the
-    model answers selects against justified abstention without new evidence.
-    """
-    answer = format_answer_markdown(strip_chat_artifacts(raw_answer))
-    if answer == REFUSAL_LINE:
-        return answer, []
-    validation = validate_and_filter_answer(answer, context_hits)
-    answer = validation.safe_answer or REFUSAL_LINE
-    return answer, parse_citations(answer, context_hits)
-
-
-def _generate_answer(llm, prompt: str, context_hits, max_new_tokens: int, query: Optional[str] = None,
-                     extra_queries=(), history=None):
-    is_comparison = bool(query and comparison_periods(query))
-    if query and not is_comparison and not assess_evidence(query, context_hits, extra_queries=extra_queries).sufficient:
-        return REFUSAL_LINE, []
-    try:
-        if is_comparison and query is not None:
-            comparison = generate_comparison_answer(
-                llm, query, context_hits, history=history, max_new_tokens=max_new_tokens,
-                extra_queries=extra_queries,
-            )
-            return comparison.answer, comparison.citations
-        raw_answer = llm.generate(prompt, max_new_tokens=max_new_tokens)
-    except Exception as exc:
-        if EXPOSE_DEBUG_STATUS:
-            print(f"[backend] LLM provider unavailable: {exc}", flush=True)
-        return _llm_error_message(exc), []
-    return _finalize_answer(llm, prompt, context_hits, raw_answer, max_new_tokens)
 
 
 def _sse(event: str, data: Dict[str, Any]) -> str:
@@ -538,11 +274,11 @@ def _sse(event: str, data: Dict[str, Any]) -> str:
 @app.post("/ask/stream")
 def ask_stream(req: AskRequest) -> StreamingResponse:
     """Streaming variant of /ask: SSE with status, meta and done events."""
-    if not _state:
+    if not ask_flow._state:
         raise HTTPException(status_code=503, detail="Service not ready")
 
     def event_source():
-        steps = _prepare_ask_steps(req)
+        steps = ask_flow._prepare_ask_steps(req)
         try:
             while True:
                 try:
@@ -554,7 +290,7 @@ def ask_stream(req: AskRequest) -> StreamingResponse:
             yield _sse("error", {"detail": "Invalid retrieval configuration"})
             return
         llm, hits, used_filter, reranked, context_hits, prompt, expanded = prepared
-        extras = _extra_queries(req, expanded)
+        extras = ask_flow._extra_queries(req, expanded)
         yield _sse(
             "meta",
             {
@@ -562,13 +298,13 @@ def ask_stream(req: AskRequest) -> StreamingResponse:
                 "strategy": req.strategy,
                 "reranked": reranked,
                 "used_filter": used_filter,
-                "hits": [h.model_dump() for h in _hits_to_out(context_hits)],
-                "retrieved_hits": [h.model_dump() for h in _hits_to_out(hits)],
+                "hits": [h.model_dump() for h in ask_flow._hits_to_out(context_hits)],
+                "retrieved_hits": [h.model_dump() for h in ask_flow._hits_to_out(hits)],
             },
         )
         if comparison_periods(req.query):
             yield _sse("status", {"stage": "generating"})
-            answer, citations = _generate_answer(
+            answer, citations = ask_flow._generate_answer(
                 llm, prompt, context_hits, req.max_new_tokens, req.query, extras,
                 [turn.model_dump() for turn in req.history],
             )
@@ -595,12 +331,12 @@ def ask_stream(req: AskRequest) -> StreamingResponse:
             if EXPOSE_DEBUG_STATUS:
                 print(f"[backend] stream failed, falling back: {exc}", flush=True)
             # The non-streaming path carries the full retry/fallback logic.
-            answer, citations = _generate_answer(llm, prompt, context_hits, req.max_new_tokens, req.query, extras)
+            answer, citations = ask_flow._generate_answer(llm, prompt, context_hits, req.max_new_tokens, req.query, extras)
             yield _sse("done", {"answer": answer, "citations": citations})
             return
 
         yield _sse("status", {"stage": "validating"})
-        answer, citations = _finalize_answer(llm, prompt, context_hits, raw_answer, req.max_new_tokens)
+        answer, citations = ask_flow._finalize_answer(llm, prompt, context_hits, raw_answer, req.max_new_tokens)
         yield _sse("done", {"answer": answer, "citations": citations})
 
     return StreamingResponse(
