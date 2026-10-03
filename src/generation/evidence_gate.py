@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from typing import Sequence
 
 from src.generation.providers.local_provider import (
-    _MIN_QUESTION_OVERLAP, _content_words, _split_sentences,
+    _MIN_QUESTION_OVERLAP, _best_question_overlap, _relevance_words, _split_sentences,
 )
 
 
@@ -17,7 +17,7 @@ class EvidenceAssessment:
 
 
 def _terms(text: str) -> set[str]:
-    return set(_content_words(text))
+    return _relevance_words(text)
 
 
 def assess_evidence(query: str, hits: Sequence[object], *, extra_queries: Sequence[str] = (),
@@ -29,9 +29,9 @@ def assess_evidence(query: str, hits: Sequence[object], *, extra_queries: Sequen
         return EvidenceAssessment(False, "no_retrieved_passages", 0.0)
     if not terms:
         return EvidenceAssessment(False, "query_has_no_checkable_terms", 0.0)
-    # Incidental words scattered across a long passage are not an answer.
-    # Apply the same sentence-level relevance floor to local and llama paths.
-    overlap = max((len(terms & _terms(sentence)) / len(terms)
-                   for hit in hits for sentence in _split_sentences(hit.text)), default=0.0)
+    # Topic, action and quantity may span adjacent source sentences. Share
+    # the bounded-window relevance check with the extractive engine.
+    overlap = max((_best_question_overlap(terms, _split_sentences(hit.text))
+                   for hit in hits), default=0.0)
     sufficient = overlap >= min_overlap
     return EvidenceAssessment(sufficient, "sufficient" if sufficient else "no_lexical_evidence", overlap)

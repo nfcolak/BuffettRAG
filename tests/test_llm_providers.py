@@ -137,5 +137,38 @@ def test_offtopic_incidental_keyword_refuses_before_both_engines(monkeypatch):
         provider.generate.assert_not_called()
 
 
+def test_relevance_uses_adjacent_evidence_not_unrelated_passages():
+    from src.generation.evidence_gate import assess_evidence
+    from src.generation.providers.local_provider import _content_words, _split_sentences
+
+    question = "Describe orchard harvest equipment acreage irrigation staffing exports storage."
+    passage = ("Orchard yields improved substantially. Harvest volumes exceeded expectations. "
+               "Equipment upgrades reduced maintenance costs.")
+    terms = set(_content_words(question))
+    assert all(len(terms & set(_content_words(s))) / len(terms) < 0.30
+               for s in _split_sentences(passage))
+    hit = SearchHit("p", passage, {}, 1.0)
+    assert assess_evidence(question, [hit]).sufficient
+    assert LocalProvider().generate(build_cited_prompt(question, [hit])) != REFUSAL_LINE
+    separate_hits = [SearchHit(str(i), s, {}, 1.0)
+                     for i, s in enumerate(_split_sentences(passage))]
+    assert not assess_evidence(question, separate_hits).sufficient
+    assert LocalProvider().generate(build_cited_prompt(question, separate_hits)) == REFUSAL_LINE
+
+
+def test_relevance_normalizes_inflection_and_percent_notation():
+    from src.generation.evidence_gate import assess_evidence
+    from src.services.backend_app import _generate_answer
+
+    question = "What percentage did the orchards own?"
+    text = "The orchard owns 35% of a distributor."
+    hits = [SearchHit("p", text, {}, 1.0)]
+    assert assess_evidence(question, hits).sufficient
+    answer, citations = _generate_answer(LocalProvider(), build_cited_prompt(question, hits),
+                                        hits, 100, query=question)
+    assert answer == text + " [1]"
+    assert citations
+
+
 if __name__ == "__main__":
     unittest.main()

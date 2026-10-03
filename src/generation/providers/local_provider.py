@@ -12,6 +12,8 @@ from __future__ import annotations
 import re
 from typing import List, Optional, Tuple
 
+from nltk.stem import PorterStemmer
+
 from src.generation.prompt import REFUSAL_LINE
 from src.evaluation.claim_validator import evidence_sentences
 
@@ -30,21 +32,47 @@ _STOPWORDS = frozenset(
     could did do does for from had has have how i if in into is it its just like more most not
     of on or over said say says she so some such than that the their them then there these they
     this to was we were what when which who why will with would you your berkshire letter
-    letters shareholder""".split()
+    letters shareholder should must may might him his her hers our us me much many
+    compare comparison toward""".split()
 )
 
 _MAX_ANCHORS = 3
 _MAX_SENTENCES = 6
 _CONTEXT_RADIUS = 2
 _CHARS_PER_TOKEN = 4
-# Dev answerable minimum: 0.40; incidental off-topic probes: at most 0.25.
 _MIN_QUESTION_OVERLAP = 0.30
+_RELEVANCE_WINDOW = 3
+_STEMMER = PorterStemmer()
 
 
 def _content_words(text: str) -> List[str]:
     text = text.lower().replace("’", "'")
     text = re.sub(r"\b([a-z]+)'s\b", r"\1", text)
-    return [w for w in _WORD_RE.findall(text) if w not in _STOPWORDS and len(w) > 2]
+    # Numeric percent notation and the question's unit are the same term;
+    # amounts themselves are still checked by the typed claim validator.
+    text = text.replace("%", " percent ")
+    return ["percent" if w == "percentage" else w
+            for w in _WORD_RE.findall(text) if w not in _STOPWORDS and len(w) > 2]
+
+
+def _relevance_words(text: str) -> set[str]:
+    # Morphological recall belongs in the sufficiency check. Applying it to
+    # extractive ranking changes tied anchors and can lose their explanations.
+    return {_STEMMER.stem(word) for word in _content_words(text)}
+
+
+def _best_question_overlap(terms: set[str], sentences: List[str]) -> float:
+    """Measure one bounded context window, never union unrelated passages.
+
+    An answer's topic, action and quantity may occupy adjacent sentences. A
+    single-sentence denominator wrongly rejects multi-part questions, while
+    whole-corpus overlap licenses incidental terms from unrelated evidence.
+    """
+    if not terms:
+        return 0.0
+    sentence_terms = [_relevance_words(sentence) for sentence in sentences]
+    return max((len(terms & set().union(*sentence_terms[start:start + _RELEVANCE_WINDOW])) / len(terms)
+                for start in range(len(sentence_terms))), default=0.0)
 
 
 def _is_header(line: str) -> bool:
@@ -85,6 +113,7 @@ class LocalProvider:
 
         question = question_match.group(1)
         query_words = set(_content_words(question))
+        relevance_words = _relevance_words(question)
         asks_quantity = bool(_QUANTITY_QUESTION_RE.search(question))
         question_numbers = set(_NUMBER_RE.findall(question))
         if not query_words:
@@ -99,9 +128,9 @@ class LocalProvider:
         for rank, (number, text) in enumerate(passages):
             sentences = _split_sentences(text)
             passage_sentences.append(sentences)
+            best_overlap = max(best_overlap, _best_question_overlap(relevance_words, sentences))
             for position, sentence in enumerate(sentences):
                 overlap = len(query_words & set(_content_words(sentence)))
-                best_overlap = max(best_overlap, overlap / len(query_words))
                 if overlap == 0:
                     continue
                 quantities = set(_NUMBER_RE.findall(sentence))
@@ -136,7 +165,9 @@ class LocalProvider:
             for distance in range(1, _CONTEXT_RADIUS + 1):
                 for neighbor in (position - distance, position + distance):
                     if 0 <= neighbor < len(sentences):
-                        candidates.append((score * 0.6 - distance * 0.1, rank, number, neighbor))
+                        # Preserve the anchor's immediate explanation before
+                        # lower-ranked keyword matches consume the answer budget.
+                        candidates.append((score - distance * 0.1, rank, number, neighbor))
         anchor_locations = {(rank, position) for _, rank, _, position in anchors}
         candidates.sort(key=lambda item: ((item[1], item[3]) in anchor_locations, item[0]), reverse=True)
 
