@@ -27,6 +27,13 @@ env/
 !.env.example
 .streamlit/secrets.toml
 
+# Local model weights and fine-tuning runtime state
+models/
+data/ft/gen.log
+data/ft/gen.pid
+data/ft/generation.lock
+data/ft/*.tmp
+
 # Generated/local indexes and local backup archives
 indices/
 *.faiss

@@ -1,0 +1,77 @@
+{
+  "accepted_before_refusal_cap": 646,
+  "corpus_sha256": "8263f08958729a77febf0922e7bbc4161bedd5fdb3e9a8b3fc9a64ab681ab5f0",
+  "counts_per_split": {
+    "train": 560,
+    "valid": 70
+  },
+  "counts_per_split_type": {
+    "train": {
+      "answerable": 420,
+      "distractor": 30,
+      "unanswerable": 110
+    },
+    "valid": {
+      "answerable": 53,
+      "distractor": 4,
+      "unanswerable": 13
+    }
+  },
+  "excluded_passage_count": 101,
+  "frozen_set_hashes": {
+    "agent/fix-eval:data/evaluation/heldout_v1/answer_benchmark_heldout_v1.json": "deea734a5b50816283aa671f9c461ce4a16d707cb41e4487c2bdd7935a5ce718",
+    "data/evaluation/answer_quality_program/answer_benchmark_v3.json": "2832d202750db493cff5e7a38f9353d8e734f5e9d85f0347e5f436f82c94de8a"
+  },
+  "generation_attempts": 1922,
+  "keep_rate": 0.3007284079084287,
+  "kept_generation_attempts": 578,
+  "kinds_kept": {
+    "distractor": 32,
+    "followup": 14,
+    "multipart": 52,
+    "single": 405,
+    "temporal": 2,
+    "unanswerable": 93,
+    "v1": 32
+  },
+  "question_count": 2145,
+  "question_jobs_completed": 1452,
+  "refusal_share": {
+    "train": 0.25,
+    "valid": 0.24285714285714285
+  },
+  "rejection_reasons": {
+    "answerable_refusal": 2,
+    "banned_filler": 30,
+    "blocked_claims": 1097,
+    "remaining_evidence_sufficient": 1557,
+    "source_not_cited": 15,
+    "too_few_sentences": 199,
+    "too_many_sentences": 1
+  },
+  "sampled_passages": 766,
+  "seed": 13,
+  "sentence_stats": {
+    "avg_citations": 2.6892177589852007,
+    "avg_sentences": 2.6723044397463003,
+    "kept_answerable_v2": 473
+  },
+  "settings": {
+    "LLM_CONTEXT_PASSAGES": 5,
+    "LLM_PASSAGE_MAX_CHARS": 1800,
+    "max_tokens": 450,
+    "split_strategy": "seeded source-year grouping; retrieval and neighbor expansion remain inside each split",
+    "temperature": 0.2
+  },
+  "style": "v2",
+  "target_met": false,
+  "teacher_id": "/Users/necatifurkancolak/AI-Workplace/Projects/done/BuffettRAG/models/teacher-qwen2.5-7b-mlx4",
+  "teacher_license": "Apache-2.0",
+  "validation_years": [
+    1988,
+    1993,
+    1995,
+    2018,
+    2020
+  ]
+}

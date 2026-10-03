@@ -1,0 +1,59 @@
+{
+  "accepted_before_refusal_cap": 301,
+  "corpus_sha256": "8263f08958729a77febf0922e7bbc4161bedd5fdb3e9a8b3fc9a64ab681ab5f0",
+  "counts_per_split": {
+    "train": 193,
+    "valid": 13
+  },
+  "counts_per_split_type": {
+    "train": {
+      "answerable": 164,
+      "distractor": 2,
+      "unanswerable": 27
+    },
+    "valid": {
+      "answerable": 11,
+      "unanswerable": 2
+    }
+  },
+  "excluded_passage_count": 101,
+  "frozen_set_hashes": {
+    "agent/fix-eval:data/evaluation/heldout_v1/answer_benchmark_heldout_v1.json": "deea734a5b50816283aa671f9c461ce4a16d707cb41e4487c2bdd7935a5ce718",
+    "data/evaluation/answer_quality_program/answer_benchmark_v3.json": "2832d202750db493cff5e7a38f9353d8e734f5e9d85f0347e5f436f82c94de8a"
+  },
+  "generation_attempts": 226,
+  "keep_rate": 0.6902654867256637,
+  "kept_generation_attempts": 156,
+  "question_count": 213,
+  "question_jobs_completed": 124,
+  "refusal_share": {
+    "train": 0.15025906735751296,
+    "valid": 0.15384615384615385
+  },
+  "rejection_reasons": {
+    "answerable_refusal": 9,
+    "blocked_claims": 52,
+    "remaining_evidence_sufficient": 169,
+    "source_not_cited": 4,
+    "unanswerable_teacher_answered_with_lexical_overlap": 5
+  },
+  "sampled_passages": 100,
+  "seed": 13,
+  "settings": {
+    "LLM_CONTEXT_PASSAGES": 5,
+    "LLM_PASSAGE_MAX_CHARS": 1800,
+    "max_tokens": 350,
+    "split_strategy": "seeded source-year grouping; retrieval and neighbor expansion remain inside each split",
+    "temperature": 0.2
+  },
+  "target_met": false,
+  "teacher_id": "/Users/necatifurkancolak/AI-Workplace/Projects/done/BuffettRAG/models/teacher-qwen2.5-7b-mlx4",
+  "teacher_license": "Apache-2.0",
+  "validation_years": [
+    1988,
+    1993,
+    1995,
+    2018,
+    2020
+  ]
+}

@@ -1,0 +1,5522 @@
+{
+  "identity": {
+    "corpus_sha256": "8263f08958729a77febf0922e7bbc4161bedd5fdb3e9a8b3fc9a64ab681ab5f0",
+    "excluded_passage_count": 101,
+    "frozen_set_hashes": {
+      "agent/fix-eval:data/evaluation/heldout_v1/answer_benchmark_heldout_v1.json": "deea734a5b50816283aa671f9c461ce4a16d707cb41e4487c2bdd7935a5ce718",
+      "data/evaluation/answer_quality_program/answer_benchmark_v3.json": "2832d202750db493cff5e7a38f9353d8e734f5e9d85f0347e5f436f82c94de8a"
+    },
+    "seed": 13,
+    "teacher_id": "/Users/necatifurkancolak/AI-Workplace/Projects/done/BuffettRAG/models/teacher-qwen2.5-7b-mlx4",
+    "teacher_license": "Apache-2.0",
+    "validation_years": [
+      1988,
+      1993,
+      1995,
+      2018,
+      2020
+    ]
+  },
+  "jobs": [
+    {
+      "id": "passage:1989_p0134",
+      "source_id": "1989_p0134",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1992_p0078",
+      "source_id": "1992_p0078",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2013_p0135",
+      "source_id": "2013_p0135",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1990_p0028",
+      "source_id": "1990_p0028",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:000",
+      "template": "What was Alphabet's exact cash flow from operations for fiscal year 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2007_p0133",
+      "source_id": "2007_p0133",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2015_p0011",
+      "source_id": "2015_p0011",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2003_p0023",
+      "source_id": "2003_p0023",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2004_p0150",
+      "source_id": "2004_p0150",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:001",
+      "template": "What was the exact closing price in US dollars of Cardano on the last trading day of October 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2002_p0119",
+      "source_id": "2002_p0119",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1985_p0107",
+      "source_id": "1985_p0107",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1979_p0069",
+      "source_id": "1979_p0069",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1977_p0024",
+      "source_id": "1977_p0024",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:002",
+      "template": "What was the exact closing price in US dollars of Polkadot on the last trading day of August 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2018_p0061",
+      "source_id": "2018_p0061",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2001_p0046",
+      "source_id": "2001_p0046",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1980_p0032",
+      "source_id": "1980_p0032",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1997_p0002",
+      "source_id": "1997_p0002",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:003",
+      "template": "What was Salesforce's exact dividend per share for fiscal year 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2011_p0096",
+      "source_id": "2011_p0096",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1993_p0058",
+      "source_id": "1993_p0058",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1996_p0034",
+      "source_id": "1996_p0034",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2016_p0111",
+      "source_id": "2016_p0111",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:004",
+      "template": "What was the exact closing price in US dollars of Chainlink on the last trading day of August 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2014_p0072",
+      "source_id": "2014_p0072",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1994_p0096",
+      "source_id": "1994_p0096",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2023_p0060",
+      "source_id": "2023_p0060",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1987_p0106",
+      "source_id": "1987_p0106",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:005",
+      "template": "What was Amazon's exact reported operating profit for fiscal year 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:1998_p0008",
+      "source_id": "1998_p0008",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2024_p0035",
+      "source_id": "2024_p0035",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2008_p0101",
+      "source_id": "2008_p0101",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1988_p0116",
+      "source_id": "1988_p0116",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:006",
+      "template": "What did Reed Hastings privately say during a secret 2025 meeting about product launch timing?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2022_p0026",
+      "source_id": "2022_p0026",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2006_p0122",
+      "source_id": "2006_p0122",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1983_p0127",
+      "source_id": "1983_p0127",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1995_p0011",
+      "source_id": "1995_p0011",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:007",
+      "template": "What was Alphabet's exact audited revenue for fiscal year 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2005_p0040",
+      "source_id": "2005_p0040",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2021_p0024",
+      "source_id": "2021_p0024",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2009_p0052",
+      "source_id": "2009_p0052",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2010_p0046",
+      "source_id": "2010_p0046",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:008",
+      "template": "What did Jamie Dimon privately say during a private 2026 discussion of cybersecurity spending?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2012_p0028",
+      "source_id": "2012_p0028",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2019_p0016",
+      "source_id": "2019_p0016",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1986_p0130",
+      "source_id": "1986_p0130",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1984_p0038",
+      "source_id": "1984_p0038",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:009",
+      "template": "What was the exact closing price in US dollars of Solana on the last trading day of February 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2020_p0045",
+      "source_id": "2020_p0045",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1981_p0040",
+      "source_id": "1981_p0040",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2017_p0085",
+      "source_id": "2017_p0085",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1978_p0030",
+      "source_id": "1978_p0030",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:010",
+      "template": "What was the exact closing price in US dollars of Bitcoin on the last trading day of October 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:1991_p0048",
+      "source_id": "1991_p0048",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1982_p0088",
+      "source_id": "1982_p0088",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2000_p0120",
+      "source_id": "2000_p0120",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1999_p0004",
+      "source_id": "1999_p0004",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:011",
+      "template": "What was the exact closing price in US dollars of Avalanche on the last trading day of February 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:1989_p0063",
+      "source_id": "1989_p0063",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1992_p0014",
+      "source_id": "1992_p0014",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2013_p0022",
+      "source_id": "2013_p0022",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1990_p0057",
+      "source_id": "1990_p0057",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:012",
+      "template": "What was the exact closing price in US dollars of Solana on the last trading day of March 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2007_p0026",
+      "source_id": "2007_p0026",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2015_p0144",
+      "source_id": "2015_p0144",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2003_p0057",
+      "source_id": "2003_p0057",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2004_p0109",
+      "source_id": "2004_p0109",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:013",
+      "template": "What was Nvidia's exact year-end workforce headcount for fiscal year 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2002_p0091",
+      "source_id": "2002_p0091",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1985_p0075",
+      "source_id": "1985_p0075",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1979_p0007",
+      "source_id": "1979_p0007",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1977_p0017",
+      "source_id": "1977_p0017",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:014",
+      "template": "What was Apple's exact reported operating profit for fiscal year 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2018_p0026",
+      "source_id": "2018_p0026",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2001_p0057",
+      "source_id": "2001_p0057",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1980_p0017",
+      "source_id": "1980_p0017",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1997_p0035",
+      "source_id": "1997_p0035",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:015",
+      "template": "What was the exact closing price in US dollars of Solana on the last trading day of May 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2011_p0135",
+      "source_id": "2011_p0135",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1993_p0016",
+      "source_id": "1993_p0016",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1996_p0053",
+      "source_id": "1996_p0053",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2016_p0031",
+      "source_id": "2016_p0031",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:016",
+      "template": "What was the exact closing price in US dollars of Solana on the last trading day of July 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2014_p0055",
+      "source_id": "2014_p0055",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1994_p0097",
+      "source_id": "1994_p0097",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2023_p0053",
+      "source_id": "2023_p0053",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1987_p0089",
+      "source_id": "1987_p0089",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:017",
+      "template": "What was the exact closing price in US dollars of Ethereum on the last trading day of July 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:1998_p0042",
+      "source_id": "1998_p0042",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2024_p0029",
+      "source_id": "2024_p0029",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2008_p0021",
+      "source_id": "2008_p0021",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1988_p0021",
+      "source_id": "1988_p0021",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:018",
+      "template": "What was the exact closing price in US dollars of Dogecoin on the last trading day of September 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2022_p0024",
+      "source_id": "2022_p0024",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2006_p0149",
+      "source_id": "2006_p0149",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1983_p0078",
+      "source_id": "1983_p0078",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1995_p0018",
+      "source_id": "1995_p0018",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:019",
+      "template": "What was the exact closing price in US dollars of Polkadot on the last trading day of May 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2005_p0127",
+      "source_id": "2005_p0127",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2021_p0048",
+      "source_id": "2021_p0048",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2009_p0019",
+      "source_id": "2009_p0019",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2010_p0145",
+      "source_id": "2010_p0145",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:020",
+      "template": "What was the exact closing price in US dollars of Avalanche on the last trading day of April 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2012_p0120",
+      "source_id": "2012_p0120",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2019_p0046",
+      "source_id": "2019_p0046",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1986_p0092",
+      "source_id": "1986_p0092",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1984_p0140",
+      "source_id": "1984_p0140",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:021",
+      "template": "What was the exact closing price in US dollars of Litecoin on the last trading day of September 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2020_p0071",
+      "source_id": "2020_p0071",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1981_p0065",
+      "source_id": "1981_p0065",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2017_p0042",
+      "source_id": "2017_p0042",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1978_p0001",
+      "source_id": "1978_p0001",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:022",
+      "template": "What did Mary Barra privately say during a private 2025 conversation about succession planning?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:1991_p0094",
+      "source_id": "1991_p0094",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1982_p0085",
+      "source_id": "1982_p0085",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2000_p0118",
+      "source_id": "2000_p0118",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1999_p0084",
+      "source_id": "1999_p0084",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:023",
+      "template": "What was Nvidia's exact reported operating profit for fiscal year 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:1989_p0122",
+      "source_id": "1989_p0122",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1992_p0085",
+      "source_id": "1992_p0085",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2013_p0024",
+      "source_id": "2013_p0024",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1990_p0118",
+      "source_id": "1990_p0118",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:024",
+      "template": "What did Jensen Huang privately say during a secret 2025 meeting about product launch timing?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2007_p0037",
+      "source_id": "2007_p0037",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2015_p0155",
+      "source_id": "2015_p0155",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2003_p0068",
+      "source_id": "2003_p0068",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2004_p0133",
+      "source_id": "2004_p0133",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:025",
+      "template": "What was the exact closing price in US dollars of Litecoin on the last trading day of March 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2002_p0007",
+      "source_id": "2002_p0007",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1985_p0089",
+      "source_id": "1985_p0089",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1979_p0058",
+      "source_id": "1979_p0058",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1977_p0003",
+      "source_id": "1977_p0003",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:026",
+      "template": "What was Apple's exact year-end workforce headcount for fiscal year 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2018_p0021",
+      "source_id": "2018_p0021",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2001_p0117",
+      "source_id": "2001_p0117",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1980_p0003",
+      "source_id": "1980_p0003",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1997_p0063",
+      "source_id": "1997_p0063",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:027",
+      "template": "What was the exact closing price in US dollars of Cardano on the last trading day of July 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2011_p0079",
+      "source_id": "2011_p0079",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1993_p0084",
+      "source_id": "1993_p0084",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1996_p0049",
+      "source_id": "1996_p0049",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2016_p0120",
+      "source_id": "2016_p0120",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:028",
+      "template": "What did Sundar Pichai privately say during a confidential 2025 board discussion of artificial intelligence?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2014_p0177",
+      "source_id": "2014_p0177",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1994_p0002",
+      "source_id": "1994_p0002",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2023_p0028",
+      "source_id": "2023_p0028",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1987_p0098",
+      "source_id": "1987_p0098",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:029",
+      "template": "What was the exact closing price in US dollars of Chainlink on the last trading day of October 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:1998_p0034",
+      "source_id": "1998_p0034",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2024_p0046",
+      "source_id": "2024_p0046",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2008_p0084",
+      "source_id": "2008_p0084",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1988_p0071",
+      "source_id": "1988_p0071",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:030",
+      "template": "What was the exact closing price in US dollars of Dogecoin on the last trading day of April 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2022_p0045",
+      "source_id": "2022_p0045",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2006_p0030",
+      "source_id": "2006_p0030",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1983_p0015",
+      "source_id": "1983_p0015",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1995_p0088",
+      "source_id": "1995_p0088",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:031",
+      "template": "What was the exact closing price in US dollars of Polkadot on the last trading day of February 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2005_p0074",
+      "source_id": "2005_p0074",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2021_p0052",
+      "source_id": "2021_p0052",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2009_p0011",
+      "source_id": "2009_p0011",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2010_p0045",
+      "source_id": "2010_p0045",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:032",
+      "template": "What was the exact closing price in US dollars of Bitcoin on the last trading day of August 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2012_p0148",
+      "source_id": "2012_p0148",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2019_p0039",
+      "source_id": "2019_p0039",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1986_p0008",
+      "source_id": "1986_p0008",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1984_p0021",
+      "source_id": "1984_p0021",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:033",
+      "template": "What did Sundar Pichai privately say during a private 2025 conversation about succession planning?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2020_p0056",
+      "source_id": "2020_p0056",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1981_p0030",
+      "source_id": "1981_p0030",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2017_p0030",
+      "source_id": "2017_p0030",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1978_p0000",
+      "source_id": "1978_p0000",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:034",
+      "template": "What was the exact closing price in US dollars of Bitcoin on the last trading day of April 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:1991_p0092",
+      "source_id": "1991_p0092",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1982_p0054",
+      "source_id": "1982_p0054",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2000_p0079",
+      "source_id": "2000_p0079",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1999_p0034",
+      "source_id": "1999_p0034",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:035",
+      "template": "What did Satya Nadella privately say during an undisclosed 2026 strategy for employee compensation?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:1989_p0103",
+      "source_id": "1989_p0103",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1992_p0119",
+      "source_id": "1992_p0119",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2013_p0081",
+      "source_id": "2013_p0081",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1990_p0084",
+      "source_id": "1990_p0084",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:036",
+      "template": "What was Apple's exact audited revenue for fiscal year 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2007_p0035",
+      "source_id": "2007_p0035",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2015_p0076",
+      "source_id": "2015_p0076",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2003_p0051",
+      "source_id": "2003_p0051",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2004_p0054",
+      "source_id": "2004_p0054",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:037",
+      "template": "What was the exact closing price in US dollars of Chainlink on the last trading day of January 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2002_p0037",
+      "source_id": "2002_p0037",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1985_p0048",
+      "source_id": "1985_p0048",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1979_p0059",
+      "source_id": "1979_p0059",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1977_p0033",
+      "source_id": "1977_p0033",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:038",
+      "template": "What was the exact closing price in US dollars of Chainlink on the last trading day of February 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2018_p0080",
+      "source_id": "2018_p0080",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2001_p0052",
+      "source_id": "2001_p0052",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1980_p0046",
+      "source_id": "1980_p0046",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1997_p0009",
+      "source_id": "1997_p0009",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:039",
+      "template": "What did Tim Cook privately say during a private 2026 discussion of cybersecurity spending?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2011_p0065",
+      "source_id": "2011_p0065",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1993_p0004",
+      "source_id": "1993_p0004",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1996_p0021",
+      "source_id": "1996_p0021",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2016_p0022",
+      "source_id": "2016_p0022",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:040",
+      "template": "What was the exact closing price in US dollars of Chainlink on the last trading day of July 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2014_p0121",
+      "source_id": "2014_p0121",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1994_p0042",
+      "source_id": "1994_p0042",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2023_p0061",
+      "source_id": "2023_p0061",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1987_p0066",
+      "source_id": "1987_p0066",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:041",
+      "template": "What was the exact closing price in US dollars of XRP on the last trading day of October 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:1998_p0064",
+      "source_id": "1998_p0064",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2024_p0048",
+      "source_id": "2024_p0048",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2008_p0127",
+      "source_id": "2008_p0127",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1988_p0081",
+      "source_id": "1988_p0081",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:042",
+      "template": "What was the exact closing price in US dollars of Ethereum on the last trading day of February 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2022_p0033",
+      "source_id": "2022_p0033",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2006_p0120",
+      "source_id": "2006_p0120",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1983_p0048",
+      "source_id": "1983_p0048",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1995_p0006",
+      "source_id": "1995_p0006",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:043",
+      "template": "What did Lisa Su privately say during an undisclosed 2026 strategy for employee compensation?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2005_p0082",
+      "source_id": "2005_p0082",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2021_p0061",
+      "source_id": "2021_p0061",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2009_p0072",
+      "source_id": "2009_p0072",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2010_p0050",
+      "source_id": "2010_p0050",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:044",
+      "template": "What did Brian Chesky privately say during a secret 2025 meeting about product launch timing?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2012_p0085",
+      "source_id": "2012_p0085",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2019_p0034",
+      "source_id": "2019_p0034",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1986_p0089",
+      "source_id": "1986_p0089",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1984_p0010",
+      "source_id": "1984_p0010",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:045",
+      "template": "What was Microsoft's exact reported operating profit for fiscal year 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2020_p0063",
+      "source_id": "2020_p0063",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1981_p0007",
+      "source_id": "1981_p0007",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2017_p0088",
+      "source_id": "2017_p0088",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1978_p0017",
+      "source_id": "1978_p0017",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:046",
+      "template": "What was the exact closing price in US dollars of Chainlink on the last trading day of June 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:1991_p0022",
+      "source_id": "1991_p0022",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1982_p0053",
+      "source_id": "1982_p0053",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2000_p0031",
+      "source_id": "2000_p0031",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1999_p0108",
+      "source_id": "1999_p0108",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:047",
+      "template": "What was the exact closing price in US dollars of Litecoin on the last trading day of October 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:1989_p0085",
+      "source_id": "1989_p0085",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1992_p0115",
+      "source_id": "1992_p0115",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2013_p0099",
+      "source_id": "2013_p0099",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1990_p0041",
+      "source_id": "1990_p0041",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:048",
+      "template": "What was the exact closing price in US dollars of Ethereum on the last trading day of October 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2007_p0114",
+      "source_id": "2007_p0114",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2015_p0109",
+      "source_id": "2015_p0109",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2003_p0105",
+      "source_id": "2003_p0105",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2004_p0059",
+      "source_id": "2004_p0059",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:049",
+      "template": "What was Adobe's exact year-end workforce headcount for fiscal year 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2002_p0143",
+      "source_id": "2002_p0143",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1985_p0079",
+      "source_id": "1985_p0079",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1979_p0062",
+      "source_id": "1979_p0062",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1977_p0015",
+      "source_id": "1977_p0015",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:050",
+      "template": "What was Tesla's exact cash flow from operations for fiscal year 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2018_p0051",
+      "source_id": "2018_p0051",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2001_p0060",
+      "source_id": "2001_p0060",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1980_p0023",
+      "source_id": "1980_p0023",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1997_p0105",
+      "source_id": "1997_p0105",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:051",
+      "template": "What was the exact closing price in US dollars of Chainlink on the last trading day of May 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2011_p0021",
+      "source_id": "2011_p0021",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1993_p0066",
+      "source_id": "1993_p0066",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1996_p0120",
+      "source_id": "1996_p0120",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2016_p0062",
+      "source_id": "2016_p0062",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:052",
+      "template": "What did Satya Nadella privately say during a confidential 2025 board discussion of artificial intelligence?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2014_p0111",
+      "source_id": "2014_p0111",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1994_p0029",
+      "source_id": "1994_p0029",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2023_p0055",
+      "source_id": "2023_p0055",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1987_p0002",
+      "source_id": "1987_p0002",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:053",
+      "template": "What was the exact closing price in US dollars of Avalanche on the last trading day of August 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:1998_p0001",
+      "source_id": "1998_p0001",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2024_p0028",
+      "source_id": "2024_p0028",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2008_p0113",
+      "source_id": "2008_p0113",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1988_p0038",
+      "source_id": "1988_p0038",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:054",
+      "template": "What was Netflix's exact year-end workforce headcount for fiscal year 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2022_p0042",
+      "source_id": "2022_p0042",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2006_p0142",
+      "source_id": "2006_p0142",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1983_p0082",
+      "source_id": "1983_p0082",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1995_p0043",
+      "source_id": "1995_p0043",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:055",
+      "template": "What was the exact closing price in US dollars of Polkadot on the last trading day of June 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2005_p0023",
+      "source_id": "2005_p0023",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2021_p0020",
+      "source_id": "2021_p0020",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2009_p0016",
+      "source_id": "2009_p0016",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2010_p0133",
+      "source_id": "2010_p0133",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:056",
+      "template": "What was Netflix's exact dividend per share for fiscal year 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2012_p0106",
+      "source_id": "2012_p0106",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2019_p0026",
+      "source_id": "2019_p0026",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1986_p0149",
+      "source_id": "1986_p0149",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1984_p0091",
+      "source_id": "1984_p0091",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:057",
+      "template": "What was the exact closing price in US dollars of Litecoin on the last trading day of April 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2020_p0033",
+      "source_id": "2020_p0033",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1981_p0041",
+      "source_id": "1981_p0041",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2017_p0015",
+      "source_id": "2017_p0015",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1978_p0006",
+      "source_id": "1978_p0006",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:058",
+      "template": "What did Jamie Dimon privately say during a secret 2025 meeting about product launch timing?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:1991_p0067",
+      "source_id": "1991_p0067",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1982_p0066",
+      "source_id": "1982_p0066",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2000_p0102",
+      "source_id": "2000_p0102",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1999_p0006",
+      "source_id": "1999_p0006",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:059",
+      "template": "What was the exact closing price in US dollars of Litecoin on the last trading day of July 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:1989_p0016",
+      "source_id": "1989_p0016",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1992_p0079",
+      "source_id": "1992_p0079",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2013_p0129",
+      "source_id": "2013_p0129",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1990_p0122",
+      "source_id": "1990_p0122",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:060",
+      "template": "What did Tim Cook privately say during an undisclosed 2026 strategy for employee compensation?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2007_p0107",
+      "source_id": "2007_p0107",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2015_p0051",
+      "source_id": "2015_p0051",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2003_p0092",
+      "source_id": "2003_p0092",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2004_p0052",
+      "source_id": "2004_p0052",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:061",
+      "template": "What did Andy Jassy privately say during a confidential 2025 board discussion of artificial intelligence?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2002_p0016",
+      "source_id": "2002_p0016",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1985_p0130",
+      "source_id": "1985_p0130",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1979_p0027",
+      "source_id": "1979_p0027",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1977_p0022",
+      "source_id": "1977_p0022",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:062",
+      "template": "What did Lisa Su privately say during a private 2025 conversation about succession planning?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2018_p0032",
+      "source_id": "2018_p0032",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2001_p0093",
+      "source_id": "2001_p0093",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1980_p0083",
+      "source_id": "1980_p0083",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1997_p0021",
+      "source_id": "1997_p0021",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:063",
+      "template": "What did Lisa Su privately say during a secret 2025 meeting about product launch timing?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2011_p0098",
+      "source_id": "2011_p0098",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1993_p0063",
+      "source_id": "1993_p0063",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1996_p0018",
+      "source_id": "1996_p0018",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2016_p0152",
+      "source_id": "2016_p0152",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:064",
+      "template": "What was the exact closing price in US dollars of Bitcoin on the last trading day of February 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2014_p0070",
+      "source_id": "2014_p0070",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1994_p0010",
+      "source_id": "1994_p0010",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2023_p0029",
+      "source_id": "2023_p0029",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1987_p0042",
+      "source_id": "1987_p0042",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:065",
+      "template": "What was the exact closing price in US dollars of Avalanche on the last trading day of January 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:1998_p0009",
+      "source_id": "1998_p0009",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2024_p0049",
+      "source_id": "2024_p0049",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2008_p0015",
+      "source_id": "2008_p0015",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1988_p0090",
+      "source_id": "1988_p0090",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:066",
+      "template": "What did Jensen Huang privately say during a confidential 2025 board discussion of artificial intelligence?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2022_p0034",
+      "source_id": "2022_p0034",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2006_p0164",
+      "source_id": "2006_p0164",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1983_p0021",
+      "source_id": "1983_p0021",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1995_p0085",
+      "source_id": "1995_p0085",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:067",
+      "template": "What was the exact closing price in US dollars of Litecoin on the last trading day of August 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2005_p0064",
+      "source_id": "2005_p0064",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2021_p0054",
+      "source_id": "2021_p0054",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2009_p0051",
+      "source_id": "2009_p0051",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2010_p0093",
+      "source_id": "2010_p0093",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:068",
+      "template": "What was Netflix's exact cash flow from operations for fiscal year 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2012_p0063",
+      "source_id": "2012_p0063",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2019_p0030",
+      "source_id": "2019_p0030",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1986_p0097",
+      "source_id": "1986_p0097",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1984_p0019",
+      "source_id": "1984_p0019",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:069",
+      "template": "What was Microsoft's exact year-end workforce headcount for fiscal year 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2020_p0028",
+      "source_id": "2020_p0028",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1981_p0015",
+      "source_id": "1981_p0015",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2017_p0047",
+      "source_id": "2017_p0047",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1978_p0009",
+      "source_id": "1978_p0009",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:070",
+      "template": "What did Reed Hastings privately say during a confidential 2025 board discussion of artificial intelligence?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:1991_p0035",
+      "source_id": "1991_p0035",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1982_p0079",
+      "source_id": "1982_p0079",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2000_p0033",
+      "source_id": "2000_p0033",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1999_p0096",
+      "source_id": "1999_p0096",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:071",
+      "template": "What did Mary Barra privately say during a confidential 2025 board discussion of artificial intelligence?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:1989_p0141",
+      "source_id": "1989_p0141",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1992_p0006",
+      "source_id": "1992_p0006",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2013_p0094",
+      "source_id": "2013_p0094",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1990_p0108",
+      "source_id": "1990_p0108",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:072",
+      "template": "What was the exact closing price in US dollars of Litecoin on the last trading day of May 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2007_p0033",
+      "source_id": "2007_p0033",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2015_p0107",
+      "source_id": "2015_p0107",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2003_p0124",
+      "source_id": "2003_p0124",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2004_p0018",
+      "source_id": "2004_p0018",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:073",
+      "template": "What was the exact closing price in US dollars of Ethereum on the last trading day of May 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2002_p0101",
+      "source_id": "2002_p0101",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1985_p0098",
+      "source_id": "1985_p0098",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1979_p0056",
+      "source_id": "1979_p0056",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1977_p0019",
+      "source_id": "1977_p0019",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:074",
+      "template": "What was the exact closing price in US dollars of Avalanche on the last trading day of October 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2018_p0073",
+      "source_id": "2018_p0073",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2001_p0089",
+      "source_id": "2001_p0089",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1980_p0007",
+      "source_id": "1980_p0007",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1997_p0118",
+      "source_id": "1997_p0118",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:075",
+      "template": "What was the exact closing price in US dollars of Cardano on the last trading day of January 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2011_p0053",
+      "source_id": "2011_p0053",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1993_p0049",
+      "source_id": "1993_p0049",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1996_p0103",
+      "source_id": "1996_p0103",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2016_p0080",
+      "source_id": "2016_p0080",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:076",
+      "template": "What was the exact closing price in US dollars of Solana on the last trading day of September 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2014_p0194",
+      "source_id": "2014_p0194",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1994_p0007",
+      "source_id": "1994_p0007",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2023_p0020",
+      "source_id": "2023_p0020",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1987_p0123",
+      "source_id": "1987_p0123",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:077",
+      "template": "What was the exact closing price in US dollars of Polkadot on the last trading day of March 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:1998_p0044",
+      "source_id": "1998_p0044",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2024_p0042",
+      "source_id": "2024_p0042",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2008_p0042",
+      "source_id": "2008_p0042",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1988_p0103",
+      "source_id": "1988_p0103",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:078",
+      "template": "What was Amazon's exact dividend per share for fiscal year 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2022_p0017",
+      "source_id": "2022_p0017",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2006_p0053",
+      "source_id": "2006_p0053",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1983_p0072",
+      "source_id": "1983_p0072",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1995_p0117",
+      "source_id": "1995_p0117",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:079",
+      "template": "What was the exact closing price in US dollars of Avalanche on the last trading day of March 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2005_p0097",
+      "source_id": "2005_p0097",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2021_p0062",
+      "source_id": "2021_p0062",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2009_p0069",
+      "source_id": "2009_p0069",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2010_p0122",
+      "source_id": "2010_p0122",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:080",
+      "template": "What was Meta's exact year-end workforce headcount for fiscal year 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2012_p0126",
+      "source_id": "2012_p0126",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2019_p0052",
+      "source_id": "2019_p0052",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1986_p0018",
+      "source_id": "1986_p0018",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1984_p0075",
+      "source_id": "1984_p0075",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:081",
+      "template": "What was Salesforce's exact year-end workforce headcount for fiscal year 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2020_p0018",
+      "source_id": "2020_p0018",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1981_p0054",
+      "source_id": "1981_p0054",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2017_p0053",
+      "source_id": "2017_p0053",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1978_p0016",
+      "source_id": "1978_p0016",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:082",
+      "template": "What was the exact closing price in US dollars of Ethereum on the last trading day of June 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:1991_p0002",
+      "source_id": "1991_p0002",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1982_p0008",
+      "source_id": "1982_p0008",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2000_p0101",
+      "source_id": "2000_p0101",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1999_p0026",
+      "source_id": "1999_p0026",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:083",
+      "template": "What was Tesla's exact year-end workforce headcount for fiscal year 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:1989_p0152",
+      "source_id": "1989_p0152",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1992_p0117",
+      "source_id": "1992_p0117",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2013_p0029",
+      "source_id": "2013_p0029",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1990_p0013",
+      "source_id": "1990_p0013",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:084",
+      "template": "What did Lisa Su privately say during a confidential 2025 board discussion of artificial intelligence?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2007_p0031",
+      "source_id": "2007_p0031",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2015_p0091",
+      "source_id": "2015_p0091",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2003_p0061",
+      "source_id": "2003_p0061",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2004_p0053",
+      "source_id": "2004_p0053",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:085",
+      "template": "What was the exact closing price in US dollars of Bitcoin on the last trading day of September 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2002_p0100",
+      "source_id": "2002_p0100",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1985_p0035",
+      "source_id": "1985_p0035",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1979_p0020",
+      "source_id": "1979_p0020",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1977_p0020",
+      "source_id": "1977_p0020",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:086",
+      "template": "What did Satya Nadella privately say during a private 2026 discussion of cybersecurity spending?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2018_p0028",
+      "source_id": "2018_p0028",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2001_p0094",
+      "source_id": "2001_p0094",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1980_p0062",
+      "source_id": "1980_p0062",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1997_p0006",
+      "source_id": "1997_p0006",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:087",
+      "template": "What was the exact closing price in US dollars of Ethereum on the last trading day of September 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2011_p0129",
+      "source_id": "2011_p0129",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1993_p0113",
+      "source_id": "1993_p0113",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1996_p0099",
+      "source_id": "1996_p0099",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2016_p0073",
+      "source_id": "2016_p0073",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:088",
+      "template": "What was the exact closing price in US dollars of XRP on the last trading day of February 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2014_p0189",
+      "source_id": "2014_p0189",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1994_p0079",
+      "source_id": "1994_p0079",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2023_p0047",
+      "source_id": "2023_p0047",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1987_p0005",
+      "source_id": "1987_p0005",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:089",
+      "template": "What was Adobe's exact audited revenue for fiscal year 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:1998_p0102",
+      "source_id": "1998_p0102",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2024_p0010",
+      "source_id": "2024_p0010",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2008_p0049",
+      "source_id": "2008_p0049",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1988_p0122",
+      "source_id": "1988_p0122",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:090",
+      "template": "What did Jamie Dimon privately say during a confidential 2025 board discussion of artificial intelligence?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2022_p0030",
+      "source_id": "2022_p0030",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2006_p0156",
+      "source_id": "2006_p0156",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1983_p0092",
+      "source_id": "1983_p0092",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1995_p0021",
+      "source_id": "1995_p0021",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:091",
+      "template": "What was Adobe's exact reported operating profit for fiscal year 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2005_p0093",
+      "source_id": "2005_p0093",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2021_p0044",
+      "source_id": "2021_p0044",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2009_p0028",
+      "source_id": "2009_p0028",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2010_p0144",
+      "source_id": "2010_p0144",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:092",
+      "template": "What did Andy Jassy privately say during an undisclosed 2026 strategy for employee compensation?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2012_p0023",
+      "source_id": "2012_p0023",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2019_p0054",
+      "source_id": "2019_p0054",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1986_p0070",
+      "source_id": "1986_p0070",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1984_p0115",
+      "source_id": "1984_p0115",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:093",
+      "template": "What was the exact closing price in US dollars of Polkadot on the last trading day of October 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2020_p0046",
+      "source_id": "2020_p0046",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1981_p0066",
+      "source_id": "1981_p0066",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2017_p0094",
+      "source_id": "2017_p0094",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1978_p0007",
+      "source_id": "1978_p0007",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:094",
+      "template": "What was Amazon's exact cash flow from operations for fiscal year 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:1991_p0037",
+      "source_id": "1991_p0037",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1982_p0087",
+      "source_id": "1982_p0087",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2000_p0096",
+      "source_id": "2000_p0096",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1999_p0071",
+      "source_id": "1999_p0071",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:095",
+      "template": "What did Jamie Dimon privately say during a private 2025 conversation about succession planning?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:1989_p0086",
+      "source_id": "1989_p0086",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1992_p0045",
+      "source_id": "1992_p0045",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2013_p0106",
+      "source_id": "2013_p0106",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1990_p0115",
+      "source_id": "1990_p0115",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:096",
+      "template": "What was the exact closing price in US dollars of Bitcoin on the last trading day of July 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2007_p0029",
+      "source_id": "2007_p0029",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2015_p0028",
+      "source_id": "2015_p0028",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2003_p0086",
+      "source_id": "2003_p0086",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2004_p0157",
+      "source_id": "2004_p0157",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:097",
+      "template": "What was the exact closing price in US dollars of Polkadot on the last trading day of September 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2002_p0117",
+      "source_id": "2002_p0117",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1985_p0014",
+      "source_id": "1985_p0014",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1979_p0053",
+      "source_id": "1979_p0053",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1977_p0011",
+      "source_id": "1977_p0011",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:098",
+      "template": "What was Netflix's exact reported operating profit for fiscal year 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2018_p0042",
+      "source_id": "2018_p0042",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2001_p0030",
+      "source_id": "2001_p0030",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1980_p0053",
+      "source_id": "1980_p0053",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1997_p0016",
+      "source_id": "1997_p0016",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:099",
+      "template": "What did Andy Jassy privately say during a private 2026 discussion of cybersecurity spending?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2011_p0049",
+      "source_id": "2011_p0049",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1993_p0098",
+      "source_id": "1993_p0098",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1996_p0026",
+      "source_id": "1996_p0026",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2016_p0043",
+      "source_id": "2016_p0043",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:100",
+      "template": "What was the exact closing price in US dollars of Ethereum on the last trading day of August 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2014_p0150",
+      "source_id": "2014_p0150",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1994_p0063",
+      "source_id": "1994_p0063",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2023_p0026",
+      "source_id": "2023_p0026",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1987_p0047",
+      "source_id": "1987_p0047",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:101",
+      "template": "What did Lisa Su privately say during a private 2026 discussion of cybersecurity spending?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:1998_p0030",
+      "source_id": "1998_p0030",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2024_p0024",
+      "source_id": "2024_p0024",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2008_p0114",
+      "source_id": "2008_p0114",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1988_p0125",
+      "source_id": "1988_p0125",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:102",
+      "template": "What was Microsoft's exact cash flow from operations for fiscal year 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2022_p0040",
+      "source_id": "2022_p0040",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2006_p0014",
+      "source_id": "2006_p0014",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1983_p0055",
+      "source_id": "1983_p0055",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1995_p0112",
+      "source_id": "1995_p0112",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:103",
+      "template": "What was the exact closing price in US dollars of Dogecoin on the last trading day of February 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2005_p0122",
+      "source_id": "2005_p0122",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2021_p0026",
+      "source_id": "2021_p0026",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2009_p0010",
+      "source_id": "2009_p0010",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2010_p0083",
+      "source_id": "2010_p0083",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:104",
+      "template": "What was the exact closing price in US dollars of XRP on the last trading day of July 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2012_p0130",
+      "source_id": "2012_p0130",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2019_p0059",
+      "source_id": "2019_p0059",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1986_p0102",
+      "source_id": "1986_p0102",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1984_p0065",
+      "source_id": "1984_p0065",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:105",
+      "template": "What did Mary Barra privately say during an undisclosed 2026 strategy for employee compensation?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2020_p0060",
+      "source_id": "2020_p0060",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1981_p0037",
+      "source_id": "1981_p0037",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2017_p0058",
+      "source_id": "2017_p0058",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1978_p0033",
+      "source_id": "1978_p0033",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:106",
+      "template": "What was Tesla's exact reported operating profit for fiscal year 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:1991_p0056",
+      "source_id": "1991_p0056",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1982_p0041",
+      "source_id": "1982_p0041",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2000_p0090",
+      "source_id": "2000_p0090",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1999_p0093",
+      "source_id": "1999_p0093",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:107",
+      "template": "What was the exact closing price in US dollars of Litecoin on the last trading day of June 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:1989_p0060",
+      "source_id": "1989_p0060",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1992_p0063",
+      "source_id": "1992_p0063",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2013_p0105",
+      "source_id": "2013_p0105",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1990_p0087",
+      "source_id": "1990_p0087",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:108",
+      "template": "What was the exact closing price in US dollars of Solana on the last trading day of June 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2007_p0105",
+      "source_id": "2007_p0105",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2015_p0104",
+      "source_id": "2015_p0104",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2003_p0112",
+      "source_id": "2003_p0112",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2004_p0168",
+      "source_id": "2004_p0168",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:109",
+      "template": "What did Reed Hastings privately say during an undisclosed 2026 strategy for employee compensation?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2002_p0099",
+      "source_id": "2002_p0099",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1985_p0132",
+      "source_id": "1985_p0132",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1979_p0028",
+      "source_id": "1979_p0028",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1977_p0002",
+      "source_id": "1977_p0002",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:110",
+      "template": "What was Apple's exact cash flow from operations for fiscal year 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2018_p0078",
+      "source_id": "2018_p0078",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2001_p0012",
+      "source_id": "2001_p0012",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1980_p0025",
+      "source_id": "1980_p0025",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1997_p0024",
+      "source_id": "1997_p0024",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:111",
+      "template": "What was the exact closing price in US dollars of Chainlink on the last trading day of April 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2011_p0122",
+      "source_id": "2011_p0122",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1993_p0074",
+      "source_id": "1993_p0074",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1996_p0108",
+      "source_id": "1996_p0108",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2016_p0122",
+      "source_id": "2016_p0122",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:112",
+      "template": "What was the exact closing price in US dollars of Dogecoin on the last trading day of June 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2014_p0018",
+      "source_id": "2014_p0018",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1994_p0000",
+      "source_id": "1994_p0000",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2023_p0013",
+      "source_id": "2023_p0013",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1987_p0038",
+      "source_id": "1987_p0038",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:113",
+      "template": "What did Jamie Dimon privately say during an undisclosed 2026 strategy for employee compensation?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:1998_p0038",
+      "source_id": "1998_p0038",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2024_p0041",
+      "source_id": "2024_p0041",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2008_p0120",
+      "source_id": "2008_p0120",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1988_p0000",
+      "source_id": "1988_p0000",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:114",
+      "template": "What was Tesla's exact audited revenue for fiscal year 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2022_p0041",
+      "source_id": "2022_p0041",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2006_p0132",
+      "source_id": "2006_p0132",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1983_p0119",
+      "source_id": "1983_p0119",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1995_p0105",
+      "source_id": "1995_p0105",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:115",
+      "template": "What was Nvidia's exact cash flow from operations for fiscal year 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2005_p0030",
+      "source_id": "2005_p0030",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2021_p0022",
+      "source_id": "2021_p0022",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2009_p0090",
+      "source_id": "2009_p0090",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2010_p0116",
+      "source_id": "2010_p0116",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:116",
+      "template": "What was Alphabet's exact year-end workforce headcount for fiscal year 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2012_p0053",
+      "source_id": "2012_p0053",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2019_p0078",
+      "source_id": "2019_p0078",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1986_p0049",
+      "source_id": "1986_p0049",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1984_p0067",
+      "source_id": "1984_p0067",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:117",
+      "template": "What was the exact closing price in US dollars of Dogecoin on the last trading day of March 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2020_p0037",
+      "source_id": "2020_p0037",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1981_p0049",
+      "source_id": "1981_p0049",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2017_p0091",
+      "source_id": "2017_p0091",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1978_p0043",
+      "source_id": "1978_p0043",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:118",
+      "template": "What did Sundar Pichai privately say during a private 2026 discussion of cybersecurity spending?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:1991_p0085",
+      "source_id": "1991_p0085",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1982_p0029",
+      "source_id": "1982_p0029",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2000_p0051",
+      "source_id": "2000_p0051",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1999_p0063",
+      "source_id": "1999_p0063",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:119",
+      "template": "What was the exact closing price in US dollars of Dogecoin on the last trading day of July 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:1989_p0084",
+      "source_id": "1989_p0084",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1992_p0116",
+      "source_id": "1992_p0116",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2013_p0082",
+      "source_id": "2013_p0082",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1990_p0153",
+      "source_id": "1990_p0153",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:120",
+      "template": "What was the exact closing price in US dollars of Cardano on the last trading day of August 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2007_p0051",
+      "source_id": "2007_p0051",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2015_p0139",
+      "source_id": "2015_p0139",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2003_p0070",
+      "source_id": "2003_p0070",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2004_p0067",
+      "source_id": "2004_p0067",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:121",
+      "template": "What did Satya Nadella privately say during a private 2025 conversation about succession planning?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2002_p0024",
+      "source_id": "2002_p0024",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1985_p0147",
+      "source_id": "1985_p0147",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1979_p0040",
+      "source_id": "1979_p0040",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1977_p0021",
+      "source_id": "1977_p0021",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:122",
+      "template": "What did Mary Barra privately say during a secret 2025 meeting about product launch timing?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2018_p0031",
+      "source_id": "2018_p0031",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2001_p0070",
+      "source_id": "2001_p0070",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1980_p0064",
+      "source_id": "1980_p0064",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1997_p0078",
+      "source_id": "1997_p0078",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:123",
+      "template": "What did Mary Barra privately say during a private 2026 discussion of cybersecurity spending?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2011_p0128",
+      "source_id": "2011_p0128",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1993_p0115",
+      "source_id": "1993_p0115",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1996_p0097",
+      "source_id": "1996_p0097",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2016_p0132",
+      "source_id": "2016_p0132",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:124",
+      "template": "What was the exact closing price in US dollars of Bitcoin on the last trading day of June 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2014_p0220",
+      "source_id": "2014_p0220",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1994_p0070",
+      "source_id": "1994_p0070",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2023_p0009",
+      "source_id": "2023_p0009",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1987_p0007",
+      "source_id": "1987_p0007",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:125",
+      "template": "What was the exact closing price in US dollars of Ethereum on the last trading day of March 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:1998_p0037",
+      "source_id": "1998_p0037",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2024_p0005",
+      "source_id": "2024_p0005",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2008_p0093",
+      "source_id": "2008_p0093",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1988_p0036",
+      "source_id": "1988_p0036",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:126",
+      "template": "What was the exact closing price in US dollars of Polkadot on the last trading day of July 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2022_p0036",
+      "source_id": "2022_p0036",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2006_p0139",
+      "source_id": "2006_p0139",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1983_p0102",
+      "source_id": "1983_p0102",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1995_p0049",
+      "source_id": "1995_p0049",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:127",
+      "template": "What was the exact closing price in US dollars of Bitcoin on the last trading day of March 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2005_p0083",
+      "source_id": "2005_p0083",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2021_p0060",
+      "source_id": "2021_p0060",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2009_p0094",
+      "source_id": "2009_p0094",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2010_p0057",
+      "source_id": "2010_p0057",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:128",
+      "template": "What was the exact closing price in US dollars of Solana on the last trading day of April 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2012_p0079",
+      "source_id": "2012_p0079",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2019_p0023",
+      "source_id": "2019_p0023",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1986_p0062",
+      "source_id": "1986_p0062",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1984_p0002",
+      "source_id": "1984_p0002",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:129",
+      "template": "What was the exact closing price in US dollars of Cardano on the last trading day of February 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2020_p0049",
+      "source_id": "2020_p0049",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1981_p0042",
+      "source_id": "1981_p0042",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2017_p0057",
+      "source_id": "2017_p0057",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1978_p0019",
+      "source_id": "1978_p0019",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:130",
+      "template": "What was Amazon's exact year-end workforce headcount for fiscal year 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:1991_p0019",
+      "source_id": "1991_p0019",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1982_p0061",
+      "source_id": "1982_p0061",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2000_p0028",
+      "source_id": "2000_p0028",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1999_p0101",
+      "source_id": "1999_p0101",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:131",
+      "template": "What did Jensen Huang privately say during an undisclosed 2026 strategy for employee compensation?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:1989_p0011",
+      "source_id": "1989_p0011",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1992_p0084",
+      "source_id": "1992_p0084",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2013_p0110",
+      "source_id": "2013_p0110",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1990_p0079",
+      "source_id": "1990_p0079",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:132",
+      "template": "What was the exact closing price in US dollars of Solana on the last trading day of August 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2007_p0012",
+      "source_id": "2007_p0012",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2015_p0037",
+      "source_id": "2015_p0037",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2003_p0088",
+      "source_id": "2003_p0088",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2004_p0163",
+      "source_id": "2004_p0163",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:133",
+      "template": "What was the exact closing price in US dollars of Avalanche on the last trading day of June 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2002_p0116",
+      "source_id": "2002_p0116",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1985_p0050",
+      "source_id": "1985_p0050",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1979_p0024",
+      "source_id": "1979_p0024",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1977_p0016",
+      "source_id": "1977_p0016",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:134",
+      "template": "What was the exact closing price in US dollars of XRP on the last trading day of August 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2018_p0035",
+      "source_id": "2018_p0035",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2001_p0049",
+      "source_id": "2001_p0049",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1980_p0008",
+      "source_id": "1980_p0008",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1997_p0044",
+      "source_id": "1997_p0044",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:135",
+      "template": "What was Microsoft's exact audited revenue for fiscal year 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2011_p0090",
+      "source_id": "2011_p0090",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1993_p0082",
+      "source_id": "1993_p0082",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1996_p0114",
+      "source_id": "1996_p0114",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2016_p0156",
+      "source_id": "2016_p0156",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:136",
+      "template": "What did Jensen Huang privately say during a private 2026 discussion of cybersecurity spending?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2014_p0118",
+      "source_id": "2014_p0118",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1994_p0030",
+      "source_id": "1994_p0030",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2023_p0014",
+      "source_id": "2023_p0014",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1987_p0131",
+      "source_id": "1987_p0131",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:137",
+      "template": "What was the exact closing price in US dollars of Bitcoin on the last trading day of January 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:1998_p0021",
+      "source_id": "1998_p0021",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2024_p0017",
+      "source_id": "2024_p0017",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2008_p0028",
+      "source_id": "2008_p0028",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1988_p0014",
+      "source_id": "1988_p0014",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:138",
+      "template": "What did Tim Cook privately say during a private 2025 conversation about succession planning?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2022_p0046",
+      "source_id": "2022_p0046",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2006_p0010",
+      "source_id": "2006_p0010",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1983_p0096",
+      "source_id": "1983_p0096",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1995_p0048",
+      "source_id": "1995_p0048",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:139",
+      "template": "What was Meta's exact reported operating profit for fiscal year 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2005_p0019",
+      "source_id": "2005_p0019",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2021_p0035",
+      "source_id": "2021_p0035",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2009_p0099",
+      "source_id": "2009_p0099",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2010_p0102",
+      "source_id": "2010_p0102",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:140",
+      "template": "What was Adobe's exact cash flow from operations for fiscal year 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2012_p0040",
+      "source_id": "2012_p0040",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2019_p0075",
+      "source_id": "2019_p0075",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1986_p0032",
+      "source_id": "1986_p0032",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1984_p0031",
+      "source_id": "1984_p0031",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:141",
+      "template": "What did Brian Chesky privately say during an undisclosed 2026 strategy for employee compensation?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2020_p0047",
+      "source_id": "2020_p0047",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1981_p0025",
+      "source_id": "1981_p0025",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2017_p0083",
+      "source_id": "2017_p0083",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1978_p0036",
+      "source_id": "1978_p0036",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:142",
+      "template": "What was Salesforce's exact cash flow from operations for fiscal year 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:1991_p0040",
+      "source_id": "1991_p0040",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1982_p0034",
+      "source_id": "1982_p0034",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2000_p0013",
+      "source_id": "2000_p0013",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1999_p0079",
+      "source_id": "1999_p0079",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:143",
+      "template": "What was the exact closing price in US dollars of XRP on the last trading day of January 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:1989_p0058",
+      "source_id": "1989_p0058",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1992_p0095",
+      "source_id": "1992_p0095",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2013_p0049",
+      "source_id": "2013_p0049",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1990_p0026",
+      "source_id": "1990_p0026",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:144",
+      "template": "What was Meta's exact audited revenue for fiscal year 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2007_p0123",
+      "source_id": "2007_p0123",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2015_p0097",
+      "source_id": "2015_p0097",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2003_p0042",
+      "source_id": "2003_p0042",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2004_p0049",
+      "source_id": "2004_p0049",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:145",
+      "template": "What was the exact closing price in US dollars of Solana on the last trading day of January 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2002_p0113",
+      "source_id": "2002_p0113",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1985_p0032",
+      "source_id": "1985_p0032",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1979_p0042",
+      "source_id": "1979_p0042",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1977_p0008",
+      "source_id": "1977_p0008",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:146",
+      "template": "What was the exact closing price in US dollars of Ethereum on the last trading day of April 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2018_p0070",
+      "source_id": "2018_p0070",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2001_p0113",
+      "source_id": "2001_p0113",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1980_p0070",
+      "source_id": "1980_p0070",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1997_p0069",
+      "source_id": "1997_p0069",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:147",
+      "template": "What was the exact closing price in US dollars of Dogecoin on the last trading day of May 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2011_p0034",
+      "source_id": "2011_p0034",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1993_p0041",
+      "source_id": "1993_p0041",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1996_p0110",
+      "source_id": "1996_p0110",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2016_p0053",
+      "source_id": "2016_p0053",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:148",
+      "template": "What was Meta's exact cash flow from operations for fiscal year 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2014_p0223",
+      "source_id": "2014_p0223",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1994_p0054",
+      "source_id": "1994_p0054",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2023_p0033",
+      "source_id": "2023_p0033",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1987_p0120",
+      "source_id": "1987_p0120",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:149",
+      "template": "What was the exact closing price in US dollars of Dogecoin on the last trading day of August 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:1998_p0090",
+      "source_id": "1998_p0090",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2024_p0039",
+      "source_id": "2024_p0039",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2008_p0104",
+      "source_id": "2008_p0104",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1988_p0124",
+      "source_id": "1988_p0124",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:150",
+      "template": "What was the exact closing price in US dollars of XRP on the last trading day of April 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2022_p0035",
+      "source_id": "2022_p0035",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2006_p0046",
+      "source_id": "2006_p0046",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1983_p0014",
+      "source_id": "1983_p0014",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1995_p0102",
+      "source_id": "1995_p0102",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:151",
+      "template": "What was the exact closing price in US dollars of XRP on the last trading day of May 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2005_p0095",
+      "source_id": "2005_p0095",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2021_p0041",
+      "source_id": "2021_p0041",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2009_p0013",
+      "source_id": "2009_p0013",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2010_p0104",
+      "source_id": "2010_p0104",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:152",
+      "template": "What was the exact closing price in US dollars of XRP on the last trading day of September 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2012_p0011",
+      "source_id": "2012_p0011",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2019_p0029",
+      "source_id": "2019_p0029",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1986_p0103",
+      "source_id": "1986_p0103",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1984_p0082",
+      "source_id": "1984_p0082",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:153",
+      "template": "What was Meta's exact dividend per share for fiscal year 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2020_p0024",
+      "source_id": "2020_p0024",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1981_p0036",
+      "source_id": "1981_p0036",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2017_p0025",
+      "source_id": "2017_p0025",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1978_p0002",
+      "source_id": "1978_p0002",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:154",
+      "template": "What was the exact closing price in US dollars of XRP on the last trading day of June 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:1991_p0013",
+      "source_id": "1991_p0013",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1982_p0058",
+      "source_id": "1982_p0058",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2000_p0066",
+      "source_id": "2000_p0066",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1999_p0048",
+      "source_id": "1999_p0048",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:155",
+      "template": "What was Nvidia's exact dividend per share for fiscal year 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:1989_p0025",
+      "source_id": "1989_p0025",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1992_p0024",
+      "source_id": "1992_p0024",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2013_p0040",
+      "source_id": "2013_p0040",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1990_p0023",
+      "source_id": "1990_p0023",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:156",
+      "template": "What was Salesforce's exact audited revenue for fiscal year 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2007_p0038",
+      "source_id": "2007_p0038",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2015_p0089",
+      "source_id": "2015_p0089",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2003_p0049",
+      "source_id": "2003_p0049",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2004_p0013",
+      "source_id": "2004_p0013",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:157",
+      "template": "What was Netflix's exact audited revenue for fiscal year 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2002_p0033",
+      "source_id": "2002_p0033",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1985_p0009",
+      "source_id": "1985_p0009",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1979_p0065",
+      "source_id": "1979_p0065",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1977_p0018",
+      "source_id": "1977_p0018",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:158",
+      "template": "What was the exact closing price in US dollars of Dogecoin on the last trading day of October 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2018_p0041",
+      "source_id": "2018_p0041",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2001_p0087",
+      "source_id": "2001_p0087",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1980_p0067",
+      "source_id": "1980_p0067",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1997_p0087",
+      "source_id": "1997_p0087",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:159",
+      "template": "What was Tesla's exact dividend per share for fiscal year 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2011_p0050",
+      "source_id": "2011_p0050",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1993_p0038",
+      "source_id": "1993_p0038",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1996_p0125",
+      "source_id": "1996_p0125",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2016_p0164",
+      "source_id": "2016_p0164",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:160",
+      "template": "What was the exact closing price in US dollars of Chainlink on the last trading day of March 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2014_p0066",
+      "source_id": "2014_p0066",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1994_p0037",
+      "source_id": "1994_p0037",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2023_p0062",
+      "source_id": "2023_p0062",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1987_p0050",
+      "source_id": "1987_p0050",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:161",
+      "template": "What did Sundar Pichai privately say during a secret 2025 meeting about product launch timing?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:1998_p0027",
+      "source_id": "1998_p0027",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2024_p0009",
+      "source_id": "2024_p0009",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2008_p0090",
+      "source_id": "2008_p0090",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1988_p0062",
+      "source_id": "1988_p0062",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:162",
+      "template": "What was Alphabet's exact dividend per share for fiscal year 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2022_p0043",
+      "source_id": "2022_p0043",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2006_p0153",
+      "source_id": "2006_p0153",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1983_p0130",
+      "source_id": "1983_p0130",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1995_p0120",
+      "source_id": "1995_p0120",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:163",
+      "template": "What did Satya Nadella privately say during a secret 2025 meeting about product launch timing?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2005_p0094",
+      "source_id": "2005_p0094",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2021_p0025",
+      "source_id": "2021_p0025",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2009_p0041",
+      "source_id": "2009_p0041",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2010_p0123",
+      "source_id": "2010_p0123",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:164",
+      "template": "What was the exact closing price in US dollars of Polkadot on the last trading day of April 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2012_p0038",
+      "source_id": "2012_p0038",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2019_p0067",
+      "source_id": "2019_p0067",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1986_p0087",
+      "source_id": "1986_p0087",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1984_p0076",
+      "source_id": "1984_p0076",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:165",
+      "template": "What was Alphabet's exact reported operating profit for fiscal year 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2020_p0026",
+      "source_id": "2020_p0026",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1981_p0033",
+      "source_id": "1981_p0033",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2017_p0045",
+      "source_id": "2017_p0045",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1978_p0040",
+      "source_id": "1978_p0040",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:166",
+      "template": "What was the exact closing price in US dollars of Avalanche on the last trading day of July 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:1991_p0057",
+      "source_id": "1991_p0057",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1982_p0073",
+      "source_id": "1982_p0073",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2000_p0116",
+      "source_id": "2000_p0116",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1999_p0112",
+      "source_id": "1999_p0112",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:167",
+      "template": "What was the exact closing price in US dollars of Ethereum on the last trading day of January 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:1989_p0138",
+      "source_id": "1989_p0138",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1992_p0049",
+      "source_id": "1992_p0049",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2013_p0011",
+      "source_id": "2013_p0011",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1990_p0003",
+      "source_id": "1990_p0003",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:168",
+      "template": "What was Apple's exact dividend per share for fiscal year 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2007_p0056",
+      "source_id": "2007_p0056",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2015_p0124",
+      "source_id": "2015_p0124",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2003_p0121",
+      "source_id": "2003_p0121",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2004_p0139",
+      "source_id": "2004_p0139",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:169",
+      "template": "What was the exact closing price in US dollars of Avalanche on the last trading day of September 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2002_p0079",
+      "source_id": "2002_p0079",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1985_p0118",
+      "source_id": "1985_p0118",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1979_p0003",
+      "source_id": "1979_p0003",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1977_p0034",
+      "source_id": "1977_p0034",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:170",
+      "template": "What did Andy Jassy privately say during a secret 2025 meeting about product launch timing?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2018_p0011",
+      "source_id": "2018_p0011",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2001_p0068",
+      "source_id": "2001_p0068",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1980_p0005",
+      "source_id": "1980_p0005",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1997_p0109",
+      "source_id": "1997_p0109",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:171",
+      "template": "What was the exact closing price in US dollars of Cardano on the last trading day of September 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2011_p0104",
+      "source_id": "2011_p0104",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1993_p0101",
+      "source_id": "1993_p0101",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1996_p0105",
+      "source_id": "1996_p0105",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2016_p0067",
+      "source_id": "2016_p0067",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:172",
+      "template": "What was Salesforce's exact reported operating profit for fiscal year 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2014_p0114",
+      "source_id": "2014_p0114",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1994_p0065",
+      "source_id": "1994_p0065",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2023_p0040",
+      "source_id": "2023_p0040",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1987_p0110",
+      "source_id": "1987_p0110",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:173",
+      "template": "What was the exact closing price in US dollars of Avalanche on the last trading day of May 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:1998_p0041",
+      "source_id": "1998_p0041",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2024_p0034",
+      "source_id": "2024_p0034",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2008_p0037",
+      "source_id": "2008_p0037",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1988_p0045",
+      "source_id": "1988_p0045",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:174",
+      "template": "What was the exact closing price in US dollars of Cardano on the last trading day of April 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2022_p0018",
+      "source_id": "2022_p0018",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2006_p0054",
+      "source_id": "2006_p0054",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1983_p0039",
+      "source_id": "1983_p0039",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1995_p0074",
+      "source_id": "1995_p0074",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:175",
+      "template": "What was the exact closing price in US dollars of Chainlink on the last trading day of September 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2005_p0120",
+      "source_id": "2005_p0120",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2021_p0051",
+      "source_id": "2021_p0051",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2009_p0049",
+      "source_id": "2009_p0049",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2010_p0137",
+      "source_id": "2010_p0137",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:176",
+      "template": "What did Brian Chesky privately say during a private 2026 discussion of cybersecurity spending?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2012_p0141",
+      "source_id": "2012_p0141",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2019_p0028",
+      "source_id": "2019_p0028",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1986_p0141",
+      "source_id": "1986_p0141",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1984_p0053",
+      "source_id": "1984_p0053",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:177",
+      "template": "What did Tim Cook privately say during a confidential 2025 board discussion of artificial intelligence?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2020_p0059",
+      "source_id": "2020_p0059",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1981_p0070",
+      "source_id": "1981_p0070",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2017_p0013",
+      "source_id": "2017_p0013",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1978_p0022",
+      "source_id": "1978_p0022",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:178",
+      "template": "What did Brian Chesky privately say during a confidential 2025 board discussion of artificial intelligence?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:1991_p0060",
+      "source_id": "1991_p0060",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1982_p0082",
+      "source_id": "1982_p0082",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2000_p0095",
+      "source_id": "2000_p0095",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1999_p0119",
+      "source_id": "1999_p0119",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:179",
+      "template": "What did Tim Cook privately say during a secret 2025 meeting about product launch timing?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:1989_p0142",
+      "source_id": "1989_p0142",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1992_p0106",
+      "source_id": "1992_p0106",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2013_p0109",
+      "source_id": "2013_p0109",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1990_p0155",
+      "source_id": "1990_p0155",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:180",
+      "template": "What did Brian Chesky privately say during a private 2025 conversation about succession planning?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2007_p0108",
+      "source_id": "2007_p0108",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2015_p0092",
+      "source_id": "2015_p0092",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2003_p0031",
+      "source_id": "2003_p0031",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2004_p0101",
+      "source_id": "2004_p0101",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:181",
+      "template": "What did Reed Hastings privately say during a private 2026 discussion of cybersecurity spending?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2002_p0104",
+      "source_id": "2002_p0104",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1985_p0044",
+      "source_id": "1985_p0044",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1979_p0052",
+      "source_id": "1979_p0052",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1977_p0004",
+      "source_id": "1977_p0004",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:182",
+      "template": "What was Microsoft's exact dividend per share for fiscal year 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2018_p0015",
+      "source_id": "2018_p0015",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2001_p0033",
+      "source_id": "2001_p0033",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1980_p0031",
+      "source_id": "1980_p0031",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1997_p0005",
+      "source_id": "1997_p0005",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:183",
+      "template": "What was the exact closing price in US dollars of Bitcoin on the last trading day of May 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2011_p0039",
+      "source_id": "2011_p0039",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1993_p0090",
+      "source_id": "1993_p0090",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1996_p0022",
+      "source_id": "1996_p0022",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2016_p0084",
+      "source_id": "2016_p0084",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:184",
+      "template": "What was Nvidia's exact audited revenue for fiscal year 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2014_p0095",
+      "source_id": "2014_p0095",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1994_p0081",
+      "source_id": "1994_p0081",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2023_p0017",
+      "source_id": "2023_p0017",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1987_p0086",
+      "source_id": "1987_p0086",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:185",
+      "template": "What was the exact closing price in US dollars of Litecoin on the last trading day of February 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:1998_p0070",
+      "source_id": "1998_p0070",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2024_p0008",
+      "source_id": "2024_p0008",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2008_p0107",
+      "source_id": "2008_p0107",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1988_p0066",
+      "source_id": "1988_p0066",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:186",
+      "template": "What was the exact closing price in US dollars of XRP on the last trading day of March 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2022_p0032",
+      "source_id": "2022_p0032",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2006_p0128",
+      "source_id": "2006_p0128",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1983_p0010",
+      "source_id": "1983_p0010",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1995_p0002",
+      "source_id": "1995_p0002",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:187",
+      "template": "What did Jensen Huang privately say during a private 2025 conversation about succession planning?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2005_p0065",
+      "source_id": "2005_p0065",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2021_p0059",
+      "source_id": "2021_p0059",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2009_p0103",
+      "source_id": "2009_p0103",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2010_p0013",
+      "source_id": "2010_p0013",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:188",
+      "template": "What was the exact closing price in US dollars of Cardano on the last trading day of March 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2012_p0039",
+      "source_id": "2012_p0039",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2019_p0047",
+      "source_id": "2019_p0047",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1986_p0140",
+      "source_id": "1986_p0140",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1984_p0126",
+      "source_id": "1984_p0126",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:189",
+      "template": "What was the exact closing price in US dollars of Solana on the last trading day of October 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2020_p0055",
+      "source_id": "2020_p0055",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1981_p0022",
+      "source_id": "1981_p0022",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2017_p0073",
+      "source_id": "2017_p0073",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1978_p0048",
+      "source_id": "1978_p0048",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:190",
+      "template": "What did Sundar Pichai privately say during an undisclosed 2026 strategy for employee compensation?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:1991_p0063",
+      "source_id": "1991_p0063",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1982_p0037",
+      "source_id": "1982_p0037",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2000_p0119",
+      "source_id": "2000_p0119",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1999_p0106",
+      "source_id": "1999_p0106",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:191",
+      "template": "What was the exact closing price in US dollars of Polkadot on the last trading day of January 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:1989_p0059",
+      "source_id": "1989_p0059",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1992_p0118",
+      "source_id": "1992_p0118",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2013_p0027",
+      "source_id": "2013_p0027",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1990_p0039",
+      "source_id": "1990_p0039",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:192",
+      "template": "What was Amazon's exact audited revenue for fiscal year 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2007_p0039",
+      "source_id": "2007_p0039",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2015_p0068",
+      "source_id": "2015_p0068",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2003_p0075",
+      "source_id": "2003_p0075",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2004_p0092",
+      "source_id": "2004_p0092",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:193",
+      "template": "What did Andy Jassy privately say during a private 2025 conversation about succession planning?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2002_p0102",
+      "source_id": "2002_p0102",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1985_p0041",
+      "source_id": "1985_p0041",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1979_p0005",
+      "source_id": "1979_p0005",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1977_p0025",
+      "source_id": "1977_p0025",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:194",
+      "template": "What was the exact closing price in US dollars of Cardano on the last trading day of May 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2018_p0040",
+      "source_id": "2018_p0040",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2001_p0092",
+      "source_id": "2001_p0092",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1980_p0041",
+      "source_id": "1980_p0041",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1997_p0012",
+      "source_id": "1997_p0012",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:195",
+      "template": "What was the exact closing price in US dollars of Dogecoin on the last trading day of January 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2011_p0078",
+      "source_id": "2011_p0078",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1993_p0111",
+      "source_id": "1993_p0111",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1996_p0061",
+      "source_id": "1996_p0061",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2016_p0054",
+      "source_id": "2016_p0054",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:196",
+      "template": "What was the exact closing price in US dollars of Cardano on the last trading day of June 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2014_p0088",
+      "source_id": "2014_p0088",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1994_p0104",
+      "source_id": "1994_p0104",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2023_p0011",
+      "source_id": "2023_p0011",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1987_p0051",
+      "source_id": "1987_p0051",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:197",
+      "template": "What was Adobe's exact dividend per share for fiscal year 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:1998_p0035",
+      "source_id": "1998_p0035",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2024_p0031",
+      "source_id": "2024_p0031",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2008_p0054",
+      "source_id": "2008_p0054",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1988_p0100",
+      "source_id": "1988_p0100",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:198",
+      "template": "What did Reed Hastings privately say during a private 2025 conversation about succession planning?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2022_p0037",
+      "source_id": "2022_p0037",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2006_p0034",
+      "source_id": "2006_p0034",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1983_p0114",
+      "source_id": "1983_p0114",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1995_p0039",
+      "source_id": "1995_p0039",
+      "type": "answerable"
+    },
+    {
+      "id": "unanswerable:199",
+      "template": "What was the exact closing price in US dollars of Litecoin on the last trading day of January 2025?",
+      "type": "unanswerable"
+    },
+    {
+      "id": "passage:2005_p0066",
+      "source_id": "2005_p0066",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2021_p0033",
+      "source_id": "2021_p0033",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2009_p0026",
+      "source_id": "2009_p0026",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2010_p0140",
+      "source_id": "2010_p0140",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2012_p0057",
+      "source_id": "2012_p0057",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2019_p0013",
+      "source_id": "2019_p0013",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1986_p0061",
+      "source_id": "1986_p0061",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1984_p0050",
+      "source_id": "1984_p0050",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2020_p0083",
+      "source_id": "2020_p0083",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1981_p0043",
+      "source_id": "1981_p0043",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2017_p0048",
+      "source_id": "2017_p0048",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1978_p0028",
+      "source_id": "1978_p0028",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1991_p0093",
+      "source_id": "1991_p0093",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1982_p0063",
+      "source_id": "1982_p0063",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2000_p0100",
+      "source_id": "2000_p0100",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1999_p0014",
+      "source_id": "1999_p0014",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1989_p0081",
+      "source_id": "1989_p0081",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1992_p0088",
+      "source_id": "1992_p0088",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2013_p0131",
+      "source_id": "2013_p0131",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1990_p0119",
+      "source_id": "1990_p0119",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2007_p0109",
+      "source_id": "2007_p0109",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2015_p0039",
+      "source_id": "2015_p0039",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2003_p0052",
+      "source_id": "2003_p0052",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2004_p0126",
+      "source_id": "2004_p0126",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2002_p0042",
+      "source_id": "2002_p0042",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1985_p0095",
+      "source_id": "1985_p0095",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1979_p0048",
+      "source_id": "1979_p0048",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1977_p0030",
+      "source_id": "1977_p0030",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2018_p0018",
+      "source_id": "2018_p0018",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2001_p0027",
+      "source_id": "2001_p0027",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1980_p0073",
+      "source_id": "1980_p0073",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1997_p0050",
+      "source_id": "1997_p0050",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2011_p0113",
+      "source_id": "2011_p0113",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1993_p0076",
+      "source_id": "1993_p0076",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1996_p0001",
+      "source_id": "1996_p0001",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2016_p0066",
+      "source_id": "2016_p0066",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2014_p0128",
+      "source_id": "2014_p0128",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1994_p0072",
+      "source_id": "1994_p0072",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2023_p0042",
+      "source_id": "2023_p0042",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1987_p0076",
+      "source_id": "1987_p0076",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1998_p0013",
+      "source_id": "1998_p0013",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2024_p0002",
+      "source_id": "2024_p0002",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2008_p0125",
+      "source_id": "2008_p0125",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1988_p0009",
+      "source_id": "1988_p0009",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2022_p0016",
+      "source_id": "2022_p0016",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2006_p0044",
+      "source_id": "2006_p0044",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1983_p0108",
+      "source_id": "1983_p0108",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1995_p0004",
+      "source_id": "1995_p0004",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2005_p0085",
+      "source_id": "2005_p0085",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2021_p0032",
+      "source_id": "2021_p0032",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2009_p0050",
+      "source_id": "2009_p0050",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2010_p0054",
+      "source_id": "2010_p0054",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2012_p0069",
+      "source_id": "2012_p0069",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2019_p0032",
+      "source_id": "2019_p0032",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1986_p0011",
+      "source_id": "1986_p0011",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1984_p0121",
+      "source_id": "1984_p0121",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2020_p0061",
+      "source_id": "2020_p0061",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1981_p0069",
+      "source_id": "1981_p0069",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2017_p0090",
+      "source_id": "2017_p0090",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1978_p0025",
+      "source_id": "1978_p0025",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1991_p0041",
+      "source_id": "1991_p0041",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1982_p0067",
+      "source_id": "1982_p0067",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2000_p0007",
+      "source_id": "2000_p0007",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1999_p0028",
+      "source_id": "1999_p0028",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1989_p0049",
+      "source_id": "1989_p0049",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1992_p0093",
+      "source_id": "1992_p0093",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2013_p0055",
+      "source_id": "2013_p0055",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1990_p0128",
+      "source_id": "1990_p0128",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2007_p0091",
+      "source_id": "2007_p0091",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2015_p0140",
+      "source_id": "2015_p0140",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2003_p0129",
+      "source_id": "2003_p0129",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2004_p0037",
+      "source_id": "2004_p0037",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2002_p0107",
+      "source_id": "2002_p0107",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1985_p0083",
+      "source_id": "1985_p0083",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1979_p0047",
+      "source_id": "1979_p0047",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1977_p0031",
+      "source_id": "1977_p0031",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2018_p0013",
+      "source_id": "2018_p0013",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2001_p0013",
+      "source_id": "2001_p0013",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1980_p0006",
+      "source_id": "1980_p0006",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1997_p0037",
+      "source_id": "1997_p0037",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2011_p0032",
+      "source_id": "2011_p0032",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1993_p0036",
+      "source_id": "1993_p0036",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1996_p0090",
+      "source_id": "1996_p0090",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2016_p0137",
+      "source_id": "2016_p0137",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2014_p0232",
+      "source_id": "2014_p0232",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1994_p0036",
+      "source_id": "1994_p0036",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2023_p0058",
+      "source_id": "2023_p0058",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1987_p0080",
+      "source_id": "1987_p0080",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1998_p0062",
+      "source_id": "1998_p0062",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2024_p0043",
+      "source_id": "2024_p0043",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2008_p0062",
+      "source_id": "2008_p0062",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1988_p0028",
+      "source_id": "1988_p0028",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2022_p0039",
+      "source_id": "2022_p0039",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2006_p0051",
+      "source_id": "2006_p0051",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1983_p0122",
+      "source_id": "1983_p0122",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:1995_p0079",
+      "source_id": "1995_p0079",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2005_p0136",
+      "source_id": "2005_p0136",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2021_p0038",
+      "source_id": "2021_p0038",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2009_p0117",
+      "source_id": "2009_p0117",
+      "type": "answerable"
+    },
+    {
+      "id": "passage:2010_p0036",
+      "source_id": "2010_p0036",
+      "type": "answerable"
+    }
+  ]
+}

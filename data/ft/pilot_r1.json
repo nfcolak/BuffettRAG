@@ -1,0 +1,9 @@
+{
+  "end_to_end_tok_per_second": 6.454378412506004,
+  "examples": 20,
+  "generation_tok_per_second": 41.300940512008765,
+  "keep_rate": 0.75,
+  "kept": 15,
+  "prompt_revision": 1,
+  "seconds": 90.6361484579993
+}

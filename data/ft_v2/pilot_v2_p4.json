@@ -1,0 +1,36 @@
+{
+  "answerable_examples": 16,
+  "answerable_keep_rate": 0.1875,
+  "avg_citations_per_kept_answer": 2.3333333333333335,
+  "avg_sentences_per_kept_answer": 2.3333333333333335,
+  "by_kind": {
+    "followup": [
+      0,
+      4
+    ],
+    "multipart": [
+      0,
+      1
+    ],
+    "single": [
+      3,
+      8
+    ],
+    "temporal": [
+      0,
+      3
+    ]
+  },
+  "end_to_end_tok_per_second": 15.180296411709872,
+  "examples": 20,
+  "generation_tok_per_second": 62.24712600177422,
+  "keep_rate": 0.35,
+  "kept": 7,
+  "prompt_rev": 4,
+  "rejection_reasons": {
+    "blocked_claims": 9,
+    "too_few_sentences": 4
+  },
+  "seconds": 68.04873804100498,
+  "total_examples": 38
+}
