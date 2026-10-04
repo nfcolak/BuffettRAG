@@ -13,9 +13,9 @@
     "nli_required_claims_met": 4,
     "required_claims": 31,
     "lexical_required_claims_met": 4,
-    "citation_support_rate": 0.7692307692307693,
+    "citation_support_rate": 1.0,
     "cited_sentences": 13,
-    "supported_cited_sentences": 10,
+    "supported_cited_sentences": 13,
     "agreement": {
       "lexical_only": 1,
       "nli_only": 1,
@@ -87,7 +87,7 @@
             "1979_p0011"
           ],
           "supported": true,
-          "support_prob": 0.9946
+          "support_prob": 1.0
         }
       ],
       "citation_support": 1.0,
@@ -116,13 +116,13 @@
           "cited_passage_ids": [
             "1982_p0016"
           ],
-          "supported": false,
-          "support_prob": 0.0
+          "supported": true,
+          "support_prob": 1.0
         }
       ],
-      "citation_support": 0.0,
+      "citation_support": 1.0,
       "cited_sentences": 1,
-      "supported_cited_sentences": 0
+      "supported_cited_sentences": 1
     },
     {
       "qid": "ho04_1983_goodwill_preference",
@@ -187,7 +187,7 @@
             "1987_p0069"
           ],
           "supported": true,
-          "support_prob": 0.9969
+          "support_prob": 1.0
         }
       ],
       "citation_support": 1.0,
@@ -217,7 +217,7 @@
             "1991_p0004"
           ],
           "supported": true,
-          "support_prob": 0.9356
+          "support_prob": 1.0
         }
       ],
       "citation_support": 1.0,
@@ -255,7 +255,7 @@
             "1994_p0085"
           ],
           "supported": true,
-          "support_prob": 0.9308
+          "support_prob": 1.0
         }
       ],
       "citation_support": 1.0,
@@ -289,7 +289,7 @@
             "1995_p0031"
           ],
           "supported": true,
-          "support_prob": 0.9448
+          "support_prob": 1.0
         }
       ],
       "citation_support": 1.0,
@@ -319,7 +319,7 @@
             "1999_p0091"
           ],
           "supported": true,
-          "support_prob": 0.9916
+          "support_prob": 1.0
         }
       ],
       "citation_support": 1.0,
@@ -381,7 +381,7 @@
             "2004_p0116"
           ],
           "supported": true,
-          "support_prob": 0.9888
+          "support_prob": 1.0
         }
       ],
       "citation_support": 1.0,
@@ -455,7 +455,7 @@
             "2007_p0086"
           ],
           "supported": true,
-          "support_prob": 0.5442
+          "support_prob": 0.8794
         }
       ],
       "citation_support": 1.0,
@@ -485,7 +485,7 @@
             "2013_p0018"
           ],
           "supported": true,
-          "support_prob": 0.8674
+          "support_prob": 1.0
         }
       ],
       "citation_support": 1.0,
@@ -570,13 +570,13 @@
           "cited_passage_ids": [
             "2019_p0020"
           ],
-          "supported": false,
-          "support_prob": 0.0
+          "supported": true,
+          "support_prob": 1.0
         }
       ],
-      "citation_support": 0.0,
+      "citation_support": 1.0,
       "cited_sentences": 1,
-      "supported_cited_sentences": 0
+      "supported_cited_sentences": 1
     },
     {
       "qid": "ho18_2023_munger_architect",
@@ -600,13 +600,13 @@
           "cited_passage_ids": [
             "2023_p0002"
           ],
-          "supported": false,
-          "support_prob": 0.0
+          "supported": true,
+          "support_prob": 1.0
         }
       ],
-      "citation_support": 0.0,
+      "citation_support": 1.0,
       "cited_sentences": 1,
-      "supported_cited_sentences": 0
+      "supported_cited_sentences": 1
     },
     {
       "qid": "ho19_2024_tax_followup",
@@ -717,7 +717,7 @@
             "1993_p0045"
           ],
           "supported": true,
-          "support_prob": 0.8149
+          "support_prob": 0.8417
         },
         {
           "text": "In 2010: The retrieved passages for this period do not cover this question.",

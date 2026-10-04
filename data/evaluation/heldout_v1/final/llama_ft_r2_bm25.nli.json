@@ -7,15 +7,15 @@
     "window_tokens": 400
   },
   "summary": {
-    "nli_accepted": 5,
+    "nli_accepted": 9,
     "scored_answers": 24,
     "lexical_accepted": 10,
     "nli_required_claims_met": 10,
     "required_claims": 31,
     "lexical_required_claims_met": 10,
-    "citation_support_rate": 0.5,
+    "citation_support_rate": 0.9666666666666667,
     "cited_sentences": 30,
-    "supported_cited_sentences": 15,
+    "supported_cited_sentences": 29,
     "agreement": {
       "lexical_only": 1,
       "nli_only": 1,
@@ -67,7 +67,7 @@
             "1977_p0000"
           ],
           "supported": true,
-          "support_prob": 0.9989
+          "support_prob": 0.9987
         },
         {
           "text": "Of these earnings, $1.43 per share resulted from substantial realized capital gains by Blue Chip Stamps which, to the extent of our proportional interest in that company, are included in our operating earnings figure.",
@@ -75,7 +75,7 @@
             "1977_p0000"
           ],
           "supported": true,
-          "support_prob": 0.8537
+          "support_prob": 1.0
         }
       ],
       "citation_support": 1.0,
@@ -104,21 +104,21 @@
           "cited_passage_ids": [
             "1979_p0011"
           ],
-          "supported": false,
-          "support_prob": 0.0
+          "supported": true,
+          "support_prob": 1.0
         },
         {
           "text": "Now such an outcome seems less certain.",
           "cited_passage_ids": [
             "1979_p0011"
           ],
-          "supported": false,
-          "support_prob": 0.0
+          "supported": true,
+          "support_prob": 1.0
         }
       ],
-      "citation_support": 0.0,
+      "citation_support": 1.0,
       "cited_sentences": 2,
-      "supported_cited_sentences": 0
+      "supported_cited_sentences": 2
     },
     {
       "qid": "ho03_1982_price_discipline",
@@ -147,7 +147,7 @@
             "1982_p0016"
           ],
           "supported": true,
-          "support_prob": 0.9703
+          "support_prob": 1.0
         },
         {
           "text": "If the purchase price is too high, the too-high purchase price for the stock of an excellent company can undo the effects of a subsequent decade of favorable business developments.",
@@ -155,7 +155,7 @@
             "1982_p0016"
           ],
           "supported": true,
-          "support_prob": 0.9945
+          "support_prob": 0.9939
         }
       ],
       "citation_support": 1.0,
@@ -184,21 +184,21 @@
           "cited_passage_ids": [
             "1983_p0029"
           ],
-          "supported": false,
-          "support_prob": 0.0
+          "supported": true,
+          "support_prob": 1.0
         },
         {
           "text": "This bias caused me to make many important business mistakes of omission, although relatively few of commission.",
           "cited_passage_ids": [
             "1983_p0029"
           ],
-          "supported": false,
-          "support_prob": 0.0
+          "supported": true,
+          "support_prob": 1.0
         }
       ],
-      "citation_support": 0.0,
+      "citation_support": 1.0,
       "cited_sentences": 2,
-      "supported_cited_sentences": 0
+      "supported_cited_sentences": 2
     },
     {
       "qid": "ho05_1987_mr_market",
@@ -222,13 +222,13 @@
           "cited_passage_ids": [
             "1987_p0069"
           ],
-          "supported": false,
-          "support_prob": 0.0
+          "supported": true,
+          "support_prob": 1.0
         }
       ],
-      "citation_support": 0.0,
+      "citation_support": 1.0,
       "cited_sentences": 1,
-      "supported_cited_sentences": 0
+      "supported_cited_sentences": 1
     },
     {
       "qid": "ho06_1991_salomon_role",
@@ -253,7 +253,7 @@
             "1991_p0004"
           ],
           "supported": true,
-          "support_prob": 0.9882
+          "support_prob": 1.0
         }
       ],
       "citation_support": 1.0,
@@ -290,18 +290,18 @@
           "cited_passage_ids": [
             "1994_p0089"
           ],
-          "supported": false,
-          "support_prob": 0.0
+          "supported": true,
+          "support_prob": 1.0
         }
       ],
-      "citation_support": 0.0,
+      "citation_support": 1.0,
       "cited_sentences": 1,
-      "supported_cited_sentences": 0
+      "supported_cited_sentences": 1
     },
     {
       "qid": "ho08_1995_geico_distribution",
       "unscored": false,
-      "nli_accepted": false,
+      "nli_accepted": true,
       "lexical_accepted": true,
       "nli_claims": [
         {
@@ -313,7 +313,7 @@
             "GEICO's method of selling - direct marketing - gave it an enormous cost advantage over competitors that sold through agents, a form of distribution so ingrained in the business of these insurers that it was impossible for them to give it up."
           ],
           "supporting_sentence_supported": [
-            false
+            true
           ]
         }
       ],
@@ -324,8 +324,8 @@
           "cited_passage_ids": [
             "1995_p0031"
           ],
-          "supported": false,
-          "support_prob": 0.0
+          "supported": true,
+          "support_prob": 1.0
         },
         {
           "text": "After my session with Davy, I was more excited about GEICO than I have ever been about a stock.",
@@ -333,12 +333,12 @@
             "1995_p0031"
           ],
           "supported": true,
-          "support_prob": 0.9941
+          "support_prob": 1.0
         }
       ],
-      "citation_support": 0.5,
+      "citation_support": 1.0,
       "cited_sentences": 2,
-      "supported_cited_sentences": 1
+      "supported_cited_sentences": 2
     },
     {
       "qid": "ho09_1999_tech_competence",
@@ -363,25 +363,25 @@
             "1999_p0091"
           ],
           "supported": true,
-          "support_prob": 0.9916
+          "support_prob": 1.0
         },
         {
           "text": "This attribute, which makes for good long-term investment results, is one Charlie and I occasionally believe we can identify.",
           "cited_passage_ids": [
             "1999_p0091"
           ],
-          "supported": false,
-          "support_prob": 0.0
+          "supported": true,
+          "support_prob": 1.0
         }
       ],
-      "citation_support": 0.5,
+      "citation_support": 1.0,
       "cited_sentences": 2,
-      "supported_cited_sentences": 1
+      "supported_cited_sentences": 2
     },
     {
       "qid": "ho10_2001_float_cost",
       "unscored": false,
-      "nli_accepted": false,
+      "nli_accepted": true,
       "lexical_accepted": true,
       "nli_claims": [
         {
@@ -395,7 +395,7 @@
           ],
           "supporting_sentence_supported": [
             true,
-            false
+            true
           ]
         }
       ],
@@ -407,20 +407,20 @@
             "2001_p0037"
           ],
           "supported": true,
-          "support_prob": 0.8727
+          "support_prob": 0.995
         },
         {
           "text": "It was our worst year in float cost since 1984, and a result that to a significant degree, as I will explain in the next section, we brought upon ourselves.",
           "cited_passage_ids": [
             "2001_p0037"
           ],
-          "supported": false,
-          "support_prob": 0.0
+          "supported": true,
+          "support_prob": 1.0
         }
       ],
-      "citation_support": 0.5,
+      "citation_support": 1.0,
       "cited_sentences": 2,
-      "supported_cited_sentences": 1
+      "supported_cited_sentences": 2
     },
     {
       "qid": "ho11_2004_currency_contracts",
@@ -445,7 +445,7 @@
             "2004_p0116"
           ],
           "supported": true,
-          "support_prob": 0.9812
+          "support_prob": 1.0
         }
       ],
       "citation_support": 1.0,
@@ -475,7 +475,7 @@
             "The remaining 20% stays in the hands of the Wertheimer family, making it our valued partner."
           ],
           "supporting_sentence_supported": [
-            false
+            true
           ]
         }
       ],
@@ -486,21 +486,21 @@
           "cited_passage_ids": [
             "2006_p0027"
           ],
-          "supported": false,
-          "support_prob": 0.0
+          "supported": true,
+          "support_prob": 1.0
         },
         {
           "text": "The remaining 20% stays in the hands of the Wertheimer family, making it our valued partner.",
           "cited_passage_ids": [
             "2006_p0027"
           ],
-          "supported": false,
-          "support_prob": 0.0
+          "supported": true,
+          "support_prob": 1.0
         }
       ],
-      "citation_support": 0.0,
+      "citation_support": 1.0,
       "cited_sentences": 2,
-      "supported_cited_sentences": 0
+      "supported_cited_sentences": 2
     },
     {
       "qid": "ho13_2007_petrochina_sale",
@@ -567,7 +567,7 @@
             "2013_p0018"
           ],
           "supported": true,
-          "support_prob": 0.9913
+          "support_prob": 1.0
         },
         {
           "text": "This acquisition fits nicely into our existing electric-utility operation and offers many possibilities for large investments in renewable energy.",
@@ -575,7 +575,7 @@
             "2013_p0018"
           ],
           "supported": true,
-          "support_prob": 0.8248
+          "support_prob": 1.0
         }
       ],
       "citation_support": 1.0,
@@ -613,7 +613,7 @@
     {
       "qid": "ho16_2017_hurricane_loss",
       "unscored": false,
-      "nli_accepted": false,
+      "nli_accepted": true,
       "lexical_accepted": true,
       "nli_claims": [
         {
@@ -627,7 +627,7 @@
           ],
           "supporting_sentence_supported": [
             true,
-            false
+            true
           ]
         }
       ],
@@ -639,25 +639,25 @@
             "2017_p0039"
           ],
           "supported": true,
-          "support_prob": 0.9651
+          "support_prob": 1.0
         },
         {
           "text": "If both that estimate and my industry estimate of $100 billion are close to accurate, our share of the industry loss was about 3%.",
           "cited_passage_ids": [
             "2017_p0039"
           ],
-          "supported": false,
-          "support_prob": 0.0
+          "supported": true,
+          "support_prob": 1.0
         }
       ],
-      "citation_support": 0.5,
+      "citation_support": 1.0,
       "cited_sentences": 2,
-      "supported_cited_sentences": 1
+      "supported_cited_sentences": 2
     },
     {
       "qid": "ho17_2019_reinvestment_priority",
       "unscored": false,
-      "nli_accepted": false,
+      "nli_accepted": true,
       "lexical_accepted": true,
       "nli_claims": [
         {
@@ -670,7 +670,7 @@
             "Reinvestment in productive operational assets will forever remain our top priority."
           ],
           "supporting_sentence_supported": [
-            false,
+            true,
             true
           ]
         }
@@ -682,8 +682,8 @@
           "cited_passage_ids": [
             "2019_p0020"
           ],
-          "supported": false,
-          "support_prob": 0.0
+          "supported": true,
+          "support_prob": 1.0
         },
         {
           "text": "Reinvestment in productive operational assets will forever remain our top priority.",
@@ -691,12 +691,12 @@
             "2019_p0020"
           ],
           "supported": true,
-          "support_prob": 0.76
+          "support_prob": 1.0
         }
       ],
-      "citation_support": 0.5,
+      "citation_support": 1.0,
       "cited_sentences": 2,
-      "supported_cited_sentences": 1
+      "supported_cited_sentences": 2
     },
     {
       "qid": "ho18_2023_munger_architect",
@@ -720,13 +720,13 @@
           "cited_passage_ids": [
             "2023_p0028"
           ],
-          "supported": false,
-          "support_prob": 0.0
+          "supported": true,
+          "support_prob": 1.0
         }
       ],
-      "citation_support": 0.0,
+      "citation_support": 1.0,
       "cited_sentences": 1,
-      "supported_cited_sentences": 0
+      "supported_cited_sentences": 1
     },
     {
       "qid": "ho19_2024_tax_followup",
@@ -843,7 +843,7 @@
             "1993_p0045"
           ],
           "supported": true,
-          "support_prob": 0.5698
+          "support_prob": 0.9378
         },
         {
           "text": "In those years when we have had an underwriting profit, which includes 1993, our cost of float has been negative, and we have determined our insurance earnings by adding underwriting profit to float income.",
@@ -851,7 +851,7 @@
             "1993_p0045"
           ],
           "supported": true,
-          "support_prob": 0.9849
+          "support_prob": 1.0
         },
         {
           "text": "In 2010: If we do that, all of our investments – those funded both by float and by retained earnings – can be viewed as an element of value for Berkshire shareholders.",

@@ -13,6 +13,8 @@ from typing import Any, Dict, List, Optional, Sequence
 
 from src.evaluation.answer_benchmark import is_unanswerable_case
 from src.evaluation.citation_faithfulness import split_sentences
+from src.retrieval.context import _walk_neighbors
+from src.storage import StoredDoc
 
 ROOT = Path(__file__).resolve().parents[2]
 MODEL_DIR = Path("/Users/necatifurkancolak/AI-Workplace/Projects/done/BuffettRAG/models/nli-deberta-v3-base")
@@ -36,17 +38,51 @@ class NliScorer:
         self.entail_idx = next(i for i, v in id2label.items() if v == "entailment")
         self.chunks_file = chunks_file
         self._passages: Optional[Dict[str, str]] = None
+        self._docs: Dict[str, StoredDoc] = {}
         self._cache: Dict[tuple, float] = {}
 
-    def passage_text(self, pid: str) -> str:
+    def _load(self) -> None:
         if self._passages is None:
             self._passages = {}
+            self._docs = {}
             with open(self.chunks_file, encoding="utf-8") as fh:
                 for line in fh:
                     if line.strip():
                         d = json.loads(line)
                         self._passages[d["id"]] = d["text"]
+                        self._docs[d["id"]] = StoredDoc(d["id"], d["text"], {k: v for k, v in d.items() if k != "text"})
+
+    def passage_text(self, pid: str) -> str:
+        self._load()
         return self._passages.get(pid, "")
+
+    def block_text(self, pid: str) -> str:
+        """Cited passage plus its +/-1 same-year neighbours, as the answer system saw it."""
+        self._load()
+        doc = self._docs.get(pid)
+        if doc is None:
+            return ""
+        before = _walk_neighbors(doc, self._docs, "previous_chunk_id", 1)
+        after = _walk_neighbors(doc, self._docs, "next_chunk_id", 1)
+        return "\n\n".join(d.text for d in (*before, doc, *after))
+
+    @staticmethod
+    def _norm(text: str) -> str:
+        return re.sub(r"\W+", " ", text.lower()).strip()
+
+    def support_prob(self, block: str, sentence: str) -> float:
+        """1.0 if the sentence is contained verbatim (normalized) in the block, else max NLI over
+        1-3 sentence windows of the block and the whole block."""
+        if not block.strip() or not sentence.strip():
+            return 0.0
+        if self._norm(sentence) and self._norm(sentence) in self._norm(block):
+            return 1.0
+        best = self.entail_prob(block, sentence)
+        bs = [s for s in split_sentences(block) if s.strip()]
+        for n in (1, 2, 3):
+            for i in range(max(0, len(bs) - n + 1)):
+                best = max(best, self.entail_prob(" ".join(bs[i:i + n]), sentence))
+        return best
 
     def _windows(self, premise: str, hypothesis: str) -> List[str]:
         ids = self.tok(premise, add_special_tokens=False)["input_ids"]
@@ -113,10 +149,10 @@ class NliScorer:
         for raw in raw_sents:
             text = self.clean(raw)
             cited = self._cited_ids(raw, passage_ids)
-            premise = "\n\n".join(self.passage_text(p) for p in cited)
-            supported = bool(cited) and self.entailed(premise, text)
+            prob = max((self.support_prob(self.block_text(p), text) for p in cited), default=0.0)
+            supported = bool(cited) and prob >= ENTAIL_THRESHOLD
             sents.append({"text": text, "cited_passage_ids": cited, "supported": supported,
-                          "support_prob": round(self.entail_prob(premise, text), 4) if cited else 0.0})
+                          "support_prob": round(prob, 4)})
         lex_claims = {c["claim"]: c.get("met") for c in lex.get("claims", [])}
         claims = []
         for gc in case["gold_claims"]:
