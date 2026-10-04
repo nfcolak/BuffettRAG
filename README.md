@@ -20,7 +20,7 @@ Three vector backends share one interface, and each persists an index identity m
 
 ## Evaluation
 
-The evaluation pipeline scores retrieval strategies against a 50-query gold set with year-labeled relevance judgments. On that set, hybrid retrieval with reranking reaches MRR 0.739, recall@1 0.60 and recall@10 0.98. The historical answer run attempted 50 questions: 39 were scored and 11 failed at the provider. Its citation coverage was 0.912 and lexical support proxy 0.254; neither is a measured faithfulness rate, and the old artifact did not save passage text. Raw reports live in `data/evaluation/`. The offline baseline/after audit and limitations are documented in [the answer-quality report](docs/ANSWER_QUALITY_20260910_TR.md).
+The evaluation pipeline scores retrieval strategies against a 50-query gold set with year-labeled relevance judgments. On that set, hybrid retrieval with reranking reaches MRR 0.739, recall@1 0.60 and recall@10 0.98. The historical answer run attempted 50 questions: 39 were scored and 11 failed at the provider. Its citation coverage was 0.912 and lexical support proxy 0.254; neither is a measured faithfulness rate, and the old artifact did not save passage text. Raw reports live in `data/evaluation/`.
 
 ## Held-out answer benchmark
 
@@ -62,6 +62,8 @@ cd frontend
 npm install
 VITE_BACKEND_URL=http://localhost:8000 npm run dev
 ```
+
+The frontend defaults to the backend at `http://localhost:8000`; it has no provider, model or key settings.
 
 The first backend start downloads the embedding model (~440MB) and the reranker (~2.3GB). On CPU the reranker adds noticeable latency per query; a GPU removes most of it.
 
