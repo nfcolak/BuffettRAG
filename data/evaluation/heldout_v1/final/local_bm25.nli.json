@@ -1,0 +1,1968 @@
+{
+  "source_result": "local_bm25.json",
+  "cases": "data/evaluation/heldout_v1/answer_benchmark_heldout_v1.json",
+  "device": "mps",
+  "rule": {
+    "entail_threshold": 0.5,
+    "window_tokens": 400
+  },
+  "summary": {
+    "nli_accepted": 7,
+    "scored_answers": 24,
+    "lexical_accepted": 18,
+    "nli_required_claims_met": 24,
+    "required_claims": 31,
+    "lexical_required_claims_met": 23,
+    "citation_support_rate": 0.5735294117647058,
+    "cited_sentences": 136,
+    "supported_cited_sentences": 78,
+    "agreement": {
+      "lexical_only": 2,
+      "nli_only": 3,
+      "both": 21,
+      "neither": 5
+    }
+  },
+  "rows": [
+    {
+      "qid": "ho01_1977_operating_earnings",
+      "unscored": false,
+      "nli_accepted": true,
+      "lexical_accepted": true,
+      "nli_claims": [
+        {
+          "claim": "Operating earnings were $21,904,000.",
+          "nli_met": true,
+          "nli_prob": 0.9961,
+          "lexical_met": true,
+          "supporting_sentences": [
+            "Operating earnings in 1977 of $21,904,000, or $22.54 per share, were moderately better than anticipated a year ago.",
+            "Of these earnings, $1.43 per share resulted from substantial realized capital gains by Blue Chip Stamps which, to the extent of our proportional interest in that company, are included in our operating earnings figure."
+          ],
+          "supporting_sentence_supported": [
+            true,
+            true
+          ]
+        },
+        {
+          "claim": "Operating earnings were $22.54 per share.",
+          "nli_met": true,
+          "nli_prob": 0.9894,
+          "lexical_met": true,
+          "supporting_sentences": [
+            "Operating earnings in 1977 of $21,904,000, or $22.54 per share, were moderately better than anticipated a year ago.",
+            "Of these earnings, $1.43 per share resulted from substantial realized capital gains by Blue Chip Stamps which, to the extent of our proportional interest in that company, are included in our operating earnings figure."
+          ],
+          "supporting_sentence_supported": [
+            true,
+            true
+          ]
+        }
+      ],
+      "nli_claim_coverage": 1.0,
+      "sentences": [
+        {
+          "text": "Operating earnings in 1977 of $21,904,000, or $22.54 per share, were moderately better than anticipated a year ago.",
+          "cited_passage_ids": [
+            "1977_p0000"
+          ],
+          "supported": true,
+          "support_prob": 0.9962
+        },
+        {
+          "text": "Of these earnings, $1.43 per share resulted from substantial realized capital gains by Blue Chip Stamps which, to the extent of our proportional interest in that company, are included in our operating earnings figure.",
+          "cited_passage_ids": [
+            "1977_p0000"
+          ],
+          "supported": true,
+          "support_prob": 0.8537
+        },
+        {
+          "text": "Capital gains or losses realized directly by Berkshire Hathaway Inc. or its insurance subsidiaries are not included in our calculation of operating earnings.",
+          "cited_passage_ids": [
+            "1977_p0000"
+          ],
+          "supported": true,
+          "support_prob": 0.9932
+        },
+        {
+          "text": "In 1977 our operating earnings on beginning equity capital amounted to 19%, slightly better than last year and above both our own long-term average and that of American industry in aggregate.",
+          "cited_passage_ids": [
+            "1977_p0003"
+          ],
+          "supported": true,
+          "support_prob": 0.9953
+        },
+        {
+          "text": "But, while our operating earnings per share were up 37% from the year before, our beginning capital was up 24%, making the gain in earnings per share considerably less impressive than it might appear at first glance.",
+          "cited_passage_ids": [
+            "1977_p0003"
+          ],
+          "supported": true,
+          "support_prob": 0.8299
+        },
+        {
+          "text": "Nevertheless, we expect a reasonably good year and our present estimate, subject to the usual caveats regarding the frailties of forecasts, is that operating earnings will improve somewhat on a per share basis during 1978.",
+          "cited_passage_ids": [
+            "1977_p0004"
+          ],
+          "supported": false,
+          "support_prob": 0.0
+        }
+      ],
+      "citation_support": 0.8333333333333334,
+      "cited_sentences": 6,
+      "supported_cited_sentences": 5
+    },
+    {
+      "qid": "ho02_1979_inflation_real_returns",
+      "unscored": false,
+      "nli_accepted": false,
+      "lexical_accepted": true,
+      "nli_claims": [
+        {
+          "claim": "A business earning 20% on capital can produce a negative real return under inflationary conditions.",
+          "nli_met": true,
+          "nli_prob": 0.9983,
+          "lexical_met": true,
+          "supporting_sentences": [
+            "Treasury Note have, in turn, been transformed by inflation into financial instruments that chew up, rather than enhance, purchasing power over their investment lives, a business earning 20% on capital can produce a negative real return for its owners under inflationary conditions not much more severe than presently prevail.",
+            "If we should continue to achieve a 20% compounded gain - not an easy or certain result by any means - and this gain is translated into a corresponding increase in the market value of Berkshire Hathaway stock as it has been over the last fifteen years, your after-tax purchasing power gain is likely to be very close to zero at a 14% inflation rate."
+          ],
+          "supporting_sentence_supported": [
+            true,
+            false
+          ]
+        }
+      ],
+      "nli_claim_coverage": 1.0,
+      "sentences": [
+        {
+          "text": "Now such an outcome seems less certain.",
+          "cited_passage_ids": [
+            "1979_p0011"
+          ],
+          "supported": false,
+          "support_prob": 0.0
+        },
+        {
+          "text": "For the inflation rate, coupled with individual tax rates, will be the ultimate determinant as to whether our internal operating performance produces successful investment results - i.e., a reasonable gain in purchasing power from funds committed - for you as shareholders.",
+          "cited_passage_ids": [
+            "1979_p0011"
+          ],
+          "supported": false,
+          "support_prob": 0.0
+        },
+        {
+          "text": "Just as the original 3% savings bond, a 5% passbook savings account or an 8% U.S.",
+          "cited_passage_ids": [],
+          "supported": false,
+          "support_prob": 0.0
+        },
+        {
+          "text": "Treasury Note have, in turn, been transformed by inflation into financial instruments that chew up, rather than enhance, purchasing power over their investment lives, a business earning 20% on capital can produce a negative real return for its owners under inflationary conditions not much more severe than presently prevail.",
+          "cited_passage_ids": [
+            "1979_p0011"
+          ],
+          "supported": true,
+          "support_prob": 0.9858
+        },
+        {
+          "text": "If we should continue to achieve a 20% compounded gain - not an easy or certain result by any means - and this gain is translated into a corresponding increase in the market value of Berkshire Hathaway stock as it has been over the last fifteen years, your after-tax purchasing power gain is likely to be very close to zero at a 14% inflation rate.",
+          "cited_passage_ids": [
+            "1979_p0011"
+          ],
+          "supported": false,
+          "support_prob": 0.0
+        },
+        {
+          "text": "When this index exceeds the rate of return earned on equity by the business, the investor’s purchasing power (real capital) shrinks even though he consumes nothing at all.",
+          "cited_passage_ids": [
+            "1979_p0013"
+          ],
+          "supported": true,
+          "support_prob": 0.5875
+        },
+        {
+          "text": "A few years ago, a business whose per-share net worth compounded at 20% annually would have guaranteed its owners a highly successful real investment return.",
+          "cited_passage_ids": [
+            "1979_p0010"
+          ],
+          "supported": true,
+          "support_prob": 0.9872
+        }
+      ],
+      "citation_support": 0.5,
+      "cited_sentences": 6,
+      "supported_cited_sentences": 3
+    },
+    {
+      "qid": "ho03_1982_price_discipline",
+      "unscored": false,
+      "nli_accepted": false,
+      "lexical_accepted": true,
+      "nli_claims": [
+        {
+          "claim": "A too-high purchase price can undo a subsequent decade of favorable business developments.",
+          "nli_met": true,
+          "nli_prob": 0.9963,
+          "lexical_met": true,
+          "supporting_sentences": [
+            "For the investor, a too-high purchase price for the stock of an excellent company can undo the effects of a subsequent decade of favorable business developments.",
+            "Should the stock market advance to considerably higher levels, our ability to utilize capital effectively in partialownership positions will be reduced or eliminated."
+          ],
+          "supporting_sentence_supported": [
+            true,
+            false
+          ]
+        }
+      ],
+      "nli_claim_coverage": 1.0,
+      "sentences": [
+        {
+          "text": "The market, like the Lord, helps those who help themselves.",
+          "cited_passage_ids": [
+            "1982_p0016"
+          ],
+          "supported": true,
+          "support_prob": 0.9979
+        },
+        {
+          "text": "But, unlike the Lord, the market does not forgive those who know not what they do.",
+          "cited_passage_ids": [
+            "1982_p0016"
+          ],
+          "supported": true,
+          "support_prob": 0.9887
+        },
+        {
+          "text": "For the investor, a too-high purchase price for the stock of an excellent company can undo the effects of a subsequent decade of favorable business developments.",
+          "cited_passage_ids": [
+            "1982_p0016"
+          ],
+          "supported": true,
+          "support_prob": 0.9703
+        },
+        {
+          "text": "Should the stock market advance to considerably higher levels, our ability to utilize capital effectively in partialownership positions will be reduced or eliminated.",
+          "cited_passage_ids": [
+            "1982_p0016"
+          ],
+          "supported": false,
+          "support_prob": 0.0
+        },
+        {
+          "text": "While high stock prices in the future would make our performance look good temporarily, they would hurt our long-term business prospects rather than help them.",
+          "cited_passage_ids": [
+            "1982_p0017"
+          ],
+          "supported": false,
+          "support_prob": 0.0
+        },
+        {
+          "text": "Our willingness to purchase either partial or total ownership positions in favorably-situated businesses, coupled with reasonable discipline about the prices we are willing to pay, should give us a good chance of achieving our goal.",
+          "cited_passage_ids": [
+            "1982_p0020"
+          ],
+          "supported": true,
+          "support_prob": 0.9896
+        }
+      ],
+      "citation_support": 0.6666666666666666,
+      "cited_sentences": 6,
+      "supported_cited_sentences": 4
+    },
+    {
+      "qid": "ho04_1983_goodwill_preference",
+      "unscored": false,
+      "nli_accepted": true,
+      "lexical_accepted": true,
+      "nli_claims": [
+        {
+          "claim": "He preferred businesses with large amounts of enduring Goodwill and a minimum of tangible assets.",
+          "nli_met": true,
+          "nli_prob": 0.9948,
+          "lexical_met": true,
+          "supporting_sentences": [
+            "Keynes identified my problem: “The difficulty lies not in the new ideas but in escaping from the old ones.” My escape was long delayed, in part because most of what I had been taught by the same teacher had been (and continues to be) so extraordinarily valuable.",
+            "Ultimately, business experience, direct and vicarious, produced my present strong preference for businesses that possess large amounts of enduring Goodwill and that utilize a minimum of tangible assets."
+          ],
+          "supporting_sentence_supported": [
+            true,
+            true
+          ]
+        }
+      ],
+      "nli_claim_coverage": 1.0,
+      "sentences": [
+        {
+          "text": "For years the traditional wisdom – long on tradition, short on wisdom – held that inflation protection was best provided by businesses laden with natural resources, plants and machinery, or other tangible assets (\"In Goods We Trust\").",
+          "cited_passage_ids": [
+            "1983_p0122"
+          ],
+          "supported": false,
+          "support_prob": 0.0
+        },
+        {
+          "text": "Asset-heavy businesses generally earn low rates of return – rates that often barely provide enough capital to fund the inflationary needs of the existing business, with nothing left over for real growth, for distribution to owners, or for acquisition of new businesses.",
+          "cited_passage_ids": [
+            "1983_p0122"
+          ],
+          "supported": false,
+          "support_prob": 0.0
+        },
+        {
+          "text": "Keynes identified my problem: “The difficulty lies not in the new ideas but in escaping from the old ones.” My escape was long delayed, in part because most of what I had been taught by the same teacher had been (and continues to be) so extraordinarily valuable.",
+          "cited_passage_ids": [
+            "1983_p0029"
+          ],
+          "supported": true,
+          "support_prob": 0.9933
+        },
+        {
+          "text": "Ultimately, business experience, direct and vicarious, produced my present strong preference for businesses that possess large amounts of enduring Goodwill and that utilize a minimum of tangible assets.",
+          "cited_passage_ids": [
+            "1983_p0029"
+          ],
+          "supported": true,
+          "support_prob": 0.9628
+        },
+        {
+          "text": "I recommend the Appendix to those who are comfortable with accounting terminology and who have an interest in understanding the business aspects of Goodwill.",
+          "cited_passage_ids": [
+            "1983_p0029"
+          ],
+          "supported": false,
+          "support_prob": 0.0
+        },
+        {
+          "text": "My own thinking has changed drastically from 35 years ago when I was taught to favor tangible assets and to shun businesses whose value depended largely upon economic Goodwill.",
+          "cited_passage_ids": [
+            "1983_p0028"
+          ],
+          "supported": true,
+          "support_prob": 0.8668
+        }
+      ],
+      "citation_support": 0.5,
+      "cited_sentences": 6,
+      "supported_cited_sentences": 3
+    },
+    {
+      "qid": "ho05_1987_mr_market",
+      "unscored": false,
+      "nli_accepted": false,
+      "lexical_accepted": false,
+      "nli_claims": [
+        {
+          "claim": "Mr. Market is there to serve you, not to guide you.",
+          "nli_met": true,
+          "nli_prob": 0.9957,
+          "lexical_met": false,
+          "supporting_sentences": [
+            "But, like Cinderella at the ball, you must heed one warning or everything will turn into pumpkins and mice: Mr.",
+            "Market is there to serve you, not to guide you."
+          ],
+          "supporting_sentence_supported": [
+            false,
+            true
+          ]
+        }
+      ],
+      "nli_claim_coverage": 1.0,
+      "sentences": [
+        {
+          "text": "Under these conditions, the more manicdepressive his behavior, the better for you.",
+          "cited_passage_ids": [
+            "1987_p0069"
+          ],
+          "supported": false,
+          "support_prob": 0.0
+        },
+        {
+          "text": "But, like Cinderella at the ball, you must heed one warning or everything will turn into pumpkins and mice: Mr.",
+          "cited_passage_ids": [],
+          "supported": false,
+          "support_prob": 0.0
+        },
+        {
+          "text": "Market is there to serve you, not to guide you.",
+          "cited_passage_ids": [
+            "1987_p0069"
+          ],
+          "supported": true,
+          "support_prob": 0.9969
+        },
+        {
+          "text": "It is his pocketbook, not his wisdom, that you will find useful.",
+          "cited_passage_ids": [
+            "1987_p0069"
+          ],
+          "supported": true,
+          "support_prob": 0.9838
+        },
+        {
+          "text": "You'll seldom see such a percentage anywhere, let alone at large, diversified companies with nominal leverage.",
+          "cited_passage_ids": [
+            "1987_p0005"
+          ],
+          "supported": true,
+          "support_prob": 0.9588
+        },
+        {
+          "text": "Here's a benchmark: In its 1988 Investor's Guide issue, Fortune reported that among the 500 largest industrial companies and 500 largest service companies, only six had averaged a return on equity of over 30% during the previous decade.",
+          "cited_passage_ids": [
+            "1987_p0005"
+          ],
+          "supported": true,
+          "support_prob": 0.959
+        },
+        {
+          "text": "Many commentators, however, have drawn an incorrect conclusion upon observing recent events: They are fond of saying that the small investor has no chance in a market now dominated by the erratic behavior of the big boys.",
+          "cited_passage_ids": [
+            "1987_p0098"
+          ],
+          "supported": false,
+          "support_prob": 0.0
+        }
+      ],
+      "citation_support": 0.6666666666666666,
+      "cited_sentences": 6,
+      "supported_cited_sentences": 4
+    },
+    {
+      "qid": "ho06_1991_salomon_role",
+      "unscored": false,
+      "nli_accepted": false,
+      "lexical_accepted": true,
+      "nli_claims": [
+        {
+          "claim": "Buffett was elected Interim Chairman of Salomon.",
+          "nli_met": false,
+          "nli_prob": null,
+          "lexical_met": true,
+          "supporting_sentences": [],
+          "supporting_sentence_supported": []
+        }
+      ],
+      "nli_claim_coverage": 0.0,
+      "sentences": [
+        {
+          "text": "But it can't recur annually: We'll have to settle for a single dip in the future.",
+          "cited_passage_ids": [
+            "1991_p0004"
+          ],
+          "supported": false,
+          "support_prob": 0.0
+        },
+        {
+          "text": "In 1989 when I - a happy consumer of five cans of Cherry Coke daily - announced our purchase of $1 billion worth of CocaCola stock, I described the move as a rather extreme example of putting our money where my mouth was.",
+          "cited_passage_ids": [
+            "1991_p0004"
+          ],
+          "supported": true,
+          "support_prob": 0.7971
+        },
+        {
+          "text": "On August 18 of last year, when I was elected Interim Chairman of Salomon Inc, it was a different story: I put my mouth where our money was.",
+          "cited_passage_ids": [
+            "1991_p0004"
+          ],
+          "supported": true,
+          "support_prob": 0.9882
+        },
+        {
+          "text": "You've all read of the events that led to my appointment.",
+          "cited_passage_ids": [
+            "1991_p0004"
+          ],
+          "supported": false,
+          "support_prob": 0.0
+        },
+        {
+          "text": "(Write to: Corporate Secretary, Salomon Inc, Seven World Trade Center, New York, NY 10048) Despite the company's travails, Charlie and I believe our Salomon preferred stock increased slightly in value during 1991.",
+          "cited_passage_ids": [
+            "1991_p0087"
+          ],
+          "supported": true,
+          "support_prob": 0.6359
+        },
+        {
+          "text": "Berkshire's Major Investees Ownership at Yearend (in millions) Capital Cities/ABC Inc. ........",
+          "cited_passage_ids": [],
+          "supported": false,
+          "support_prob": 0.0
+        },
+        {
+          "text": "18.1% 17.9% $ 61 $ 85 The Coca-Cola Company ..........",
+          "cited_passage_ids": [],
+          "supported": false,
+          "support_prob": 0.0
+        },
+        {
+          "text": "7.0% 7.0% 69 58 Federal Home Loan Mortgage Corp.",
+          "cited_passage_ids": [],
+          "supported": false,
+          "support_prob": 0.0
+        },
+        {
+          "text": "3.4%(1) 3.2%(1) 15 10 The Gillette Company ...........",
+          "cited_passage_ids": [],
+          "supported": false,
+          "support_prob": 0.0
+        },
+        {
+          "text": "11.0% --- 23(2) --- GEICO Corp. ....................",
+          "cited_passage_ids": [],
+          "supported": false,
+          "support_prob": 0.0
+        },
+        {
+          "text": "48.2% 46.1% 69 76 The Washington Post Company ....",
+          "cited_passage_ids": [],
+          "supported": false,
+          "support_prob": 0.0
+        },
+        {
+          "text": "14.6% 14.6% 10 18 Wells Fargo & Company ..........",
+          "cited_passage_ids": [],
+          "supported": false,
+          "support_prob": 0.0
+        },
+        {
+          "text": "9.6% 9.7% (17) 19(3) Berkshire's share of undistributed earnings of major investees $230 $266 Hypothetical tax on these undistributed investee earnings (30) (35) Reported operating earnings of Berkshire 316 371 Total look-through earnings of Berkshire $516 $602 ======== ======== (1) Net of minority interest at Wesco (2) For the nine months after Berkshire converted its preferred on April 1 (3) Calculated on average ownership for the year We also believe that investors can benefit by focusing on their own look-through earnings.",
+          "cited_passage_ids": [
+            "1991_p0018"
+          ],
+          "supported": false,
+          "support_prob": 0.0
+        }
+      ],
+      "citation_support": 0.5,
+      "cited_sentences": 6,
+      "supported_cited_sentences": 3
+    },
+    {
+      "qid": "ho07_1994_usair_mistake",
+      "unscored": false,
+      "nli_accepted": false,
+      "lexical_accepted": false,
+      "nli_claims": [
+        {
+          "claim": "Berkshire purchased $358 million of USAir preferred stock.",
+          "nli_met": false,
+          "nli_prob": null,
+          "lexical_met": true,
+          "supporting_sentences": [],
+          "supporting_sentence_supported": []
+        },
+        {
+          "claim": "Buffett described the mistake as sloppy analysis.",
+          "nli_met": false,
+          "nli_prob": null,
+          "lexical_met": false,
+          "supporting_sentences": [],
+          "supporting_sentence_supported": []
+        }
+      ],
+      "nli_claim_coverage": 0.0,
+      "sentences": [
+        {
+          "text": "Maybe it's time to get a guardian appointed.",
+          "cited_passage_ids": [
+            "1994_p0085"
+          ],
+          "supported": false,
+          "support_prob": 0.0
+        },
+        {
+          "text": "Egregious as it is, the Cap Cities decision earns only a silver medal.",
+          "cited_passage_ids": [
+            "1994_p0085"
+          ],
+          "supported": true,
+          "support_prob": 0.9916
+        },
+        {
+          "text": "Top honors go to a mistake I made five years ago that fully ripened in 1994: Our $358 million purchase of USAir preferred stock, on which the dividend was suspended in September.",
+          "cited_passage_ids": [
+            "1994_p0085"
+          ],
+          "supported": true,
+          "support_prob": 0.9249
+        },
+        {
+          "text": "In the 1990 Annual Report I correctly described this deal as an \"unforced error,\" meaning that I was neither pushed into the investment nor misled by anyone when making it.",
+          "cited_passage_ids": [
+            "1994_p0085"
+          ],
+          "supported": true,
+          "support_prob": 0.9894
+        },
+        {
+          "text": "Last spring, we offered to merge with a large, familycontrolled business on terms that included a Berkshire convertible preferred stock.",
+          "cited_passage_ids": [
+            "1994_p0095"
+          ],
+          "supported": true,
+          "support_prob": 0.9891
+        },
+        {
+          "text": "(10,419) (9,448) (6,668) (5,994) Other ........................",
+          "cited_passage_ids": [],
+          "supported": false,
+          "support_prob": 0.0
+        },
+        {
+          "text": "36,232 28,428 22,576 15,094 Operating Earnings .............",
+          "cited_passage_ids": [],
+          "supported": false,
+          "support_prob": 0.0
+        },
+        {
+          "text": "839,365 643,296 606,239 477,751 Sales of Securities ............",
+          "cited_passage_ids": [],
+          "supported": false,
+          "support_prob": 0.0
+        },
+        {
+          "text": "91,332 546,422 61,138 356,702 Decline in Value of USAir Preferred Stock .....",
+          "cited_passage_ids": [
+            "1994_p0050"
+          ],
+          "supported": true,
+          "support_prob": 0.5858
+        }
+      ],
+      "citation_support": 0.8333333333333334,
+      "cited_sentences": 6,
+      "supported_cited_sentences": 5
+    },
+    {
+      "qid": "ho08_1995_geico_distribution",
+      "unscored": false,
+      "nli_accepted": false,
+      "lexical_accepted": true,
+      "nli_claims": [
+        {
+          "claim": "GEICO's direct marketing gave it an enormous cost advantage over competitors selling through agents.",
+          "nli_met": true,
+          "nli_prob": 0.9953,
+          "lexical_met": true,
+          "supporting_sentences": [
+            "As Davy made clear, GEICO's method of selling - direct marketing - gave it an enormous cost advantage over competitors that sold through agents, a form of distribution so ingrained in the business of these insurers that it was impossible for them to give it up."
+          ],
+          "supporting_sentence_supported": [
+            false
+          ]
+        }
+      ],
+      "nli_claim_coverage": 1.0,
+      "sentences": [
+        {
+          "text": "Though my only credentials were that I was a student of Graham's, \"Davy\" graciously spent four hours or so showering me with both kindness and instruction.",
+          "cited_passage_ids": [
+            "1995_p0031"
+          ],
+          "supported": false,
+          "support_prob": 0.0
+        },
+        {
+          "text": "No one has ever received a better half-day course in how the insurance industry functions nor in the factors that enable one company to excel over others.",
+          "cited_passage_ids": [
+            "1995_p0031"
+          ],
+          "supported": true,
+          "support_prob": 0.7704
+        },
+        {
+          "text": "As Davy made clear, GEICO's method of selling - direct marketing - gave it an enormous cost advantage over competitors that sold through agents, a form of distribution so ingrained in the business of these insurers that it was impossible for them to give it up.",
+          "cited_passage_ids": [
+            "1995_p0031"
+          ],
+          "supported": false,
+          "support_prob": 0.0
+        },
+        {
+          "text": "After my session with Davy, I was more excited about GEICO than I have ever been about a stock.",
+          "cited_passage_ids": [
+            "1995_p0031"
+          ],
+          "supported": true,
+          "support_prob": 0.9941
+        },
+        {
+          "text": "But in the next 20 years, the GEICO stock I sold grew in value to about $1.3 million, which taught me a lesson about the inadvisability of selling a stake in an identifiably-wonderful company.",
+          "cited_passage_ids": [
+            "1995_p0035"
+          ],
+          "supported": true,
+          "support_prob": 0.9853
+        },
+        {
+          "text": "In any event, I accumulated 350 shares of GEICO during the year, at a cost of $10,282.",
+          "cited_passage_ids": [
+            "1995_p0033"
+          ],
+          "supported": true,
+          "support_prob": 0.8366
+        }
+      ],
+      "citation_support": 0.6666666666666666,
+      "cited_sentences": 6,
+      "supported_cited_sentences": 4
+    },
+    {
+      "qid": "ho09_1999_tech_competence",
+      "unscored": false,
+      "nli_accepted": false,
+      "lexical_accepted": true,
+      "nli_claims": [
+        {
+          "claim": "They had no insights into which tech participants possess a truly durable competitive advantage.",
+          "nli_met": true,
+          "nli_prob": 0.9792,
+          "lexical_met": true,
+          "supporting_sentences": [
+            "Our problem — which we can’t solve by studying up — is that we have no insights into which participants in the tech field possess a truly durable competitive advantage.",
+            "As I mentioned earlier, several of the companies in which we have large investments had disappointing business results last year."
+          ],
+          "supporting_sentence_supported": [
+            true,
+            false
+          ]
+        }
+      ],
+      "nli_claim_coverage": 1.0,
+      "sentences": [
+        {
+          "text": "This attribute, which makes for good long-term investment results, is one Charlie and I occasionally believe we can identify.",
+          "cited_passage_ids": [
+            "1999_p0091"
+          ],
+          "supported": false,
+          "support_prob": 0.0
+        },
+        {
+          "text": "More often, however, we can’t — not at least with a high degree of conviction.",
+          "cited_passage_ids": [
+            "1999_p0091"
+          ],
+          "supported": false,
+          "support_prob": 0.0
+        },
+        {
+          "text": "Our problem — which we can’t solve by studying up — is that we have no insights into which participants in the tech field possess a truly durable competitive advantage.",
+          "cited_passage_ids": [
+            "1999_p0091"
+          ],
+          "supported": true,
+          "support_prob": 0.9909
+        },
+        {
+          "text": "As I mentioned earlier, several of the companies in which we have large investments had disappointing business results last year.",
+          "cited_passage_ids": [
+            "1999_p0090"
+          ],
+          "supported": false,
+          "support_prob": 0.0
+        },
+        {
+          "text": "Last year, EJA passed the ultimate test: Charlie signed up.",
+          "cited_passage_ids": [
+            "1999_p0052"
+          ],
+          "supported": false,
+          "support_prob": 0.0
+        }
+      ],
+      "citation_support": 0.2,
+      "cited_sentences": 5,
+      "supported_cited_sentences": 1
+    },
+    {
+      "qid": "ho10_2001_float_cost",
+      "unscored": false,
+      "nli_accepted": false,
+      "lexical_accepted": true,
+      "nli_claims": [
+        {
+          "claim": "The float cost came in at 12.8%.",
+          "nli_met": true,
+          "nli_prob": 0.9957,
+          "lexical_met": true,
+          "supporting_sentences": [
+            "Our float cost therefore came in at a staggering 12.8%.",
+            "It was our worst year in float cost since 1984, and a result that to a significant degree, as I will explain in the next section, we brought upon ourselves."
+          ],
+          "supporting_sentence_supported": [
+            false,
+            false
+          ]
+        }
+      ],
+      "nli_claim_coverage": 1.0,
+      "sentences": [
+        {
+          "text": "which we generate in large amounts relative to our premium volume — by adding net loss reserves, loss adjustment reserves, funds held under reinsurance assumed and unearned premium reserves, and then subtracting insurancerelated receivables, prepaid acquisition costs, prepaid taxes and deferred charges applicable to assumed reinsurance.",
+          "cited_passage_ids": [
+            "2001_p0037"
+          ],
+          "supported": false,
+          "support_prob": 0.0
+        },
+        {
+          "text": "I had in mind natural catastrophes when I said that, but instead we were hit by a man-made catastrophe on September 11th – an event that delivered the insurance industry its largest loss in history.",
+          "cited_passage_ids": [
+            "2001_p0037"
+          ],
+          "supported": true,
+          "support_prob": 0.5231
+        },
+        {
+          "text": "Our float cost therefore came in at a staggering 12.8%.",
+          "cited_passage_ids": [
+            "2001_p0037"
+          ],
+          "supported": false,
+          "support_prob": 0.0
+        },
+        {
+          "text": "It was our worst year in float cost since 1984, and a result that to a significant degree, as I will explain in the next section, we brought upon ourselves.",
+          "cited_passage_ids": [
+            "2001_p0037"
+          ],
+          "supported": false,
+          "support_prob": 0.0
+        },
+        {
+          "text": "(Got that?) Yearend Float (in $ millions) 1,508 2,917 4,014 7,386 3,125 14,909 4,305 22,754 3,444 15,166 6,285 25,298 3,943 15,525 7,805 27,871 4,251 19,310 11,262 35,508 Last year I told you that, barring a mega-catastrophe, our cost of float would probably drop from its 2000 level of 6%.",
+          "cited_passage_ids": [
+            "2001_p0036"
+          ],
+          "supported": false,
+          "support_prob": 0.0
+        },
+        {
+          "text": "An insurance business has value if its cost of float over time is less than the cost the company would otherwise incur to obtain funds.",
+          "cited_passage_ids": [
+            "2001_p0035"
+          ],
+          "supported": false,
+          "support_prob": 0.0
+        }
+      ],
+      "citation_support": 0.16666666666666666,
+      "cited_sentences": 6,
+      "supported_cited_sentences": 1
+    },
+    {
+      "qid": "ho11_2004_currency_contracts",
+      "unscored": false,
+      "nli_accepted": true,
+      "lexical_accepted": true,
+      "nli_claims": [
+        {
+          "claim": "Berkshire owned about $21.4 billion of foreign exchange contracts spread among 12 currencies.",
+          "nli_met": true,
+          "nli_prob": 0.9904,
+          "lexical_met": true,
+          "supporting_sentences": [
+            "Berkshire owned about $21.4 billion of foreign exchange contracts at yearend, spread among 12 currencies.",
+            "As I mentioned last year, holdings of this kind are a decided change for us."
+          ],
+          "supporting_sentence_supported": [
+            true,
+            true
+          ]
+        }
+      ],
+      "nli_claim_coverage": 1.0,
+      "sentences": [
+        {
+          "text": "But he’s usually right.",
+          "cited_passage_ids": [
+            "2004_p0116"
+          ],
+          "supported": false,
+          "support_prob": 0.0
+        },
+        {
+          "text": "Berkshire owned about $21.4 billion of foreign exchange contracts at yearend, spread among 12 currencies.",
+          "cited_passage_ids": [
+            "2004_p0116"
+          ],
+          "supported": true,
+          "support_prob": 0.9888
+        },
+        {
+          "text": "As I mentioned last year, holdings of this kind are a decided change for us.",
+          "cited_passage_ids": [
+            "2004_p0116"
+          ],
+          "supported": true,
+          "support_prob": 0.9812
+        },
+        {
+          "text": "Before March 2002, neither Berkshire nor I had ever traded in currencies.",
+          "cited_passage_ids": [
+            "2004_p0116"
+          ],
+          "supported": true,
+          "support_prob": 0.9874
+        },
+        {
+          "text": "Pre-Tax Gain (in $ millions) Common Stocks ............................. $ 870 $ 448 U.S.",
+          "cited_passage_ids": [],
+          "supported": false,
+          "support_prob": 0.0
+        },
+        {
+          "text": "Government Bonds.................",
+          "cited_passage_ids": [],
+          "supported": false,
+          "support_prob": 0.0
+        },
+        {
+          "text": "1,485 Junk Bonds .....................................",
+          "cited_passage_ids": [],
+          "supported": false,
+          "support_prob": 0.0
+        },
+        {
+          "text": "1,138 Foreign Exchange Contracts...........",
+          "cited_passage_ids": [],
+          "supported": false,
+          "support_prob": 0.0
+        },
+        {
+          "text": "1,839 Other...............................................",
+          "cited_passage_ids": [
+            "2004_p0108"
+          ],
+          "supported": false,
+          "support_prob": 0.0
+        },
+        {
+          "text": "A further complication in our reported gains occurs because GAAP requires that foreign exchange contracts be marked to market, a stipulation that causes unrealized gains or losses in these holdings to flow through our published earnings as if we had sold our positions.",
+          "cited_passage_ids": [
+            "2004_p0107"
+          ],
+          "supported": false,
+          "support_prob": 0.0
+        }
+      ],
+      "citation_support": 0.5,
+      "cited_sentences": 6,
+      "supported_cited_sentences": 3
+    },
+    {
+      "qid": "ho12_2006_iscar_ownership",
+      "unscored": false,
+      "nli_accepted": false,
+      "lexical_accepted": false,
+      "nli_claims": [
+        {
+          "claim": "Berkshire purchased 80% of ISCAR for $4 billion.",
+          "nli_met": true,
+          "nli_prob": 0.9959,
+          "lexical_met": false,
+          "supporting_sentences": [
+            "With that task completed, Berkshire purchased 80% of ISCAR for $4 billion."
+          ],
+          "supporting_sentence_supported": [
+            false
+          ]
+        },
+        {
+          "claim": "The Wertheimer family retained the remaining 20%.",
+          "nli_met": true,
+          "nli_prob": 0.9946,
+          "lexical_met": false,
+          "supporting_sentences": [
+            "With that task completed, Berkshire purchased 80% of ISCAR for $4 billion.",
+            "The remaining 20% stays in the hands of the Wertheimer family, making it our valued partner."
+          ],
+          "supporting_sentence_supported": [
+            false,
+            false
+          ]
+        }
+      ],
+      "nli_claim_coverage": 1.0,
+      "sentences": [
+        {
+          "text": "The highlight of the year, however, was our July 5th acquisition of most of ISCAR, an Israeli company, and our new association with its chairman, Eitan Wertheimer, and CEO, Jacob Harpaz.",
+          "cited_passage_ids": [
+            "2006_p0024"
+          ],
+          "supported": false,
+          "support_prob": 0.0
+        },
+        {
+          "text": "The letter began, “I am writing to introduce you to ISCAR,” and proceeded to describe a cuttingtool business carried on in 61 countries.",
+          "cited_passage_ids": [
+            "2006_p0024"
+          ],
+          "supported": false,
+          "support_prob": 0.0
+        },
+        {
+          "text": "We don’t itemize the two securities referred to, which have a market value of $1.9 billion, because we continue to buy them.",
+          "cited_passage_ids": [
+            "2006_p0092"
+          ],
+          "supported": false,
+          "support_prob": 0.0
+        },
+        {
+          "text": "get educated on some tax and jurisdictional matters.",
+          "cited_passage_ids": [
+            "2006_p0027"
+          ],
+          "supported": false,
+          "support_prob": 0.0
+        },
+        {
+          "text": "With that task completed, Berkshire purchased 80% of ISCAR for $4 billion.",
+          "cited_passage_ids": [
+            "2006_p0027"
+          ],
+          "supported": false,
+          "support_prob": 0.0
+        },
+        {
+          "text": "The remaining 20% stays in the hands of the Wertheimer family, making it our valued partner.",
+          "cited_passage_ids": [
+            "2006_p0027"
+          ],
+          "supported": false,
+          "support_prob": 0.0
+        }
+      ],
+      "citation_support": 0.0,
+      "cited_sentences": 6,
+      "supported_cited_sentences": 0
+    },
+    {
+      "qid": "ho13_2007_petrochina_sale",
+      "unscored": false,
+      "nli_accepted": false,
+      "lexical_accepted": false,
+      "nli_claims": [
+        {
+          "claim": "Berkshire bought its PetroChina holding for $488 million.",
+          "nli_met": true,
+          "nli_prob": 0.9979,
+          "lexical_met": true,
+          "supporting_sentences": [
+            "In 2002 and 2003 Berkshire bought 1.3% of PetroChina for $488 million, a price that valued the entire business at about $37 billion.",
+            "By 2007, two factors had materially increased its value: the price of oil had climbed significantly, and PetroChina’s management had done a great job in building oil and gas reserves."
+          ],
+          "supporting_sentence_supported": [
+            true,
+            true
+          ]
+        },
+        {
+          "claim": "Berkshire sold its holdings for $4 billion.",
+          "nli_met": false,
+          "nli_prob": null,
+          "lexical_met": false,
+          "supporting_sentences": [],
+          "supporting_sentence_supported": []
+        }
+      ],
+      "nli_claim_coverage": 0.5,
+      "sentences": [
+        {
+          "text": "In 2002 and 2003 Berkshire bought 1.3% of PetroChina for $488 million, a price that valued the entire business at about $37 billion.",
+          "cited_passage_ids": [
+            "2007_p0086"
+          ],
+          "supported": true,
+          "support_prob": 0.9954
+        },
+        {
+          "text": "By 2007, two factors had materially increased its value: the price of oil had climbed significantly, and PetroChina’s management had done a great job in building oil and gas reserves.",
+          "cited_passage_ids": [
+            "2007_p0086"
+          ],
+          "supported": true,
+          "support_prob": 0.9715
+        },
+        {
+          "text": "A footnote: We paid the IRS tax of $1.2 billion on our PetroChina gain.",
+          "cited_passage_ids": [
+            "2007_p0086"
+          ],
+          "supported": false,
+          "support_prob": 0.0
+        },
+        {
+          "text": "Our direct currency positions have yielded $2.3 billion of pre-tax profits over the past five years, and in addition we have profited by holding bonds of U.S. companies that are denominated in other currencies.",
+          "cited_passage_ids": [
+            "2007_p0098"
+          ],
+          "supported": false,
+          "support_prob": 0.0
+        },
+        {
+          "text": "At yearend 2007, we show an insurance liability of $56 billion that represents our guess as to what we will eventually pay for all loss events that occurred before yearend (except for about $3 billion of the reserve that has been discounted to present value).",
+          "cited_passage_ids": [
+            "2007_p0118"
+          ],
+          "supported": true,
+          "support_prob": 0.8951
+        },
+        {
+          "text": "At yearend we had received $3.2 billion in premiums on these contracts; had paid $472 million in losses; and in the worst case (though it is extremely unlikely to occur) could be required to pay an additional $4.7 billion.",
+          "cited_passage_ids": [
+            "2007_p0087"
+          ],
+          "supported": false,
+          "support_prob": 0.0
+        }
+      ],
+      "citation_support": 0.5,
+      "cited_sentences": 6,
+      "supported_cited_sentences": 3
+    },
+    {
+      "qid": "ho14_2013_nv_energy",
+      "unscored": false,
+      "nli_accepted": true,
+      "lexical_accepted": true,
+      "nli_claims": [
+        {
+          "claim": "NV Energy was purchased for $5.6 billion and supplied electricity to about 88% of Nevada's population.",
+          "nli_met": true,
+          "nli_prob": 0.9972,
+          "lexical_met": true,
+          "supporting_sentences": [
+            "NV Energy, purchased for $5.6 billion by MidAmerican Energy, our utility subsidiary, supplies electricity to about 88% of Nevada’s population.",
+            "This acquisition fits nicely into our existing electric-utility operation and offers many possibilities for large investments in renewable energy."
+          ],
+          "supporting_sentence_supported": [
+            true,
+            true
+          ]
+        }
+      ],
+      "nli_claim_coverage": 1.0,
+      "sentences": [
+        {
+          "text": "With Heinz, Berkshire now owns 81⁄2 companies that, were they stand-alone businesses, would be in the Fortune 500.",
+          "cited_passage_ids": [
+            "2013_p0018"
+          ],
+          "supported": false,
+          "support_prob": 0.0
+        },
+        {
+          "text": "NV Energy, purchased for $5.6 billion by MidAmerican Energy, our utility subsidiary, supplies electricity to about 88% of Nevada’s population.",
+          "cited_passage_ids": [
+            "2013_p0018"
+          ],
+          "supported": true,
+          "support_prob": 0.9913
+        },
+        {
+          "text": "This acquisition fits nicely into our existing electric-utility operation and offers many possibilities for large investments in renewable energy.",
+          "cited_passage_ids": [
+            "2013_p0018"
+          ],
+          "supported": true,
+          "support_prob": 0.8248
+        },
+        {
+          "text": "NV Energy will not be MidAmerican’s last major acquisition.",
+          "cited_passage_ids": [
+            "2013_p0018"
+          ],
+          "supported": true,
+          "support_prob": 0.8674
+        },
+        {
+          "text": "Now, with the acquisition of NV Energy, MidAmerican’s earnings base has further broadened.",
+          "cited_passage_ids": [
+            "2013_p0059"
+          ],
+          "supported": true,
+          "support_prob": 0.9708
+        },
+        {
+          "text": "If we do, the amounts involved could be large.” — 1999 Annual Report We have two major operations, BNSF and MidAmerican Energy, that share important characteristics distinguishing them from our other businesses.",
+          "cited_passage_ids": [
+            "2013_p0057"
+          ],
+          "supported": true,
+          "support_prob": 0.5918
+        }
+      ],
+      "citation_support": 0.8333333333333334,
+      "cited_sentences": 6,
+      "supported_cited_sentences": 5
+    },
+    {
+      "qid": "ho15_2014_dealership_followup",
+      "unscored": false,
+      "nli_accepted": false,
+      "lexical_accepted": true,
+      "nli_claims": [
+        {
+          "claim": "The group was Van Tuyl Automotive with 78 automobile dealerships.",
+          "nli_met": true,
+          "nli_prob": 0.9954,
+          "lexical_met": true,
+          "supporting_sentences": [
+            "Our participation in any joint activities, whether as a financing or equity partner, will be limited to friendly transactions. ‹ In October, we contracted to buy Van Tuyl Automotive, a group of 78 automobile dealerships that is exceptionally well-run.",
+            "Larry Van Tuyl, the company’s owner, and I met some years ago."
+          ],
+          "supporting_sentence_supported": [
+            true,
+            false
+          ]
+        }
+      ],
+      "nli_claim_coverage": 1.0,
+      "sentences": [
+        {
+          "text": "Larry and his dad, Cecil, spent 62 years building the group, following a strategy that made owner-partners of all local managers.",
+          "cited_passage_ids": [
+            "2014_p0027"
+          ],
+          "supported": false,
+          "support_prob": 0.0
+        },
+        {
+          "text": "Van Tuyl is now the fifth-largest automotive group in the country, with per-dealership sales figures that are outstanding.",
+          "cited_passage_ids": [
+            "2014_p0027"
+          ],
+          "supported": false,
+          "support_prob": 0.0
+        },
+        {
+          "text": "Berkshire also has fine partnerships with Mars and Leucadia, and we may form new ones with them or with other partners.",
+          "cited_passage_ids": [
+            "2014_p0026"
+          ],
+          "supported": true,
+          "support_prob": 0.5018
+        },
+        {
+          "text": "Our participation in any joint activities, whether as a financing or equity partner, will be limited to friendly transactions. ‹ In October, we contracted to buy Van Tuyl Automotive, a group of 78 automobile dealerships that is exceptionally well-run.",
+          "cited_passage_ids": [
+            "2014_p0026"
+          ],
+          "supported": true,
+          "support_prob": 0.8544
+        },
+        {
+          "text": "Larry Van Tuyl, the company’s owner, and I met some years ago.",
+          "cited_passage_ids": [
+            "2014_p0026"
+          ],
+          "supported": false,
+          "support_prob": 0.0
+        },
+        {
+          "text": "If we do this – and if we can buy dealerships at sensible prices – we will build a business that before long will be multiples the size of Van Tuyl’s $9 billion of sales.",
+          "cited_passage_ids": [
+            "2014_p0028"
+          ],
+          "supported": true,
+          "support_prob": 0.9747
+        }
+      ],
+      "citation_support": 0.5,
+      "cited_sentences": 6,
+      "supported_cited_sentences": 3
+    },
+    {
+      "qid": "ho16_2017_hurricane_loss",
+      "unscored": false,
+      "nli_accepted": false,
+      "lexical_accepted": true,
+      "nli_claims": [
+        {
+          "claim": "Berkshire estimated hurricane losses of $3 billion, or about $2 billion after tax.",
+          "nli_met": true,
+          "nli_prob": 0.948,
+          "lexical_met": true,
+          "supporting_sentences": [
+            "We currently estimate Berkshire’s losses from the three hurricanes to be $3 billion (or about $2 billion after tax).",
+            "If both that estimate and my industry estimate of $100 billion are close to accurate, our share of the industry loss was about 3%."
+          ],
+          "supporting_sentence_supported": [
+            true,
+            false
+          ]
+        }
+      ],
+      "nli_claim_coverage": 1.0,
+      "sentences": [
+        {
+          "text": "As well-known analyst V.J.",
+          "cited_passage_ids": [],
+          "supported": false,
+          "support_prob": 0.0
+        },
+        {
+          "text": "Dowling has pointed out, the loss reserves of an insurer are similar to a self-graded exam.",
+          "cited_passage_ids": [
+            "2017_p0039"
+          ],
+          "supported": false,
+          "support_prob": 0.0
+        },
+        {
+          "text": "Ignorance, wishful thinking or, occasionally, downright fraud can deliver inaccurate figures about an insurer’s financial condition for a very long time.",
+          "cited_passage_ids": [
+            "2017_p0039"
+          ],
+          "supported": false,
+          "support_prob": 0.0
+        },
+        {
+          "text": "We currently estimate Berkshire’s losses from the three hurricanes to be $3 billion (or about $2 billion after tax).",
+          "cited_passage_ids": [
+            "2017_p0039"
+          ],
+          "supported": true,
+          "support_prob": 0.9651
+        },
+        {
+          "text": "If both that estimate and my industry estimate of $100 billion are close to accurate, our share of the industry loss was about 3%.",
+          "cited_passage_ids": [
+            "2017_p0039"
+          ],
+          "supported": false,
+          "support_prob": 0.0
+        },
+        {
+          "text": "Last September drove home that point, as three significant hurricanes hit Texas, Florida and Puerto Rico.",
+          "cited_passage_ids": [
+            "2017_p0038"
+          ],
+          "supported": true,
+          "support_prob": 0.9823
+        },
+        {
+          "text": "My guess at this time is that the insured losses arising from the hurricanes are $100 billion or so.",
+          "cited_passage_ids": [
+            "2017_p0040"
+          ],
+          "supported": true,
+          "support_prob": 0.8506
+        }
+      ],
+      "citation_support": 0.5,
+      "cited_sentences": 6,
+      "supported_cited_sentences": 3
+    },
+    {
+      "qid": "ho17_2019_reinvestment_priority",
+      "unscored": false,
+      "nli_accepted": false,
+      "lexical_accepted": true,
+      "nli_claims": [
+        {
+          "claim": "Reinvestment in productive operational assets remains the top priority.",
+          "nli_met": true,
+          "nli_prob": 0.9882,
+          "lexical_met": true,
+          "supporting_sentences": [
+            "Reinvestment in productive operational assets will forever remain our top priority.",
+            "Normally, those companies use retained earnings to expand their business and increase its efficiency."
+          ],
+          "supporting_sentence_supported": [
+            true,
+            false
+          ]
+        }
+      ],
+      "nli_claim_coverage": 1.0,
+      "sentences": [
+        {
+          "text": "Rockefeller and Ford, all of whom had retained a huge portion of their business earnings to fund growth and produce ever-greater profits.",
+          "cited_passage_ids": [
+            "2019_p0020"
+          ],
+          "supported": false,
+          "support_prob": 0.0
+        },
+        {
+          "text": "Throughout America, also, there had long been small-time capitalists who became rich following the same playbook.",
+          "cited_passage_ids": [
+            "2019_p0020"
+          ],
+          "supported": false,
+          "support_prob": 0.0
+        },
+        {
+          "text": "At Berkshire, Charlie and I have long focused on using retained earnings advantageously.",
+          "cited_passage_ids": [
+            "2019_p0020"
+          ],
+          "supported": true,
+          "support_prob": 0.9942
+        },
+        {
+          "text": "Reinvestment in productive operational assets will forever remain our top priority.",
+          "cited_passage_ids": [
+            "2019_p0020"
+          ],
+          "supported": true,
+          "support_prob": 0.76
+        },
+        {
+          "text": "Normally, those companies use retained earnings to expand their business and increase its efficiency.",
+          "cited_passage_ids": [
+            "2019_p0025"
+          ],
+          "supported": false,
+          "support_prob": 0.0
+        },
+        {
+          "text": "(For good reason, too: Over the previous decade, the struggling business had recorded a net loss.) Since then, as Berkshire retained nearly all of its earnings, the beneficiaries of that policy became not only the company’s shareholders but also the federal government.",
+          "cited_passage_ids": [
+            "2019_p0079"
+          ],
+          "supported": false,
+          "support_prob": 0.0
+        }
+      ],
+      "citation_support": 0.3333333333333333,
+      "cited_sentences": 6,
+      "supported_cited_sentences": 2
+    },
+    {
+      "qid": "ho18_2023_munger_architect",
+      "unscored": false,
+      "nli_accepted": false,
+      "lexical_accepted": false,
+      "nli_claims": [
+        {
+          "claim": "Charlie was the architect and Buffett acted as the general contractor.",
+          "nli_met": false,
+          "nli_prob": null,
+          "lexical_met": false,
+          "supporting_sentences": [],
+          "supporting_sentence_supported": []
+        }
+      ],
+      "nli_claim_coverage": 0.0,
+      "sentences": [
+        {
+          "text": "Moreover, neither of us expected that Charlie would ever own a share of Berkshire stock.",
+          "cited_passage_ids": [
+            "2023_p0002"
+          ],
+          "supported": false,
+          "support_prob": 0.0
+        },
+        {
+          "text": "Nevertheless, Charlie, in 1965, promptly advised me: “Warren, forget about ever buying another company like Berkshire.",
+          "cited_passage_ids": [
+            "2023_p0002"
+          ],
+          "supported": false,
+          "support_prob": 0.0
+        },
+        {
+          "text": "Charlie Munger – The Architect of Berkshire Hathaway Charlie Munger died on November 28, just 33 days before his 100th birthday.",
+          "cited_passage_ids": [
+            "2023_p0000"
+          ],
+          "supported": true,
+          "support_prob": 0.8259
+        },
+        {
+          "text": "Though born and raised in Omaha, he spent 80% of his life domiciled elsewhere.",
+          "cited_passage_ids": [
+            "2023_p0000"
+          ],
+          "supported": true,
+          "support_prob": 0.7434
+        },
+        {
+          "text": "Consequently, it was not until 1959 when he was 35 that I first met him.",
+          "cited_passage_ids": [
+            "2023_p0000"
+          ],
+          "supported": true,
+          "support_prob": 0.9737
+        },
+        {
+          "text": "Until his death, he continued in this role and together we, along with those who early on invested with us, ended up far better off than Charlie and I had ever dreamed possible.",
+          "cited_passage_ids": [
+            "2023_p0003"
+          ],
+          "supported": false,
+          "support_prob": 0.0
+        }
+      ],
+      "citation_support": 0.5,
+      "cited_sentences": 6,
+      "supported_cited_sentences": 3
+    },
+    {
+      "qid": "ho19_2024_tax_followup",
+      "unscored": false,
+      "nli_accepted": true,
+      "lexical_accepted": true,
+      "nli_claims": [
+        {
+          "claim": "Berkshire made payments to the IRS totaling $26.8 billion.",
+          "nli_met": true,
+          "nli_prob": 0.9929,
+          "lexical_met": true,
+          "supporting_sentences": [
+            "tech titans that commanded market values in the trillions.",
+            "To be precise, Berkshire last year made four payments to the IRS that totaled $26.8 billion."
+          ],
+          "supporting_sentence_supported": [
+            true,
+            true
+          ]
+        },
+        {
+          "claim": "That was about 5% of what all of corporate America paid.",
+          "nli_met": true,
+          "nli_prob": 0.9964,
+          "lexical_met": true,
+          "supporting_sentences": [
+            "That’s about 5% of what all of corporate America paid."
+          ],
+          "supporting_sentence_supported": [
+            true
+          ]
+        }
+      ],
+      "nli_claim_coverage": 1.0,
+      "sentences": [
+        {
+          "text": "tech titans that commanded market values in the trillions.",
+          "cited_passage_ids": [
+            "2024_p0019"
+          ],
+          "supported": true,
+          "support_prob": 0.9887
+        },
+        {
+          "text": "To be precise, Berkshire last year made four payments to the IRS that totaled $26.8 billion.",
+          "cited_passage_ids": [
+            "2024_p0019"
+          ],
+          "supported": true,
+          "support_prob": 0.9913
+        },
+        {
+          "text": "That’s about 5% of what all of corporate America paid.",
+          "cited_passage_ids": [
+            "2024_p0019"
+          ],
+          "supported": true,
+          "support_prob": 0.9776
+        },
+        {
+          "text": "(In addition, we paid sizable amounts for income taxes to foreign governments and to 44 states.)",
+          "cited_passage_ids": [
+            "2024_p0019"
+          ],
+          "supported": true,
+          "support_prob": 0.9873
+        },
+        {
+          "text": "In 1965, the company did not pay a dime of income tax, an embarrassment that had generally prevailed at the company for a decade.",
+          "cited_passage_ids": [
+            "2024_p0018"
+          ],
+          "supported": true,
+          "support_prob": 0.9132
+        },
+        {
+          "text": "On January 3, 1967, we disbursed our sole payment – $101,755 or 10¢ per A share.",
+          "cited_passage_ids": [
+            "2024_p0020"
+          ],
+          "supported": true,
+          "support_prob": 0.9587
+        }
+      ],
+      "citation_support": 1.0,
+      "cited_sentences": 6,
+      "supported_cited_sentences": 6
+    },
+    {
+      "qid": "ho20_1977_1985_textile_comparison",
+      "unscored": false,
+      "nli_accepted": false,
+      "lexical_accepted": false,
+      "nli_claims": [
+        {
+          "claim": "The mills were among the largest employers in each town with workers of high average age.",
+          "nli_met": false,
+          "nli_prob": null,
+          "lexical_met": false,
+          "supporting_sentences": [],
+          "supporting_sentence_supported": []
+        },
+        {
+          "claim": "In July Berkshire decided to close its textile operation.",
+          "nli_met": false,
+          "nli_prob": null,
+          "lexical_met": false,
+          "supporting_sentences": [],
+          "supporting_sentence_supported": []
+        }
+      ],
+      "nli_claim_coverage": 0.0,
+      "sentences": [
+        {
+          "text": "In 1977: The retrieved passages for this period do not cover this question.",
+          "cited_passage_ids": [],
+          "supported": false,
+          "support_prob": 0.0
+        },
+        {
+          "text": "In 1985: The retrieved passages for this period do not cover this question.",
+          "cited_passage_ids": [],
+          "supported": false,
+          "support_prob": 0.0
+        }
+      ],
+      "citation_support": null,
+      "cited_sentences": 0,
+      "supported_cited_sentences": 0
+    },
+    {
+      "qid": "ho21_1993_2010_float_comparison",
+      "unscored": false,
+      "nli_accepted": false,
+      "lexical_accepted": true,
+      "nli_claims": [
+        {
+          "claim": "With an underwriting profit, the cost of float has been negative.",
+          "nli_met": true,
+          "nli_prob": 0.9982,
+          "lexical_met": true,
+          "supporting_sentences": [
+            "In those years when we have had an underwriting profit, which includes 1993, our cost of float has been negative, and we have determined our insurance earnings by adding underwriting profit to float income.",
+            "Only by making an analysis that incorporates both underwriting results and the current risk-free earnings obtainable from float can one evaluate the true economics of the business that a property-casualty insurer writes."
+          ],
+          "supporting_sentence_supported": [
+            true,
+            true
+          ]
+        },
+        {
+          "claim": "Float is free as long as insurance underwriting breaks even.",
+          "nli_met": true,
+          "nli_prob": 0.9962,
+          "lexical_met": true,
+          "supporting_sentences": [
+            "General Re’s huge float has been better than cost-free under his leadership, and we expect that, on average, it will continue to be.",
+            "This float is “free” as long as insurance underwriting breaks even, meaning that the premiums we receive equal the losses and expenses we incur. $ 1980 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . ."
+          ],
+          "supporting_sentence_supported": [
+            true,
+            false
+          ]
+        }
+      ],
+      "nli_claim_coverage": 1.0,
+      "sentences": [
+        {
+          "text": "In 1993: We calculate our float - which we generate in exceptional amounts relative to our premium volume - by adding loss reserves, loss adjustment reserves and unearned premium reserves and then subtracting agent's balances, prepaid acquisition costs and deferred charges applicable to assumed reinsurance.",
+          "cited_passage_ids": [
+            "1993_p0045"
+          ],
+          "supported": true,
+          "support_prob": 0.9079
+        },
+        {
+          "text": "Our cost of float is determined by our underwriting loss or profit.",
+          "cited_passage_ids": [
+            "1993_p0045"
+          ],
+          "supported": true,
+          "support_prob": 0.9939
+        },
+        {
+          "text": "In those years when we have had an underwriting profit, which includes 1993, our cost of float has been negative, and we have determined our insurance earnings by adding underwriting profit to float income.",
+          "cited_passage_ids": [
+            "1993_p0045"
+          ],
+          "supported": true,
+          "support_prob": 0.9849
+        },
+        {
+          "text": "Only by making an analysis that incorporates both underwriting results and the current risk-free earnings obtainable from float can one evaluate the true economics of the business that a property-casualty insurer writes.",
+          "cited_passage_ids": [
+            "1993_p0044"
+          ],
+          "supported": true,
+          "support_prob": 0.9811
+        },
+        {
+          "text": "This sounds good - is good - but is far from as good as it sounds.",
+          "cited_passage_ids": [
+            "1993_p0049"
+          ],
+          "supported": true,
+          "support_prob": 0.8534
+        },
+        {
+          "text": "In 2010: Tad has observed all four of the insurance commandments, and it shows in his results.",
+          "cited_passage_ids": [
+            "2010_p0066"
+          ],
+          "supported": true,
+          "support_prob": 0.7611
+        },
+        {
+          "text": "General Re’s huge float has been better than cost-free under his leadership, and we expect that, on average, it will continue to be.",
+          "cited_passage_ids": [
+            "2010_p0066"
+          ],
+          "supported": true,
+          "support_prob": 0.9596
+        },
+        {
+          "text": "This float is “free” as long as insurance underwriting breaks even, meaning that the premiums we receive equal the losses and expenses we incur. $ 1980 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .",
+          "cited_passage_ids": [
+            "2010_p0030"
+          ],
+          "supported": false,
+          "support_prob": 0.0
+        },
+        {
+          "text": "1990 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .",
+          "cited_passage_ids": [],
+          "supported": false,
+          "support_prob": 0.0
+        },
+        {
+          "text": "1,632 2000 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .",
+          "cited_passage_ids": [],
+          "supported": false,
+          "support_prob": 0.0
+        },
+        {
+          "text": "27,871 2010 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .",
+          "cited_passage_ids": [],
+          "supported": false,
+          "support_prob": 0.0
+        },
+        {
+          "text": "65,832 If our premiums exceed the total of our expenses and eventual losses, we register an underwriting profit that adds to the investment income that our float produces.",
+          "cited_passage_ids": [
+            "2010_p0059"
+          ],
+          "supported": false,
+          "support_prob": 0.0
+        },
+        {
+          "text": "When such a profit occurs, we enjoy the use of free money – and, better yet, get paid for holding it.",
+          "cited_passage_ids": [
+            "2010_p0059"
+          ],
+          "supported": false,
+          "support_prob": 0.0
+        },
+        {
+          "text": "Alas, the wish of all insurers to achieve this happy result creates",
+          "cited_passage_ids": [
+            "2010_p0059"
+          ],
+          "supported": true,
+          "support_prob": 0.7041
+        }
+      ],
+      "citation_support": 0.7272727272727273,
+      "cited_sentences": 11,
+      "supported_cited_sentences": 8
+    },
+    {
+      "qid": "ho22_1988_2022_coca_cola_comparison",
+      "unscored": false,
+      "nli_accepted": false,
+      "lexical_accepted": true,
+      "nli_claims": [
+        {
+          "claim": "The favorite holding period for outstanding businesses is forever.",
+          "nli_met": true,
+          "nli_prob": 0.9709,
+          "lexical_met": true,
+          "supporting_sentences": [
+            "In fact, when we own portions of outstanding businesses with outstanding managements, our favorite holding period is forever.",
+            "We are just the opposite of those who hurry to sell and book profits when companies perform well but who tenaciously hang on to businesses that disappoint."
+          ],
+          "supporting_sentence_supported": [
+            true,
+            false
+          ]
+        },
+        {
+          "claim": "The cash dividend from Coke was $75 million.",
+          "nli_met": true,
+          "nli_prob": 0.9974,
+          "lexical_met": true,
+          "supporting_sentences": [
+            "The cash dividend we received from Coke in 1994 was $75 million.",
+            "By 2022, the dividend had increased to $704 million."
+          ],
+          "supporting_sentence_supported": [
+            true,
+            false
+          ]
+        },
+        {
+          "claim": "The dividend increased to $704 million.",
+          "nli_met": true,
+          "nli_prob": 0.9945,
+          "lexical_met": true,
+          "supporting_sentences": [
+            "By 2022, the dividend had increased to $704 million.",
+            "All Charlie and I were required to do was cash Coke’s quarterly dividend checks."
+          ],
+          "supporting_sentence_supported": [
+            false,
+            true
+          ]
+        }
+      ],
+      "nli_claim_coverage": 1.0,
+      "sentences": [
+        {
+          "text": "In 1988: (“Freddie Mac”) and Coca Cola.",
+          "cited_passage_ids": [
+            "1988_p0068"
+          ],
+          "supported": true,
+          "support_prob": 0.9461
+        },
+        {
+          "text": "We expect to hold these securities for a long time.",
+          "cited_passage_ids": [
+            "1988_p0068"
+          ],
+          "supported": true,
+          "support_prob": 0.9959
+        },
+        {
+          "text": "In fact, when we own portions of outstanding businesses with outstanding managements, our favorite holding period is forever.",
+          "cited_passage_ids": [
+            "1988_p0068"
+          ],
+          "supported": true,
+          "support_prob": 0.5568
+        },
+        {
+          "text": "We are just the opposite of those who hurry to sell and book profits when companies perform well but who tenaciously hang on to businesses that disappoint.",
+          "cited_passage_ids": [
+            "1988_p0068"
+          ],
+          "supported": false,
+          "support_prob": 0.0
+        },
+        {
+          "text": "In past reports we have told you that our insurance subsidiaries sometimes engage in arbitrage as an alternative to holding short-term cash equivalents.",
+          "cited_passage_ids": [
+            "1988_p0077"
+          ],
+          "supported": true,
+          "support_prob": 0.8078
+        },
+        {
+          "text": "One pleasant reason is that our cash holdings are down - because our position in equities that we expect to hold for a very long time is substantially up.",
+          "cited_passage_ids": [
+            "1988_p0099"
+          ],
+          "supported": true,
+          "support_prob": 0.9843
+        },
+        {
+          "text": "In 2022: In August 1994 – yes, 1994 – Berkshire completed its seven-year purchase of the 400 million shares of Coca-Cola we now own.",
+          "cited_passage_ids": [
+            "2022_p0021"
+          ],
+          "supported": false,
+          "support_prob": 0.0
+        },
+        {
+          "text": "The total cost was $1.3 billion – then a very meaningful sum at Berkshire.",
+          "cited_passage_ids": [
+            "2022_p0021"
+          ],
+          "supported": true,
+          "support_prob": 0.9503
+        },
+        {
+          "text": "The cash dividend we received from Coke in 1994 was $75 million.",
+          "cited_passage_ids": [
+            "2022_p0021"
+          ],
+          "supported": true,
+          "support_prob": 0.9933
+        },
+        {
+          "text": "By 2022, the dividend had increased to $704 million.",
+          "cited_passage_ids": [
+            "2022_p0021"
+          ],
+          "supported": false,
+          "support_prob": 0.0
+        },
+        {
+          "text": "All Charlie and I were required to do was cash Coke’s quarterly dividend checks.",
+          "cited_passage_ids": [
+            "2022_p0022"
+          ],
+          "supported": true,
+          "support_prob": 0.992
+        },
+        {
+          "text": "Each holding now accounts for roughly 5% of Berkshire’s net worth, akin to its weighting long ago.",
+          "cited_passage_ids": [
+            "2022_p0023"
+          ],
+          "supported": true,
+          "support_prob": 0.7652
+        },
+        {
+          "text": "In 1994: The retrieved passages for this period do not cover this question.",
+          "cited_passage_ids": [],
+          "supported": false,
+          "support_prob": 0.0
+        }
+      ],
+      "citation_support": 0.75,
+      "cited_sentences": 12,
+      "supported_cited_sentences": 9
+    },
+    {
+      "qid": "ho23_unanswerable_quantum",
+      "unscored": false,
+      "nli_accepted": true,
+      "lexical_accepted": true,
+      "nli_claims": [],
+      "nli_claim_coverage": null,
+      "sentences": [],
+      "citation_support": null
+    },
+    {
+      "qid": "ho24_unanswerable_sourdough",
+      "unscored": false,
+      "nli_accepted": true,
+      "lexical_accepted": true,
+      "nli_claims": [],
+      "nli_claim_coverage": null,
+      "sentences": [],
+      "citation_support": null
+    }
+  ]
+}
