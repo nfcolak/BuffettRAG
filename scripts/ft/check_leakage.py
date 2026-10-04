@@ -3,6 +3,7 @@ from __future__ import annotations
 from collections import defaultdict
 import json
 import re
+import common
 from common import OUT, inputs, near_frozen, read_jsonl
 from src.evaluation.claim_validator import validate_and_filter_answer, _split_original
 from src.generation.evidence_gate import assess_evidence
@@ -18,6 +19,19 @@ def check():
     plan = json.loads((OUT / 'question_plan.json').read_text())
     assert plan['identity'] == identity, 'Corpus/frozen identity changed'
     examples = {row['id']: row for row in read_jsonl(OUT / 'examples.jsonl')}
+    if common.ROUND3:
+        from round3 import reused_rows
+        expected_reuse, reuse_info = reused_rows(excluded, frozen)
+        assert reuse_info['input_sha256'] == plan['reuse']['input_sha256'], 'v2 reuse inputs changed'
+        reused = [row for row in examples.values() if row.get('origin') == 'ft_v2']
+        assert {r['id'] for r in reused} == {r['id'] for r in expected_reuse}, 'Missing or extra v2 reuse'
+        expected_by_id = {r['id']: r for r in expected_reuse}
+        for row in reused:
+            # inputs() contains v2 gold/relevant IDs and +/-1 neighbors on a real run.
+            assert not common.leakage_reasons(row, excluded, frozen), f'Frozen overlap in reused v2 example: {row["id"]}'
+            assert row == expected_by_id[row['id']], 'Reused v2 example modified'
+        for row in examples.values():
+            assert not common.leakage_reasons(row, excluded, frozen), f'Frozen overlap in {row["id"]}'
     metadata = read_jsonl(OUT / 'split_metadata.jsonl')
     used = defaultdict(set)
     overlapping = set()
@@ -64,6 +78,9 @@ def check():
                     for sentence in _split_original(line):
                         citations = parse_citations(sentence, hits)
                         assert citations and all(c['passage_indices'] and not c['invalid_numbers'] for c in citations)
+                if full.get('origin') == 'v3_new':
+                    from round3 import coverage_reason
+                    assert coverage_reason(answer, hits, full['evidence']) is None, f'Incomplete v3 answer: {full["id"]}'
             else:
                 assert answer == REFUSAL_LINE
                 if full['type'] == 'distractor':

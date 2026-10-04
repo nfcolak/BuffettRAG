@@ -8,8 +8,15 @@ cd "$ROOT"
 PY="${PY:-/Users/necatifurkancolak/AI-Workplace/Projects/done/BuffettRAG/.venv/bin/python}"
 BATCH=2
 OUT="models/ft/round${ROUND}"
-mkdir -p "$OUT/adapters"
 DATA_DIR="${DATA_DIR:-data/ft}"
+if [ "$ROUND" = 3 ]; then
+  [ "${PILOT:-0}" != 1 ] || { printf '%s\n' 'Pilot data is never trainable.' >&2; exit 2; }
+  [ "$DATA_DIR" = data/ft_v3 ] || [ "$DATA_DIR" = "$ROOT/data/ft_v3" ] || {
+    printf '%s\n' 'Round 3 trains only the audited production data/ft_v3 mix.' >&2; exit 2;
+  }
+  FT_STYLE=v3 FT_DATA_DIR=data/ft_v3 env -u PYTHONPATH PYTHON_DOTENV_DISABLED=1 HF_HUB_OFFLINE=1 "$PY" scripts/ft/check_leakage.py || exit $?
+fi
+mkdir -p "$OUT/adapters"
 TRAIN_N=$(wc -l < "$DATA_DIR/train.jsonl" | tr -d ' ')
 TOTAL="${2:-$(( (2 * TRAIN_N + BATCH - 1) / BATCH ))}"   # 2 epochs
 PROGRESS="$OUT/progress.json"
@@ -18,7 +25,7 @@ DONE=0
 RESUME=()
 if [ -f "$OUT/adapters/adapters.safetensors" ]; then
   # completed iters: progress.json, else the newest absolute checkpoint copy (abs_<iter>.safetensors)
-  DONE=$(env -u PYTHONPATH "$PY" - "$PROGRESS" "$OUT/adapters" <<'EOF2'
+  DONE=$(env -u PYTHONPATH PYTHON_DOTENV_DISABLED=1 HF_HUB_OFFLINE=1 "$PY" - "$PROGRESS" "$OUT/adapters" <<'EOF2'
 import glob, json, os, re, sys
 done = 0
 if os.path.exists(sys.argv[1]):
@@ -44,7 +51,7 @@ echo "round=$ROUND total=$TOTAL done=$DONE remaining=$REMAIN train_n=$TRAIN_N $(
   env -u PYTHONPATH PYTHON_DOTENV_DISABLED=1 HF_HUB_OFFLINE=1 PYTHONUNBUFFERED=1 "$PY" -m mlx_lm lora \
     -c scripts/ft/lora_config.yaml --data "$DATA_DIR" --iters "$REMAIN" --adapter-path "$OUT/adapters" ${RESUME[@]+"${RESUME[@]}"} 2>&1
   echo "EXIT:$?"
-) | tee -a "$OUT/train.log" | env -u PYTHONPATH "$PY" scripts/ft/track_progress.py "$PROGRESS" "$TOTAL" "$DONE" "$OUT/adapters"
+) | tee -a "$OUT/train.log" | env -u PYTHONPATH PYTHON_DOTENV_DISABLED=1 HF_HUB_OFFLINE=1 "$PY" scripts/ft/track_progress.py "$PROGRESS" "$TOTAL" "$DONE" "$OUT/adapters"
 RC=$(grep -a -o 'EXIT:[0-9]*' "$OUT/train.log" | tail -1 | cut -d: -f2)
 RC="${RC:-1}"
 echo "$RC" > "$OUT/train_exit.txt"
