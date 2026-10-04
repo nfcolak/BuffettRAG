@@ -27,6 +27,41 @@ V1_DIR = ROOT / 'data/ft'
 TEACHER = Path('/Users/necatifurkancolak/AI-Workplace/Projects/done/BuffettRAG/models/teacher-qwen2.5-7b-mlx4')
 DEV = 'data/evaluation/answer_quality_program/answer_benchmark_v3.json'
 HELDOUT = 'agent/fix-eval:data/evaluation/heldout_v1/answer_benchmark_heldout_v1.json'
+HELDOUT_V2 = 'data/evaluation/heldout_v2/answer_benchmark_heldout_v2.json'
+ROUND3 = os.environ.get('FT_STYLE') == 'v3' or OUT == ROOT / 'data/ft_v3'
+PILOT = False
+
+
+def configure_round3(pilot=False):
+    """Pilot has a fixed, worktree-local throwaway destination; never inspect v2."""
+    global OUT, ROUND3, PILOT
+    ROUND3, PILOT = True, bool(pilot)
+    OUT = ROOT / ('models/ft/round3_pilot' if PILOT else 'data/ft_v3')
+    require_round3_holdout()
+    return OUT
+
+
+def require_round3_holdout():
+    if ROUND3 and not PILOT and not (ROOT / HELDOUT_V2).is_file():
+        raise RuntimeError('Round 3 requires the blind heldout_v2 benchmark before starting. '
+                           'Use --style v3 --pilot for generation-only work outside data/.')
+
+
+def question_text(row):
+    return row['question'] + ' ' + ' '.join(t['content'] for t in row.get('history', []) if t['role'] == 'user')
+
+
+def leakage_reasons(row, excluded, frozen):
+    """Audit source, anchor, and ALL expanded neighbors, including reused rows."""
+    ids = set(row.get('context_passage_ids', [])) | set(row.get('passage_ids', [])) | set(row.get('source_ids', []))
+    if row.get('source_id'):
+        ids.add(row['source_id'])
+    reasons = []
+    if ids & excluded:
+        reasons.append('frozen_passage_or_neighbor')
+    if near_frozen(row['question'], frozen) or near_frozen(question_text(row), frozen):
+        reasons.append('near_duplicate_frozen_question')
+    return reasons
 
 
 def sha(data):
@@ -79,6 +114,7 @@ def near_frozen(question, frozen_questions):
 
 
 def inputs():
+    require_round3_holdout()
     docs = load_chunks_as_docs(CORPUS)
     lookup = {doc.id: doc for doc in docs}
     snapshot = OUT / 'frozen_heldout_v1.json'
@@ -98,6 +134,9 @@ def inputs():
         OUT.mkdir(parents=True, exist_ok=True)
         snapshot.write_bytes(heldout_blob)
     blobs = {DEV: (ROOT / DEV).read_bytes(), HELDOUT: heldout_blob}
+    if ROUND3 and not PILOT:
+        # Blind gold is used ONLY to exclude training sources/questions, never in prompts.
+        blobs[HELDOUT_V2] = (ROOT / HELDOUT_V2).read_bytes()
     excluded, questions = set(), []
     def walk(node):
         if isinstance(node, dict):
@@ -125,6 +164,8 @@ def inputs():
     valid_years = set(random.Random(SEED).sample(years, 5))
     safe = [doc for doc in docs if doc.id not in excluded]
     identity = {'corpus_sha256': sha(CORPUS.read_bytes()), 'frozen_set_hashes': {key: sha(blob) for key, blob in blobs.items()}, 'seed': SEED, 'teacher_id': str(TEACHER), 'teacher_license': 'Apache-2.0', 'excluded_passage_count': len(excluded), 'validation_years': sorted(valid_years)}
+    if ROUND3:
+        identity['pilot'] = PILOT
     return safe, excluded, questions, valid_years, identity
 
 
@@ -136,7 +177,8 @@ def split_for(year=None, key=''):
 
 
 class Teacher:
-    def __init__(self):
+    def __init__(self, deadline=None):
+        self.deadline = deadline
         import mlx.core as mx
         from mlx_lm import load
         self.mx = mx
@@ -151,11 +193,16 @@ class Teacher:
         self.mx.random.seed(int(sha(f'{SEED}:{key}'.encode())[:8], 16))
         prompt = self.tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
         started = time.monotonic()
-        text, last, refusal_stopped = '', None, False
+        if self.deadline is not None and started >= self.deadline:
+            return '', {'tokens': 0, 'seconds': 0., 'generation_tps': 0., 'finish_reason': 'budget'}
+        text, last, refusal_stopped, budget_stopped = '', None, False, False
         from src.generation.prompt import REFUSAL_LINE
         for response in stream_generate(self.model, self.tokenizer, prompt, max_tokens=max_tokens, sampler=make_sampler(temp=temperature)):
             text += response.text
             last = response
+            if self.deadline is not None and time.monotonic() >= self.deadline:
+                budget_stopped = True
+                break
             # A contract-defined stop sequence, not post-hoc target replacement:
             # the teacher has actually generated the entire exact refusal line.
             # Stop before it can append forbidden citations or an explanation.
@@ -163,7 +210,7 @@ class Teacher:
                 refusal_stopped = True
                 break
         self.mx.clear_cache()
-        return text.strip(), {'tokens': last.generation_tokens if last else 0, 'seconds': time.monotonic() - started, 'generation_tps': last.generation_tps if last else 0., 'finish_reason': 'refusal_stop_sequence' if refusal_stopped else (last.finish_reason if last else None)}
+        return text.strip(), {'tokens': last.generation_tokens if last else 0, 'seconds': time.monotonic() - started, 'generation_tps': last.generation_tps if last else 0., 'finish_reason': 'budget' if budget_stopped else ('refusal_stop_sequence' if refusal_stopped else (last.finish_reason if last else None))}
 
 
 def parse_questions(text):

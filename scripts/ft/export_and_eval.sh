@@ -16,7 +16,10 @@ QUANT=/opt/homebrew/bin/llama-quantize
 OUT="$ROOT/models/ft/round${ROUND}"
 GGUF="$OUT/buffett-qwen2.5-1.5b-ft-r${ROUND}-q4_k_m.gguf"
 HELD=data/evaluation/heldout_v1
-RESULT="$ROOT/$HELD/heldout_v1_llama_ft_r${ROUND}_bm25.json"
+RESULT="${RESULT:-$ROOT/$HELD/heldout_v1_llama_ft_r${ROUND}_bm25.json}"
+if [ "$ROUND" = 3 ]; then
+  RESULT="$OUT/heldout_v1_llama_ft_r3_bm25.json"
+fi
 run() { env -u PYTHONPATH PYTHON_DOTENV_DISABLED=1 HF_HUB_OFFLINE=1 "$PY" "$@"; }
 
 if [ "${FORCE:-0}" != 1 ] && [ "$(cat "$OUT/train_exit.txt" 2>/dev/null || echo missing)" != 0 ]; then
@@ -88,8 +91,8 @@ LLM_MODEL_PATH="$GGUF" run "$BENCH/scripts/eval/run_live_benchmark.py" --provide
 run - "$ROOT/$HELD" "$RESULT" "$ROUND" <<'EOF'
 import json, sys
 held, result, rnd = sys.argv[1], sys.argv[2], sys.argv[3]
-rows = [('extractive local', f'{held}/heldout_v1_local_bm25.json'),
-        ('base llama (untuned)', f'{held}/heldout_v1_llama_base_bm25.json'),
+rows = [('extractive local', f'{held}/final/local_bm25.json'),
+        ('base llama (untuned)', f'{held}/final/llama_base_bm25.json'),
         (f'fine-tuned round {rnd}', result)]
 print(f"{'system':26} {'accepted':>10} {'unexp.refusals':>15} {'correct.refusals':>17} {'provider.fail':>14}")
 for name, path in rows:

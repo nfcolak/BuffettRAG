@@ -84,7 +84,7 @@ class Builder:
 
     def with_sources(self, anchors, question):
         """v2 only: the passage(s) a question was written from replace the lowest-ranked anchors if retrieval missed them."""
-        if self.style != 'v2' or question['type'] != 'answerable':
+        if self.style not in ('v2', 'v3') or question['type'] != 'answerable':
             return anchors
         needed = list(dict.fromkeys(question.get('source_ids') or [question['source_id']]))
         anchors = list(anchors)
@@ -109,7 +109,7 @@ class Builder:
             query = ' '.join([turn['content'] for turn in question['history'] if turn['role'] == 'user'] + [query])
         explicit_years = {int(value) for value in re.findall(r'\b(?:19|20)\d{2}\b', query)}
         compatible = sorted(explicit_years.intersection(years))
-        if self.style == 'v2' and question.get('kind') == 'temporal' and len(compatible) == 2:
+        if self.style in ('v2', 'v3') and question.get('kind') == 'temporal' and len(compatible) == 2:
             # Mirror the serving multi-period search: best anchor of each period first, then alternate by rank.
             rankings = [self.bm25.search(query, top_k=5, where={'year': year}) for year in compatible]
             anchors = []
@@ -438,13 +438,16 @@ def run_v2(args, parser):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--resume', action='store_true')
-    parser.add_argument('--pilot', type=int, help='Run only this many new teacher answers; do not synthesize more questions')
+    parser.add_argument('--pilot', type=int, nargs='?', const=1000, help='Limit new teacher answers; v3 always uses a throwaway directory and skips v2 custody')
     parser.add_argument('--prompt-revision', type=int, default=1, choices=(0, 1))
-    parser.add_argument('--style', choices=('v1', 'v2'), default='v2', help='v2 (default): 2-4 cited sentences into data/ft_v2; v1: single-sentence round-1 style (set FT_DATA_DIR=data/ft)')
+    parser.add_argument('--style', choices=('v1', 'v2', 'v3'), default='v2', help='v3: complete evidence obligations + deduplicated v2 reuse into data/ft_v3; rounds 1-2 unchanged')
     parser.add_argument('--target', type=int, help='v2: stop once this many kept examples (incl. refusals) exist')
     parser.add_argument('--max-minutes', type=float, help='v2: stop generating after this wall-clock time')
     parser.add_argument('--split-only', action='store_true', help='Rewrite train/valid/split_metadata/manifest from existing examples.jsonl; no generation')
     args = parser.parse_args()
+    if args.style == 'v3':
+        from round3 import run
+        return run(args, parser)
     OUT.mkdir(parents=True, exist_ok=True)
     if args.split_only:
         builder = Builder(None, style=args.style, target=args.target or 900)
