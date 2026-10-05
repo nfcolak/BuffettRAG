@@ -1,0 +1,280 @@
+{
+ "schema_version": 1,
+ "purpose": "Dev-only adversarial cases for grounded calibration. Never counted as quality evidence. Gold from chunks_v3.",
+ "frozen": false,
+ "dev_only": true,
+ "created": "2026-10-05",
+ "source_corpus": "data/processed/chunks_v3_paragraph.jsonl",
+ "corpus_sha256": "8263f08958729a77febf0922e7bbc4161bedd5fdb3e9a8b3fc9a64ab681ab5f0",
+ "cases": [
+  {
+   "qid": "adv01",
+   "question_type": "fact_number",
+   "adversarial": "swapped_years",
+   "years": [
+    1985
+   ],
+   "query": "What was Berkshire's insurance combined ratio in 1985?",
+   "gold_passage_ids": [
+    "1985_p0104"
+   ],
+   "relevant_ids": [
+    "1985_p0104"
+   ],
+   "gold_claims": [
+    {
+     "claim": "The combined ratio in 1985 was 111.",
+     "required_terms": [
+      "combined ratio",
+      "111",
+      "1985"
+     ],
+     "gold_passage_ids": [
+      "1985_p0104"
+     ]
+    }
+   ],
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": true
+   },
+   "reject": {
+    "forbidden_terms": []
+   },
+   "verification_note": "1985_p0104 gives 134 for 1984 and 111 for 1985 in one sentence; a year/value swap would answer 134."
+  },
+  {
+   "qid": "adv02",
+   "question_type": "fact_number",
+   "adversarial": "industry_vs_berkshire",
+   "years": [
+    1990
+   ],
+   "query": "What range does Buffett give for the industry's combined ratio, and where will Berkshire's super-cat business fall instead?",
+   "gold_passage_ids": [
+    "1990_p0058"
+   ],
+   "relevant_ids": [
+    "1990_p0058"
+   ],
+   "gold_claims": [
+    {
+     "claim": "The industry combined ratio range is 100 - 120.",
+     "required_terms": [
+      "industry range",
+      "100 - 120"
+     ],
+     "gold_passage_ids": [
+      "1990_p0058"
+     ]
+    },
+    {
+     "claim": "Berkshire's super-cat combined ratio will be close to either zero or 300%.",
+     "required_terms": [
+      "zero",
+      "300%"
+     ],
+     "gold_passage_ids": [
+      "1990_p0058"
+     ]
+    }
+   ],
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": true
+   },
+   "reject": {
+    "forbidden_terms": []
+   },
+   "verification_note": "1990_p0058 contrasts the industry range 100-120 with Berkshire's super-cat ratio near zero or 300%; reversing them is wrong."
+  },
+  {
+   "qid": "adv03",
+   "question_type": "fact_number",
+   "adversarial": "forecast_vs_actual",
+   "years": [
+    2001
+   ],
+   "query": "How much does Berkshire plan to spend on flight simulators, and how does that compare with its annual depreciation charge?",
+   "gold_passage_ids": [
+    "2001_p0085"
+   ],
+   "relevant_ids": [
+    "2001_p0085"
+   ],
+   "gold_claims": [
+    {
+     "claim": "Berkshire expects to spend $162 million for 27 simulators, versus annual depreciation of $95 million.",
+     "required_terms": [
+      "expect",
+      "$162 million",
+      "$95 million"
+     ],
+     "gold_passage_ids": [
+      "2001_p0085"
+     ]
+    }
+   ],
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": true
+   },
+   "reject": {
+    "forbidden_terms": []
+   },
+   "verification_note": "2001_p0085 states an expectation (we expect to spend $162 million) not a result; $95 million is the annual depreciation charge."
+  },
+  {
+   "qid": "adv04",
+   "question_type": "temporal_comparison",
+   "adversarial": "comparison_one_side_missing",
+   "years": [
+    1965,
+    1985
+   ],
+   "query": "Compare Berkshire's combined ratio in 1965 and 1985.",
+   "gold_passage_ids": [
+    "1985_p0104"
+   ],
+   "relevant_ids": [
+    "1985_p0104"
+   ],
+   "gold_claims": [
+    {
+     "claim": "The combined ratio in 1985 was 111.",
+     "required_terms": [
+      "combined ratio",
+      "111",
+      "1985"
+     ],
+     "gold_passage_ids": [
+      "1985_p0104"
+     ]
+    }
+   ],
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": true
+   },
+   "reject": {
+    "forbidden_terms": []
+   },
+   "verification_note": "No 1965 letter exists (corpus 1977-2024), so only the 1985 side is answerable; the expected answer is a partial answer with a coverage note for 1965."
+  },
+  {
+   "qid": "adv05",
+   "question_type": "unanswerable",
+   "adversarial": "plausible_unsupported_figure",
+   "years": [
+    1979
+   ],
+   "answerable": false,
+   "query": "How many Coca-Cola shares did Berkshire hold at the end of 1979, and what did they cost?",
+   "gold_passage_ids": [],
+   "relevant_ids": [],
+   "gold_claims": [],
+   "expected_answer": "The retrieved passages do not provide enough evidence to answer this question.",
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": false,
+    "require_exact_refusal": true
+   },
+   "reject": {
+    "forbidden_terms": []
+   },
+   "verification_note": "Searched all passages: no 1979 passage mentions Coca-Cola; the first Coca-Cola holding discussion is later."
+  },
+  {
+   "qid": "adv06",
+   "question_type": "fact_number",
+   "adversarial": "pretax_vs_aftertax",
+   "years": [
+    1984
+   ],
+   "query": "What after-tax earnings did Buffett use for a business that might command $250-$300 million, and what is the pretax equivalent?",
+   "gold_passage_ids": [
+    "1984_p0094"
+   ],
+   "relevant_ids": [
+    "1984_p0094"
+   ],
+   "gold_claims": [
+    {
+     "claim": "Unleveraged corporate earnings of $22.7 million after-tax.",
+     "required_terms": [
+      "after-tax",
+      "$22.7 million"
+     ],
+     "gold_passage_ids": [
+      "1984_p0094"
+     ]
+    },
+    {
+     "claim": "That is equivalent to about $45 million pretax.",
+     "required_terms": [
+      "$45 million",
+      "pretax"
+     ],
+     "gold_passage_ids": [
+      "1984_p0094"
+     ]
+    }
+   ],
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": true
+   },
+   "reject": {
+    "forbidden_terms": []
+   },
+   "verification_note": "1984_p0094: $22.7 million after-tax equals about $45 million pretax; the two must not be swapped."
+  },
+  {
+   "qid": "adv07",
+   "question_type": "unanswerable",
+   "adversarial": "comparison_both_sides_unsupported",
+   "years": [
+    2035,
+    2040
+   ],
+   "answerable": false,
+   "query": "Compare Berkshire's operating earnings in 2035 and 2040.",
+   "gold_passage_ids": [],
+   "relevant_ids": [],
+   "gold_claims": [],
+   "expected_answer": "The retrieved passages do not provide enough evidence to answer this question.",
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": false,
+    "require_exact_refusal": true
+   },
+   "reject": {
+    "forbidden_terms": []
+   },
+   "verification_note": "The corpus covers letters 1977-2024; no passage mentions 2035 or 2040."
+  },
+  {
+   "qid": "adv08",
+   "question_type": "unanswerable",
+   "adversarial": "false_premise",
+   "years": [
+    1995
+   ],
+   "answerable": false,
+   "query": "Why did Buffett decide to sell all of Berkshire's Coca-Cola shares in 1995?",
+   "gold_passage_ids": [],
+   "relevant_ids": [],
+   "gold_claims": [],
+   "expected_answer": "The retrieved passages do not provide enough evidence to answer this question.",
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": false,
+    "require_exact_refusal": true
+   },
+   "reject": {
+    "forbidden_terms": []
+   },
+   "verification_note": "Searched all passages mentioning selling Coca-Cola: none reports Berkshire selling its Coca-Cola holding; the premise is false."
+  }
+ ]
+}

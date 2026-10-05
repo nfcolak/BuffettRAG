@@ -96,7 +96,7 @@ use information outside the numbered evidence."""
         self.resources = resources
         self.settings = settings
         self.composer_kind = composer_kind or settings.COMPOSER
-        self.verifier = verifier or DeterministicVerifier()
+        self.verifier = verifier or DeterministicVerifier(settings.NUMERIC_GUARD)
         self.temperature = temperature
         self._build_plan = build_plan
         self._group_evidence = group_evidence

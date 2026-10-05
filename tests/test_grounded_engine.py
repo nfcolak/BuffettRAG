@@ -317,3 +317,10 @@ def test_decision_table_consistent_with_group_slot_check():
     slots = [Slot("1985", "period", 1985, 1985)]
     assert decide(slots, [unit("a", 0, 1985)], SETTINGS, context_hit_count=1).decision == "answer"
     assert decide(slots, [unit("a", 0, 1990)], SETTINGS, context_hit_count=1).decision == "refuse"
+
+
+@pytest.mark.parametrize("guard", ["verbatim", "bound"])
+def test_engine_builds_verifier_with_settings_numeric_guard(guard, monkeypatch):
+    monkeypatch.setenv("GROUNDED_NUMERIC_GUARD", "verbatim" if guard == "bound" else "bound")
+    engine = GroundedEngine(SimpleNamespace(), GroundedSettings(COMPOSER="template", NUMERIC_GUARD=guard))
+    assert engine.verifier.numeric_guard == guard
