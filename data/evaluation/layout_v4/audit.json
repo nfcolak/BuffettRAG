@@ -1,0 +1,957 @@
+{
+  "definitions": {
+    "line_break_in_sentence": "single newline inside a (non-[TABLE]) paragraph where the previous line does not end in terminal punctuation",
+    "hyphen_break": "word-hyphen at a line end or 'xx- yy' split",
+    "header_page_number_residue": "'Page n'/'YYYY Annual Report' lines or bare 1-3 digit lines inside prose paragraphs",
+    "table_paragraphs": "[TABLE]-marked paragraphs (v4 only)",
+    "table_paragraphs_unmarked_in_prose": "paragraphs with >=4 lines, >=50% numeric/dot-leader lines, not marked as table"
+  },
+  "v3": {
+    "per_year": {
+      "1977": {
+        "chunks": 35,
+        "mean_chunk_chars": 577.5,
+        "line_break_in_sentence": 278,
+        "hyphen_break": 0,
+        "header_page_number_residue": 0,
+        "table_paragraphs_unmarked_in_prose": 2,
+        "table_paragraphs": 0
+      },
+      "1978": {
+        "chunks": 49,
+        "mean_chunk_chars": 585.0,
+        "line_break_in_sentence": 409,
+        "hyphen_break": 0,
+        "header_page_number_residue": 0,
+        "table_paragraphs_unmarked_in_prose": 4,
+        "table_paragraphs": 0
+      },
+      "1979": {
+        "chunks": 72,
+        "mean_chunk_chars": 580.6,
+        "line_break_in_sentence": 607,
+        "hyphen_break": 0,
+        "header_page_number_residue": 0,
+        "table_paragraphs_unmarked_in_prose": 4,
+        "table_paragraphs": 0
+      },
+      "1980": {
+        "chunks": 84,
+        "mean_chunk_chars": 571.1,
+        "line_break_in_sentence": 673,
+        "hyphen_break": 0,
+        "header_page_number_residue": 0,
+        "table_paragraphs_unmarked_in_prose": 4,
+        "table_paragraphs": 0
+      },
+      "1981": {
+        "chunks": 77,
+        "mean_chunk_chars": 563.2,
+        "line_break_in_sentence": 599,
+        "hyphen_break": 0,
+        "header_page_number_residue": 0,
+        "table_paragraphs_unmarked_in_prose": 4,
+        "table_paragraphs": 0
+      },
+      "1982": {
+        "chunks": 89,
+        "mean_chunk_chars": 572.8,
+        "line_break_in_sentence": 718,
+        "hyphen_break": 0,
+        "header_page_number_residue": 0,
+        "table_paragraphs_unmarked_in_prose": 4,
+        "table_paragraphs": 0
+      },
+      "1983": {
+        "chunks": 131,
+        "mean_chunk_chars": 547.1,
+        "line_break_in_sentence": 812,
+        "hyphen_break": 0,
+        "header_page_number_residue": 0,
+        "table_paragraphs_unmarked_in_prose": 8,
+        "table_paragraphs": 0
+      },
+      "1984": {
+        "chunks": 143,
+        "mean_chunk_chars": 563.0,
+        "line_break_in_sentence": 1150,
+        "hyphen_break": 0,
+        "header_page_number_residue": 0,
+        "table_paragraphs_unmarked_in_prose": 8,
+        "table_paragraphs": 0
+      },
+      "1985": {
+        "chunks": 150,
+        "mean_chunk_chars": 567.6,
+        "line_break_in_sentence": 1210,
+        "hyphen_break": 1,
+        "header_page_number_residue": 0,
+        "table_paragraphs_unmarked_in_prose": 5,
+        "table_paragraphs": 0
+      },
+      "1986": {
+        "chunks": 151,
+        "mean_chunk_chars": 568.4,
+        "line_break_in_sentence": 997,
+        "hyphen_break": 4,
+        "header_page_number_residue": 0,
+        "table_paragraphs_unmarked_in_prose": 6,
+        "table_paragraphs": 0
+      },
+      "1987": {
+        "chunks": 135,
+        "mean_chunk_chars": 570.5,
+        "line_break_in_sentence": 1070,
+        "hyphen_break": 0,
+        "header_page_number_residue": 0,
+        "table_paragraphs_unmarked_in_prose": 5,
+        "table_paragraphs": 0
+      },
+      "1988": {
+        "chunks": 126,
+        "mean_chunk_chars": 575.6,
+        "line_break_in_sentence": 1004,
+        "hyphen_break": 0,
+        "header_page_number_residue": 0,
+        "table_paragraphs_unmarked_in_prose": 4,
+        "table_paragraphs": 0
+      },
+      "1989": {
+        "chunks": 153,
+        "mean_chunk_chars": 576.9,
+        "line_break_in_sentence": 1219,
+        "hyphen_break": 1,
+        "header_page_number_residue": 0,
+        "table_paragraphs_unmarked_in_prose": 4,
+        "table_paragraphs": 0
+      },
+      "1990": {
+        "chunks": 164,
+        "mean_chunk_chars": 588.4,
+        "line_break_in_sentence": 81,
+        "hyphen_break": 8,
+        "header_page_number_residue": 0,
+        "table_paragraphs_unmarked_in_prose": 6,
+        "table_paragraphs": 0
+      },
+      "1991": {
+        "chunks": 100,
+        "mean_chunk_chars": 568.4,
+        "line_break_in_sentence": 802,
+        "hyphen_break": 0,
+        "header_page_number_residue": 0,
+        "table_paragraphs_unmarked_in_prose": 6,
+        "table_paragraphs": 0
+      },
+      "1992": {
+        "chunks": 125,
+        "mean_chunk_chars": 561.7,
+        "line_break_in_sentence": 956,
+        "hyphen_break": 2,
+        "header_page_number_residue": 0,
+        "table_paragraphs_unmarked_in_prose": 9,
+        "table_paragraphs": 0
+      },
+      "1993": {
+        "chunks": 117,
+        "mean_chunk_chars": 581.1,
+        "line_break_in_sentence": 949,
+        "hyphen_break": 2,
+        "header_page_number_residue": 0,
+        "table_paragraphs_unmarked_in_prose": 5,
+        "table_paragraphs": 0
+      },
+      "1994": {
+        "chunks": 105,
+        "mean_chunk_chars": 559.9,
+        "line_break_in_sentence": 828,
+        "hyphen_break": 0,
+        "header_page_number_residue": 0,
+        "table_paragraphs_unmarked_in_prose": 8,
+        "table_paragraphs": 0
+      },
+      "1995": {
+        "chunks": 127,
+        "mean_chunk_chars": 565.2,
+        "line_break_in_sentence": 992,
+        "hyphen_break": 1,
+        "header_page_number_residue": 0,
+        "table_paragraphs_unmarked_in_prose": 7,
+        "table_paragraphs": 0
+      },
+      "1996": {
+        "chunks": 128,
+        "mean_chunk_chars": 564.7,
+        "line_break_in_sentence": 890,
+        "hyphen_break": 0,
+        "header_page_number_residue": 0,
+        "table_paragraphs_unmarked_in_prose": 8,
+        "table_paragraphs": 0
+      },
+      "1997": {
+        "chunks": 124,
+        "mean_chunk_chars": 567.1,
+        "line_break_in_sentence": 113,
+        "hyphen_break": 0,
+        "header_page_number_residue": 0,
+        "table_paragraphs_unmarked_in_prose": 7,
+        "table_paragraphs": 0
+      },
+      "1998": {
+        "chunks": 110,
+        "mean_chunk_chars": 711.3,
+        "line_break_in_sentence": 631,
+        "hyphen_break": 0,
+        "header_page_number_residue": 0,
+        "table_paragraphs_unmarked_in_prose": 12,
+        "table_paragraphs": 0
+      },
+      "1999": {
+        "chunks": 123,
+        "mean_chunk_chars": 686.8,
+        "line_break_in_sentence": 652,
+        "hyphen_break": 0,
+        "header_page_number_residue": 0,
+        "table_paragraphs_unmarked_in_prose": 13,
+        "table_paragraphs": 0
+      },
+      "2000": {
+        "chunks": 130,
+        "mean_chunk_chars": 711.5,
+        "line_break_in_sentence": 878,
+        "hyphen_break": 0,
+        "header_page_number_residue": 0,
+        "table_paragraphs_unmarked_in_prose": 12,
+        "table_paragraphs": 0
+      },
+      "2001": {
+        "chunks": 123,
+        "mean_chunk_chars": 707.6,
+        "line_break_in_sentence": 802,
+        "hyphen_break": 0,
+        "header_page_number_residue": 0,
+        "table_paragraphs_unmarked_in_prose": 11,
+        "table_paragraphs": 0
+      },
+      "2002": {
+        "chunks": 146,
+        "mean_chunk_chars": 703.7,
+        "line_break_in_sentence": 981,
+        "hyphen_break": 0,
+        "header_page_number_residue": 0,
+        "table_paragraphs_unmarked_in_prose": 12,
+        "table_paragraphs": 0
+      },
+      "2003": {
+        "chunks": 138,
+        "mean_chunk_chars": 698.2,
+        "line_break_in_sentence": 1027,
+        "hyphen_break": 0,
+        "header_page_number_residue": 0,
+        "table_paragraphs_unmarked_in_prose": 21,
+        "table_paragraphs": 0
+      },
+      "2004": {
+        "chunks": 174,
+        "mean_chunk_chars": 561.3,
+        "line_break_in_sentence": 1184,
+        "hyphen_break": 0,
+        "header_page_number_residue": 0,
+        "table_paragraphs_unmarked_in_prose": 23,
+        "table_paragraphs": 0
+      },
+      "2005": {
+        "chunks": 148,
+        "mean_chunk_chars": 587.5,
+        "line_break_in_sentence": 900,
+        "hyphen_break": 0,
+        "header_page_number_residue": 0,
+        "table_paragraphs_unmarked_in_prose": 19,
+        "table_paragraphs": 0
+      },
+      "2006": {
+        "chunks": 166,
+        "mean_chunk_chars": 563.8,
+        "line_break_in_sentence": 998,
+        "hyphen_break": 0,
+        "header_page_number_residue": 0,
+        "table_paragraphs_unmarked_in_prose": 19,
+        "table_paragraphs": 0
+      },
+      "2007": {
+        "chunks": 135,
+        "mean_chunk_chars": 586.2,
+        "line_break_in_sentence": 926,
+        "hyphen_break": 0,
+        "header_page_number_residue": 0,
+        "table_paragraphs_unmarked_in_prose": 23,
+        "table_paragraphs": 0
+      },
+      "2008": {
+        "chunks": 140,
+        "mean_chunk_chars": 709.0,
+        "line_break_in_sentence": 902,
+        "hyphen_break": 0,
+        "header_page_number_residue": 0,
+        "table_paragraphs_unmarked_in_prose": 21,
+        "table_paragraphs": 0
+      },
+      "2009": {
+        "chunks": 120,
+        "mean_chunk_chars": 715.5,
+        "line_break_in_sentence": 851,
+        "hyphen_break": 0,
+        "header_page_number_residue": 0,
+        "table_paragraphs_unmarked_in_prose": 21,
+        "table_paragraphs": 0
+      },
+      "2010": {
+        "chunks": 164,
+        "mean_chunk_chars": 704.5,
+        "line_break_in_sentence": 1200,
+        "hyphen_break": 0,
+        "header_page_number_residue": 0,
+        "table_paragraphs_unmarked_in_prose": 34,
+        "table_paragraphs": 0
+      },
+      "2011": {
+        "chunks": 146,
+        "mean_chunk_chars": 713.9,
+        "line_break_in_sentence": 996,
+        "hyphen_break": 0,
+        "header_page_number_residue": 0,
+        "table_paragraphs_unmarked_in_prose": 21,
+        "table_paragraphs": 0
+      },
+      "2012": {
+        "chunks": 150,
+        "mean_chunk_chars": 696.9,
+        "line_break_in_sentence": 944,
+        "hyphen_break": 0,
+        "header_page_number_residue": 0,
+        "table_paragraphs_unmarked_in_prose": 23,
+        "table_paragraphs": 0
+      },
+      "2013": {
+        "chunks": 140,
+        "mean_chunk_chars": 711.6,
+        "line_break_in_sentence": 954,
+        "hyphen_break": 0,
+        "header_page_number_residue": 0,
+        "table_paragraphs_unmarked_in_prose": 24,
+        "table_paragraphs": 0
+      },
+      "2014": {
+        "chunks": 246,
+        "mean_chunk_chars": 699.7,
+        "line_break_in_sentence": 1447,
+        "hyphen_break": 0,
+        "header_page_number_residue": 0,
+        "table_paragraphs_unmarked_in_prose": 27,
+        "table_paragraphs": 0
+      },
+      "2015": {
+        "chunks": 178,
+        "mean_chunk_chars": 704.9,
+        "line_break_in_sentence": 1147,
+        "hyphen_break": 2,
+        "header_page_number_residue": 0,
+        "table_paragraphs_unmarked_in_prose": 26,
+        "table_paragraphs": 0
+      },
+      "2016": {
+        "chunks": 167,
+        "mean_chunk_chars": 701.9,
+        "line_break_in_sentence": 1311,
+        "hyphen_break": 0,
+        "header_page_number_residue": 0,
+        "table_paragraphs_unmarked_in_prose": 26,
+        "table_paragraphs": 0
+      },
+      "2017": {
+        "chunks": 98,
+        "mean_chunk_chars": 705.0,
+        "line_break_in_sentence": 755,
+        "hyphen_break": 0,
+        "header_page_number_residue": 0,
+        "table_paragraphs_unmarked_in_prose": 15,
+        "table_paragraphs": 0
+      },
+      "2018": {
+        "chunks": 84,
+        "mean_chunk_chars": 692.1,
+        "line_break_in_sentence": 601,
+        "hyphen_break": 0,
+        "header_page_number_residue": 0,
+        "table_paragraphs_unmarked_in_prose": 16,
+        "table_paragraphs": 0
+      },
+      "2019": {
+        "chunks": 82,
+        "mean_chunk_chars": 709.7,
+        "line_break_in_sentence": 546,
+        "hyphen_break": 0,
+        "header_page_number_residue": 0,
+        "table_paragraphs_unmarked_in_prose": 17,
+        "table_paragraphs": 0
+      },
+      "2020": {
+        "chunks": 85,
+        "mean_chunk_chars": 684.8,
+        "line_break_in_sentence": 532,
+        "hyphen_break": 0,
+        "header_page_number_residue": 0,
+        "table_paragraphs_unmarked_in_prose": 18,
+        "table_paragraphs": 0
+      },
+      "2021": {
+        "chunks": 64,
+        "mean_chunk_chars": 696.7,
+        "line_break_in_sentence": 427,
+        "hyphen_break": 0,
+        "header_page_number_residue": 0,
+        "table_paragraphs_unmarked_in_prose": 18,
+        "table_paragraphs": 0
+      },
+      "2022": {
+        "chunks": 48,
+        "mean_chunk_chars": 692.3,
+        "line_break_in_sentence": 315,
+        "hyphen_break": 0,
+        "header_page_number_residue": 0,
+        "table_paragraphs_unmarked_in_prose": 15,
+        "table_paragraphs": 0
+      },
+      "2023": {
+        "chunks": 76,
+        "mean_chunk_chars": 711.9,
+        "line_break_in_sentence": 494,
+        "hyphen_break": 0,
+        "header_page_number_residue": 0,
+        "table_paragraphs_unmarked_in_prose": 14,
+        "table_paragraphs": 0
+      },
+      "2024": {
+        "chunks": 65,
+        "mean_chunk_chars": 684.9,
+        "line_break_in_sentence": 444,
+        "hyphen_break": 0,
+        "header_page_number_residue": 0,
+        "table_paragraphs_unmarked_in_prose": 13,
+        "table_paragraphs": 0
+      }
+    },
+    "totals": {
+      "pdf_years_all": {
+        "chunks": 3446,
+        "line_break_in_sentence": 22845,
+        "hyphen_break": 2,
+        "header_page_number_residue": 0,
+        "table_paragraphs": 0,
+        "table_paragraphs_unmarked_in_prose": 514,
+        "mean_chunk_chars": 679.8
+      },
+      "1998-2003": {
+        "chunks": 770,
+        "line_break_in_sentence": 4971,
+        "hyphen_break": 0,
+        "header_page_number_residue": 0,
+        "table_paragraphs": 0,
+        "table_paragraphs_unmarked_in_prose": 81,
+        "mean_chunk_chars": 703.0
+      },
+      "2008-2024": {
+        "chunks": 2053,
+        "line_break_in_sentence": 13866,
+        "hyphen_break": 2,
+        "header_page_number_residue": 0,
+        "table_paragraphs": 0,
+        "table_paragraphs_unmarked_in_prose": 349,
+        "mean_chunk_chars": 703.3
+      },
+      "2004-2007": {
+        "chunks": 623,
+        "line_break_in_sentence": 4008,
+        "hyphen_break": 0,
+        "header_page_number_residue": 0,
+        "table_paragraphs": 0,
+        "table_paragraphs_unmarked_in_prose": 84,
+        "mean_chunk_chars": 573.6
+      }
+    }
+  },
+  "v4": {
+    "per_year": {
+      "1977": {
+        "chunks": 35,
+        "mean_chunk_chars": 577.5,
+        "line_break_in_sentence": 278,
+        "hyphen_break": 0,
+        "header_page_number_residue": 0,
+        "table_paragraphs_unmarked_in_prose": 2,
+        "table_paragraphs": 0
+      },
+      "1978": {
+        "chunks": 49,
+        "mean_chunk_chars": 585.0,
+        "line_break_in_sentence": 409,
+        "hyphen_break": 0,
+        "header_page_number_residue": 0,
+        "table_paragraphs_unmarked_in_prose": 4,
+        "table_paragraphs": 0
+      },
+      "1979": {
+        "chunks": 72,
+        "mean_chunk_chars": 580.6,
+        "line_break_in_sentence": 607,
+        "hyphen_break": 0,
+        "header_page_number_residue": 0,
+        "table_paragraphs_unmarked_in_prose": 4,
+        "table_paragraphs": 0
+      },
+      "1980": {
+        "chunks": 84,
+        "mean_chunk_chars": 571.1,
+        "line_break_in_sentence": 673,
+        "hyphen_break": 0,
+        "header_page_number_residue": 0,
+        "table_paragraphs_unmarked_in_prose": 4,
+        "table_paragraphs": 0
+      },
+      "1981": {
+        "chunks": 77,
+        "mean_chunk_chars": 563.2,
+        "line_break_in_sentence": 599,
+        "hyphen_break": 0,
+        "header_page_number_residue": 0,
+        "table_paragraphs_unmarked_in_prose": 4,
+        "table_paragraphs": 0
+      },
+      "1982": {
+        "chunks": 89,
+        "mean_chunk_chars": 572.8,
+        "line_break_in_sentence": 718,
+        "hyphen_break": 0,
+        "header_page_number_residue": 0,
+        "table_paragraphs_unmarked_in_prose": 4,
+        "table_paragraphs": 0
+      },
+      "1983": {
+        "chunks": 131,
+        "mean_chunk_chars": 547.1,
+        "line_break_in_sentence": 812,
+        "hyphen_break": 0,
+        "header_page_number_residue": 0,
+        "table_paragraphs_unmarked_in_prose": 8,
+        "table_paragraphs": 0
+      },
+      "1984": {
+        "chunks": 143,
+        "mean_chunk_chars": 563.0,
+        "line_break_in_sentence": 1150,
+        "hyphen_break": 0,
+        "header_page_number_residue": 0,
+        "table_paragraphs_unmarked_in_prose": 8,
+        "table_paragraphs": 0
+      },
+      "1985": {
+        "chunks": 150,
+        "mean_chunk_chars": 567.6,
+        "line_break_in_sentence": 1210,
+        "hyphen_break": 1,
+        "header_page_number_residue": 0,
+        "table_paragraphs_unmarked_in_prose": 5,
+        "table_paragraphs": 0
+      },
+      "1986": {
+        "chunks": 151,
+        "mean_chunk_chars": 568.4,
+        "line_break_in_sentence": 997,
+        "hyphen_break": 4,
+        "header_page_number_residue": 0,
+        "table_paragraphs_unmarked_in_prose": 6,
+        "table_paragraphs": 0
+      },
+      "1987": {
+        "chunks": 135,
+        "mean_chunk_chars": 570.5,
+        "line_break_in_sentence": 1070,
+        "hyphen_break": 0,
+        "header_page_number_residue": 0,
+        "table_paragraphs_unmarked_in_prose": 5,
+        "table_paragraphs": 0
+      },
+      "1988": {
+        "chunks": 126,
+        "mean_chunk_chars": 575.6,
+        "line_break_in_sentence": 1004,
+        "hyphen_break": 0,
+        "header_page_number_residue": 0,
+        "table_paragraphs_unmarked_in_prose": 4,
+        "table_paragraphs": 0
+      },
+      "1989": {
+        "chunks": 153,
+        "mean_chunk_chars": 576.9,
+        "line_break_in_sentence": 1219,
+        "hyphen_break": 1,
+        "header_page_number_residue": 0,
+        "table_paragraphs_unmarked_in_prose": 4,
+        "table_paragraphs": 0
+      },
+      "1990": {
+        "chunks": 164,
+        "mean_chunk_chars": 588.4,
+        "line_break_in_sentence": 81,
+        "hyphen_break": 8,
+        "header_page_number_residue": 0,
+        "table_paragraphs_unmarked_in_prose": 6,
+        "table_paragraphs": 0
+      },
+      "1991": {
+        "chunks": 100,
+        "mean_chunk_chars": 568.4,
+        "line_break_in_sentence": 802,
+        "hyphen_break": 0,
+        "header_page_number_residue": 0,
+        "table_paragraphs_unmarked_in_prose": 6,
+        "table_paragraphs": 0
+      },
+      "1992": {
+        "chunks": 125,
+        "mean_chunk_chars": 561.7,
+        "line_break_in_sentence": 956,
+        "hyphen_break": 2,
+        "header_page_number_residue": 0,
+        "table_paragraphs_unmarked_in_prose": 9,
+        "table_paragraphs": 0
+      },
+      "1993": {
+        "chunks": 117,
+        "mean_chunk_chars": 581.1,
+        "line_break_in_sentence": 949,
+        "hyphen_break": 2,
+        "header_page_number_residue": 0,
+        "table_paragraphs_unmarked_in_prose": 5,
+        "table_paragraphs": 0
+      },
+      "1994": {
+        "chunks": 105,
+        "mean_chunk_chars": 559.9,
+        "line_break_in_sentence": 828,
+        "hyphen_break": 0,
+        "header_page_number_residue": 0,
+        "table_paragraphs_unmarked_in_prose": 8,
+        "table_paragraphs": 0
+      },
+      "1995": {
+        "chunks": 127,
+        "mean_chunk_chars": 565.2,
+        "line_break_in_sentence": 992,
+        "hyphen_break": 1,
+        "header_page_number_residue": 0,
+        "table_paragraphs_unmarked_in_prose": 7,
+        "table_paragraphs": 0
+      },
+      "1996": {
+        "chunks": 128,
+        "mean_chunk_chars": 564.7,
+        "line_break_in_sentence": 890,
+        "hyphen_break": 0,
+        "header_page_number_residue": 0,
+        "table_paragraphs_unmarked_in_prose": 8,
+        "table_paragraphs": 0
+      },
+      "1997": {
+        "chunks": 124,
+        "mean_chunk_chars": 567.1,
+        "line_break_in_sentence": 113,
+        "hyphen_break": 0,
+        "header_page_number_residue": 0,
+        "table_paragraphs_unmarked_in_prose": 7,
+        "table_paragraphs": 0
+      },
+      "1998": {
+        "chunks": 117,
+        "mean_chunk_chars": 591.8,
+        "line_break_in_sentence": 0,
+        "hyphen_break": 0,
+        "header_page_number_residue": 0,
+        "table_paragraphs_unmarked_in_prose": 0,
+        "table_paragraphs": 7
+      },
+      "1999": {
+        "chunks": 129,
+        "mean_chunk_chars": 579.9,
+        "line_break_in_sentence": 0,
+        "hyphen_break": 0,
+        "header_page_number_residue": 0,
+        "table_paragraphs_unmarked_in_prose": 0,
+        "table_paragraphs": 8
+      },
+      "2000": {
+        "chunks": 143,
+        "mean_chunk_chars": 564.3,
+        "line_break_in_sentence": 0,
+        "hyphen_break": 0,
+        "header_page_number_residue": 0,
+        "table_paragraphs_unmarked_in_prose": 0,
+        "table_paragraphs": 7
+      },
+      "2001": {
+        "chunks": 135,
+        "mean_chunk_chars": 557.1,
+        "line_break_in_sentence": 0,
+        "hyphen_break": 0,
+        "header_page_number_residue": 0,
+        "table_paragraphs_unmarked_in_prose": 0,
+        "table_paragraphs": 4
+      },
+      "2002": {
+        "chunks": 153,
+        "mean_chunk_chars": 586.2,
+        "line_break_in_sentence": 0,
+        "hyphen_break": 0,
+        "header_page_number_residue": 0,
+        "table_paragraphs_unmarked_in_prose": 0,
+        "table_paragraphs": 4
+      },
+      "2003": {
+        "chunks": 139,
+        "mean_chunk_chars": 583.9,
+        "line_break_in_sentence": 0,
+        "hyphen_break": 0,
+        "header_page_number_residue": 0,
+        "table_paragraphs_unmarked_in_prose": 0,
+        "table_paragraphs": 11
+      },
+      "2004": {
+        "chunks": 162,
+        "mean_chunk_chars": 562.0,
+        "line_break_in_sentence": 0,
+        "hyphen_break": 0,
+        "header_page_number_residue": 0,
+        "table_paragraphs_unmarked_in_prose": 0,
+        "table_paragraphs": 13
+      },
+      "2005": {
+        "chunks": 142,
+        "mean_chunk_chars": 572.9,
+        "line_break_in_sentence": 0,
+        "hyphen_break": 0,
+        "header_page_number_residue": 0,
+        "table_paragraphs_unmarked_in_prose": 0,
+        "table_paragraphs": 16
+      },
+      "2006": {
+        "chunks": 152,
+        "mean_chunk_chars": 580.3,
+        "line_break_in_sentence": 0,
+        "hyphen_break": 0,
+        "header_page_number_residue": 0,
+        "table_paragraphs_unmarked_in_prose": 0,
+        "table_paragraphs": 15
+      },
+      "2007": {
+        "chunks": 130,
+        "mean_chunk_chars": 571.7,
+        "line_break_in_sentence": 0,
+        "hyphen_break": 0,
+        "header_page_number_residue": 0,
+        "table_paragraphs_unmarked_in_prose": 0,
+        "table_paragraphs": 12
+      },
+      "2008": {
+        "chunks": 143,
+        "mean_chunk_chars": 571.5,
+        "line_break_in_sentence": 0,
+        "hyphen_break": 0,
+        "header_page_number_residue": 0,
+        "table_paragraphs_unmarked_in_prose": 0,
+        "table_paragraphs": 9
+      },
+      "2009": {
+        "chunks": 118,
+        "mean_chunk_chars": 594.2,
+        "line_break_in_sentence": 0,
+        "hyphen_break": 0,
+        "header_page_number_residue": 0,
+        "table_paragraphs_unmarked_in_prose": 0,
+        "table_paragraphs": 11
+      },
+      "2010": {
+        "chunks": 155,
+        "mean_chunk_chars": 592.0,
+        "line_break_in_sentence": 0,
+        "hyphen_break": 0,
+        "header_page_number_residue": 0,
+        "table_paragraphs_unmarked_in_prose": 0,
+        "table_paragraphs": 14
+      },
+      "2011": {
+        "chunks": 147,
+        "mean_chunk_chars": 585.4,
+        "line_break_in_sentence": 0,
+        "hyphen_break": 0,
+        "header_page_number_residue": 0,
+        "table_paragraphs_unmarked_in_prose": 0,
+        "table_paragraphs": 10
+      },
+      "2012": {
+        "chunks": 150,
+        "mean_chunk_chars": 575.4,
+        "line_break_in_sentence": 0,
+        "hyphen_break": 0,
+        "header_page_number_residue": 0,
+        "table_paragraphs_unmarked_in_prose": 0,
+        "table_paragraphs": 9
+      },
+      "2013": {
+        "chunks": 142,
+        "mean_chunk_chars": 578.4,
+        "line_break_in_sentence": 0,
+        "hyphen_break": 0,
+        "header_page_number_residue": 0,
+        "table_paragraphs_unmarked_in_prose": 0,
+        "table_paragraphs": 9
+      },
+      "2014": {
+        "chunks": 251,
+        "mean_chunk_chars": 585.4,
+        "line_break_in_sentence": 0,
+        "hyphen_break": 0,
+        "header_page_number_residue": 0,
+        "table_paragraphs_unmarked_in_prose": 0,
+        "table_paragraphs": 11
+      },
+      "2015": {
+        "chunks": 185,
+        "mean_chunk_chars": 565.6,
+        "line_break_in_sentence": 0,
+        "hyphen_break": 1,
+        "header_page_number_residue": 0,
+        "table_paragraphs_unmarked_in_prose": 0,
+        "table_paragraphs": 10
+      },
+      "2016": {
+        "chunks": 169,
+        "mean_chunk_chars": 590.2,
+        "line_break_in_sentence": 0,
+        "hyphen_break": 0,
+        "header_page_number_residue": 0,
+        "table_paragraphs_unmarked_in_prose": 0,
+        "table_paragraphs": 13
+      },
+      "2017": {
+        "chunks": 92,
+        "mean_chunk_chars": 611.8,
+        "line_break_in_sentence": 0,
+        "hyphen_break": 0,
+        "header_page_number_residue": 0,
+        "table_paragraphs_unmarked_in_prose": 0,
+        "table_paragraphs": 5
+      },
+      "2018": {
+        "chunks": 78,
+        "mean_chunk_chars": 592.0,
+        "line_break_in_sentence": 0,
+        "hyphen_break": 0,
+        "header_page_number_residue": 0,
+        "table_paragraphs_unmarked_in_prose": 0,
+        "table_paragraphs": 4
+      },
+      "2019": {
+        "chunks": 74,
+        "mean_chunk_chars": 616.5,
+        "line_break_in_sentence": 0,
+        "hyphen_break": 0,
+        "header_page_number_residue": 0,
+        "table_paragraphs_unmarked_in_prose": 0,
+        "table_paragraphs": 6
+      },
+      "2020": {
+        "chunks": 76,
+        "mean_chunk_chars": 595.1,
+        "line_break_in_sentence": 0,
+        "hyphen_break": 0,
+        "header_page_number_residue": 0,
+        "table_paragraphs_unmarked_in_prose": 0,
+        "table_paragraphs": 2
+      },
+      "2021": {
+        "chunks": 51,
+        "mean_chunk_chars": 634.6,
+        "line_break_in_sentence": 0,
+        "hyphen_break": 0,
+        "header_page_number_residue": 0,
+        "table_paragraphs_unmarked_in_prose": 0,
+        "table_paragraphs": 3
+      },
+      "2022": {
+        "chunks": 37,
+        "mean_chunk_chars": 628.4,
+        "line_break_in_sentence": 0,
+        "hyphen_break": 0,
+        "header_page_number_residue": 0,
+        "table_paragraphs_unmarked_in_prose": 0,
+        "table_paragraphs": 2
+      },
+      "2023": {
+        "chunks": 67,
+        "mean_chunk_chars": 623.7,
+        "line_break_in_sentence": 0,
+        "hyphen_break": 0,
+        "header_page_number_residue": 0,
+        "table_paragraphs_unmarked_in_prose": 0,
+        "table_paragraphs": 3
+      },
+      "2024": {
+        "chunks": 57,
+        "mean_chunk_chars": 604.5,
+        "line_break_in_sentence": 0,
+        "hyphen_break": 0,
+        "header_page_number_residue": 0,
+        "table_paragraphs_unmarked_in_prose": 0,
+        "table_paragraphs": 3
+      }
+    },
+    "totals": {
+      "pdf_years_all": {
+        "chunks": 3394,
+        "line_break_in_sentence": 0,
+        "hyphen_break": 1,
+        "header_page_number_residue": 0,
+        "table_paragraphs": 221,
+        "table_paragraphs_unmarked_in_prose": 0,
+        "mean_chunk_chars": 583.5
+      },
+      "1998-2003": {
+        "chunks": 816,
+        "line_break_in_sentence": 0,
+        "hyphen_break": 0,
+        "header_page_number_residue": 0,
+        "table_paragraphs": 41,
+        "table_paragraphs_unmarked_in_prose": 0,
+        "mean_chunk_chars": 577.0
+      },
+      "2008-2024": {
+        "chunks": 1992,
+        "line_break_in_sentence": 0,
+        "hyphen_break": 1,
+        "header_page_number_residue": 0,
+        "table_paragraphs": 124,
+        "table_paragraphs_unmarked_in_prose": 0,
+        "mean_chunk_chars": 589.6
+      },
+      "2004-2007": {
+        "chunks": 586,
+        "line_break_in_sentence": 0,
+        "hyphen_break": 0,
+        "header_page_number_residue": 0,
+        "table_paragraphs": 56,
+        "table_paragraphs_unmarked_in_prose": 0,
+        "mean_chunk_chars": 571.5
+      }
+    }
+  }
+}

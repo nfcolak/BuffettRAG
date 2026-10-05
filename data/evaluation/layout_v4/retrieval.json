@@ -1,0 +1,1358 @@
+{
+  "gold_set": {
+    "n_queries": 50,
+    "v3": {
+      "year_hit_rate@1": 0.58,
+      "year_hit_rate@3": 0.4467,
+      "year_hit_rate@5": 0.404,
+      "year_hit_rate@10": 0.348,
+      "recall@1": 0.56,
+      "recall@3": 0.72,
+      "recall@5": 0.82,
+      "recall@10": 0.94,
+      "mrr": 0.6749
+    },
+    "v4": {
+      "year_hit_rate@1": 0.58,
+      "year_hit_rate@3": 0.4333,
+      "year_hit_rate@5": 0.412,
+      "year_hit_rate@10": 0.348,
+      "recall@1": 0.58,
+      "recall@3": 0.74,
+      "recall@5": 0.84,
+      "recall@10": 0.92,
+      "mrr": 0.6904
+    },
+    "delta": {
+      "year_hit_rate@1": 0.0,
+      "year_hit_rate@3": -0.0134,
+      "year_hit_rate@5": 0.008,
+      "year_hit_rate@10": 0.0,
+      "recall@1": 0.02,
+      "recall@3": 0.02,
+      "recall@5": 0.02,
+      "recall@10": -0.02,
+      "mrr": 0.0155
+    }
+  },
+  "hard_negatives_v3": {
+    "v3": {
+      "n_cases": 8,
+      "passed": 8,
+      "rows": [
+        {
+          "qid": "hn01_derivatives_vs_mass_risk",
+          "relevant_ids": [
+            "2002_p0086"
+          ],
+          "hard_negative_ids": [
+            "2015_p0144"
+          ],
+          "best_relevant_rank": 1,
+          "best_negative_rank": 3,
+          "passed": true
+        },
+        {
+          "qid": "hn02_crisis_vs_buybacks",
+          "relevant_ids": [
+            "2009_p0021"
+          ],
+          "hard_negative_ids": [
+            "2008_p0089"
+          ],
+          "best_relevant_rank": 1,
+          "best_negative_rank": null,
+          "passed": true
+        },
+        {
+          "qid": "hn03_bnsf_vs_railroad_dividends",
+          "relevant_ids": [
+            "2021_p0056"
+          ],
+          "hard_negative_ids": [
+            "2020_p0076"
+          ],
+          "best_relevant_rank": 2,
+          "best_negative_rank": 8,
+          "passed": true
+        },
+        {
+          "qid": "hn04_apple_earnings_vs_stake",
+          "relevant_ids": [
+            "2021_p0030"
+          ],
+          "hard_negative_ids": [
+            "2020_p0035"
+          ],
+          "best_relevant_rank": 1,
+          "best_negative_rank": 7,
+          "passed": true
+        },
+        {
+          "qid": "hn05_index_funds_vs_manager_fees",
+          "relevant_ids": [
+            "1996_p0092"
+          ],
+          "hard_negative_ids": [
+            "2006_p0141"
+          ],
+          "best_relevant_rank": 5,
+          "best_negative_rank": 10,
+          "passed": true
+        },
+        {
+          "qid": "hn06_dividend_policy_vs_tax",
+          "relevant_ids": [
+            "2012_p0109"
+          ],
+          "hard_negative_ids": [
+            "2016_p0112"
+          ],
+          "best_relevant_rank": 1,
+          "best_negative_rank": 9,
+          "passed": true
+        },
+        {
+          "qid": "hn07_see_operations_vs_table",
+          "relevant_ids": [
+            "1989_p0033"
+          ],
+          "hard_negative_ids": [
+            "1989_p0018"
+          ],
+          "best_relevant_rank": 1,
+          "best_negative_rank": 3,
+          "passed": true
+        },
+        {
+          "qid": "hn08_greg_meeting_vs_midamerican",
+          "relevant_ids": [
+            "2020_p0081"
+          ],
+          "hard_negative_ids": [
+            "2005_p0049"
+          ],
+          "best_relevant_rank": 5,
+          "best_negative_rank": 10,
+          "passed": true
+        }
+      ]
+    },
+    "v4_mapped": {
+      "n_cases": 8,
+      "passed": 6,
+      "rows": [
+        {
+          "qid": "hn01_derivatives_vs_mass_risk",
+          "relevant_ids": [
+            "2002_p0090"
+          ],
+          "hard_negative_ids": [
+            "2015_p0148"
+          ],
+          "best_relevant_rank": 1,
+          "best_negative_rank": null,
+          "passed": true,
+          "map_confident": true
+        },
+        {
+          "qid": "hn02_crisis_vs_buybacks",
+          "relevant_ids": [
+            "2009_p0016"
+          ],
+          "hard_negative_ids": [
+            "2008_p0084"
+          ],
+          "best_relevant_rank": 1,
+          "best_negative_rank": null,
+          "passed": true,
+          "map_confident": false
+        },
+        {
+          "qid": "hn03_bnsf_vs_railroad_dividends",
+          "relevant_ids": [
+            "2021_p0043"
+          ],
+          "hard_negative_ids": [
+            "2020_p0067"
+          ],
+          "best_relevant_rank": 18,
+          "best_negative_rank": 8,
+          "passed": false,
+          "map_confident": true
+        },
+        {
+          "qid": "hn04_apple_earnings_vs_stake",
+          "relevant_ids": [
+            "2021_p0018"
+          ],
+          "hard_negative_ids": [
+            "2020_p0025"
+          ],
+          "best_relevant_rank": 4,
+          "best_negative_rank": 5,
+          "passed": true,
+          "map_confident": true
+        },
+        {
+          "qid": "hn05_index_funds_vs_manager_fees",
+          "relevant_ids": [
+            "1996_p0092"
+          ],
+          "hard_negative_ids": [
+            "2006_p0128"
+          ],
+          "best_relevant_rank": 6,
+          "best_negative_rank": 10,
+          "passed": true,
+          "map_confident": true
+        },
+        {
+          "qid": "hn06_dividend_policy_vs_tax",
+          "relevant_ids": [
+            "2012_p0102"
+          ],
+          "hard_negative_ids": [
+            "2016_p0111"
+          ],
+          "best_relevant_rank": 1,
+          "best_negative_rank": 18,
+          "passed": true,
+          "map_confident": true
+        },
+        {
+          "qid": "hn07_see_operations_vs_table",
+          "relevant_ids": [
+            "1989_p0033"
+          ],
+          "hard_negative_ids": [
+            "1989_p0018"
+          ],
+          "best_relevant_rank": 1,
+          "best_negative_rank": 3,
+          "passed": true,
+          "map_confident": true
+        },
+        {
+          "qid": "hn08_greg_meeting_vs_midamerican",
+          "relevant_ids": [
+            "2020_p0072"
+          ],
+          "hard_negative_ids": [
+            "2005_p0041"
+          ],
+          "best_relevant_rank": 14,
+          "best_negative_rank": 8,
+          "passed": false,
+          "map_confident": true
+        }
+      ]
+    }
+  },
+  "per_query_gold": {
+    "v3": {
+      "g01": {
+        "year_hit_rate@1": 0.0,
+        "year_hit_rate@3": 0.3333333333333333,
+        "year_hit_rate@5": 0.2,
+        "year_hit_rate@10": 0.1,
+        "recall@1": 0.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "mrr": 0.5
+      },
+      "g02": {
+        "year_hit_rate@1": 1.0,
+        "year_hit_rate@3": 0.3333333333333333,
+        "year_hit_rate@5": 0.2,
+        "year_hit_rate@10": 0.4,
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "mrr": 1.0
+      },
+      "g03": {
+        "year_hit_rate@1": 0.0,
+        "year_hit_rate@3": 0.3333333333333333,
+        "year_hit_rate@5": 0.6,
+        "year_hit_rate@10": 0.4,
+        "recall@1": 0.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "mrr": 0.5
+      },
+      "g04": {
+        "year_hit_rate@1": 0.0,
+        "year_hit_rate@3": 0.0,
+        "year_hit_rate@5": 0.2,
+        "year_hit_rate@10": 0.1,
+        "recall@1": 0.0,
+        "recall@3": 0.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "mrr": 0.2
+      },
+      "g05": {
+        "year_hit_rate@1": 1.0,
+        "year_hit_rate@3": 0.3333333333333333,
+        "year_hit_rate@5": 0.2,
+        "year_hit_rate@10": 0.3,
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "mrr": 1.0
+      },
+      "g06": {
+        "year_hit_rate@1": 0.0,
+        "year_hit_rate@3": 0.0,
+        "year_hit_rate@5": 0.2,
+        "year_hit_rate@10": 0.1,
+        "recall@1": 0.0,
+        "recall@3": 0.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "mrr": 0.2
+      },
+      "g07": {
+        "year_hit_rate@1": 1.0,
+        "year_hit_rate@3": 0.6666666666666666,
+        "year_hit_rate@5": 0.4,
+        "year_hit_rate@10": 0.3,
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "mrr": 1.0
+      },
+      "g08": {
+        "year_hit_rate@1": 0.0,
+        "year_hit_rate@3": 0.3333333333333333,
+        "year_hit_rate@5": 0.4,
+        "year_hit_rate@10": 0.3,
+        "recall@1": 0.0,
+        "recall@3": 0.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "mrr": 0.25
+      },
+      "g09": {
+        "year_hit_rate@1": 0.0,
+        "year_hit_rate@3": 0.0,
+        "year_hit_rate@5": 0.0,
+        "year_hit_rate@10": 0.1,
+        "recall@1": 0.0,
+        "recall@3": 0.0,
+        "recall@5": 0.0,
+        "recall@10": 1.0,
+        "mrr": 0.1
+      },
+      "g10": {
+        "year_hit_rate@1": 1.0,
+        "year_hit_rate@3": 0.3333333333333333,
+        "year_hit_rate@5": 0.2,
+        "year_hit_rate@10": 0.3,
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "mrr": 1.0
+      },
+      "g11": {
+        "year_hit_rate@1": 1.0,
+        "year_hit_rate@3": 1.0,
+        "year_hit_rate@5": 0.8,
+        "year_hit_rate@10": 0.7,
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "mrr": 1.0
+      },
+      "g12": {
+        "year_hit_rate@1": 0.0,
+        "year_hit_rate@3": 0.0,
+        "year_hit_rate@5": 0.0,
+        "year_hit_rate@10": 0.1,
+        "recall@1": 0.0,
+        "recall@3": 0.0,
+        "recall@5": 0.0,
+        "recall@10": 1.0,
+        "mrr": 0.1
+      },
+      "g13": {
+        "year_hit_rate@1": 1.0,
+        "year_hit_rate@3": 0.3333333333333333,
+        "year_hit_rate@5": 0.4,
+        "year_hit_rate@10": 0.2,
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "mrr": 1.0
+      },
+      "g14": {
+        "year_hit_rate@1": 0.0,
+        "year_hit_rate@3": 0.0,
+        "year_hit_rate@5": 0.2,
+        "year_hit_rate@10": 0.1,
+        "recall@1": 0.0,
+        "recall@3": 0.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "mrr": 0.25
+      },
+      "g15": {
+        "year_hit_rate@1": 1.0,
+        "year_hit_rate@3": 0.6666666666666666,
+        "year_hit_rate@5": 0.8,
+        "year_hit_rate@10": 0.4,
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "mrr": 1.0
+      },
+      "g16": {
+        "year_hit_rate@1": 1.0,
+        "year_hit_rate@3": 0.3333333333333333,
+        "year_hit_rate@5": 0.2,
+        "year_hit_rate@10": 0.1,
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "mrr": 1.0
+      },
+      "g17": {
+        "year_hit_rate@1": 1.0,
+        "year_hit_rate@3": 0.3333333333333333,
+        "year_hit_rate@5": 0.2,
+        "year_hit_rate@10": 0.3,
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "mrr": 1.0
+      },
+      "g18": {
+        "year_hit_rate@1": 0.0,
+        "year_hit_rate@3": 0.0,
+        "year_hit_rate@5": 0.0,
+        "year_hit_rate@10": 0.2,
+        "recall@1": 0.0,
+        "recall@3": 0.0,
+        "recall@5": 0.0,
+        "recall@10": 1.0,
+        "mrr": 0.16666666666666666
+      },
+      "g19": {
+        "year_hit_rate@1": 1.0,
+        "year_hit_rate@3": 0.6666666666666666,
+        "year_hit_rate@5": 0.6,
+        "year_hit_rate@10": 0.3,
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "mrr": 1.0
+      },
+      "g20": {
+        "year_hit_rate@1": 1.0,
+        "year_hit_rate@3": 1.0,
+        "year_hit_rate@5": 0.8,
+        "year_hit_rate@10": 0.5,
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "mrr": 1.0
+      },
+      "g21": {
+        "year_hit_rate@1": 0.0,
+        "year_hit_rate@3": 0.0,
+        "year_hit_rate@5": 0.2,
+        "year_hit_rate@10": 0.2,
+        "recall@1": 0.0,
+        "recall@3": 0.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "mrr": 0.2
+      },
+      "g22": {
+        "year_hit_rate@1": 1.0,
+        "year_hit_rate@3": 1.0,
+        "year_hit_rate@5": 0.8,
+        "year_hit_rate@10": 0.7,
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "mrr": 1.0
+      },
+      "g23": {
+        "year_hit_rate@1": 0.0,
+        "year_hit_rate@3": 0.6666666666666666,
+        "year_hit_rate@5": 0.6,
+        "year_hit_rate@10": 0.3,
+        "recall@1": 0.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "mrr": 0.5
+      },
+      "g24": {
+        "year_hit_rate@1": 1.0,
+        "year_hit_rate@3": 1.0,
+        "year_hit_rate@5": 1.0,
+        "year_hit_rate@10": 1.0,
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "mrr": 1.0
+      },
+      "g25": {
+        "year_hit_rate@1": 1.0,
+        "year_hit_rate@3": 0.6666666666666666,
+        "year_hit_rate@5": 0.6,
+        "year_hit_rate@10": 0.4,
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "mrr": 1.0
+      },
+      "g26": {
+        "year_hit_rate@1": 1.0,
+        "year_hit_rate@3": 0.3333333333333333,
+        "year_hit_rate@5": 0.4,
+        "year_hit_rate@10": 0.4,
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "mrr": 1.0
+      },
+      "g27": {
+        "year_hit_rate@1": 0.0,
+        "year_hit_rate@3": 0.0,
+        "year_hit_rate@5": 0.0,
+        "year_hit_rate@10": 0.2,
+        "recall@1": 0.0,
+        "recall@3": 0.0,
+        "recall@5": 0.0,
+        "recall@10": 1.0,
+        "mrr": 0.16666666666666666
+      },
+      "g28": {
+        "year_hit_rate@1": 1.0,
+        "year_hit_rate@3": 0.3333333333333333,
+        "year_hit_rate@5": 0.2,
+        "year_hit_rate@10": 0.1,
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "mrr": 1.0
+      },
+      "g29": {
+        "year_hit_rate@1": 1.0,
+        "year_hit_rate@3": 0.6666666666666666,
+        "year_hit_rate@5": 0.4,
+        "year_hit_rate@10": 0.2,
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "mrr": 1.0
+      },
+      "g30": {
+        "year_hit_rate@1": 1.0,
+        "year_hit_rate@3": 1.0,
+        "year_hit_rate@5": 0.6,
+        "year_hit_rate@10": 0.7,
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "mrr": 1.0
+      },
+      "g31": {
+        "year_hit_rate@1": 1.0,
+        "year_hit_rate@3": 1.0,
+        "year_hit_rate@5": 1.0,
+        "year_hit_rate@10": 0.8,
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "mrr": 1.0
+      },
+      "g32": {
+        "year_hit_rate@1": 0.0,
+        "year_hit_rate@3": 0.0,
+        "year_hit_rate@5": 0.0,
+        "year_hit_rate@10": 0.2,
+        "recall@1": 0.0,
+        "recall@3": 0.0,
+        "recall@5": 0.0,
+        "recall@10": 1.0,
+        "mrr": 0.16666666666666666
+      },
+      "g33": {
+        "year_hit_rate@1": 1.0,
+        "year_hit_rate@3": 1.0,
+        "year_hit_rate@5": 0.6,
+        "year_hit_rate@10": 0.7,
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "mrr": 1.0
+      },
+      "g34": {
+        "year_hit_rate@1": 1.0,
+        "year_hit_rate@3": 0.3333333333333333,
+        "year_hit_rate@5": 0.2,
+        "year_hit_rate@10": 0.3,
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "mrr": 1.0
+      },
+      "g35": {
+        "year_hit_rate@1": 1.0,
+        "year_hit_rate@3": 1.0,
+        "year_hit_rate@5": 1.0,
+        "year_hit_rate@10": 1.0,
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "mrr": 1.0
+      },
+      "g36": {
+        "year_hit_rate@1": 1.0,
+        "year_hit_rate@3": 0.6666666666666666,
+        "year_hit_rate@5": 0.4,
+        "year_hit_rate@10": 0.2,
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "mrr": 1.0
+      },
+      "g37": {
+        "year_hit_rate@1": 0.0,
+        "year_hit_rate@3": 0.0,
+        "year_hit_rate@5": 0.0,
+        "year_hit_rate@10": 0.1,
+        "recall@1": 0.0,
+        "recall@3": 0.0,
+        "recall@5": 0.0,
+        "recall@10": 1.0,
+        "mrr": 0.1111111111111111
+      },
+      "g38": {
+        "year_hit_rate@1": 0.0,
+        "year_hit_rate@3": 0.0,
+        "year_hit_rate@5": 0.0,
+        "year_hit_rate@10": 0.0,
+        "recall@1": 0.0,
+        "recall@3": 0.0,
+        "recall@5": 0.0,
+        "recall@10": 0.0,
+        "mrr": 0.0
+      },
+      "g39": {
+        "year_hit_rate@1": 1.0,
+        "year_hit_rate@3": 0.6666666666666666,
+        "year_hit_rate@5": 0.6,
+        "year_hit_rate@10": 0.5,
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "mrr": 1.0
+      },
+      "g40": {
+        "year_hit_rate@1": 1.0,
+        "year_hit_rate@3": 0.3333333333333333,
+        "year_hit_rate@5": 0.4,
+        "year_hit_rate@10": 0.3,
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "mrr": 1.0
+      },
+      "g41": {
+        "year_hit_rate@1": 1.0,
+        "year_hit_rate@3": 0.3333333333333333,
+        "year_hit_rate@5": 0.2,
+        "year_hit_rate@10": 0.1,
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "mrr": 1.0
+      },
+      "g42": {
+        "year_hit_rate@1": 0.0,
+        "year_hit_rate@3": 0.3333333333333333,
+        "year_hit_rate@5": 0.6,
+        "year_hit_rate@10": 0.6,
+        "recall@1": 0.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "mrr": 0.5
+      },
+      "g43": {
+        "year_hit_rate@1": 0.0,
+        "year_hit_rate@3": 0.0,
+        "year_hit_rate@5": 0.0,
+        "year_hit_rate@10": 0.0,
+        "recall@1": 0.0,
+        "recall@3": 0.0,
+        "recall@5": 0.0,
+        "recall@10": 0.0,
+        "mrr": 0.0
+      },
+      "g44": {
+        "year_hit_rate@1": 0.0,
+        "year_hit_rate@3": 0.3333333333333333,
+        "year_hit_rate@5": 0.2,
+        "year_hit_rate@10": 0.1,
+        "recall@1": 0.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "mrr": 0.5
+      },
+      "g45": {
+        "year_hit_rate@1": 0.0,
+        "year_hit_rate@3": 0.0,
+        "year_hit_rate@5": 0.0,
+        "year_hit_rate@10": 0.1,
+        "recall@1": 0.0,
+        "recall@3": 0.0,
+        "recall@5": 0.0,
+        "recall@10": 0.0,
+        "mrr": 0.0
+      },
+      "g46": {
+        "year_hit_rate@1": 1.0,
+        "year_hit_rate@3": 1.0,
+        "year_hit_rate@5": 0.8,
+        "year_hit_rate@10": 0.6,
+        "recall@1": 0.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "mrr": 0.5
+      },
+      "g47": {
+        "year_hit_rate@1": 1.0,
+        "year_hit_rate@3": 1.0,
+        "year_hit_rate@5": 1.0,
+        "year_hit_rate@10": 0.7,
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "mrr": 1.0
+      },
+      "g48": {
+        "year_hit_rate@1": 1.0,
+        "year_hit_rate@3": 1.0,
+        "year_hit_rate@5": 1.0,
+        "year_hit_rate@10": 0.5,
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "mrr": 1.0
+      },
+      "g49": {
+        "year_hit_rate@1": 0.0,
+        "year_hit_rate@3": 0.3333333333333333,
+        "year_hit_rate@5": 0.4,
+        "year_hit_rate@10": 0.7,
+        "recall@1": 0.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "mrr": 0.5
+      },
+      "g50": {
+        "year_hit_rate@1": 0.0,
+        "year_hit_rate@3": 0.3333333333333333,
+        "year_hit_rate@5": 0.4,
+        "year_hit_rate@10": 0.4,
+        "recall@1": 0.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "mrr": 0.3333333333333333
+      }
+    },
+    "v4": {
+      "g01": {
+        "year_hit_rate@1": 1.0,
+        "year_hit_rate@3": 0.3333333333333333,
+        "year_hit_rate@5": 0.2,
+        "year_hit_rate@10": 0.2,
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "mrr": 1.0
+      },
+      "g02": {
+        "year_hit_rate@1": 1.0,
+        "year_hit_rate@3": 0.3333333333333333,
+        "year_hit_rate@5": 0.4,
+        "year_hit_rate@10": 0.6,
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "mrr": 1.0
+      },
+      "g03": {
+        "year_hit_rate@1": 0.0,
+        "year_hit_rate@3": 0.6666666666666666,
+        "year_hit_rate@5": 0.4,
+        "year_hit_rate@10": 0.4,
+        "recall@1": 0.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "mrr": 0.5
+      },
+      "g04": {
+        "year_hit_rate@1": 0.0,
+        "year_hit_rate@3": 0.0,
+        "year_hit_rate@5": 0.2,
+        "year_hit_rate@10": 0.1,
+        "recall@1": 0.0,
+        "recall@3": 0.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "mrr": 0.2
+      },
+      "g05": {
+        "year_hit_rate@1": 0.0,
+        "year_hit_rate@3": 0.3333333333333333,
+        "year_hit_rate@5": 0.2,
+        "year_hit_rate@10": 0.4,
+        "recall@1": 0.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "mrr": 0.3333333333333333
+      },
+      "g06": {
+        "year_hit_rate@1": 0.0,
+        "year_hit_rate@3": 0.0,
+        "year_hit_rate@5": 0.2,
+        "year_hit_rate@10": 0.1,
+        "recall@1": 0.0,
+        "recall@3": 0.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "mrr": 0.25
+      },
+      "g07": {
+        "year_hit_rate@1": 1.0,
+        "year_hit_rate@3": 0.6666666666666666,
+        "year_hit_rate@5": 0.4,
+        "year_hit_rate@10": 0.4,
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "mrr": 1.0
+      },
+      "g08": {
+        "year_hit_rate@1": 0.0,
+        "year_hit_rate@3": 0.3333333333333333,
+        "year_hit_rate@5": 0.2,
+        "year_hit_rate@10": 0.3,
+        "recall@1": 0.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "mrr": 0.5
+      },
+      "g09": {
+        "year_hit_rate@1": 0.0,
+        "year_hit_rate@3": 0.0,
+        "year_hit_rate@5": 0.0,
+        "year_hit_rate@10": 0.0,
+        "recall@1": 0.0,
+        "recall@3": 0.0,
+        "recall@5": 0.0,
+        "recall@10": 0.0,
+        "mrr": 0.0
+      },
+      "g10": {
+        "year_hit_rate@1": 1.0,
+        "year_hit_rate@3": 0.3333333333333333,
+        "year_hit_rate@5": 0.2,
+        "year_hit_rate@10": 0.3,
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "mrr": 1.0
+      },
+      "g11": {
+        "year_hit_rate@1": 1.0,
+        "year_hit_rate@3": 0.6666666666666666,
+        "year_hit_rate@5": 0.8,
+        "year_hit_rate@10": 0.7,
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "mrr": 1.0
+      },
+      "g12": {
+        "year_hit_rate@1": 1.0,
+        "year_hit_rate@3": 0.3333333333333333,
+        "year_hit_rate@5": 0.2,
+        "year_hit_rate@10": 0.2,
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "mrr": 1.0
+      },
+      "g13": {
+        "year_hit_rate@1": 1.0,
+        "year_hit_rate@3": 0.3333333333333333,
+        "year_hit_rate@5": 0.2,
+        "year_hit_rate@10": 0.2,
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "mrr": 1.0
+      },
+      "g14": {
+        "year_hit_rate@1": 0.0,
+        "year_hit_rate@3": 0.0,
+        "year_hit_rate@5": 0.2,
+        "year_hit_rate@10": 0.3,
+        "recall@1": 0.0,
+        "recall@3": 0.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "mrr": 0.2
+      },
+      "g15": {
+        "year_hit_rate@1": 1.0,
+        "year_hit_rate@3": 0.6666666666666666,
+        "year_hit_rate@5": 0.8,
+        "year_hit_rate@10": 0.4,
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "mrr": 1.0
+      },
+      "g16": {
+        "year_hit_rate@1": 1.0,
+        "year_hit_rate@3": 0.3333333333333333,
+        "year_hit_rate@5": 0.2,
+        "year_hit_rate@10": 0.1,
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "mrr": 1.0
+      },
+      "g17": {
+        "year_hit_rate@1": 1.0,
+        "year_hit_rate@3": 0.3333333333333333,
+        "year_hit_rate@5": 0.2,
+        "year_hit_rate@10": 0.2,
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "mrr": 1.0
+      },
+      "g18": {
+        "year_hit_rate@1": 0.0,
+        "year_hit_rate@3": 0.0,
+        "year_hit_rate@5": 0.0,
+        "year_hit_rate@10": 0.0,
+        "recall@1": 0.0,
+        "recall@3": 0.0,
+        "recall@5": 0.0,
+        "recall@10": 0.0,
+        "mrr": 0.0
+      },
+      "g19": {
+        "year_hit_rate@1": 1.0,
+        "year_hit_rate@3": 0.3333333333333333,
+        "year_hit_rate@5": 0.6,
+        "year_hit_rate@10": 0.4,
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "mrr": 1.0
+      },
+      "g20": {
+        "year_hit_rate@1": 1.0,
+        "year_hit_rate@3": 0.6666666666666666,
+        "year_hit_rate@5": 0.8,
+        "year_hit_rate@10": 0.7,
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "mrr": 1.0
+      },
+      "g21": {
+        "year_hit_rate@1": 0.0,
+        "year_hit_rate@3": 0.0,
+        "year_hit_rate@5": 0.0,
+        "year_hit_rate@10": 0.1,
+        "recall@1": 0.0,
+        "recall@3": 0.0,
+        "recall@5": 0.0,
+        "recall@10": 1.0,
+        "mrr": 0.1
+      },
+      "g22": {
+        "year_hit_rate@1": 1.0,
+        "year_hit_rate@3": 1.0,
+        "year_hit_rate@5": 0.8,
+        "year_hit_rate@10": 0.7,
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "mrr": 1.0
+      },
+      "g23": {
+        "year_hit_rate@1": 0.0,
+        "year_hit_rate@3": 0.3333333333333333,
+        "year_hit_rate@5": 0.6,
+        "year_hit_rate@10": 0.4,
+        "recall@1": 0.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "mrr": 0.5
+      },
+      "g24": {
+        "year_hit_rate@1": 1.0,
+        "year_hit_rate@3": 1.0,
+        "year_hit_rate@5": 1.0,
+        "year_hit_rate@10": 0.7,
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "mrr": 1.0
+      },
+      "g25": {
+        "year_hit_rate@1": 0.0,
+        "year_hit_rate@3": 0.6666666666666666,
+        "year_hit_rate@5": 0.4,
+        "year_hit_rate@10": 0.4,
+        "recall@1": 0.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "mrr": 0.5
+      },
+      "g26": {
+        "year_hit_rate@1": 1.0,
+        "year_hit_rate@3": 0.6666666666666666,
+        "year_hit_rate@5": 0.6,
+        "year_hit_rate@10": 0.4,
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "mrr": 1.0
+      },
+      "g27": {
+        "year_hit_rate@1": 0.0,
+        "year_hit_rate@3": 0.0,
+        "year_hit_rate@5": 0.0,
+        "year_hit_rate@10": 0.2,
+        "recall@1": 0.0,
+        "recall@3": 0.0,
+        "recall@5": 0.0,
+        "recall@10": 1.0,
+        "mrr": 0.125
+      },
+      "g28": {
+        "year_hit_rate@1": 1.0,
+        "year_hit_rate@3": 0.3333333333333333,
+        "year_hit_rate@5": 0.2,
+        "year_hit_rate@10": 0.1,
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "mrr": 1.0
+      },
+      "g29": {
+        "year_hit_rate@1": 1.0,
+        "year_hit_rate@3": 0.6666666666666666,
+        "year_hit_rate@5": 0.4,
+        "year_hit_rate@10": 0.2,
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "mrr": 1.0
+      },
+      "g30": {
+        "year_hit_rate@1": 1.0,
+        "year_hit_rate@3": 1.0,
+        "year_hit_rate@5": 0.6,
+        "year_hit_rate@10": 0.7,
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "mrr": 1.0
+      },
+      "g31": {
+        "year_hit_rate@1": 1.0,
+        "year_hit_rate@3": 1.0,
+        "year_hit_rate@5": 1.0,
+        "year_hit_rate@10": 0.7,
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "mrr": 1.0
+      },
+      "g32": {
+        "year_hit_rate@1": 0.0,
+        "year_hit_rate@3": 0.0,
+        "year_hit_rate@5": 0.0,
+        "year_hit_rate@10": 0.1,
+        "recall@1": 0.0,
+        "recall@3": 0.0,
+        "recall@5": 0.0,
+        "recall@10": 1.0,
+        "mrr": 0.16666666666666666
+      },
+      "g33": {
+        "year_hit_rate@1": 1.0,
+        "year_hit_rate@3": 1.0,
+        "year_hit_rate@5": 0.8,
+        "year_hit_rate@10": 0.7,
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "mrr": 1.0
+      },
+      "g34": {
+        "year_hit_rate@1": 1.0,
+        "year_hit_rate@3": 0.6666666666666666,
+        "year_hit_rate@5": 0.6,
+        "year_hit_rate@10": 0.4,
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "mrr": 1.0
+      },
+      "g35": {
+        "year_hit_rate@1": 1.0,
+        "year_hit_rate@3": 1.0,
+        "year_hit_rate@5": 1.0,
+        "year_hit_rate@10": 1.0,
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "mrr": 1.0
+      },
+      "g36": {
+        "year_hit_rate@1": 1.0,
+        "year_hit_rate@3": 0.6666666666666666,
+        "year_hit_rate@5": 0.4,
+        "year_hit_rate@10": 0.2,
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "mrr": 1.0
+      },
+      "g37": {
+        "year_hit_rate@1": 0.0,
+        "year_hit_rate@3": 0.0,
+        "year_hit_rate@5": 0.0,
+        "year_hit_rate@10": 0.1,
+        "recall@1": 0.0,
+        "recall@3": 0.0,
+        "recall@5": 0.0,
+        "recall@10": 1.0,
+        "mrr": 0.14285714285714285
+      },
+      "g38": {
+        "year_hit_rate@1": 0.0,
+        "year_hit_rate@3": 0.0,
+        "year_hit_rate@5": 0.2,
+        "year_hit_rate@10": 0.1,
+        "recall@1": 0.0,
+        "recall@3": 0.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "mrr": 0.25
+      },
+      "g39": {
+        "year_hit_rate@1": 1.0,
+        "year_hit_rate@3": 0.6666666666666666,
+        "year_hit_rate@5": 0.6,
+        "year_hit_rate@10": 0.5,
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "mrr": 1.0
+      },
+      "g40": {
+        "year_hit_rate@1": 1.0,
+        "year_hit_rate@3": 0.3333333333333333,
+        "year_hit_rate@5": 0.4,
+        "year_hit_rate@10": 0.2,
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "mrr": 1.0
+      },
+      "g41": {
+        "year_hit_rate@1": 1.0,
+        "year_hit_rate@3": 0.3333333333333333,
+        "year_hit_rate@5": 0.2,
+        "year_hit_rate@10": 0.1,
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "mrr": 1.0
+      },
+      "g42": {
+        "year_hit_rate@1": 0.0,
+        "year_hit_rate@3": 0.3333333333333333,
+        "year_hit_rate@5": 0.6,
+        "year_hit_rate@10": 0.6,
+        "recall@1": 0.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "mrr": 0.5
+      },
+      "g43": {
+        "year_hit_rate@1": 0.0,
+        "year_hit_rate@3": 0.0,
+        "year_hit_rate@5": 0.0,
+        "year_hit_rate@10": 0.0,
+        "recall@1": 0.0,
+        "recall@3": 0.0,
+        "recall@5": 0.0,
+        "recall@10": 0.0,
+        "mrr": 0.0
+      },
+      "g44": {
+        "year_hit_rate@1": 0.0,
+        "year_hit_rate@3": 0.0,
+        "year_hit_rate@5": 0.2,
+        "year_hit_rate@10": 0.1,
+        "recall@1": 0.0,
+        "recall@3": 0.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "mrr": 0.25
+      },
+      "g45": {
+        "year_hit_rate@1": 0.0,
+        "year_hit_rate@3": 0.0,
+        "year_hit_rate@5": 0.0,
+        "year_hit_rate@10": 0.1,
+        "recall@1": 0.0,
+        "recall@3": 0.0,
+        "recall@5": 0.0,
+        "recall@10": 0.0,
+        "mrr": 0.0
+      },
+      "g46": {
+        "year_hit_rate@1": 1.0,
+        "year_hit_rate@3": 0.6666666666666666,
+        "year_hit_rate@5": 0.8,
+        "year_hit_rate@10": 0.6,
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "mrr": 1.0
+      },
+      "g47": {
+        "year_hit_rate@1": 1.0,
+        "year_hit_rate@3": 0.6666666666666666,
+        "year_hit_rate@5": 0.8,
+        "year_hit_rate@10": 0.7,
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "mrr": 1.0
+      },
+      "g48": {
+        "year_hit_rate@1": 1.0,
+        "year_hit_rate@3": 1.0,
+        "year_hit_rate@5": 0.8,
+        "year_hit_rate@10": 0.5,
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "mrr": 1.0
+      },
+      "g49": {
+        "year_hit_rate@1": 0.0,
+        "year_hit_rate@3": 0.6666666666666666,
+        "year_hit_rate@5": 0.8,
+        "year_hit_rate@10": 0.5,
+        "recall@1": 0.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "mrr": 0.5
+      },
+      "g50": {
+        "year_hit_rate@1": 0.0,
+        "year_hit_rate@3": 0.3333333333333333,
+        "year_hit_rate@5": 0.4,
+        "year_hit_rate@10": 0.3,
+        "recall@1": 0.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "mrr": 0.5
+      }
+    }
+  }
+}
