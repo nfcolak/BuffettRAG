@@ -148,6 +148,9 @@ def test_strict_label_strip_exact_engine_form_only():
     from src.evaluation.supported_claims import _strip_label
     h = [SimpleNamespace(id="g1", text="", year=2002)]
     assert _strip_label("In the 2002 letter: Float rose [1].", h) == "Float rose [1]."
+    assert _strip_label("In the 2001-2003 letters: Float rose [1].", h) == "Float rose [1]."
+    assert _strip_label("In the 2003-2005 letters: Float rose [1].", h) == "In the 2003-2005 letters: Float rose [1]."
+    assert _strip_label("In the 2001-2003 letter: Float rose [1].", h) == "In the 2001-2003 letter: Float rose [1]."
     assert _strip_label("In 2002, float rose [1].", h) == "In 2002, float rose [1]."
     assert _strip_label("In 2002: float rose [1].", h) == "In 2002: float rose [1]."
     assert _strip_label("In the 1985 letter: Float rose [1].", h) == "In the 1985 letter: Float rose [1]."
@@ -181,3 +184,20 @@ def test_rescore_adds_strict_column_and_checks_identity(tmp_path, monkeypatch):
     path.write_text(json.dumps(result))
     with pytest.raises(ValueError, match="sha256"):
         rescore_nli.rescore(path, cases, scorer=FakeNli())
+
+
+def test_grounded_provider_forwards_temperature_to_engine():
+    from src.generation.providers.grounded_provider import GroundedProvider
+
+    seen = {}
+
+    class _Engine:
+        def answer(self, query, hits, **kwargs):
+            seen["temperature"] = self.temperature
+            return "answer"
+
+    provider = GroundedProvider(composer_kind="template")
+    provider._engine = _Engine()
+    assert provider.temperature == 0.0
+    provider.temperature = 0.5
+    assert provider.answer_grounded("q", []) == "answer" and seen["temperature"] == 0.5

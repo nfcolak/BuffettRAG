@@ -29,6 +29,7 @@ class GroundedProvider:
         *,
         composer_kind: Optional[str] = None,
         model_path: Optional[str] = None,
+        temperature: float = 0.0,
     ) -> None:
         if settings is None:
             from config import load_grounded_settings
@@ -47,6 +48,7 @@ class GroundedProvider:
             settings = dataclasses.replace(settings, **{field: path})
         self.settings = settings
         self.composer_kind = kind
+        self.temperature = temperature  # the runner overwrites this; answer_grounded forwards it to the engine
         self.model_path = None if kind in ("template", "auto") else str(
             settings.LLAMA_MODEL if kind == "llama" else settings.MLX_MODEL
         )
@@ -100,9 +102,9 @@ class GroundedProvider:
         max_new_tokens: int = 200,
     ):
         """Return a GroundedAnswer (answer text, citations, plan, trace)."""
-        return self._get_engine().answer(
-            original_query, context_hits, history=history, max_new_tokens=max_new_tokens
-        )
+        engine = self._get_engine()
+        engine.temperature = self.temperature  # engine.answer uses it when no per-call temperature is given
+        return engine.answer(original_query, context_hits, history=history, max_new_tokens=max_new_tokens)
 
     def generate(self, prompt: str, max_new_tokens: Optional[int] = None) -> str:
         """Raw text for query expansion only; the template composer has no model."""

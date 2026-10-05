@@ -1,0 +1,3057 @@
+{
+ "schema_version": 1,
+ "purpose": "Union of the 4 dev sets (heldout_v1, heldout_v2, answer_benchmark_v3, adversarial_dev) in calibrate_grounded.load_cases order, for the u6c confirmation runs. Dev only.",
+ "frozen": false,
+ "dev_only": true,
+ "corpus_sha256": "8263f08958729a77febf0922e7bbc4161bedd5fdb3e9a8b3fc9a64ab681ab5f0",
+ "cases": [
+  {
+   "qid": "ho01_1977_operating_earnings",
+   "question_type": "fact_number",
+   "years": [
+    1977
+   ],
+   "query": "What were Berkshire's total operating earnings and operating earnings per share in 1977?",
+   "gold_passage_ids": [
+    "1977_p0000"
+   ],
+   "relevant_ids": [
+    "1977_p0000"
+   ],
+   "gold_claims": [
+    {
+     "claim": "Operating earnings were $21,904,000.",
+     "required_terms": [
+      "operating earnings",
+      "$21,904,000"
+     ],
+     "gold_passage_ids": [
+      "1977_p0000"
+     ]
+    },
+    {
+     "claim": "Operating earnings were $22.54 per share.",
+     "required_terms": [
+      "$22.54",
+      "share"
+     ],
+     "gold_passage_ids": [
+      "1977_p0000"
+     ]
+    }
+   ],
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": true
+   },
+   "reject": {
+    "forbidden_terms": []
+   },
+   "verification_note": "Opened 1977_p0000: its opening paragraph states both $21,904,000 of operating earnings and $22.54 per share.",
+   "_set": "heldout_v1"
+  },
+  {
+   "qid": "ho02_1979_inflation_real_returns",
+   "question_type": "opinion",
+   "years": [
+    1979
+   ],
+   "query": "In the 1979 letter, could a business earning 20% on capital still give its owners a negative real return, and why?",
+   "gold_passage_ids": [
+    "1979_p0011"
+   ],
+   "relevant_ids": [
+    "1979_p0011"
+   ],
+   "gold_claims": [
+    {
+     "claim": "A business earning 20% on capital can produce a negative real return under inflationary conditions.",
+     "required_terms": [
+      "20%",
+      "negative real return",
+      "inflation"
+     ],
+     "gold_passage_ids": [
+      "1979_p0011"
+     ]
+    }
+   ],
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": true
+   },
+   "reject": {
+    "forbidden_terms": [
+     "guaranteed positive real return"
+    ]
+   },
+   "verification_note": "Opened 1979_p0011: the final clause explicitly links a 20% return on capital to a possible negative real return under inflation.",
+   "_set": "heldout_v1"
+  },
+  {
+   "qid": "ho03_1982_price_discipline",
+   "question_type": "opinion",
+   "years": [
+    1982
+   ],
+   "query": "What warning did Buffett give in 1982 about paying too high a purchase price for an excellent company's stock?",
+   "gold_passage_ids": [
+    "1982_p0016"
+   ],
+   "relevant_ids": [
+    "1982_p0016"
+   ],
+   "gold_claims": [
+    {
+     "claim": "A too-high purchase price can undo a subsequent decade of favorable business developments.",
+     "required_terms": [
+      "purchase price",
+      "undo",
+      "decade"
+     ],
+     "gold_passage_ids": [
+      "1982_p0016"
+     ]
+    }
+   ],
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": true
+   },
+   "reject": {
+    "forbidden_terms": [
+     "purchase price is irrelevant"
+    ]
+   },
+   "verification_note": "Opened 1982_p0016: its last sentence says a too-high stock purchase price can undo a decade of favorable business developments.",
+   "_set": "heldout_v1"
+  },
+  {
+   "qid": "ho04_1983_goodwill_preference",
+   "question_type": "opinion",
+   "years": [
+    1983
+   ],
+   "query": "By 1983, what combination of enduring Goodwill and tangible assets had Buffett come to prefer in businesses?",
+   "gold_passage_ids": [
+    "1983_p0029"
+   ],
+   "relevant_ids": [
+    "1983_p0029"
+   ],
+   "gold_claims": [
+    {
+     "claim": "He preferred businesses with large amounts of enduring Goodwill and a minimum of tangible assets.",
+     "required_terms": [
+      "enduring goodwill",
+      "minimum",
+      "tangible assets"
+     ],
+     "gold_passage_ids": [
+      "1983_p0029"
+     ]
+    }
+   ],
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": true
+   },
+   "reject": {
+    "forbidden_terms": [
+     "maximum of tangible assets"
+    ]
+   },
+   "verification_note": "Opened 1983_p0029: Buffett states a strong preference for enduring Goodwill combined with a minimum of tangible assets.",
+   "_set": "heldout_v1"
+  },
+  {
+   "qid": "ho05_1987_mr_market",
+   "question_type": "opinion",
+   "years": [
+    1987
+   ],
+   "query": "In the 1987 letter, should an investor let Mr. Market guide decisions or use him as a servant?",
+   "gold_passage_ids": [
+    "1987_p0069"
+   ],
+   "relevant_ids": [
+    "1987_p0069"
+   ],
+   "gold_claims": [
+    {
+     "claim": "Mr. Market is there to serve you, not to guide you.",
+     "required_terms": [
+      "mr. market",
+      "serve",
+      "not",
+      "guide"
+     ],
+     "gold_passage_ids": [
+      "1987_p0069"
+     ]
+    }
+   ],
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": true
+   },
+   "reject": {
+    "forbidden_terms": [
+     "always follow mr. market"
+    ]
+   },
+   "verification_note": "Opened 1987_p0069: the passage explicitly says Mr. Market is there to serve, not guide, the investor.",
+   "_set": "heldout_v1"
+  },
+  {
+   "qid": "ho06_1991_salomon_role",
+   "question_type": "company",
+   "years": [
+    1991
+   ],
+   "query": "What position at Salomon was Buffett elected to on August 18, as reported in the 1991 letter?",
+   "gold_passage_ids": [
+    "1991_p0004"
+   ],
+   "relevant_ids": [
+    "1991_p0004"
+   ],
+   "gold_claims": [
+    {
+     "claim": "Buffett was elected Interim Chairman of Salomon.",
+     "required_terms": [
+      "interim chairman",
+      "salomon"
+     ],
+     "gold_passage_ids": [
+      "1991_p0004"
+     ]
+    }
+   ],
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": true
+   },
+   "reject": {
+    "forbidden_terms": [
+     "permanent chairman"
+    ]
+   },
+   "verification_note": "Opened 1991_p0004: Buffett states that he was elected Interim Chairman of Salomon Inc. on August 18.",
+   "_set": "heldout_v1"
+  },
+  {
+   "qid": "ho07_1994_usair_mistake",
+   "question_type": "company",
+   "years": [
+    1994
+   ],
+   "query": "How large was Berkshire's USAir preferred-stock purchase, and how did Buffett characterize his analytical mistake in the 1994 letter?",
+   "gold_passage_ids": [
+    "1994_p0085"
+   ],
+   "relevant_ids": [
+    "1994_p0085"
+   ],
+   "gold_claims": [
+    {
+     "claim": "Berkshire purchased $358 million of USAir preferred stock.",
+     "required_terms": [
+      "$358 million",
+      "usair",
+      "preferred stock"
+     ],
+     "gold_passage_ids": [
+      "1994_p0085"
+     ]
+    },
+    {
+     "claim": "Buffett described the mistake as sloppy analysis.",
+     "required_terms": [
+      "sloppy analysis"
+     ],
+     "gold_passage_ids": [
+      "1994_p0085"
+     ]
+    }
+   ],
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": true
+   },
+   "reject": {
+    "forbidden_terms": [
+     "misled by usair management"
+    ]
+   },
+   "verification_note": "Opened 1994_p0085: it identifies the $358 million USAir preferred purchase and calls the error a case of sloppy analysis.",
+   "_set": "heldout_v1"
+  },
+  {
+   "qid": "ho08_1995_geico_distribution",
+   "question_type": "company",
+   "years": [
+    1995
+   ],
+   "query": "According to the 1995 letter, what method of selling gave GEICO an enormous cost advantage over competitors selling through agents?",
+   "gold_passage_ids": [
+    "1995_p0031"
+   ],
+   "relevant_ids": [
+    "1995_p0031"
+   ],
+   "gold_claims": [
+    {
+     "claim": "GEICO's direct marketing gave it an enormous cost advantage over competitors selling through agents.",
+     "required_terms": [
+      "direct marketing",
+      "cost advantage",
+      "agents"
+     ],
+     "gold_passage_ids": [
+      "1995_p0031"
+     ]
+    }
+   ],
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": true
+   },
+   "reject": {
+    "forbidden_terms": [
+     "exclusive reliance on agents"
+    ]
+   },
+   "verification_note": "Opened 1995_p0031: Davidson's explanation expressly attributes GEICO's cost advantage to direct marketing rather than agents.",
+   "_set": "heldout_v1"
+  },
+  {
+   "qid": "ho09_1999_tech_competence",
+   "question_type": "opinion",
+   "years": [
+    1999
+   ],
+   "query": "What insight into tech companies did Buffett say he and Charlie lacked in the 1999 letter?",
+   "gold_passage_ids": [
+    "1999_p0091"
+   ],
+   "relevant_ids": [
+    "1999_p0091"
+   ],
+   "gold_claims": [
+    {
+     "claim": "They had no insights into which tech participants possess a truly durable competitive advantage.",
+     "required_terms": [
+      "no insights",
+      "tech",
+      "durable competitive advantage"
+     ],
+     "gold_passage_ids": [
+      "1999_p0091"
+     ]
+    }
+   ],
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": true
+   },
+   "reject": {
+    "forbidden_terms": [
+     "all tech companies lack competitive advantages"
+    ]
+   },
+   "verification_note": "Opened 1999_p0091: Buffett expressly says they have no insights into which tech participants possess a durable competitive advantage.",
+   "_set": "heldout_v1"
+  },
+  {
+   "qid": "ho10_2001_float_cost",
+   "question_type": "fact_number",
+   "years": [
+    2001
+   ],
+   "query": "What cost of insurance float did Berkshire report in 2001 after the September 11 catastrophe?",
+   "gold_passage_ids": [
+    "2001_p0037"
+   ],
+   "relevant_ids": [
+    "2001_p0037"
+   ],
+   "gold_claims": [
+    {
+     "claim": "The float cost came in at 12.8%.",
+     "required_terms": [
+      "float cost",
+      "12.8%"
+     ],
+     "gold_passage_ids": [
+      "2001_p0037"
+     ]
+    }
+   ],
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": true
+   },
+   "reject": {
+    "forbidden_terms": []
+   },
+   "verification_note": "Opened 2001_p0037: it links September 11's man-made catastrophe to Berkshire's stated float cost of 12.8%.",
+   "_set": "heldout_v1"
+  },
+  {
+   "qid": "ho11_2004_currency_contracts",
+   "question_type": "fact_number",
+   "years": [
+    2004
+   ],
+   "query": "How much did Berkshire own in foreign exchange contracts at yearend 2004, and across how many currencies?",
+   "gold_passage_ids": [
+    "2004_p0116"
+   ],
+   "relevant_ids": [
+    "2004_p0116"
+   ],
+   "gold_claims": [
+    {
+     "claim": "Berkshire owned about $21.4 billion of foreign exchange contracts spread among 12 currencies.",
+     "required_terms": [
+      "$21.4 billion",
+      "12 currencies"
+     ],
+     "gold_passage_ids": [
+      "2004_p0116"
+     ]
+    }
+   ],
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": true
+   },
+   "reject": {
+    "forbidden_terms": []
+   },
+   "verification_note": "Opened 2004_p0116: the first sentence gives about $21.4 billion of foreign exchange contracts and 12 currencies.",
+   "_set": "heldout_v1"
+  },
+  {
+   "qid": "ho12_2006_iscar_ownership",
+   "question_type": "company",
+   "years": [
+    2006
+   ],
+   "query": "What percentage of ISCAR did Berkshire buy in 2006, what did it pay, and who retained the rest?",
+   "gold_passage_ids": [
+    "2006_p0026"
+   ],
+   "relevant_ids": [
+    "2006_p0026"
+   ],
+   "gold_claims": [
+    {
+     "claim": "Berkshire purchased 80% of ISCAR for $4 billion.",
+     "required_terms": [
+      "80%",
+      "iscar",
+      "$4 billion"
+     ],
+     "gold_passage_ids": [
+      "2006_p0026"
+     ]
+    },
+    {
+     "claim": "The Wertheimer family retained the remaining 20%.",
+     "required_terms": [
+      "wertheimer family",
+      "20%"
+     ],
+     "gold_passage_ids": [
+      "2006_p0026"
+     ]
+    }
+   ],
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": true
+   },
+   "reject": {
+    "forbidden_terms": [
+     "bought 100% of iscar"
+    ]
+   },
+   "verification_note": "Opened 2006_p0026: it states the 80% purchase for $4 billion and the remaining 20% held by the Wertheimer family.",
+   "_set": "heldout_v1"
+  },
+  {
+   "qid": "ho13_2007_petrochina_sale",
+   "question_type": "company",
+   "years": [
+    2007
+   ],
+   "query": "What did Berkshire originally pay for its PetroChina holding, and how much did it receive when selling it in 2007?",
+   "gold_passage_ids": [
+    "2007_p0086"
+   ],
+   "relevant_ids": [
+    "2007_p0086"
+   ],
+   "gold_claims": [
+    {
+     "claim": "Berkshire bought its PetroChina holding for $488 million.",
+     "required_terms": [
+      "petrochina",
+      "$488 million"
+     ],
+     "gold_passage_ids": [
+      "2007_p0086"
+     ]
+    },
+    {
+     "claim": "Berkshire sold its holdings for $4 billion.",
+     "required_terms": [
+      "sold",
+      "$4 billion"
+     ],
+     "gold_passage_ids": [
+      "2007_p0086"
+     ]
+    }
+   ],
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": true
+   },
+   "reject": {
+    "forbidden_terms": [
+     "sold at a loss"
+    ]
+   },
+   "verification_note": "Opened 2007_p0086: its purchase sentence gives $488 million and its final sentence gives sale proceeds of $4 billion.",
+   "_set": "heldout_v1"
+  },
+  {
+   "qid": "ho14_2013_nv_energy",
+   "question_type": "company",
+   "years": [
+    2013
+   ],
+   "query": "What price did MidAmerican pay for NV Energy in 2013, and approximately what share of Nevada's population did it supply with electricity?",
+   "gold_passage_ids": [
+    "2013_p0018"
+   ],
+   "relevant_ids": [
+    "2013_p0018"
+   ],
+   "gold_claims": [
+    {
+     "claim": "NV Energy was purchased for $5.6 billion and supplied electricity to about 88% of Nevada's population.",
+     "required_terms": [
+      "nv energy",
+      "$5.6 billion",
+      "88%"
+     ],
+     "gold_passage_ids": [
+      "2013_p0018"
+     ]
+    }
+   ],
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": true
+   },
+   "reject": {
+    "forbidden_terms": []
+   },
+   "verification_note": "Opened 2013_p0018: the NV Energy sentence names MidAmerican, the $5.6 billion purchase price, and about 88% of Nevada's population.",
+   "_set": "heldout_v1"
+  },
+  {
+   "qid": "ho15_2014_dealership_followup",
+   "question_type": "follow_up",
+   "years": [
+    2014
+   ],
+   "query": "What was the name of that dealership group, and how many automobile dealerships did it have?",
+   "history": [
+    {
+     "role": "user",
+     "content": "Let's discuss the automobile dealership acquisition described in Berkshire's 2014 letter."
+    },
+    {
+     "role": "assistant",
+     "content": "Which detail of the acquisition would you like to examine?"
+    }
+   ],
+   "gold_passage_ids": [
+    "2014_p0026"
+   ],
+   "relevant_ids": [
+    "2014_p0026"
+   ],
+   "gold_claims": [
+    {
+     "claim": "The group was Van Tuyl Automotive with 78 automobile dealerships.",
+     "required_terms": [
+      "van tuyl",
+      "78",
+      "dealerships"
+     ],
+     "gold_passage_ids": [
+      "2014_p0026"
+     ]
+    }
+   ],
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": true
+   },
+   "reject": {
+    "forbidden_terms": []
+   },
+   "verification_note": "Opened 2014_p0026: it names Van Tuyl Automotive and describes a group of 78 automobile dealerships; history supplies only question context.",
+   "_set": "heldout_v1"
+  },
+  {
+   "qid": "ho16_2017_hurricane_loss",
+   "question_type": "fact_number",
+   "years": [
+    2017
+   ],
+   "query": "What did Berkshire estimate its losses from the three 2017 hurricanes to be before and after tax?",
+   "gold_passage_ids": [
+    "2017_p0039"
+   ],
+   "relevant_ids": [
+    "2017_p0039"
+   ],
+   "gold_claims": [
+    {
+     "claim": "Berkshire estimated hurricane losses of $3 billion, or about $2 billion after tax.",
+     "required_terms": [
+      "$3 billion",
+      "$2 billion",
+      "after tax"
+     ],
+     "gold_passage_ids": [
+      "2017_p0039"
+     ]
+    }
+   ],
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": true
+   },
+   "reject": {
+    "forbidden_terms": [
+     "final audited loss"
+    ]
+   },
+   "verification_note": "Opened 2017_p0039: Buffett explicitly labels Berkshire's $3 billion loss ($2 billion after tax) a current estimate, not a final outcome.",
+   "_set": "heldout_v1"
+  },
+  {
+   "qid": "ho17_2019_reinvestment_priority",
+   "question_type": "opinion",
+   "years": [
+    2019
+   ],
+   "query": "In the 2019 letter, what did Buffett identify as Berkshire's top priority when deploying retained earnings?",
+   "gold_passage_ids": [
+    "2019_p0020"
+   ],
+   "relevant_ids": [
+    "2019_p0020"
+   ],
+   "gold_claims": [
+    {
+     "claim": "Reinvestment in productive operational assets remains the top priority.",
+     "required_terms": [
+      "reinvestment",
+      "productive operational assets",
+      "top priority"
+     ],
+     "gold_passage_ids": [
+      "2019_p0020"
+     ]
+    }
+   ],
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": true
+   },
+   "reject": {
+    "forbidden_terms": [
+     "speculation is our top priority"
+    ]
+   },
+   "verification_note": "Opened 2019_p0020: it says retained funds first go to existing businesses and explicitly calls productive operational asset reinvestment the top priority.",
+   "_set": "heldout_v1"
+  },
+  {
+   "qid": "ho18_2023_munger_architect",
+   "question_type": "opinion",
+   "years": [
+    2023
+   ],
+   "query": "In the 2023 tribute, how did Buffett distinguish Charlie Munger's role as architect from his own role at Berkshire?",
+   "gold_passage_ids": [
+    "2023_p0002"
+   ],
+   "relevant_ids": [
+    "2023_p0002"
+   ],
+   "gold_claims": [
+    {
+     "claim": "Charlie was the architect and Buffett acted as the general contractor.",
+     "required_terms": [
+      "charlie",
+      "architect",
+      "general contractor"
+     ],
+     "gold_passage_ids": [
+      "2023_p0002"
+     ]
+    }
+   ],
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": true
+   },
+   "reject": {
+    "forbidden_terms": [
+     "buffett was the architect and charlie was the contractor"
+    ]
+   },
+   "verification_note": "Opened 2023_p0002: Buffett calls Charlie the architect of present Berkshire and himself the general contractor implementing Charlie's vision.",
+   "_set": "heldout_v1"
+  },
+  {
+   "qid": "ho19_2024_tax_followup",
+   "question_type": "follow_up",
+   "years": [
+    2024
+   ],
+   "query": "How much did it pay, and roughly what share of corporate America's payments was that?",
+   "history": [
+    {
+     "role": "user",
+     "content": "Let's discuss Berkshire's federal corporate income-tax payments to the IRS as reported in the 2024 letter."
+    },
+    {
+     "role": "assistant",
+     "content": "Which aspect of those tax payments would you like to examine?"
+    }
+   ],
+   "gold_passage_ids": [
+    "2024_p0019"
+   ],
+   "relevant_ids": [
+    "2024_p0019"
+   ],
+   "gold_claims": [
+    {
+     "claim": "Berkshire made payments to the IRS totaling $26.8 billion.",
+     "required_terms": [
+      "irs",
+      "$26.8 billion"
+     ],
+     "gold_passage_ids": [
+      "2024_p0019"
+     ]
+    },
+    {
+     "claim": "That was about 5% of what all of corporate America paid.",
+     "required_terms": [
+      "5%",
+      "corporate america"
+     ],
+     "gold_passage_ids": [
+      "2024_p0019"
+     ]
+    }
+   ],
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": true
+   },
+   "reject": {
+    "forbidden_terms": []
+   },
+   "verification_note": "Opened 2024_p0019: it states four IRS payments totaling $26.8 billion and about 5% of corporate America's payments; history contains no answer facts.",
+   "_set": "heldout_v1"
+  },
+  {
+   "qid": "ho20_1977_1985_textile_comparison",
+   "question_type": "temporal_comparison",
+   "years": [
+    1977,
+    1985
+   ],
+   "query": "Compare Berkshire's stance toward its textile operation in 1977 and 1985: what employment consideration favored staying, and what shutdown decision followed?",
+   "gold_passage_ids": [
+    "1977_p0006",
+    "1985_p0029"
+   ],
+   "relevant_ids": [
+    "1977_p0006",
+    "1985_p0029"
+   ],
+   "gold_claims": [
+    {
+     "claim": "The mills were among the largest employers in each town with workers of high average age.",
+     "required_terms": [
+      "largest employers",
+      "high average age"
+     ],
+     "gold_passage_ids": [
+      "1977_p0006"
+     ]
+    },
+    {
+     "claim": "In July Berkshire decided to close its textile operation.",
+     "required_terms": [
+      "july",
+      "close",
+      "textile operation"
+     ],
+     "gold_passage_ids": [
+      "1985_p0029"
+     ]
+    }
+   ],
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": true
+   },
+   "reject": {
+    "forbidden_terms": [
+     "closed its textile operation in 1977"
+    ]
+   },
+   "verification_note": "Opened both chunks: 1977_p0006 cites the mills' employment and older workers as reasons to remain; 1985_p0029 records the July closure decision.",
+   "_set": "heldout_v1"
+  },
+  {
+   "qid": "ho21_1993_2010_float_comparison",
+   "question_type": "temporal_comparison",
+   "years": [
+    1993,
+    2010
+   ],
+   "query": "Compare how the 1993 and 2010 letters related the cost of insurance float to underwriting results: what happens with an underwriting profit, and with breakeven underwriting?",
+   "gold_passage_ids": [
+    "1993_p0045",
+    "2010_p0030"
+   ],
+   "relevant_ids": [
+    "1993_p0045",
+    "2010_p0030"
+   ],
+   "gold_claims": [
+    {
+     "claim": "With an underwriting profit, the cost of float has been negative.",
+     "required_terms": [
+      "underwriting profit",
+      "cost of float",
+      "negative"
+     ],
+     "gold_passage_ids": [
+      "1993_p0045"
+     ]
+    },
+    {
+     "claim": "Float is free as long as insurance underwriting breaks even.",
+     "required_terms": [
+      "float",
+      "free",
+      "breaks even"
+     ],
+     "gold_passage_ids": [
+      "2010_p0030"
+     ]
+    }
+   ],
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": true
+   },
+   "reject": {
+    "forbidden_terms": [
+     "breakeven underwriting makes float expensive"
+    ]
+   },
+   "verification_note": "Opened both chunks: 1993_p0045 explicitly links underwriting profit to negative float cost; 2010_p0030 calls float free when underwriting breaks even.",
+   "_set": "heldout_v1"
+  },
+  {
+   "qid": "ho22_1988_2022_coca_cola_comparison",
+   "question_type": "temporal_comparison",
+   "years": [
+    1988,
+    2022
+   ],
+   "query": "Compare Buffett's stated holding horizon for Coca-Cola in 1988 with the cash-dividend outcome reported in 2022: how long did he favor holding outstanding businesses, and what dividends did Coke pay Berkshire in 1994 and 2022?",
+   "gold_passage_ids": [
+    "1988_p0068",
+    "2022_p0021"
+   ],
+   "relevant_ids": [
+    "1988_p0068",
+    "2022_p0021"
+   ],
+   "gold_claims": [
+    {
+     "claim": "The favorite holding period for outstanding businesses is forever.",
+     "required_terms": [
+      "holding period",
+      "forever"
+     ],
+     "gold_passage_ids": [
+      "1988_p0068"
+     ]
+    },
+    {
+     "claim": "The cash dividend from Coke was $75 million.",
+     "required_terms": [
+      "dividend",
+      "$75 million"
+     ],
+     "gold_passage_ids": [
+      "2022_p0021"
+     ]
+    },
+    {
+     "claim": "The dividend increased to $704 million.",
+     "required_terms": [
+      "dividend",
+      "$704 million"
+     ],
+     "gold_passage_ids": [
+      "2022_p0021"
+     ]
+    }
+   ],
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": true
+   },
+   "reject": {
+    "forbidden_terms": [
+     "sold all coca-cola shares"
+    ]
+   },
+   "verification_note": "Opened both chunks: 1988_p0068 states the forever holding preference after Coca Cola purchases; 2022_p0021 gives Coke dividends of $75 million in 1994 and $704 million in 2022.",
+   "_set": "heldout_v1"
+  },
+  {
+   "qid": "ho23_unanswerable_quantum",
+   "question_type": "unanswerable",
+   "years": [],
+   "answerable": false,
+   "query": "What exact quantum error-correction code and qubit architecture does Buffett recommend for building a quantum computer?",
+   "gold_passage_ids": [],
+   "relevant_ids": [],
+   "gold_claims": [],
+   "expected_answer": "The retrieved passages do not provide enough evidence to answer this question.",
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": false,
+    "require_exact_refusal": true
+   },
+   "reject": {
+    "forbidden_terms": []
+   },
+   "verification_note": "Searched all 5,831 actual chunk texts for quantum or qubit: zero matches; no gold evidence is assigned to the requested engineering recommendation.",
+   "_set": "heldout_v1"
+  },
+  {
+   "qid": "ho24_unanswerable_sourdough",
+   "question_type": "unanswerable",
+   "years": [],
+   "answerable": false,
+   "query": "What is Buffett's exact sourdough-starter feeding schedule and bread recipe, including flour-to-water ratios?",
+   "gold_passage_ids": [],
+   "relevant_ids": [],
+   "gold_claims": [],
+   "expected_answer": "The retrieved passages do not provide enough evidence to answer this question.",
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": false,
+    "require_exact_refusal": true
+   },
+   "reject": {
+    "forbidden_terms": []
+   },
+   "verification_note": "Searched all 5,831 actual chunk texts for sourdough, bread recipe, or sourdough starter: zero matches; no gold evidence is assigned to the requested recipe.",
+   "_set": "heldout_v1"
+  },
+  {
+   "qid": "hv01",
+   "question_type": "opinion",
+   "years": [
+    1977
+   ],
+   "query": "What personal qualities did Buffett want in the people running a potential stock investment in 1977?",
+   "gold_passage_ids": [
+    "1977_p0028"
+   ],
+   "relevant_ids": [
+    "1977_p0028"
+   ],
+   "gold_claims": [
+    {
+     "claim": "The people running the business should be honest and competent.",
+     "required_terms": [
+      "honest",
+      "competent"
+     ],
+     "gold_passage_ids": [
+      "1977_p0028"
+     ]
+    }
+   ],
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": true
+   },
+   "reject": {
+    "forbidden_terms": []
+   },
+   "verification_note": "Opened the complete text of 1977_p0028: criterion (3) explicitly calls for honest and competent people operating the business.",
+   "_set": "heldout_v2"
+  },
+  {
+   "qid": "hv02",
+   "question_type": "opinion",
+   "years": [
+    1980
+   ],
+   "query": "Why did Berkshire borrow money in 1980 even though it had no pressing need for financing?",
+   "gold_passage_ids": [
+    "1980_p0076"
+   ],
+   "relevant_ids": [
+    "1980_p0076"
+   ],
+   "gold_claims": [
+    {
+     "claim": "Berkshire wanted financial firepower for opportunities when credit was unavailable.",
+     "required_terms": [
+      "financial firepower",
+      "credit",
+      "unavailable"
+     ],
+     "gold_passage_ids": [
+      "1980_p0076"
+     ]
+    }
+   ],
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": true
+   },
+   "reject": {
+    "forbidden_terms": []
+   },
+   "verification_note": "Opened the complete text of 1980_p0076: it denies immediate financing needs and says attractive opportunities may arise when credit is extremely expensive or unavailable, requiring financial firepower.",
+   "_set": "heldout_v2"
+  },
+  {
+   "qid": "hv03",
+   "question_type": "opinion",
+   "years": [
+    1981
+   ],
+   "query": "Did Buffett think gaining control justified paying twice as much per share in his 1981 hypothetical acquisition example?",
+   "gold_passage_ids": [
+    "1981_p0006"
+   ],
+   "relevant_ids": [
+    "1981_p0006"
+   ],
+   "gold_claims": [
+    {
+     "claim": "Berkshire would rather buy 10% at X per share than 100% at 2X per share.",
+     "required_terms": [
+      "10%",
+      "100%",
+      "2X"
+     ],
+     "gold_passage_ids": [
+      "1981_p0006"
+     ]
+    }
+   ],
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": true
+   },
+   "reject": {
+    "forbidden_terms": []
+   },
+   "verification_note": "Opened the complete text of 1981_p0006: its first paragraph explicitly prefers 10% of Wonderful Business T at X per share to 100% at 2X, regardless of immediately reportable earnings.",
+   "_set": "heldout_v2"
+  },
+  {
+   "qid": "hv04",
+   "question_type": "opinion",
+   "years": [
+    1986
+   ],
+   "query": "In Buffett's 1986 discussion of accounting, who is responsible for judging a business rather than merely recording its transactions?",
+   "gold_passage_ids": [
+    "1986_p0150"
+   ],
+   "relevant_ids": [
+    "1986_p0150"
+   ],
+   "gold_claims": [
+    {
+     "claim": "The evaluation job falls to investors and managers.",
+     "required_terms": [
+      "evaluation",
+      "investors and managers"
+     ],
+     "gold_passage_ids": [
+      "1986_p0150"
+     ]
+    }
+   ],
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": true
+   },
+   "reject": {
+    "forbidden_terms": []
+   },
+   "verification_note": "Opened the complete text of 1986_p0150: it assigns recording to accountants and says the evaluation job falls to investors and managers.",
+   "_set": "heldout_v2"
+  },
+  {
+   "qid": "hv05",
+   "question_type": "opinion",
+   "years": [
+    1990
+   ],
+   "query": "When investees kept earnings that Berkshire's accounts omitted, what did Buffett say mattered most in 1990?",
+   "gold_passage_ids": [
+    "1990_p0019"
+   ],
+   "relevant_ids": [
+    "1990_p0019"
+   ],
+   "gold_claims": [
+    {
+     "claim": "Ownership and subsequent utilization of those earnings are all-important.",
+     "required_terms": [
+      "ownership",
+      "subsequent utilization",
+      "all-important"
+     ],
+     "gold_passage_ids": [
+      "1990_p0019"
+     ]
+    }
+   ],
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": true
+   },
+   "reject": {
+    "forbidden_terms": []
+   },
+   "verification_note": "Opened the complete text of 1990_p0019: for forgotten-but-not-gone earnings, it explicitly contrasts unimportant accounting with all-important ownership and subsequent utilization.",
+   "_set": "heldout_v2"
+  },
+  {
+   "qid": "hv06",
+   "question_type": "opinion",
+   "years": [
+    1996
+   ],
+   "query": "How did Buffett weigh a higher but uneven return against a lower steady return when discussing catastrophe insurance in 1996?",
+   "gold_passage_ids": [
+    "1996_p0036"
+   ],
+   "relevant_ids": [
+    "1996_p0036"
+   ],
+   "gold_claims": [
+    {
+     "claim": "Charlie and Buffett preferred a lumpy 15% over time to a smooth 12%.",
+     "required_terms": [
+      "lumpy 15%",
+      "smooth 12%"
+     ],
+     "gold_passage_ids": [
+      "1996_p0036"
+     ]
+    }
+   ],
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": true
+   },
+   "reject": {
+    "forbidden_terms": []
+   },
+   "verification_note": "Opened the complete text of 1996_p0036: the super-cat paragraph expressly says Charlie and Buffett would rather earn a lumpy 15% over time than a smooth 12%.",
+   "_set": "heldout_v2"
+  },
+  {
+   "qid": "hv07",
+   "question_type": "opinion",
+   "years": [
+    1998
+   ],
+   "query": "What drawback did Buffett see in using stock options to motivate executives in his 1998 discussion?",
+   "gold_passage_ids": [
+    "1998_p0069"
+   ],
+   "relevant_ids": [
+    "1998_p0069"
+   ],
+   "gold_claims": [
+    {
+     "claim": "Options are often inefficient as motivators.",
+     "required_terms": [
+      "options",
+      "inefficient as motivators"
+     ],
+     "gold_passage_ids": [
+      "1998_p0069"
+     ]
+    }
+   ],
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": true
+   },
+   "reject": {
+    "forbidden_terms": []
+   },
+   "verification_note": "Opened the complete text of 1998_p0069: despite acknowledging properly structured options can be appropriate, its first paragraph describes them more often as inefficient as motivators.",
+   "_set": "heldout_v2"
+  },
+  {
+   "qid": "hv08",
+   "question_type": "opinion",
+   "years": [
+    2003
+   ],
+   "query": "Beyond independence, what did Buffett regard as the hardest-to-find qualification for a board director in 2003?",
+   "gold_passage_ids": [
+    "2003_p0054"
+   ],
+   "relevant_ids": [
+    "2003_p0054"
+   ],
+   "gold_claims": [
+    {
+     "claim": "Business savvy was the rarest of the director qualities.",
+     "required_terms": [
+      "business savvy",
+      "rarest"
+     ],
+     "gold_passage_ids": [
+      "2003_p0054"
+     ]
+    }
+   ],
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": true
+   },
+   "reject": {
+    "forbidden_terms": []
+   },
+   "verification_note": "Opened the complete text of 2003_p0054: after listing business savvy, shareholder orientation and genuine interest, it explicitly calls business savvy the rarest quality.",
+   "_set": "heldout_v2"
+  },
+  {
+   "qid": "hv09",
+   "question_type": "opinion",
+   "years": [
+    2011
+   ],
+   "query": "What limits did Buffett put on monetary and fiscal stimulus as a remedy for the housing slump in his 2011 letter?",
+   "gold_passage_ids": [
+    "2011_p0026"
+   ],
+   "relevant_ids": [
+    "2011_p0026"
+   ],
+   "gold_claims": [
+    {
+     "claim": "Monetary and fiscal policies do not create households or eliminate excess housing units.",
+     "required_terms": [
+      "monetary and fiscal policies",
+      "households",
+      "housing units"
+     ],
+     "gold_passage_ids": [
+      "2011_p0026"
+     ]
+    }
+   ],
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": true
+   },
+   "reject": {
+    "forbidden_terms": []
+   },
+   "verification_note": "Opened the complete text of 2011_p0026: it says wise monetary and fiscal policies temper recessions but do not create households or eliminate excess housing units.",
+   "_set": "heldout_v2"
+  },
+  {
+   "qid": "hv10",
+   "question_type": "opinion",
+   "years": [
+    2023
+   ],
+   "query": "In 2023, what ability to reinvest made a business especially appealing to Berkshire?",
+   "gold_passage_ids": [
+    "2023_p0014"
+   ],
+   "relevant_ids": [
+    "2023_p0014"
+   ],
+   "gold_claims": [
+    {
+     "claim": "Berkshire favors an enterprise that can deploy additional capital at high returns in the future.",
+     "required_terms": [
+      "deploy additional capital",
+      "high returns"
+     ],
+     "gold_passage_ids": [
+      "2023_p0014"
+     ]
+    }
+   ],
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": true
+   },
+   "reject": {
+    "forbidden_terms": []
+   },
+   "verification_note": "Opened the complete text of 2023_p0014: its first sentence identifies the favored rare enterprise as one able to deploy additional capital at high future returns.",
+   "_set": "heldout_v2"
+  },
+  {
+   "qid": "hv11",
+   "question_type": "company",
+   "years": [
+    1978
+   ],
+   "query": "How did Buffett assess SAFECO's approach to reserving for losses in the 1978 letter?",
+   "gold_passage_ids": [
+    "1978_p0039"
+   ],
+   "relevant_ids": [
+    "1978_p0039"
+   ],
+   "gold_claims": [
+    {
+     "claim": "SAFECO's loss reserving was conservative.",
+     "required_terms": [
+      "SAFECO",
+      "loss reserving",
+      "conservative"
+     ],
+     "gold_passage_ids": [
+      "1978_p0039"
+     ]
+    }
+   ],
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": true
+   },
+   "reject": {
+    "forbidden_terms": []
+   },
+   "verification_note": "Opened the complete text of 1978_p0039: the SAFECO paragraph explicitly describes its loss reserving as conservative.",
+   "_set": "heldout_v2"
+  },
+  {
+   "qid": "hv12",
+   "question_type": "company",
+   "years": [
+    1979
+   ],
+   "query": "Was buying Waumbec Mills cheaply a success in Buffett's 1979 account?",
+   "gold_passage_ids": [
+    "1979_p0024"
+   ],
+   "relevant_ids": [
+    "1979_p0024"
+   ],
+   "gold_claims": [
+    {
+     "claim": "The purchase of Waumbec Mills was a mistake.",
+     "required_terms": [
+      "Waumbec Mills",
+      "purchase",
+      "mistake"
+     ],
+     "gold_passage_ids": [
+      "1979_p0024"
+     ]
+    }
+   ],
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": true
+   },
+   "reject": {
+    "forbidden_terms": []
+   },
+   "verification_note": "Opened the complete text of 1979_p0024: after calling the Waumbec purchase an extraordinary statistical bargain below working capital, Buffett explicitly says the purchase was a mistake.",
+   "_set": "heldout_v2"
+  },
+  {
+   "qid": "hv13",
+   "question_type": "company",
+   "years": [
+    1983
+   ],
+   "query": "How did Nebraska Furniture Mart's single location compare with the rest of Omaha's home-furnishing sellers in 1983?",
+   "gold_passage_ids": [
+    "1983_p0017"
+   ],
+   "relevant_ids": [
+    "1983_p0017"
+   ],
+   "gold_claims": [
+    {
+     "claim": "That single store sold more furniture, carpets, and appliances than all Omaha competitors combined.",
+     "required_terms": [
+      "single store",
+      "Omaha competitors",
+      "combined"
+     ],
+     "gold_passage_ids": [
+      "1983_p0017"
+     ]
+    }
+   ],
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": true
+   },
+   "reject": {
+    "forbidden_terms": []
+   },
+   "verification_note": "Opened the complete text of 1983_p0017: its final sentence says NFM's single store sold more furniture, carpets and appliances than all Omaha competitors combined.",
+   "_set": "heldout_v2"
+  },
+  {
+   "qid": "hv14",
+   "question_type": "company",
+   "years": [
+    1997
+   ],
+   "query": "Who took charge of Star Furniture in 1962, according to the history Buffett recounted in 1997?",
+   "gold_passage_ids": [
+    "1997_p0072"
+   ],
+   "relevant_ids": [
+    "1997_p0072"
+   ],
+   "gold_claims": [
+    {
+     "claim": "Melvyn and his sister Shirley Toomin took over in 1962.",
+     "required_terms": [
+      "Melvyn",
+      "Shirley Toomin",
+      "1962"
+     ],
+     "gold_passage_ids": [
+      "1997_p0072"
+     ]
+    }
+   ],
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": true
+   },
+   "reject": {
+    "forbidden_terms": []
+   },
+   "verification_note": "Opened the complete text of 1997_p0072: its first sentence identifies Melvyn and his sister Shirley Toomin as taking over Star in 1962.",
+   "_set": "heldout_v2"
+  },
+  {
+   "qid": "hv15",
+   "question_type": "company",
+   "years": [
+    1999
+   ],
+   "query": "Why did R. C. Willey keep its stores shut on Sundays, as Buffett explained in 1999?",
+   "gold_passage_ids": [
+    "1999_p0016"
+   ],
+   "relevant_ids": [
+    "1999_p0016"
+   ],
+   "gold_claims": [
+    {
+     "claim": "R. C. Willey's stores were closed on Sunday because Bill and most managers were Mormons.",
+     "required_terms": [
+      "R. C. Willey",
+      "Sunday",
+      "Mormons"
+     ],
+     "gold_passage_ids": [
+      "1999_p0016"
+     ]
+    }
+   ],
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": true
+   },
+   "reject": {
+    "forbidden_terms": []
+   },
+   "verification_note": "Opened the complete text of 1999_p0016, and 1999_p0017 as continuation context: 1999_p0016 itself says Bill and most managers are Mormons and for that reason the stores have never operated on Sunday. Only 1999_p0016 supplies the claim.",
+   "_set": "heldout_v2"
+  },
+  {
+   "qid": "hv16",
+   "question_type": "company",
+   "years": [
+    2000
+   ],
+   "query": "What did Berkshire pay for Justin Industries in the deal described in the 2000 letter, and was the payment in cash?",
+   "gold_passage_ids": [
+    "2000_p0024"
+   ],
+   "relevant_ids": [
+    "2000_p0024"
+   ],
+   "gold_claims": [
+    {
+     "claim": "Berkshire bought Justin for $570 million in cash.",
+     "required_terms": [
+      "Justin",
+      "$570 million",
+      "cash"
+     ],
+     "gold_passage_ids": [
+      "2000_p0024"
+     ]
+    }
+   ],
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": true
+   },
+   "reject": {
+    "forbidden_terms": []
+   },
+   "verification_note": "Opened the complete text of 2000_p0024: after the Fort Worth meeting with John Roach and John Justin, it explicitly records buying Justin for $570 million in cash.",
+   "_set": "heldout_v2"
+  },
+  {
+   "qid": "hv17",
+   "question_type": "company",
+   "years": [
+    2008
+   ],
+   "query": "Which two British electricity distributors were part of MidAmerican's operations in the 2008 letter?",
+   "gold_passage_ids": [
+    "2008_p0028"
+   ],
+   "relevant_ids": [
+    "2008_p0028"
+   ],
+   "gold_claims": [
+    {
+     "claim": "Yorkshire Electricity and Northern Electric were MidAmerican's British electricity distributors.",
+     "required_terms": [
+      "Yorkshire Electricity",
+      "Northern Electric"
+     ],
+     "gold_passage_ids": [
+      "2008_p0028"
+     ]
+    }
+   ],
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": true
+   },
+   "reject": {
+    "forbidden_terms": []
+   },
+   "verification_note": "Opened the complete text of 2008_p0028: item (1) names Yorkshire Electricity and Northern Electric and identifies their joint position as the U.K.'s third largest distributor.",
+   "_set": "heldout_v2"
+  },
+  {
+   "qid": "hv18",
+   "question_type": "company",
+   "years": [
+    2013
+   ],
+   "query": "Who was leading Berkshire Hathaway Specialty Insurance when Buffett introduced the new operation in 2013?",
+   "gold_passage_ids": [
+    "2013_p0046"
+   ],
+   "relevant_ids": [
+    "2013_p0046"
+   ],
+   "gold_claims": [
+    {
+     "claim": "Berkshire Hathaway Specialty Insurance was led by Peter Eastwood.",
+     "required_terms": [
+      "Berkshire Hathaway Specialty Insurance",
+      "Peter Eastwood"
+     ],
+     "gold_passage_ids": [
+      "2013_p0046"
+     ]
+    }
+   ],
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": true
+   },
+   "reject": {
+    "forbidden_terms": []
+   },
+   "verification_note": "Opened the complete text of 2013_p0046: it expands BHSI as Berkshire Hathaway Specialty Insurance and directly says BHSI is led by Peter Eastwood.",
+   "_set": "heldout_v2"
+  },
+  {
+   "qid": "hv19",
+   "question_type": "company",
+   "years": [
+    2016
+   ],
+   "query": "How many Berkshire shares did Buffett regret issuing to acquire General Re in his 2016 review of the deal?",
+   "gold_passage_ids": [
+    "2016_p0018"
+   ],
+   "relevant_ids": [
+    "2016_p0018"
+   ],
+   "gold_claims": [
+    {
+     "claim": "Berkshire issued 272,200 shares to buy General Re.",
+     "required_terms": [
+      "272,200",
+      "General Re",
+      "shares"
+     ],
+     "gold_passage_ids": [
+      "2016_p0018"
+     ]
+    }
+   ],
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": true
+   },
+   "reject": {
+    "forbidden_terms": []
+   },
+   "verification_note": "Opened the complete text of 2016_p0018: Buffett calls issuing 272,200 Berkshire shares to buy General Re a terrible mistake. This is a retrospective in the 2016 letter, not a claim that the purchase happened in 2016.",
+   "_set": "heldout_v2"
+  },
+  {
+   "qid": "hv20",
+   "question_type": "fact_number",
+   "years": [
+    1984
+   ],
+   "query": "What stake in Nebraska Furniture Mart did Berkshire purchase, and what check did Mrs. B receive, as recalled in 1984?",
+   "gold_passage_ids": [
+    "1984_p0034"
+   ],
+   "relevant_ids": [
+    "1984_p0034"
+   ],
+   "gold_claims": [
+    {
+     "claim": "Berkshire purchased 90% of NFM.",
+     "required_terms": [
+      "90%",
+      "NFM"
+     ],
+     "gold_passage_ids": [
+      "1984_p0034"
+     ]
+    },
+    {
+     "claim": "Mrs. B received a check for $55 million.",
+     "required_terms": [
+      "Mrs. B",
+      "$55 million"
+     ],
+     "gold_passage_ids": [
+      "1984_p0034"
+     ]
+    }
+   ],
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": true
+   },
+   "reject": {
+    "forbidden_terms": []
+   },
+   "verification_note": "Opened the complete text of 1984_p0034: its first paragraph explicitly gives the 90% NFM purchase and the check to Mrs. B for $55 million. The question dates the account, not the acquisition.",
+   "_set": "heldout_v2"
+  },
+  {
+   "qid": "hv21",
+   "question_type": "fact_number",
+   "years": [
+    1985
+   ],
+   "query": "How many charities received distributions through Berkshire's shareholder-directed giving scheme in 1985?",
+   "gold_passage_ids": [
+    "1985_p0143"
+   ],
+   "relevant_ids": [
+    "1985_p0143"
+   ],
+   "gold_claims": [
+    {
+     "claim": "There were 1,724 charities receiving contributions.",
+     "required_terms": [
+      "1,724",
+      "charities"
+     ],
+     "gold_passage_ids": [
+      "1985_p0143"
+     ]
+    }
+   ],
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": true
+   },
+   "reject": {
+    "forbidden_terms": []
+   },
+   "verification_note": "Opened the complete text of 1985_p0143: its clean opening paragraph identifies 1,724 charities as recipients. A later duplicated continuation line is outside the evidence used.",
+   "_set": "heldout_v2"
+  },
+  {
+   "qid": "hv22",
+   "question_type": "fact_number",
+   "years": [
+    1988
+   ],
+   "query": "In 1988, how much profit did Buffett say Berkshire would need over the coming decade to achieve a 15% annual return?",
+   "gold_passage_ids": [
+    "1988_p0003"
+   ],
+   "relevant_ids": [
+    "1988_p0003"
+   ],
+   "gold_claims": [
+    {
+     "claim": "A 15% annual return over the next decade required profits of $10.3 billion.",
+     "required_terms": [
+      "15%",
+      "profits",
+      "$10.3"
+     ],
+     "gold_passage_ids": [
+      "1988_p0003"
+     ]
+    }
+   ],
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": true
+   },
+   "reject": {
+    "forbidden_terms": []
+   },
+   "verification_note": "Opened the complete text of 1988_p0003: it says a 15% return for the next decade demands $10.3 billion of profits. This is a forward-looking requirement, not realized profits.",
+   "_set": "heldout_v2"
+  },
+  {
+   "qid": "hv23",
+   "question_type": "fact_number",
+   "years": [
+    1994
+   ],
+   "query": "What acquisition price does the 1994 letter give for Scott Fetzer?",
+   "gold_passage_ids": [
+    "1994_p0017"
+   ],
+   "relevant_ids": [
+    "1994_p0017"
+   ],
+   "gold_claims": [
+    {
+     "claim": "Berkshire paid $315.2 million for Scott Fetzer.",
+     "required_terms": [
+      "$315.2 million",
+      "Scott Fetzer"
+     ],
+     "gold_passage_ids": [
+      "1994_p0017"
+     ]
+    }
+   ],
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": true
+   },
+   "reject": {
+    "forbidden_terms": []
+   },
+   "verification_note": "Opened the complete text of 1994_p0017: the second paragraph directly states the $315.2 million purchase price. The first paragraph dates the acquisition to the beginning of 1986, distinct from the letter year.",
+   "_set": "heldout_v2"
+  },
+  {
+   "qid": "hv24",
+   "question_type": "fact_number",
+   "years": [
+    2001
+   ],
+   "query": "How much float was Berkshire holding from GEICO in the 2001 account?",
+   "gold_passage_ids": [
+    "2001_p0060",
+    "2001_p0061"
+   ],
+   "relevant_ids": [
+    "2001_p0060",
+    "2001_p0061"
+   ],
+   "gold_claims": [
+    {
+     "claim": "GEICO's float was $4.25 billion.",
+     "required_terms": [
+      "$4.25",
+      "float"
+     ],
+     "gold_passage_ids": [
+      "2001_p0061"
+     ]
+    }
+   ],
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": true
+   },
+   "reject": {
+    "forbidden_terms": []
+   },
+   "verification_note": "Opened the complete texts of 2001_p0060 and 2001_p0061: the GEICO paragraph begins in 2001_p0060, and the continuation in 2001_p0061 explicitly states $4.25 billion in float. Claim-level citation is assigned to 2001_p0061 where both required terms occur.",
+   "_set": "heldout_v2"
+  },
+  {
+   "qid": "hv25",
+   "question_type": "fact_number",
+   "years": [
+    2002
+   ],
+   "query": "About how much gas did the Kern River pipeline move each day before the expansion discussed in 2002?",
+   "gold_passage_ids": [
+    "2002_p0024"
+   ],
+   "relevant_ids": [
+    "2002_p0024"
+   ],
+   "gold_claims": [
+    {
+     "claim": "Kern River moved about 900 million cubic feet of gas a day.",
+     "required_terms": [
+      "900 million",
+      "cubic feet",
+      "a day"
+     ],
+     "gold_passage_ids": [
+      "2002_p0024"
+     ]
+    }
+   ],
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": true
+   },
+   "reject": {
+    "forbidden_terms": []
+   },
+   "verification_note": "Opened the complete text of 2002_p0024: after identifying Kern River, it gives current throughput of about 900 million cubic feet daily before the expansion expected to double it.",
+   "_set": "heldout_v2"
+  },
+  {
+   "qid": "hv26",
+   "question_type": "fact_number",
+   "years": [
+    2017
+   ],
+   "query": "What was Berkshire's cash-plus-Treasury-bill balance at the end of 2017?",
+   "gold_passage_ids": [
+    "2017_p0047"
+   ],
+   "relevant_ids": [
+    "2017_p0047"
+   ],
+   "gold_claims": [
+    {
+     "claim": "Berkshire held $116.0 billion in cash and U.S. Treasury Bills at yearend.",
+     "required_terms": [
+      "$116.0 billion",
+      "cash",
+      "U.S. Treasury Bills"
+     ],
+     "gold_passage_ids": [
+      "2017_p0047"
+     ]
+    }
+   ],
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": true
+   },
+   "reject": {
+    "forbidden_terms": []
+   },
+   "verification_note": "Opened the complete text of 2017_p0047: it explicitly states yearend cash and U.S. Treasury Bills of $116.0 billion; the $86.4 billion comparison is for yearend 2016, not the requested balance.",
+   "_set": "heldout_v2"
+  },
+  {
+   "qid": "hv27",
+   "question_type": "fact_number",
+   "years": [
+    2020
+   ],
+   "query": "How large was the write-down that Buffett tied mainly to overpaying for Precision Castparts in his 2020 letter?",
+   "gold_passage_ids": [
+    "2020_p0020"
+   ],
+   "relevant_ids": [
+    "2020_p0020"
+   ],
+   "gold_claims": [
+    {
+     "claim": "The write-down was $11 billion.",
+     "required_terms": [
+      "write-down",
+      "$11 billion"
+     ],
+     "gold_passage_ids": [
+      "2020_p0020"
+     ]
+    }
+   ],
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": true
+   },
+   "reject": {
+    "forbidden_terms": []
+   },
+   "verification_note": "Opened the complete text of 2020_p0020: its opening calls the GAAP write-down $11 billion and attributes it almost entirely to paying too much for PCC in 2016. The question concerns the 2020 charge, not the purchase year.",
+   "_set": "heldout_v2"
+  },
+  {
+   "qid": "hv28",
+   "question_type": "temporal_comparison",
+   "years": [
+    1984,
+    1985
+   ],
+   "query": "What improvement in Berkshire's insurance combined ratio is shown by the 1984 and 1985 letters? Give the ratio for each year.",
+   "gold_passage_ids": [
+    "1984_p0057",
+    "1985_p0104"
+   ],
+   "relevant_ids": [
+    "1984_p0057",
+    "1985_p0104"
+   ],
+   "gold_claims": [
+    {
+     "claim": "The combined ratio in 1984 was 134.",
+     "required_terms": [
+      "combined ratio",
+      "1984",
+      "134"
+     ],
+     "gold_passage_ids": [
+      "1984_p0057"
+     ]
+    },
+    {
+     "claim": "The combined ratio in 1985 was 111.",
+     "required_terms": [
+      "combined ratio",
+      "1985",
+      "111"
+     ],
+     "gold_passage_ids": [
+      "1985_p0104"
+     ]
+    }
+   ],
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": true
+   },
+   "reject": {
+    "forbidden_terms": []
+   },
+   "verification_note": "Opened the complete texts of 1984_p0057 and 1985_p0104: the former reports a combined ratio of 134 in 1984; the latter explicitly reports its improvement to 111 in 1985. Each year has a separate claim-level passage assignment.",
+   "_set": "heldout_v2"
+  },
+  {
+   "qid": "hv29",
+   "question_type": "temporal_comparison",
+   "years": [
+    1983,
+    2014
+   ],
+   "query": "How did the earnings hurdle for acquisition candidates differ between Berkshire's 1983 and 2014 criteria? Include the tax basis and the later exception.",
+   "gold_passage_ids": [
+    "1983_p0095",
+    "2014_p0136"
+   ],
+   "relevant_ids": [
+    "1983_p0095",
+    "2014_p0136"
+   ],
+   "gold_claims": [
+    {
+     "claim": "The earlier hurdle was at least $5 million of after-tax earnings.",
+     "required_terms": [
+      "at least",
+      "$5 million",
+      "after-tax"
+     ],
+     "gold_passage_ids": [
+      "1983_p0095"
+     ]
+    },
+    {
+     "claim": "The later hurdle was at least $75 million of pre-tax earnings.",
+     "required_terms": [
+      "at least",
+      "$75 million",
+      "pre-tax earnings"
+     ],
+     "gold_passage_ids": [
+      "2014_p0136"
+     ]
+    },
+    {
+     "claim": "The later hurdle had an exception for a business that would fit into one of the existing units.",
+     "required_terms": [
+      "fit into",
+      "existing units"
+     ],
+     "gold_passage_ids": [
+      "2014_p0136"
+     ]
+    }
+   ],
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": true
+   },
+   "reject": {
+    "forbidden_terms": []
+   },
+   "verification_note": "Opened the complete texts of 1983_p0095 and 2014_p0136: item (1) in each directly states its earnings hurdle. The earlier basis is after-tax; the later is pre-tax and explicitly excepts businesses fitting an existing unit. No like-for-like earnings multiple is inferred.",
+   "_set": "heldout_v2"
+  },
+  {
+   "qid": "hv30",
+   "question_type": "temporal_comparison",
+   "years": [
+    2002,
+    2003
+   ],
+   "query": "What market-share figures did NetJets report in the 2002 and 2003 letters, and what sales or aircraft-value measure accompanied each figure?",
+   "gold_passage_ids": [
+    "2002_p0063",
+    "2003_p0110"
+   ],
+   "relevant_ids": [
+    "2002_p0063",
+    "2003_p0110"
+   ],
+   "gold_claims": [
+    {
+     "claim": "NetJets' industry share in 2002 was 75%.",
+     "required_terms": [
+      "industry share",
+      "2002",
+      "75%"
+     ],
+     "gold_passage_ids": [
+      "2002_p0063"
+     ]
+    },
+    {
+     "claim": "The earlier comparison valued the planes clients purchased or leased.",
+     "required_terms": [
+      "planes",
+      "purchased",
+      "leased"
+     ],
+     "gold_passage_ids": [
+      "2002_p0063"
+     ]
+    },
+    {
+     "claim": "The later figure was 70% of net sales measured by value.",
+     "required_terms": [
+      "70%",
+      "net sales",
+      "value"
+     ],
+     "gold_passage_ids": [
+      "2003_p0110"
+     ]
+    }
+   ],
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": true
+   },
+   "reject": {
+    "forbidden_terms": []
+   },
+   "verification_note": "Opened the complete texts of 2002_p0063 and 2003_p0110: the former gives 75% industry share based on the value of purchased or leased planes; the latter gives 70% of net sales measured by value. The question explicitly asks both definitions rather than inferring a like-for-like market-share decline.",
+   "_set": "heldout_v2"
+  },
+  {
+   "qid": "hv31",
+   "question_type": "temporal_comparison",
+   "years": [
+    1986,
+    2016
+   ],
+   "query": "How did Berkshire's relationship with GEICO change between the ownership position described in 1986 and the takeover recalled in 2016?",
+   "gold_passage_ids": [
+    "1986_p0070",
+    "2016_p0017"
+   ],
+   "relevant_ids": [
+    "1986_p0070",
+    "2016_p0017"
+   ],
+   "gold_claims": [
+    {
+     "claim": "GEICO was 41% owned by Berkshire in the earlier account.",
+     "required_terms": [
+      "GEICO",
+      "41%",
+      "Berkshire"
+     ],
+     "gold_passage_ids": [
+      "1986_p0070"
+     ]
+    },
+    {
+     "claim": "The GEICO purchase turned the holding into a wholly-owned operating business.",
+     "required_terms": [
+      "GEICO",
+      "wholly-owned operating business"
+     ],
+     "gold_passage_ids": [
+      "2016_p0017"
+     ]
+    },
+    {
+     "claim": "Berkshire acquired the remaining half at the beginning of 1996.",
+     "required_terms": [
+      "half",
+      "beginning of 1996"
+     ],
+     "gold_passage_ids": [
+      "2016_p0017"
+     ]
+    }
+   ],
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": true
+   },
+   "reject": {
+    "forbidden_terms": []
+   },
+   "verification_note": "Opened the complete texts of 1986_p0070 and 2016_p0017: the first identifies Berkshire's 41% GEICO ownership; the latter retrospectively dates acquiring the remaining half to the beginning of 1996 and calls the result a wholly-owned operating business. The takeover is not dated to 2016.",
+   "_set": "heldout_v2"
+  },
+  {
+   "qid": "hv32",
+   "question_type": "temporal_comparison",
+   "years": [
+    1986,
+    1989
+   ],
+   "query": "What purchase prices did Buffett give for Berkshire's first used corporate jet in the 1986 letter and its replacement in the 1989 letter?",
+   "gold_passage_ids": [
+    "1986_p0120",
+    "1989_p0146"
+   ],
+   "relevant_ids": [
+    "1986_p0120",
+    "1989_p0146"
+   ],
+   "gold_claims": [
+    {
+     "claim": "The earlier used plane was bought for $850,000.",
+     "required_terms": [
+      "plane",
+      "$850,000",
+      "used"
+     ],
+     "gold_passage_ids": [
+      "1986_p0120"
+     ]
+    },
+    {
+     "claim": "The replacement used jet cost $6.7 million.",
+     "required_terms": [
+      "used jet",
+      "$6.7",
+      "million"
+     ],
+     "gold_passage_ids": [
+      "1989_p0146"
+     ]
+    }
+   ],
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": true
+   },
+   "reject": {
+    "forbidden_terms": []
+   },
+   "verification_note": "Opened the complete texts of 1986_p0120 and 1989_p0146: the former gives $850,000 for its used plane; the latter states that this jet was sold and another used jet bought for $6.7 million. Letter years label the accounts, not an inferred exact purchase date.",
+   "_set": "heldout_v2"
+  },
+  {
+   "qid": "hv33",
+   "question_type": "follow_up",
+   "years": [
+    2009
+   ],
+   "query": "At what price per dollar of receivables did they unload that troubled portfolio?",
+   "history": [
+    {
+     "role": "user",
+     "content": "Let's discuss the unsuccessful GEICO credit-card venture covered in Berkshire's 2009 letter."
+    },
+    {
+     "role": "assistant",
+     "content": "Which detail of that venture would you like to examine?"
+    }
+   ],
+   "gold_passage_ids": [
+    "2009_p0042"
+   ],
+   "relevant_ids": [
+    "2009_p0042"
+   ],
+   "gold_claims": [
+    {
+     "claim": "The troubled portfolio was sold for 55¢ on the dollar.",
+     "required_terms": [
+      "55¢",
+      "dollar"
+     ],
+     "gold_passage_ids": [
+      "2009_p0042"
+     ]
+    }
+   ],
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": true
+   },
+   "reject": {
+    "forbidden_terms": []
+   },
+   "verification_note": "Opened the complete text of 2009_p0042: its credit-card paragraph explicitly says the troubled receivables portfolio was sold for 55¢ on the dollar. History supplies the venture and letter year, but no sale-price fact.",
+   "_set": "heldout_v2"
+  },
+  {
+   "qid": "hv34",
+   "question_type": "follow_up",
+   "years": [
+    2012
+   ],
+   "query": "What ownership stake in that holding company did Berkshire agree to buy?",
+   "history": [
+    {
+     "role": "user",
+     "content": "Tell me about the proposed Heinz investment described in Berkshire's 2012 letter."
+    },
+    {
+     "role": "assistant",
+     "content": "Which aspect of the proposed investment interests you?"
+    }
+   ],
+   "gold_passage_ids": [
+    "2012_p0016"
+   ],
+   "relevant_ids": [
+    "2012_p0016"
+   ],
+   "gold_claims": [
+    {
+     "claim": "Berkshire agreed to buy 50% of the holding company.",
+     "required_terms": [
+      "50%",
+      "holding company"
+     ],
+     "gold_passage_ids": [
+      "2012_p0016"
+     ]
+    }
+   ],
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": true
+   },
+   "reject": {
+    "forbidden_terms": []
+   },
+   "verification_note": "Opened the complete text of 2012_p0016: its opening says Berkshire agreed in February to buy 50% of a holding company owning all of H. J. Heinz. The question identifies the letter, not the calendar year of the February announcement. History contains no ownership percentage.",
+   "_set": "heldout_v2"
+  },
+  {
+   "qid": "hv35",
+   "question_type": "follow_up",
+   "years": [
+    2015
+   ],
+   "query": "Which investment manager first brought that company to Buffett's attention?",
+   "history": [
+    {
+     "role": "user",
+     "content": "Let's look at the Precision Castparts acquisition discussed in Berkshire's 2015 letter."
+    },
+    {
+     "role": "assistant",
+     "content": "Which part of the acquisition would you like to explore?"
+    }
+   ],
+   "gold_passage_ids": [
+    "2015_p0022"
+   ],
+   "relevant_ids": [
+    "2015_p0022"
+   ],
+   "gold_claims": [
+    {
+     "claim": "Todd Combs brought the company to Buffett's attention.",
+     "required_terms": [
+      "Todd Combs",
+      "attention"
+     ],
+     "gold_passage_ids": [
+      "2015_p0022"
+     ]
+    }
+   ],
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": true
+   },
+   "reject": {
+    "forbidden_terms": []
+   },
+   "verification_note": "Opened the complete text of 2015_p0022: its personal thank-you credits Todd Combs with bringing the PCC company to Buffett's attention and educating him about it. History identifies only the acquisition and letter, not the manager.",
+   "_set": "heldout_v2"
+  },
+  {
+   "qid": "hv36",
+   "question_type": "follow_up",
+   "years": [
+    2024
+   ],
+   "query": "When did Berkshire first start buying that group of five companies?",
+   "history": [
+    {
+     "role": "user",
+     "content": "Let's discuss Berkshire's Japanese trading-company investments in the 2024 letter."
+    },
+    {
+     "role": "assistant",
+     "content": "Which part of those investments would you like to examine?"
+    }
+   ],
+   "gold_passage_ids": [
+    "2024_p0041"
+   ],
+   "relevant_ids": [
+    "2024_p0041"
+   ],
+   "gold_claims": [
+    {
+     "claim": "The first purchases involving the five companies were in July 2019.",
+     "required_terms": [
+      "July",
+      "2019"
+     ],
+     "gold_passage_ids": [
+      "2024_p0041"
+     ]
+    }
+   ],
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": true
+   },
+   "reject": {
+    "forbidden_terms": []
+   },
+   "verification_note": "Opened the complete text of 2024_p0041: its first sentence dates the first purchases involving the five to July 2019. Opened neighboring 2024_p0040 and 2024_p0042 for referent context only, not as gold or relevant evidence; neither supplies the scored date. History contains no purchase date.",
+   "_set": "heldout_v2"
+  },
+  {
+   "qid": "hv37",
+   "question_type": "unanswerable",
+   "years": [],
+   "answerable": false,
+   "query": "What guide-RNA sequence does Buffett prescribe for a CRISPR-Cas9 gene-editing experiment?",
+   "gold_passage_ids": [],
+   "relevant_ids": [],
+   "gold_claims": [],
+   "expected_answer": "The retrieved passages do not provide enough evidence to answer this question.",
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": false,
+    "require_exact_refusal": true
+   },
+   "reject": {
+    "forbidden_terms": []
+   },
+   "verification_note": "Opened the actual corpus and case-insensitively searched all 5,831 passage texts for crispr, cas9 and gene editing: zero matching passages for each term. No evidence is assigned for a gene-editing protocol.",
+   "_set": "heldout_v2"
+  },
+  {
+   "qid": "hv38",
+   "question_type": "unanswerable",
+   "years": [],
+   "answerable": false,
+   "query": "How does Buffett solve a Sudoku puzzle step by step?",
+   "gold_passage_ids": [],
+   "relevant_ids": [],
+   "gold_claims": [],
+   "expected_answer": "The retrieved passages do not provide enough evidence to answer this question.",
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": false,
+    "require_exact_refusal": true
+   },
+   "reject": {
+    "forbidden_terms": []
+   },
+   "verification_note": "Opened the actual corpus and case-insensitively searched all 5,831 passage texts for sudoku and sudoku puzzle: zero matching passages for each term. No evidence is assigned for the requested puzzle-solving method.",
+   "_set": "heldout_v2"
+  },
+  {
+   "qid": "hv39",
+   "question_type": "unanswerable",
+   "years": [],
+   "answerable": false,
+   "query": "Which molecules does Buffett identify in the atmosphere of the exoplanet TRAPPIST-1e?",
+   "gold_passage_ids": [],
+   "relevant_ids": [],
+   "gold_claims": [],
+   "expected_answer": "The retrieved passages do not provide enough evidence to answer this question.",
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": false,
+    "require_exact_refusal": true
+   },
+   "reject": {
+    "forbidden_terms": []
+   },
+   "verification_note": "Opened the actual corpus and case-insensitively searched all 5,831 passage texts for exoplanet, trappist and exoplanet atmosphere: zero matching passages for each term. No evidence is assigned for the requested atmospheric composition.",
+   "_set": "heldout_v2"
+  },
+  {
+   "qid": "hv40",
+   "question_type": "unanswerable",
+   "years": [],
+   "answerable": false,
+   "query": "What weight and grip size does Buffett recommend for a pickleball paddle?",
+   "gold_passage_ids": [],
+   "relevant_ids": [],
+   "gold_claims": [],
+   "expected_answer": "The retrieved passages do not provide enough evidence to answer this question.",
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": false,
+    "require_exact_refusal": true
+   },
+   "reject": {
+    "forbidden_terms": []
+   },
+   "verification_note": "Opened the actual corpus and case-insensitively searched all 5,831 passage texts for pickleball and pickleball paddle: zero matching passages for each term. No evidence is assigned for the requested equipment recommendation.",
+   "_set": "heldout_v2"
+  },
+  {
+   "qid": "aq01_derivatives",
+   "query": "What did Buffett say about derivatives being weapons of mass destruction?",
+   "gold_passage_ids": [
+    "2002_p0086"
+   ],
+   "gold_claims": [
+    {
+     "claim": "Buffett called derivatives financial weapons of mass destruction.",
+     "gold_passage_ids": [
+      "2002_p0086"
+     ],
+     "required_terms": [
+      "financial weapons",
+      "mass destruction"
+     ]
+    }
+   ],
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": true
+   },
+   "reject": {
+    "forbidden_terms": [
+     "safe investments"
+    ]
+   },
+   "_set": "answer_benchmark_v3",
+   "question_type": "answerable"
+  },
+  {
+   "qid": "aq02_crisis",
+   "query": "How did Berkshire respond when the financial system seized in September 2008?",
+   "gold_passage_ids": [
+    "2009_p0021"
+   ],
+   "gold_claims": [
+    {
+     "claim": "Berkshire supplied liquidity and capital during the crisis.",
+     "gold_passage_ids": [
+      "2009_p0021"
+     ],
+     "required_terms": [
+      "supplier of liquidity",
+      "capital"
+     ]
+    },
+    {
+     "claim": "It committed $15.5 billion.",
+     "gold_passage_ids": [
+      "2009_p0021"
+     ],
+     "required_terms": [
+      "15.5 billion"
+     ]
+    }
+   ],
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": true
+   },
+   "reject": {
+    "forbidden_terms": [
+     "asked the government for a bailout"
+    ]
+   },
+   "_set": "answer_benchmark_v3",
+   "question_type": "answerable"
+  },
+  {
+   "qid": "aq03_bnsf",
+   "query": "What firm deal did Berkshire and BNSF announce, and what did Buffett predict about BNSF as a key asset?",
+   "gold_passage_ids": [
+    "2021_p0056"
+   ],
+   "gold_claims": [
+    {
+     "claim": "Berkshire and BNSF announced a firm deal.",
+     "gold_passage_ids": [
+      "2021_p0056"
+     ],
+     "required_terms": [
+      "BNSF",
+      "firm deal"
+     ]
+    },
+    {
+     "claim": "Buffett predicted BNSF would be a key asset.",
+     "gold_passage_ids": [
+      "2021_p0056"
+     ],
+     "required_terms": [
+      "key asset"
+     ]
+    }
+   ],
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": true
+   },
+   "reject": {
+    "forbidden_terms": [
+     "sold BNSF"
+    ]
+   },
+   "_set": "answer_benchmark_v3",
+   "question_type": "answerable"
+  },
+  {
+   "qid": "aq04_apple",
+   "query": "How did Buffett describe the economic benefit of Apple share repurchases?",
+   "gold_passage_ids": [
+    "2021_p0030",
+    "2022_p0028"
+   ],
+   "gold_claims": [
+    {
+     "claim": "Apple repurchases increased Berkshire's share.",
+     "gold_passage_ids": [
+      "2022_p0028"
+     ],
+     "required_terms": [
+      "Apple",
+      "repurchases"
+     ]
+    },
+    {
+     "claim": "Berkshire's share of Apple earnings was $5.6 billion.",
+     "gold_passage_ids": [
+      "2021_p0030"
+     ],
+     "required_terms": [
+      "5.6 billion"
+     ]
+    }
+   ],
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": true
+   },
+   "reject": {
+    "forbidden_terms": [
+     "Berkshire sold all Apple shares"
+    ]
+   },
+   "_set": "answer_benchmark_v3",
+   "question_type": "answerable"
+  },
+  {
+   "qid": "aq05_index",
+   "query": "What investing advice did Buffett give individual investors about index funds?",
+   "gold_passage_ids": [
+    "1996_p0092"
+   ],
+   "gold_claims": [
+    {
+     "claim": "Most investors should use a low-fee index fund.",
+     "gold_passage_ids": [
+      "1996_p0092"
+     ],
+     "required_terms": [
+      "index fund",
+      "minimal fees"
+     ]
+    }
+   ],
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": true
+   },
+   "reject": {
+    "forbidden_terms": [
+     "high-fee hedge fund"
+    ]
+   },
+   "_set": "answer_benchmark_v3",
+   "question_type": "answerable"
+  },
+  {
+   "qid": "aq06_dividends",
+   "query": "Why did Buffett discuss not paying Berkshire a cash dividend?",
+   "gold_passage_ids": [
+    "2012_p0109"
+   ],
+   "gold_claims": [
+    {
+     "claim": "Some shareholders wanted a cash dividend.",
+     "gold_passage_ids": [
+      "2012_p0109"
+     ],
+     "required_terms": [
+      "cash dividend"
+     ]
+    },
+    {
+     "claim": "Berkshire paid out nothing itself.",
+     "gold_passage_ids": [
+      "2012_p0109"
+     ],
+     "required_terms": [
+      "pay out nothing"
+     ]
+    }
+   ],
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": true
+   },
+   "reject": {
+    "forbidden_terms": [
+     "Berkshire announced a regular dividend"
+    ]
+   },
+   "_set": "answer_benchmark_v3",
+   "question_type": "answerable"
+  },
+  {
+   "qid": "aq07_see",
+   "query": "What did Buffett report about See's Candies in 1989?",
+   "gold_passage_ids": [
+    "1989_p0033"
+   ],
+   "gold_claims": [
+    {
+     "claim": "See's Candies had an 8% increase in pounds sold.",
+     "gold_passage_ids": [
+      "1989_p0033"
+     ],
+     "required_terms": [
+      "8% increase",
+      "pounds sold"
+     ]
+    }
+   ],
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": true
+   },
+   "reject": {
+    "forbidden_terms": [
+     "closed See's Candies"
+    ]
+   },
+   "_set": "answer_benchmark_v3",
+   "question_type": "answerable"
+  },
+  {
+   "qid": "aq08_greg_abel",
+   "query": "Which Berkshire vice chairman joined Buffett on stage at the 2020 annual meeting?",
+   "gold_passage_ids": [
+    "2020_p0081"
+   ],
+   "gold_claims": [
+    {
+     "claim": "Greg Abel was a Berkshire vice chairman and joined Buffett on stage.",
+     "gold_passage_ids": [
+      "2020_p0081"
+     ],
+     "required_terms": [
+      "Greg Abel",
+      "Vice Chairmen",
+      "joined me on stage"
+     ]
+    }
+   ],
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": true
+   },
+   "reject": {
+    "forbidden_terms": [
+     "was not at the meeting"
+    ]
+   },
+   "_set": "answer_benchmark_v3",
+   "question_type": "answerable"
+  },
+  {
+   "qid": "adv01",
+   "question_type": "fact_number",
+   "adversarial": "swapped_years",
+   "years": [
+    1985
+   ],
+   "query": "What was Berkshire's insurance combined ratio in 1985?",
+   "gold_passage_ids": [
+    "1985_p0104"
+   ],
+   "relevant_ids": [
+    "1985_p0104"
+   ],
+   "gold_claims": [
+    {
+     "claim": "The combined ratio in 1985 was 111.",
+     "required_terms": [
+      "combined ratio",
+      "111",
+      "1985"
+     ],
+     "gold_passage_ids": [
+      "1985_p0104"
+     ]
+    }
+   ],
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": true
+   },
+   "reject": {
+    "forbidden_terms": []
+   },
+   "verification_note": "1985_p0104 gives 134 for 1984 and 111 for 1985 in one sentence; a year/value swap would answer 134.",
+   "_set": "adversarial_dev"
+  },
+  {
+   "qid": "adv02",
+   "question_type": "fact_number",
+   "adversarial": "industry_vs_berkshire",
+   "years": [
+    1990
+   ],
+   "query": "What range does Buffett give for the industry's combined ratio, and where will Berkshire's super-cat business fall instead?",
+   "gold_passage_ids": [
+    "1990_p0058"
+   ],
+   "relevant_ids": [
+    "1990_p0058"
+   ],
+   "gold_claims": [
+    {
+     "claim": "The industry combined ratio range is 100 - 120.",
+     "required_terms": [
+      "industry range",
+      "100 - 120"
+     ],
+     "gold_passage_ids": [
+      "1990_p0058"
+     ]
+    },
+    {
+     "claim": "Berkshire's super-cat combined ratio will be close to either zero or 300%.",
+     "required_terms": [
+      "zero",
+      "300%"
+     ],
+     "gold_passage_ids": [
+      "1990_p0058"
+     ]
+    }
+   ],
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": true
+   },
+   "reject": {
+    "forbidden_terms": []
+   },
+   "verification_note": "1990_p0058 contrasts the industry range 100-120 with Berkshire's super-cat ratio near zero or 300%; reversing them is wrong.",
+   "_set": "adversarial_dev"
+  },
+  {
+   "qid": "adv03",
+   "question_type": "fact_number",
+   "adversarial": "forecast_vs_actual",
+   "years": [
+    2001
+   ],
+   "query": "How much does Berkshire plan to spend on flight simulators, and how does that compare with its annual depreciation charge?",
+   "gold_passage_ids": [
+    "2001_p0085"
+   ],
+   "relevant_ids": [
+    "2001_p0085"
+   ],
+   "gold_claims": [
+    {
+     "claim": "Berkshire expects to spend $162 million for 27 simulators, versus annual depreciation of $95 million.",
+     "required_terms": [
+      "expect",
+      "$162 million",
+      "$95 million"
+     ],
+     "gold_passage_ids": [
+      "2001_p0085"
+     ]
+    }
+   ],
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": true
+   },
+   "reject": {
+    "forbidden_terms": []
+   },
+   "verification_note": "2001_p0085 states an expectation (we expect to spend $162 million) not a result; $95 million is the annual depreciation charge.",
+   "_set": "adversarial_dev"
+  },
+  {
+   "qid": "adv04",
+   "question_type": "temporal_comparison",
+   "adversarial": "comparison_one_side_missing",
+   "years": [
+    1965,
+    1985
+   ],
+   "query": "Compare Berkshire's combined ratio in 1965 and 1985.",
+   "gold_passage_ids": [
+    "1985_p0104"
+   ],
+   "relevant_ids": [
+    "1985_p0104"
+   ],
+   "gold_claims": [
+    {
+     "claim": "The combined ratio in 1985 was 111.",
+     "required_terms": [
+      "combined ratio",
+      "111",
+      "1985"
+     ],
+     "gold_passage_ids": [
+      "1985_p0104"
+     ]
+    }
+   ],
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": true
+   },
+   "reject": {
+    "forbidden_terms": []
+   },
+   "verification_note": "No 1965 letter exists (corpus 1977-2024), so only the 1985 side is answerable; the expected answer is a partial answer with a coverage note for 1965.",
+   "_set": "adversarial_dev"
+  },
+  {
+   "qid": "adv05",
+   "question_type": "unanswerable",
+   "adversarial": "plausible_unsupported_figure",
+   "years": [
+    1979
+   ],
+   "answerable": false,
+   "query": "How many Coca-Cola shares did Berkshire hold at the end of 1979, and what did they cost?",
+   "gold_passage_ids": [],
+   "relevant_ids": [],
+   "gold_claims": [],
+   "expected_answer": "The retrieved passages do not provide enough evidence to answer this question.",
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": false,
+    "require_exact_refusal": true
+   },
+   "reject": {
+    "forbidden_terms": []
+   },
+   "verification_note": "Searched all passages: no 1979 passage mentions Coca-Cola; the first Coca-Cola holding discussion is later.",
+   "_set": "adversarial_dev"
+  },
+  {
+   "qid": "adv06",
+   "question_type": "fact_number",
+   "adversarial": "pretax_vs_aftertax",
+   "years": [
+    1984
+   ],
+   "query": "What after-tax earnings did Buffett use for a business that might command $250-$300 million, and what is the pretax equivalent?",
+   "gold_passage_ids": [
+    "1984_p0094"
+   ],
+   "relevant_ids": [
+    "1984_p0094"
+   ],
+   "gold_claims": [
+    {
+     "claim": "Unleveraged corporate earnings of $22.7 million after-tax.",
+     "required_terms": [
+      "after-tax",
+      "$22.7 million"
+     ],
+     "gold_passage_ids": [
+      "1984_p0094"
+     ]
+    },
+    {
+     "claim": "That is equivalent to about $45 million pretax.",
+     "required_terms": [
+      "$45 million",
+      "pretax"
+     ],
+     "gold_passage_ids": [
+      "1984_p0094"
+     ]
+    }
+   ],
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": true
+   },
+   "reject": {
+    "forbidden_terms": []
+   },
+   "verification_note": "1984_p0094: $22.7 million after-tax equals about $45 million pretax; the two must not be swapped.",
+   "_set": "adversarial_dev"
+  },
+  {
+   "qid": "adv07",
+   "question_type": "unanswerable",
+   "adversarial": "comparison_both_sides_unsupported",
+   "years": [
+    2035,
+    2040
+   ],
+   "answerable": false,
+   "query": "Compare Berkshire's operating earnings in 2035 and 2040.",
+   "gold_passage_ids": [],
+   "relevant_ids": [],
+   "gold_claims": [],
+   "expected_answer": "The retrieved passages do not provide enough evidence to answer this question.",
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": false,
+    "require_exact_refusal": true
+   },
+   "reject": {
+    "forbidden_terms": []
+   },
+   "verification_note": "The corpus covers letters 1977-2024; no passage mentions 2035 or 2040.",
+   "_set": "adversarial_dev"
+  },
+  {
+   "qid": "adv08",
+   "question_type": "unanswerable",
+   "adversarial": "false_premise",
+   "years": [
+    1995
+   ],
+   "answerable": false,
+   "query": "Why did Buffett decide to sell all of Berkshire's Coca-Cola shares in 1995?",
+   "gold_passage_ids": [],
+   "relevant_ids": [],
+   "gold_claims": [],
+   "expected_answer": "The retrieved passages do not provide enough evidence to answer this question.",
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": false,
+    "require_exact_refusal": true
+   },
+   "reject": {
+    "forbidden_terms": []
+   },
+   "verification_note": "Searched all passages mentioning selling Coca-Cola: none reports Berkshire selling its Coca-Cola holding; the premise is false.",
+   "_set": "adversarial_dev"
+  }
+ ]
+}

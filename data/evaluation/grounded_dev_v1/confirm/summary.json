@@ -1,0 +1,208 @@
+{
+ "schema_version": 1,
+ "retrieval": "bm25",
+ "temperature": 0.0,
+ "cases": 80,
+ "metric": "strict supported claims (src.evaluation.supported_claims via calibrate_grounded.Scorer); same scorer as chosen.json",
+ "settings": {
+  "T_RELEVANT": 0.01,
+  "T_SLOT": 0.001,
+  "MAX_UNITS": 6,
+  "NUMERIC_GUARD": "bound"
+ },
+ "machine_load_note": "load average 9-10 during both runs (other agents on the machine, 8 users); latency indicative only",
+ "baselines_from_chosen_json": {
+  "grounded_template": {
+   "supported_met": 46,
+   "required_claims": 95,
+   "invalid_markers": 0,
+   "answerable": 71,
+   "abstain_answerable": 1,
+   "unanswerable": 9,
+   "preexisting_unanswerable": 6,
+   "preexisting_refusals": 6,
+   "adversarial_unanswerable": 3,
+   "adversarial_refusals": 1
+  },
+  "extractive": {
+   "supported_met": 46,
+   "required_claims": 95,
+   "invalid_markers": 0,
+   "answerable": 71,
+   "abstain_answerable": 2,
+   "unanswerable": 9,
+   "preexisting_unanswerable": 6,
+   "preexisting_refusals": 4,
+   "adversarial_unanswerable": 3,
+   "adversarial_refusals": 0
+  }
+ },
+ "grounded_mlx7b": {
+  "metrics": {
+   "preexisting_unanswerable": 6,
+   "preexisting_refusals": 6,
+   "adversarial_unanswerable": 3,
+   "adversarial_refusals": 1,
+   "supported_met": 46,
+   "required_claims": 95,
+   "invalid_markers": 0,
+   "answerable": 71,
+   "abstain_answerable": 1,
+   "unanswerable": 9,
+   "correct_refusals": 7,
+   "supported_heldout_v1": 18,
+   "abstain_heldout_v1": 0,
+   "refusals_heldout_v1": 2,
+   "supported_heldout_v2": 21,
+   "abstain_heldout_v2": 1,
+   "refusals_heldout_v2": 4,
+   "supported_answer_benchmark_v3": 4,
+   "abstain_answer_benchmark_v3": 0,
+   "refusals_answer_benchmark_v3": 0,
+   "supported_adversarial_dev": 3,
+   "abstain_adversarial_dev": 0,
+   "refusals_adversarial_dev": 1
+  },
+  "cases_run": 80,
+  "answer_decisions": {
+   "answer": 72,
+   "refuse": 8
+  },
+  "fallback": {
+   "groups_composed": 81,
+   "groups_fallback_to_template": 44,
+   "fallback_rate": 0.5432,
+   "reasons": {
+    "verifier_rejected": 26,
+    "model_refused": 18
+   }
+  },
+  "verifier_drop_reasons_model_text": {
+   "unsupported": 28,
+   "malformed_marker": 1,
+   "unmarked": 3,
+   "numeric_guard": 1
+  },
+  "verifier_drop_reasons_template_fallback": {
+   "unsupported": 10
+  },
+  "provider_failures": {
+   "total": 0,
+   "by_stage_type": {},
+   "summary_count": 0
+  },
+  "latency_ms": {
+   "all_cases": {
+    "n": 80,
+    "p50": 3141.2,
+    "p95": 8359.9
+   },
+   "warm_cases": {
+    "n": 79,
+    "p50": 3134.0,
+    "p95": 7811.6
+   },
+   "warm_cases_with_model_call": {
+    "n": 71,
+    "p50": 3209.9,
+    "p95": 8054.5
+   },
+   "cold_cases_excluded": 1,
+   "cold_rule": "sum of cold_load_ms > 50.0 ms"
+  },
+  "temperature": {
+   "requested": 0.0,
+   "asserted_at_provider": true,
+   "provider_attr": 0.0
+  },
+  "code_sha": "69b1931c8eadba6d22f4c2862ffae75af302f0e4",
+  "code_dirty": true,
+  "model": "grounded:mlx:teacher-qwen2.5-7b-mlx4",
+  "unexpected_refusals_summary": 1,
+  "preexisting_refusals_of": "6/6"
+ },
+ "grounded_llama_ftr2": {
+  "metrics": {
+   "preexisting_unanswerable": 6,
+   "preexisting_refusals": 6,
+   "adversarial_unanswerable": 3,
+   "adversarial_refusals": 1,
+   "supported_met": 38,
+   "required_claims": 95,
+   "invalid_markers": 0,
+   "answerable": 71,
+   "abstain_answerable": 1,
+   "unanswerable": 9,
+   "correct_refusals": 7,
+   "supported_heldout_v1": 15,
+   "abstain_heldout_v1": 0,
+   "refusals_heldout_v1": 2,
+   "supported_heldout_v2": 15,
+   "abstain_heldout_v2": 1,
+   "refusals_heldout_v2": 4,
+   "supported_answer_benchmark_v3": 6,
+   "abstain_answer_benchmark_v3": 0,
+   "refusals_answer_benchmark_v3": 0,
+   "supported_adversarial_dev": 2,
+   "abstain_adversarial_dev": 0,
+   "refusals_adversarial_dev": 1
+  },
+  "cases_run": 80,
+  "answer_decisions": {
+   "answer": 72,
+   "refuse": 8
+  },
+  "fallback": {
+   "groups_composed": 81,
+   "groups_fallback_to_template": 67,
+   "fallback_rate": 0.8272,
+   "reasons": {
+    "verifier_rejected": 43,
+    "model_refused": 24
+   }
+  },
+  "verifier_drop_reasons_model_text": {
+   "unsupported": 89,
+   "numeric_guard": 4,
+   "unmarked": 3
+  },
+  "verifier_drop_reasons_template_fallback": {
+   "unsupported": 12,
+   "numeric_guard": 3
+  },
+  "provider_failures": {
+   "total": 0,
+   "by_stage_type": {},
+   "summary_count": 0
+  },
+  "latency_ms": {
+   "all_cases": {
+    "n": 80,
+    "p50": 1777.0,
+    "p95": 5083.2
+   },
+   "warm_cases": {
+    "n": 79,
+    "p50": 1773.4,
+    "p95": 5135.0
+   },
+   "warm_cases_with_model_call": {
+    "n": 71,
+    "p50": 1879.7,
+    "p95": 5549.8
+   },
+   "cold_cases_excluded": 1,
+   "cold_rule": "sum of cold_load_ms > 50.0 ms"
+  },
+  "temperature": {
+   "requested": 0.0,
+   "asserted_at_provider": true,
+   "provider_attr": 0.0
+  },
+  "code_sha": "69b1931c8eadba6d22f4c2862ffae75af302f0e4",
+  "code_dirty": true,
+  "model": "grounded:llama:buffett-qwen2.5-1.5b-ft-r2-q4_k_m.gguf",
+  "unexpected_refusals_summary": 1,
+  "preexisting_refusals_of": "6/6"
+ }
+}

@@ -15,8 +15,9 @@ from typing import Any, Dict, List, Optional, Sequence
 from src.evaluation.answer_benchmark import _CITATION_RE, _polarity_and_numbers_agree, is_unanswerable_case
 from src.evaluation.citation_faithfulness import split_sentences
 
-# Exact engine label (engine.py: f"In the {year} letter:"); colon required, so "In 2002, ..." is never stripped.
-_LABEL_RE = re.compile(r"^\s*In the ((?:19|20)\d{2}) letter:\s+")
+# Exact engine labels (engine.py _label: "In the {y} letter:" and "In the {y1}-{y2} letters:"); colon required,
+# so "In 2002, ..." is never stripped. A label is stripped only when a cited hit's year lies in its range.
+_LABEL_RE = re.compile(r"^\s*In the ((?:19|20)\d{2})(?: letter:|-((?:19|20)\d{2}) letters:)\s+")
 _MARKERS_RE = re.compile(r"\s*\[\d+(?:\s*,\s*\d+)*\]")
 _SRC_SENT_RE = re.compile(r"(?<=[.!?])\s+(?=[A-Z0-9\"'])")
 
@@ -39,8 +40,11 @@ def _hit_year(hit: Any) -> Optional[int]:
 
 def _strip_label(sentence: str, cited_hits: Sequence[Any]) -> str:
     match = _LABEL_RE.match(sentence)
-    if match and int(match.group(1)) in {_hit_year(h) for h in cited_hits}:
-        return sentence[match.end():]
+    if match:
+        low = int(match.group(1))
+        high = int(match.group(2) or low)
+        if any(y is not None and low <= y <= high for y in (_hit_year(h) for h in cited_hits)):
+            return sentence[match.end():]
     return sentence
 
 

@@ -249,6 +249,7 @@ class _Sidecar:
         except Exception as exc:
             settings = {"unavailable": type(exc).__name__}
         status = _git("status", "--porcelain")
+        provider_attr = getattr(llm._provider, "temperature", None) if llm is not None else None
         paths = {"model_path": model_path}
         if model_path is None and provider == "grounded" and isinstance(settings, dict):
             paths = {"model_path": settings.get({"mlx": "MLX_MODEL", "llama": "LLAMA_MODEL"}.get(composer or "", ""))}
@@ -259,8 +260,9 @@ class _Sidecar:
             "provider": provider, "composer": composer, "retrieval": retrieval,
             "model": _model_fingerprint(Path(paths["model_path"])) if paths["model_path"] else None,
             "effective_settings": settings,
-            "temperature": {"requested": temperature, "asserted_at_provider": llm is not None,
-                            "provider_attr": getattr(llm._provider, "temperature", None) if llm is not None else None},
+            "temperature": {"requested": temperature, "asserted_at_provider": llm is not None and (
+                                provider_attr is None or provider_attr == temperature),
+                            "provider_attr": provider_attr},
             "library_versions": _library_versions(), "device": _device(),
             "initialization_failure": initialization_failure, "resumes": resumes}
         self._flush()
@@ -469,7 +471,7 @@ def run(
                           "temperature": temperature,
                           "temperature_applies": provider == "llama" or (grounded_run and composer != "template"),
                           **({"composer": composer, "model_path": str(model_path) if model_path else None,
-                              "temperature_asserted": True} if grounded_run else {})},
+                              "temperature_asserted": llm is not None and getattr(llm._provider, "temperature", None) == temperature} if grounded_run else {})},
         "retrieval": retrieval, "setup_latency_ms": round(setup_latency_ms, 3),
         "fixture_validation": fixture_check,
         "summary": {"fixture_cases": len(cases), "cases_run": len(rows),
