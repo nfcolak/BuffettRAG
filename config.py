@@ -150,6 +150,22 @@ LLM_GPU_LAYERS = int(os.getenv("LLM_GPU_LAYERS", "-1"))  # -1 = all (Metal); 0 =
 LLM_CONTEXT_PASSAGES = int(os.getenv("LLM_CONTEXT_PASSAGES", "5"))
 LLM_PASSAGE_MAX_CHARS = int(os.getenv("LLM_PASSAGE_MAX_CHARS", "1800"))
 
+# Grounded provider (DEFAULT_LLM_PROVIDER=grounded). Knob names, ranges and built-in
+# defaults live in src/generation/grounded/settings.py (GroundedSettings); this block
+# only (a) lets calibrated values be committed as defaults without code changes
+# (GROUNDED_DEFAULTS, string values, same keys as the environment). The environment,
+# read at call time, always wins over GROUNDED_DEFAULTS.
+GROUNDED_DEFAULTS: dict = {}
+
+
+def load_grounded_settings(environ=None):
+    """Validated GroundedSettings from GROUNDED_DEFAULTS + environment (lazy import)."""
+    from src.generation.grounded.settings import GroundedSettings
+
+    env = os.environ if environ is None else environ
+    merged = {**GROUNDED_DEFAULTS, **{k: v for k, v in env.items() if k.startswith("GROUNDED_")}}
+    return GroundedSettings.from_env(merged)
+
 # -----------------------------------------------------------------------------
 # Service URLs
 # -----------------------------------------------------------------------------
