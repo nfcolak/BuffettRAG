@@ -1,0 +1,507 @@
+{
+  "schema_version": 1,
+  "purpose": "Curated confusable passage negatives on corpus v3 for retrieval regression checks; a case passes only when evidence ranks above its named decoys. Curated by reading passage text, not tuned to any retriever.",
+  "source_corpus": "data/processed/chunks_v3_paragraph.jsonl",
+  "cases": [
+    {
+      "qid": "hn4_01_float_2009",
+      "query": "What was Berkshire's total insurance float at the end of 2009?",
+      "relevant_ids": [
+        "2009_p0030"
+      ],
+      "hard_negative_ids": [
+        "2010_p0030",
+        "2008_p0019"
+      ],
+      "type": "same_topic_other_year",
+      "rationale": "2009 letter states float of $62 billion; the 2010 and 2008 letters give $66 billion and $58.5 billion."
+    },
+    {
+      "qid": "hn4_02_float_2006",
+      "query": "How large was Berkshire's float at the end of 2006, before the Equitas contract?",
+      "relevant_ids": [
+        "2006_p0038"
+      ],
+      "hard_negative_ids": [
+        "2005_p0031"
+      ],
+      "type": "same_topic_other_year",
+      "rationale": "2006 letter gives $50.9 billion; the 2005 float-growth passage reads the same but says $49 billion."
+    },
+    {
+      "qid": "hn4_03_float_2021",
+      "query": "How large had Berkshire's total float grown to by 2021 since it entered insurance?",
+      "relevant_ids": [
+        "2021_p0024"
+      ],
+      "hard_negative_ids": [
+        "2020_p0030"
+      ],
+      "type": "same_topic_other_year",
+      "rationale": "2021 letter says $147 billion; 2020 letter discusses $138 billion of float."
+    },
+    {
+      "qid": "hn4_04_underwriting_loss_1999",
+      "query": "What underwriting loss did Berkshire incur in 1999 and what float cost resulted?",
+      "relevant_ids": [
+        "1999_p0026"
+      ],
+      "hard_negative_ids": [
+        "2000_p0043"
+      ],
+      "type": "same_topic_other_year",
+      "rationale": "1999: $1.4 billion loss, 5.8% cost; 2000: $1.6 billion loss, 6% cost."
+    },
+    {
+      "qid": "hn4_05_float_growth_2002",
+      "query": "How much did Berkshire's insurance float grow in 2002 and what did using it cost?",
+      "relevant_ids": [
+        "2002_p0007"
+      ],
+      "hard_negative_ids": [
+        "2004_p0033",
+        "2004_p0069"
+      ],
+      "type": "same_topic_other_year",
+      "rationale": "2002 float rose $5.7 billion to $41.2 billion at 1% cost; 2004 passages give other float figures."
+    },
+    {
+      "qid": "hn4_06_float_change_2012",
+      "query": "By how much did Berkshire's float rise in 2012?",
+      "relevant_ids": [
+        "2012_p0035"
+      ],
+      "hard_negative_ids": [
+        "2016_p0041"
+      ],
+      "type": "same_topic_other_year",
+      "rationale": "2012 letter reports a $2.5 billion increase; 2016 letter shows the same float table with later numbers."
+    },
+    {
+      "qid": "hn4_07_float_2022",
+      "query": "How much did Berkshire's insurance float increase during 2022 with the help of an acquisition?",
+      "relevant_ids": [
+        "2022_p0026"
+      ],
+      "hard_negative_ids": [
+        "2021_p0025"
+      ],
+      "type": "same_topic_other_year",
+      "rationale": "2022 float went from $147 billion to $164 billion; the 2021 letter describes the earlier float."
+    },
+    {
+      "qid": "hn4_08_derivatives_float_2008",
+      "query": "What did Buffett mean by Berkshire's derivatives float at yearend 2008?",
+      "relevant_ids": [
+        "2008_p0106"
+      ],
+      "hard_negative_ids": [
+        "2008_p0019",
+        "2009_p0087"
+      ],
+      "type": "same_term_different_meaning",
+      "rationale": "Derivatives float (payments received less losses paid) differs from insurance float in the same letter."
+    },
+    {
+      "qid": "hn4_09_accounting_goodwill_amortization",
+      "query": "How must purchased Goodwill be amortized under the accounting rules, and is the charge tax deductible?",
+      "relevant_ids": [
+        "1983_p0104"
+      ],
+      "hard_negative_ids": [
+        "1983_p0106"
+      ],
+      "type": "same_term_different_meaning",
+      "rationale": "Accounting amortization over 40 years versus the economic Goodwill passage."
+    },
+    {
+      "qid": "hn4_10_economic_goodwill_source",
+      "query": "What creates economic Goodwill in a business, as opposed to the Goodwill account on the balance sheet?",
+      "relevant_ids": [
+        "1983_p0106",
+        "1983_p0108"
+      ],
+      "hard_negative_ids": [
+        "1983_p0102",
+        "1983_p0104"
+      ],
+      "type": "same_term_different_meaning",
+      "rationale": "Economic Goodwill is excess return on tangible assets; neighbours define the accounting item."
+    },
+    {
+      "qid": "hn4_11_owner_earnings_definition",
+      "query": "How does Buffett define owner earnings and why do they differ from reported GAAP earnings?",
+      "relevant_ids": [
+        "1986_p0140"
+      ],
+      "hard_negative_ids": [
+        "1991_p0013",
+        "1990_p0021"
+      ],
+      "type": "same_term_different_meaning",
+      "rationale": "Owner earnings (earnings plus non-cash charges less maintenance capex) versus look-through earnings."
+    },
+    {
+      "qid": "hn4_12_retroactive_reinsurance",
+      "query": "What is retroactive reinsurance and how is it treated under GAAP in Berkshire's earnings?",
+      "relevant_ids": [
+        "2000_p0046"
+      ],
+      "hard_negative_ids": [
+        "1999_p0070"
+      ],
+      "type": "same_term_different_meaning",
+      "rationale": "Retroactive insurance covering past events versus a rule proposed to apply retroactively."
+    },
+    {
+      "qid": "hn4_13_operating_earnings_1977",
+      "query": "What did Berkshire include in and exclude from its operating earnings figure in 1977?",
+      "relevant_ids": [
+        "1977_p0000"
+      ],
+      "hard_negative_ids": [
+        "1990_p0021",
+        "1991_p0013"
+      ],
+      "type": "same_term_different_meaning",
+      "rationale": "1977 definition excludes realized capital gains; later passages reuse the term in look-through context."
+    },
+    {
+      "qid": "hn4_14_goodwill_charge_gap_1999",
+      "query": "How does the annual goodwill amortization charge widen the gap between intrinsic value and book value?",
+      "relevant_ids": [
+        "1999_p0013"
+      ],
+      "hard_negative_ids": [
+        "1983_p0106"
+      ],
+      "type": "same_term_different_meaning",
+      "rationale": "1999 letter ties the roughly $500 million charge to the book-value gap; 1983 explains economic Goodwill."
+    },
+    {
+      "qid": "hn4_15_sees_2006_sales_profit",
+      "query": "What were See's Candies sales and pre-tax profits in 2006?",
+      "relevant_ids": [
+        "2007_p0035"
+      ],
+      "hard_negative_ids": [
+        "2011_p0087",
+        "1999_p0081"
+      ],
+      "type": "numeric_near_miss",
+      "rationale": "Sales $383 million and pre-tax $82 million; other years give $83 million and cumulative totals."
+    },
+    {
+      "qid": "hn4_16_nfm_sales_1990",
+      "query": "What were sales at the Nebraska Furniture Mart in 1990?",
+      "relevant_ids": [
+        "1990_p0030"
+      ],
+      "hard_negative_ids": [
+        "1993_p0105",
+        "1986_p0027"
+      ],
+      "type": "numeric_near_miss",
+      "rationale": "1990: $159 million; 1993 gives $200 million and 1986 gives $132 million."
+    },
+    {
+      "qid": "hn4_17_sees_pretax_1977",
+      "query": "How much were See's pre-tax operating earnings in 1977?",
+      "relevant_ids": [
+        "1977_p0034"
+      ],
+      "hard_negative_ids": [
+        "1991_p0036"
+      ],
+      "type": "numeric_near_miss",
+      "rationale": "1977: $12.6 million; 1991 passage also starts from the 1972 figure of $4.2 million but ends at $42.4 million."
+    },
+    {
+      "qid": "hn4_18_national_indemnity_ratio_1996",
+      "query": "What combined ratio did National Indemnity's traditional business post in 1996?",
+      "relevant_ids": [
+        "1996_p0057"
+      ],
+      "hard_negative_ids": [
+        "1995_p0064"
+      ],
+      "type": "numeric_near_miss",
+      "rationale": "1996: 74.2; 1995: 84.2, same sentence structure."
+    },
+    {
+      "qid": "hn4_19_ajit_float_2011",
+      "query": "How much float had Ajit Jain's reinsurance business built by the 2011 letter?",
+      "relevant_ids": [
+        "2011_p0050"
+      ],
+      "hard_negative_ids": [
+        "2012_p0043",
+        "2010_p0064"
+      ],
+      "type": "numeric_near_miss",
+      "rationale": "2011: $34 billion; 2012: $35 billion; 2010: $30 billion."
+    },
+    {
+      "qid": "hn4_20_operating_earnings_2023",
+      "query": "What were Berkshire's operating earnings in 2023?",
+      "relevant_ids": [
+        "2023_p0010"
+      ],
+      "hard_negative_ids": [
+        "2022_p0025"
+      ],
+      "type": "numeric_near_miss",
+      "rationale": "2023: $37.4 billion; the 2022 letter gives the record $30.8 billion."
+    },
+    {
+      "qid": "hn4_21_book_value_1979",
+      "query": "What was Berkshire's book value per share at yearend 1979?",
+      "relevant_ids": [
+        "1979_p0007"
+      ],
+      "hard_negative_ids": [
+        "1981_p0024"
+      ],
+      "type": "numeric_near_miss",
+      "rationale": "1979: $335.85; 1981 letter gives $526.02 with the same $19.46 starting point."
+    },
+    {
+      "qid": "hn4_22_simpson_geico_portfolio_1996",
+      "query": "How did Lou Simpson's equity portfolio at GEICO perform against the S&P 500 in 1996?",
+      "relevant_ids": [
+        "1996_p0056"
+      ],
+      "hard_negative_ids": [
+        "2013_p0025",
+        "2012_p0022"
+      ],
+      "type": "named_entity_confusion",
+      "rationale": "Lou Simpson at GEICO versus the later managers Combs and Weschler beating the S&P."
+    },
+    {
+      "qid": "hn4_23_combs_weschler_compensation",
+      "query": "How is performance pay split between Todd Combs and Ted Weschler?",
+      "relevant_ids": [
+        "2011_p0104"
+      ],
+      "hard_negative_ids": [
+        "2010_p0112"
+      ],
+      "type": "named_entity_confusion",
+      "rationale": "80% own results and 20% partner's; the 2010 passage covers Combs's pay versus the S&P only."
+    },
+    {
+      "qid": "hn4_24_mrs_b_quit_nfm_1989",
+      "query": "Why did Rose Blumkin (Mrs. B) leave the Nebraska Furniture Mart in 1989?",
+      "relevant_ids": [
+        "1989_p0036"
+      ],
+      "hard_negative_ids": [
+        "1993_p0105"
+      ],
+      "type": "named_entity_confusion",
+      "rationale": "1989 departure after family disagreement; 1993 passage tells her life story and store sales."
+    },
+    {
+      "qid": "hn4_25_wurster_national_indemnity_1995",
+      "query": "How did Don Wurster's National Indemnity traditional business do in 1995?",
+      "relevant_ids": [
+        "1995_p0064"
+      ],
+      "hard_negative_ids": [
+        "1999_p0027"
+      ],
+      "type": "named_entity_confusion",
+      "rationale": "National Indemnity traditional versus Ajit Jain's reinsurance division."
+    },
+    {
+      "qid": "hn4_26_geico_2001_results",
+      "query": "How did GEICO's float and underwriting do in 2001 under Tony Nicely?",
+      "relevant_ids": [
+        "2001_p0060",
+        "2001_p0061"
+      ],
+      "hard_negative_ids": [
+        "2001_p0062"
+      ],
+      "type": "named_entity_confusion",
+      "rationale": "GEICO versus Berkshire's smaller primary insurers in the same letter."
+    },
+    {
+      "qid": "hn4_27_general_re_float_2007",
+      "query": "How much float does General Re hold according to the 2007 letter?",
+      "relevant_ids": [
+        "2007_p0053"
+      ],
+      "hard_negative_ids": [
+        "2004_p0050"
+      ],
+      "type": "named_entity_confusion",
+      "rationale": "General Re $23 billion versus NICO $950 million float."
+    },
+    {
+      "qid": "hn4_28_mr_market_allegory",
+      "query": "What is Ben Graham's Mr. Market allegory about market quotations?",
+      "relevant_ids": [
+        "1987_p0066",
+        "1987_p0067"
+      ],
+      "hard_negative_ids": [
+        "1987_p0086",
+        "1987_p0098"
+      ],
+      "type": "rhetorical_vs_substantive",
+      "rationale": "Explanation of the allegory versus passing remarks that Mr. Market was a friend or will offer chances."
+    },
+    {
+      "qid": "hn4_29_price_vs_value_graham",
+      "query": "What did Ben Graham teach Buffett about the difference between price and value?",
+      "relevant_ids": [
+        "2008_p0024"
+      ],
+      "hard_negative_ids": [
+        "2010_p0048"
+      ],
+      "type": "rhetorical_vs_substantive",
+      "rationale": "The price/value quote versus a biographical mention of Graham's class."
+    },
+    {
+      "qid": "hn4_30_voting_weighing_machine",
+      "query": "What is Graham's saying about the market as a voting machine and a weighing machine?",
+      "relevant_ids": [
+        "1993_p0008",
+        "2014_p0194"
+      ],
+      "hard_negative_ids": [
+        "1994_p0027"
+      ],
+      "type": "rhetorical_vs_substantive",
+      "rationale": "The quote itself versus another passage that merely credits Graham's teaching."
+    },
+    {
+      "qid": "hn4_31_geico_moat_castle_1986",
+      "query": "How does GEICO's cost advantage work as a moat around the castle?",
+      "relevant_ids": [
+        "1986_p0072"
+      ],
+      "hard_negative_ids": [
+        "1995_p0039"
+      ],
+      "type": "rhetorical_vs_substantive",
+      "rationale": "1986 explains the moat concept with expense ratios; 1995 only says the moat widened."
+    },
+    {
+      "qid": "hn4_32_ajit_float_2002",
+      "query": "What did Buffett say about Ajit Jain's reinsurance float and underwriting profits in 2002?",
+      "relevant_ids": [
+        "2002_p0049"
+      ],
+      "hard_negative_ids": [
+        "2002_p0053"
+      ],
+      "type": "rhetorical_vs_substantive",
+      "rationale": "Substantive float figures versus the 'bow deeply' flourish next to smaller-insurer results."
+    },
+    {
+      "qid": "hn4_33_widening_moat_meaning_2005",
+      "query": "What does widening the moat mean in practice for Berkshire's operating managers?",
+      "relevant_ids": [
+        "2005_p0084"
+      ],
+      "hard_negative_ids": [
+        "2005_p0086"
+      ],
+      "type": "rhetorical_vs_substantive",
+      "rationale": "Explanation of the practice versus praise of managers as brilliant at it."
+    },
+    {
+      "qid": "hn4_34_geico_float_growth_1995_2018",
+      "query": "From 1995 through 2018, how far did GEICO's float grow?",
+      "relevant_ids": [
+        "2018_p0064"
+      ],
+      "hard_negative_ids": [
+        "2009_p0036",
+        "1995_p0051"
+      ],
+      "type": "multi_year_one_year",
+      "rationale": "2018 letter gives $2.5 billion to $22.1 billion; other years cover partial spans."
+    },
+    {
+      "qid": "hn4_35_nfm_sales_ten_years_1986",
+      "query": "How did Nebraska Furniture Mart's sales change over the ten years ending 1986?",
+      "relevant_ids": [
+        "1986_p0027"
+      ],
+      "hard_negative_ids": [
+        "1983_p0017",
+        "1990_p0030"
+      ],
+      "type": "multi_year_one_year",
+      "rationale": "1986 letter compares $44 million with $132 million."
+    },
+    {
+      "qid": "hn4_36_sees_cumulative_earnings_2011",
+      "query": "How much has See's earned pre-tax in total since Berkshire bought it, as of the 2011 letter?",
+      "relevant_ids": [
+        "2011_p0087"
+      ],
+      "hard_negative_ids": [
+        "2014_p0156",
+        "1999_p0081"
+      ],
+      "type": "multi_year_one_year",
+      "rationale": "$1.65 billion in 2011 versus $1.9 billion in 2014 and $857 million in 1999."
+    },
+    {
+      "qid": "hn4_37_combs_weschler_portfolios_2013",
+      "query": "How large were the portfolios run by Todd Combs and Ted Weschler by 2013?",
+      "relevant_ids": [
+        "2013_p0025"
+      ],
+      "hard_negative_ids": [
+        "2011_p0103"
+      ],
+      "type": "multi_year_one_year",
+      "rationale": "2013: each exceeds $7 billion; 2011: $1.75 billion at cost."
+    },
+    {
+      "qid": "hn4_38_look_through_target_1992",
+      "query": "What level of look-through earnings did Buffett say was needed by 2000 to meet the 15% goal, as stated in the 1992 letter?",
+      "relevant_ids": [
+        "1992_p0032"
+      ],
+      "hard_negative_ids": [
+        "1993_p0027",
+        "1994_p0053"
+      ],
+      "type": "multi_year_one_year",
+      "rationale": "1992 letter: $1.8 billion; 1993 and 1994 raise it to $1.85 billion."
+    },
+    {
+      "qid": "hn4_39_sees_purchase_1972_figures",
+      "query": "At the time of the 1972 purchase, what were See's sales and pre-tax earnings?",
+      "relevant_ids": [
+        "2007_p0034"
+      ],
+      "hard_negative_ids": [
+        "1977_p0034",
+        "1991_p0036"
+      ],
+      "type": "multi_year_one_year",
+      "rationale": "Price $25 million, sales $30 million, earnings under $5 million; other passages give 1972 earnings only."
+    },
+    {
+      "qid": "hn4_40_coke_dividend_1994_2022",
+      "query": "How much had Coca-Cola's annual dividend to Berkshire grown by 2022 compared with 1994?",
+      "relevant_ids": [
+        "2022_p0021"
+      ],
+      "hard_negative_ids": [
+        "2010_p0108"
+      ],
+      "type": "multi_year_one_year",
+      "rationale": "2022: $75 million to $704 million; 2010 letter gives $88 million (1995) to $376 million (2011)."
+    }
+  ]
+}
