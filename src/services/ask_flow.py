@@ -82,7 +82,36 @@ def _do_search(req: SearchRequest, retrieval_query: Optional[str] = None):
 def _server_llm():
     if "llm" not in _state:
         _state["llm"] = create_llm_provider()
+        attach_grounded_resources(_state["llm"], _state.get("retriever"))
     return _state["llm"]
+
+
+def is_grounded(llm) -> bool:
+    return getattr(llm, "provider_name", "") == "grounded"
+
+
+def attach_grounded_resources(llm, retriever) -> None:
+    """Let the grounded scorer reuse the retriever's reranker (no-op for other providers)."""
+    reranker = getattr(retriever, "reranker", None)
+    if is_grounded(llm) and reranker is not None and hasattr(llm, "attach_resources"):
+        llm.attach_resources(reranker=reranker)
+
+
+def _generate_grounded(llm, query: str, context_hits, max_new_tokens: int, history=None):
+    """The one grounded generation path, shared by /ask, /ask/stream and _generate_answer.
+
+    No evidence gate and no comparison special case: the engine owns the decision,
+    including the exact refusal for an empty context.
+    """
+    try:
+        result = llm.answer_grounded(
+            query, context_hits, history=list(history or []), max_new_tokens=max_new_tokens,
+        )
+    except Exception as exc:
+        if EXPOSE_DEBUG_STATUS:
+            print(f"[backend] grounded provider unavailable: {exc}", flush=True)
+        return _llm_error_message(exc), []
+    return result.answer, result.citations
 
 
 def _extra_queries(req: AskRequest, expanded: Optional[str]) -> List[str]:
@@ -163,6 +192,8 @@ def _finalize_answer(llm, prompt: str, context_hits, raw_answer: str, max_new_to
 
 def _generate_answer(llm, prompt: str, context_hits, max_new_tokens: int, query: Optional[str] = None,
                      extra_queries=(), history=None):
+    if is_grounded(llm):
+        return _generate_grounded(llm, query or "", context_hits, max_new_tokens, history)
     is_comparison = bool(query and comparison_periods(query))
     if query and not is_comparison and not assess_evidence(query, context_hits, extra_queries=extra_queries).sufficient:
         return REFUSAL_LINE, []

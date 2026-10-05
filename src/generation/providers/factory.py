@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 
 def create_llm_provider(provider: Optional[str] = None) -> LLMProvider:
-    """Create the embedded provider: ``llama`` (default) or ``local`` (extractive)."""
+    """Create the embedded provider: ``llama`` (default), ``local`` (extractive), ``mlx`` or ``grounded``."""
     selected = (provider or DEFAULT_LLM_PROVIDER).strip().lower()
 
     if selected == "llama":
@@ -29,5 +29,16 @@ def create_llm_provider(provider: Optional[str] = None) -> LLMProvider:
 
     if selected == "local":
         return LocalProvider()
+
+    # Factory-local imports: grounded/mlx stay out of the import graph of old providers.
+    if selected == "grounded":
+        from src.generation.providers.grounded_provider import GroundedProvider
+
+        return GroundedProvider()
+
+    if selected == "mlx":
+        from src.generation.providers.mlx_provider import MlxProvider
+
+        return MlxProvider()
 
     raise ValueError(f"Unsupported LLM provider: {selected}")

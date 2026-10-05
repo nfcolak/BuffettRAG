@@ -136,6 +136,8 @@ class BuffettRAGPipeline:
         history: Optional[List[Dict[str, str]]] = None,
     ) -> Dict[str, Any]:
         """Run a query end-to-end; history resolves retrieval intent, not facts."""
+        if getattr(self.llm, "provider_name", "") == "grounded":
+            raise ValueError("grounded is served by the backend and the benchmark runner")
         history = history or []
         retrieval_query = build_followup_retrieval_query(query, history)
         result = self.retriever.search(
