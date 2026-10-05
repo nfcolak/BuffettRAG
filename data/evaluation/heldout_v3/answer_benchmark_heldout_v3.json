@@ -1,0 +1,509 @@
+{
+  "schema_version": 1,
+  "purpose": "Frozen blind set measured once per system, never used for tuning. Scope: source-heldout (FT answer passages excluded), not unseen-evidence (FT context overlap allowed). Curated from the frozen corpus without running any retriever or model.",
+  "frozen": true,
+  "created": "2026-10-05",
+  "source_corpus": "data/processed/chunks_v3_paragraph.jsonl",
+  "corpus_sha256": "8263f08958729a77febf0922e7bbc4161bedd5fdb3e9a8b3fc9a64ab681ab5f0",
+  "cases": [
+    {
+      "qid": "hv3_01", "question_type": "opinion", "answerable": true,
+      "years": [1978],
+      "query": "Why did buying SAFECO shares look preferable to starting an insurer from scratch in Buffett's 1978 assessment?",
+      "gold_passage_ids": ["1978_p0040"], "relevant_ids": ["1978_p0040"],
+      "gold_claims": [
+        {"claim": "Berkshire purchased SAFECO at substantially under book value, whereas a new operation could not be started at less than 100 cents on the dollar.", "required_terms": ["SAFECO", "under book value", "100 cents"], "gold_passage_ids": ["1978_p0040"], "verification_note": "1978 letter; unit=cents per dollar of book value; definition=minority stock purchase versus the capital cost of creating a new insurance operation."}
+      ],
+      "accept": {"min_claim_coverage": 1.0, "require_valid_citation": true}, "reject": {"forbidden_terms": []},
+      "verification_note": "1978_p0040 explicitly contrasts SAFECO purchased below book value with a new operation costing at least a dollar per dollar; the comparison is about purchase economics, not underwriting margins.",
+      "ft_context_overlap": false
+    },
+    {
+      "qid": "hv3_02", "question_type": "opinion", "answerable": true,
+      "years": [1981],
+      "query": "What distorted managerial incentives did Buffett identify in 1981 when he discussed corporate league tables?",
+      "gold_passage_ids": ["1981_p0007"], "relevant_ids": ["1981_p0007"],
+      "gold_claims": [
+        {"claim": "Organizations compensate managers far more by size than other yardsticks, with managers focusing on sales rankings rather than profitability.", "required_terms": ["compensate", "size", "profitability"], "gold_passage_ids": ["1981_p0007"], "verification_note": "1981 letter; unit=qualitative incentive criterion; definition=organizational size and sales rank, contrasted with profitability rank."}
+      ],
+      "accept": {"min_claim_coverage": 1.0, "require_valid_citation": true}, "reject": {"forbidden_terms": []},
+      "verification_note": "1981_p0007 states the size-based compensation problem and contrasts the sales and profitability versions of the Fortune rankings; it does not assert a numerical compensation formula.",
+      "ft_context_overlap": false
+    },
+    {
+      "qid": "hv3_03", "question_type": "opinion", "answerable": true,
+      "years": [1984],
+      "query": "In 1984, what conditions did Buffett think buyers should use to test an insurer's promise to pay?",
+      "gold_passage_ids": ["1984_p0060"], "relevant_ids": ["1984_p0060"],
+      "gold_claims": [
+        {"claim": "An insurance promise should withstand depressed financial markets and exceptionally unfavorable underwriting results.", "required_terms": ["promise", "depressed financial markets", "underwriting results"], "gold_passage_ids": ["1984_p0060"], "verification_note": "1984 letter; unit=qualitative solvency stress test; definition=simultaneous financial-market weakness and unfavorable underwriting, rather than prosperity."}
+      ],
+      "accept": {"min_claim_coverage": 1.0, "require_valid_citation": true}, "reject": {"forbidden_terms": []},
+      "verification_note": "1984_p0060 defines the buyer's insurance purchase as a promise and requires it to survive the prolonged combination of weak markets and unfavorable underwriting.",
+      "ft_context_overlap": false
+    },
+    {
+      "qid": "hv3_04", "question_type": "opinion", "answerable": true,
+      "years": [1986],
+      "query": "What hiring standard did Buffett endorse through David Ogilvy's analogy in the 1986 letter?",
+      "gold_passage_ids": ["1986_p0006"], "relevant_ids": ["1986_p0006"],
+      "gold_claims": [
+        {"claim": "A company becomes a company of giants if each leader hires people who are bigger than the leader.", "required_terms": ["hires people", "bigger", "giants"], "gold_passage_ids": ["1986_p0006"], "verification_note": "1986 letter; unit=qualitative hiring principle; definition=bigger refers to the Ogilvy talent analogy, not employee height or organizational headcount."}
+      ],
+      "accept": {"min_claim_coverage": 1.0, "require_valid_citation": true}, "reject": {"forbidden_terms": []},
+      "verification_note": "1986_p0006 says Buffett and Munger subscribe to Ogilvy's philosophy and supplies the bigger-hires/giants contrast; the metaphor concerns hiring stronger people.",
+      "ft_context_overlap": false
+    },
+    {
+      "qid": "hv3_05", "question_type": "opinion", "answerable": true,
+      "years": [1987],
+      "query": "How did Buffett judge the practice of expanding staffing in good times and cutting necessary work in bad times in 1987?",
+      "gold_passage_ids": ["1987_p0030"], "relevant_ids": ["1987_p0030"],
+      "gold_claims": [
+        {"claim": "Adding unneeded people when profits boom and cutting essential people when profitability shrinks is neither business-like nor humane.", "required_terms": ["unneeded people", "essential people", "humane"], "gold_passage_ids": ["1987_p0030"], "verification_note": "1987 letter; unit=qualitative staffing policy; definition=unnecessary additions and essential cuts driven by current profitability, not all hiring or all layoffs."}
+      ],
+      "accept": {"min_claim_coverage": 1.0, "require_valid_citation": true}, "reject": {"forbidden_terms": []},
+      "verification_note": "1987_p0030 explicitly rejects the yo-yo approach as neither business-like nor humane and distinguishes unneeded additions from essential activities.",
+      "ft_context_overlap": false
+    },
+    {
+      "qid": "hv3_06", "question_type": "opinion", "answerable": true,
+      "years": [1988],
+      "query": "Why was widespread belief in efficient-market theory useful to Graham-style investors, as Buffett saw it in 1988?",
+      "gold_passage_ids": ["1988_p0107"], "relevant_ids": ["1988_p0107"],
+      "gold_claims": [
+        {"claim": "Graham-style investors gained an advantage from opponents taught that it was useless to even try.", "required_terms": ["advantage", "opponents", "useless"], "gold_passage_ids": ["1988_p0107"], "verification_note": "1988 letter; unit=qualitative competitive advantage; definition=opponents discouraged from attempting superior investment results by EMT teaching."}
+      ],
+      "accept": {"min_claim_coverage": 1.0, "require_valid_citation": true}, "reject": {"forbidden_terms": []},
+      "verification_note": "1988_p0107 directly describes discouraged opponents as an enormous advantage to Graham followers; it is a critique of EMT's effect on competitors rather than a measured return premium.",
+      "ft_context_overlap": false
+    },
+    {
+      "qid": "hv3_07", "question_type": "opinion", "answerable": true,
+      "years": [1990],
+      "query": "In Buffett's 1990 explanation, what underpinned the value of Berkshire's convertible preferred holdings besides the conversion feature?",
+      "gold_passage_ids": ["1990_p0106"], "relevant_ids": ["1990_p0106"],
+      "gold_claims": [
+        {"claim": "Most of the value of Berkshire's convertible preferreds came from their fixed-income characteristics.", "required_terms": ["most of the value", "convertible preferreds", "fixed-income characteristics"], "gold_passage_ids": ["1990_p0106"], "verification_note": "1990 letter; unit=qualitative security valuation; definition=the preferred securities' fixed-income component rather than the incremental conversion option."}
+      ],
+      "accept": {"min_claim_coverage": 1.0, "require_valid_citation": true}, "reject": {"forbidden_terms": []},
+      "verification_note": "1990_p0106 assigns most convertible-preferred value to fixed-income characteristics and says conversion can add value; it gives no percentage allocation between the components.",
+      "ft_context_overlap": true
+    },
+    {
+      "qid": "hv3_08", "question_type": "opinion", "answerable": true,
+      "years": [1992],
+      "query": "When did Buffett consider business expansion harmful to shareholders, according to his 1992 discussion?",
+      "gold_passage_ids": ["1992_p0068"], "relevant_ids": ["1992_p0068"],
+      "gold_claims": [
+        {"claim": "Growth in a low-return business requiring incremental funds hurts the investor.", "required_terms": ["low-return", "incremental funds", "hurts"], "gold_passage_ids": ["1992_p0068"], "verification_note": "1992 letter; unit=qualitative incremental-return test; definition=growth needing additional capital in a low-return business, not growth considered in isolation."}
+      ],
+      "accept": {"min_claim_coverage": 1.0, "require_valid_citation": true}, "reject": {"forbidden_terms": []},
+      "verification_note": "1992_p0068 expressly says low-return growth requiring incremental funds hurts investors and contrasts it with capital creating more than its cost in long-term market value.",
+      "ft_context_overlap": false
+    },
+    {
+      "qid": "hv3_09", "question_type": "opinion", "answerable": true,
+      "years": [2024],
+      "query": "What danger to the CEO personally did Buffett associate with misleading owners in the 2024 letter?",
+      "gold_passage_ids": ["2024_p0003"], "relevant_ids": ["2024_p0003"],
+      "gold_claims": [
+        {"claim": "If you start fooling your shareholders, you will soon believe your own baloney and end up fooling yourself.", "required_terms": ["fooling your shareholders", "believe", "fooling yourself"], "gold_passage_ids": ["2024_p0003"], "verification_note": "2024 letter; unit=qualitative reporting principle; definition=self-deception induced by misleading shareholders, not a quantified legal liability."}
+      ],
+      "accept": {"min_claim_coverage": 1.0, "require_valid_citation": true}, "reject": {"forbidden_terms": []},
+      "verification_note": "2024_p0003 connects fooling shareholders to believing one's own claims and fooling oneself in its discussion of the annual reporting obligation.",
+      "ft_context_overlap": false
+    },
+    {
+      "qid": "hv3_10", "question_type": "company", "answerable": true,
+      "years": [1977],
+      "query": "Which part of Berkshire surprised Buffett on the upside in his 1977 operations review?",
+      "gold_passage_ids": ["1977_p0001"], "relevant_ids": ["1977_p0001"],
+      "gold_claims": [
+        {"claim": "Insurance operations led by National Indemnity Company were even better than Buffett's optimistic expectations.", "required_terms": ["insurance operations", "National Indemnity Company", "expectations"], "gold_passage_ids": ["1977_p0001"], "verification_note": "1977 letter; unit=qualitative result versus forecast; definition=insurance operations led by Phil Liesche's National Indemnity group, not textile or bank results."}
+      ],
+      "accept": {"min_claim_coverage": 1.0, "require_valid_citation": true}, "reject": {"forbidden_terms": []},
+      "verification_note": "1977_p0001 separates below-forecast textiles, anticipated bank/Blue Chip results, and insurance exceeding optimistic expectations.",
+      "ft_context_overlap": false
+    },
+    {
+      "qid": "hv3_11", "question_type": "company", "answerable": true,
+      "years": [1979],
+      "query": "What was George Young's reinsurance unit doing well and poorly in Berkshire's 1979 account?",
+      "gold_passage_ids": ["1979_p0032"], "relevant_ids": ["1979_p0032"],
+      "gold_claims": [
+        {"claim": "Overall results after allowing for investment income were reasonably satisfactory, but underwriting performance remained unsatisfactory.", "required_terms": ["investment income", "underwriting performance", "unsatisfactory"], "gold_passage_ids": ["1979_p0032"], "verification_note": "1979 letter; unit=qualitative reinsurance performance; definition=overall results include investment income while underwriting performance is considered separately."}
+      ],
+      "accept": {"min_claim_coverage": 1.0, "require_valid_citation": true}, "reject": {"forbidden_terms": []},
+      "verification_note": "1979_p0032 explicitly distinguishes reasonably satisfactory results including investment income from unsatisfactory underwriting; no underwriting-profit figure is inferred.",
+      "ft_context_overlap": false
+    },
+    {
+      "qid": "hv3_12", "question_type": "company", "answerable": true,
+      "years": [1980],
+      "query": "Where did Berkshire put Insurance Company of Iowa after stopping its underwriting there, according to the 1980 letter?",
+      "gold_passage_ids": ["1980_p0067"], "relevant_ids": ["1980_p0067"],
+      "gold_claims": [
+        {"claim": "Insurance Company of Iowa was merged into Cornhusker Casualty.", "required_terms": ["merged", "Cornhusker", "Casualty"], "gold_passage_ids": ["1980_p0067"], "verification_note": "1980 letter; unit=corporate merger destination; definition=Insurance Company of Iowa merged into Cornhusker Casualty following abandonment of underwriting in Iowa."}
+      ],
+      "accept": {"min_claim_coverage": 1.0, "require_valid_citation": true}, "reject": {"forbidden_terms": []},
+      "verification_note": "1980_p0067 names Iowa as the poorest performer and records the Cornhusker Casualty merger; the annual losses since founding are not a sale-price figure.",
+      "ft_context_overlap": true
+    },
+    {
+      "qid": "hv3_13", "question_type": "company", "answerable": true,
+      "years": [1989],
+      "query": "What operating-cost and customer-service strengths did NFM and Borsheim's share in Buffett's 1989 account?",
+      "gold_passage_ids": ["1989_p0038"], "relevant_ids": ["1989_p0038"],
+      "gold_claims": [
+        {"claim": "NFM and Borsheim's paired the lowest operating costs in the business with friendly personalized service.", "required_terms": ["Borsheim's", "lowest operating costs", "friendly personalized service"], "gold_passage_ids": ["1989_p0038"], "verification_note": "1989 letter; unit=qualitative retail operating formula; definition=the shared NFM/Borsheim's cost and service characteristics, not a numerical gross-margin spread."}
+      ],
+      "accept": {"min_claim_coverage": 1.0, "require_valid_citation": true}, "reject": {"forbidden_terms": []},
+      "verification_note": "1989_p0038 lists these two strengths in the common retail formula, alongside merchandise breadth, buying and pricing; the question requests only cost and service.",
+      "ft_context_overlap": true
+    },
+    {
+      "qid": "hv3_14", "question_type": "company", "answerable": true,
+      "years": [1991],
+      "query": "Why was the Guinness holding a geographic milestone for Berkshire in the 1991 letter?",
+      "gold_passage_ids": ["1991_p0073"], "relevant_ids": ["1991_p0073"],
+      "gold_claims": [
+        {"claim": "Guinness was Berkshire's first significant investment in a company domiciled outside the United States.", "required_terms": ["Guinness", "domiciled outside", "United States"], "gold_passage_ids": ["1991_p0073"], "verification_note": "1991 letter; unit=corporate domicile milestone; definition=first significant foreign-domiciled investment, distinguished from where a company earns its profits."}
+      ],
+      "accept": {"min_claim_coverage": 1.0, "require_valid_citation": true}, "reject": {"forbidden_terms": []},
+      "verification_note": "1991_p0073 explicitly defines the milestone by domicile and then distinguishes profit geography using other multinational companies.",
+      "ft_context_overlap": true
+    },
+    {
+      "qid": "hv3_15", "question_type": "company", "answerable": true,
+      "years": [1993],
+      "query": "Who ran Berkshire's workers' compensation business in the 1993 insurance update?",
+      "gold_passage_ids": ["1993_p0055"], "relevant_ids": ["1993_p0055"],
+      "gold_claims": [
+        {"claim": "Brad Kinstler headed Berkshire's workers' compensation business.", "required_terms": ["Brad Kinstler", "workers' compensation"], "gold_passage_ids": ["1993_p0055"], "verification_note": "1993 letter; unit=management assignment; definition=Brad Kinstler heads workers' compensation, distinct from the managers of the other three listed insurance operations."}
+      ],
+      "accept": {"min_claim_coverage": 1.0, "require_valid_citation": true}, "reject": {"forbidden_terms": []},
+      "verification_note": "1993_p0055 assigns each of four insurance operations to its named manager; Brad Kinstler is explicitly tied to workers' compensation.",
+      "ft_context_overlap": true
+    },
+    {
+      "qid": "hv3_16", "question_type": "company", "answerable": true,
+      "years": [1994],
+      "query": "What electronics-focused addition to Nebraska Furniture Mart was highlighted in the 1994 letter?",
+      "gold_passage_ids": ["1994_p0101"], "relevant_ids": ["1994_p0101"],
+      "gold_claims": [
+        {"claim": "Nebraska Furniture Mart had opened the Mega Mart selling electronics, appliances, computers, CD's, cameras and audio equipment.", "required_terms": ["Mega Mart", "electronics", "appliances"], "gold_passage_ids": ["1994_p0101"], "verification_note": "1994 letter; unit=retail facility and product categories; definition=Mega Mart is the newly opened Nebraska Furniture Mart addition, not a separate Berkshire acquisition."}
+      ],
+      "accept": {"min_claim_coverage": 1.0, "require_valid_citation": true}, "reject": {"forbidden_terms": []},
+      "verification_note": "1994_p0101 names the new Mega Mart and enumerates its six product categories; its meeting invitation is future-dated but the facility is already open.",
+      "ft_context_overlap": true
+    },
+    {
+      "qid": "hv3_17", "question_type": "company", "answerable": true,
+      "years": [1995],
+      "query": "How large was R.C. Willey's Utah furniture footprint by 1995, and what were its annual sales?",
+      "gold_passage_ids": ["1995_p0024"], "relevant_ids": ["1995_p0024"],
+      "gold_claims": [
+        {"claim": "R.C. Willey accounted for over 50% of the furniture business in Utah.", "required_terms": ["50%", "furniture business", "Utah"], "gold_passage_ids": ["1995_p0024"], "verification_note": "1995 letter; unit=percentage of Utah furniture business; definition=over 50% market footprint, not Berkshire's ownership percentage."},
+        {"claim": "R.C. Willey's 1995 sales volume was $257 million.", "required_terms": ["1995", "sales volume", "$257 million"], "gold_passage_ids": ["1995_p0024"], "verification_note": "1995 letter; unit=millions of dollars of annual sales; definition=$257 million is 1995 sales volume, not the acquisition price or profit."}
+      ],
+      "accept": {"min_claim_coverage": 1.0, "require_valid_citation": true}, "reject": {"forbidden_terms": []},
+      "verification_note": "1995_p0024 gives both the over-50% Utah furniture footprint and $257 million 1995 sales volume; the earlier $250,000 refers to the 1954 starting base.",
+      "ft_context_overlap": true
+    },
+    {
+      "qid": "hv3_18", "question_type": "fact_number", "answerable": true,
+      "years": [1997],
+      "query": "How extensive was Dairy Queen's store network when Berkshire announced the deal in the 1997 letter?",
+      "gold_passage_ids": ["1997_p0074"], "relevant_ids": ["1997_p0074"],
+      "gold_claims": [
+        {"claim": "There were 5,792 Dairy Queen stores operating in 23 countries.", "required_terms": ["5,792", "Dairy Queen", "23 countries"], "gold_passage_ids": ["1997_p0074"], "verification_note": "1997 letter; unit=stores and countries; definition=5,792 Dairy Queen stores in 23 countries, excluding separately counted Orange Julius and Karmelkorn operations."}
+      ],
+      "accept": {"min_claim_coverage": 1.0, "require_valid_citation": true}, "reject": {"forbidden_terms": []},
+      "verification_note": "1997_p0074 distinguishes Dairy Queen's 5,792 stores in 23 countries from the additional franchise operations and combined treat-center locations.",
+      "ft_context_overlap": false
+    },
+    {
+      "qid": "hv3_19", "question_type": "fact_number", "answerable": true,
+      "years": [1998],
+      "query": "How much seating capacity had Berkshire lined up across its two meeting venues in the 1998 letter?",
+      "gold_passage_ids": ["1998_p0096"], "relevant_ids": ["1998_p0096"],
+      "gold_claims": [
+        {"claim": "Aksarben Coliseum held about 14,000, while the Holiday Convention Centre could seat an additional 5,000.", "required_terms": ["14,000", "5,000", "Holiday Convention Centre"], "gold_passage_ids": ["1998_p0096"], "verification_note": "1998 letter; unit=seats at the forthcoming meeting; definition=about 14,000 Aksarben capacity plus 5,000 overflow seats, not observed meeting attendance."}
+      ],
+      "accept": {"min_claim_coverage": 1.0, "require_valid_citation": true}, "reject": {"forbidden_terms": []},
+      "verification_note": "1998_p0096 supplies the two venue capacities, while uncertainty about forthcoming attendance explains booking both; no attendance total is inferred.",
+      "ft_context_overlap": false
+    },
+    {
+      "qid": "hv3_20", "question_type": "fact_number", "answerable": true,
+      "years": [1999],
+      "query": "What budget did Buffett foresee for GEICO's advertising in 2000 when he wrote the 1999 letter?",
+      "gold_passage_ids": ["1999_p0040"], "relevant_ids": ["1999_p0040"],
+      "gold_claims": [
+        {"claim": "The planned advertising expenditure in 2000 was $300-$350 million.", "required_terms": ["2000", "$300-$350 million", "advertising"], "gold_passage_ids": ["1999_p0040"], "verification_note": "1999 letter; unit=millions of dollars of planned advertising expenditure; definition=forecast for 2000, not actual 1999 expenditure or total acquisition costs."}
+      ],
+      "accept": {"min_claim_coverage": 1.0, "require_valid_citation": true}, "reject": {"forbidden_terms": []},
+      "verification_note": "1999_p0040 explicitly forecasts $300-$350 million advertising expenditure for 2000; the adjacent GEICO referral discussion in 1999_p0039 confirms the operating context.",
+      "ft_context_overlap": false
+    },
+    {
+      "qid": "hv3_21", "question_type": "fact_number", "answerable": true,
+      "years": [2000],
+      "query": "How much of an A share's economic interest did a Berkshire B share represent in the 2000 report?",
+      "gold_passage_ids": ["2000_p0012"], "relevant_ids": ["2000_p0012"],
+      "gold_claims": [
+        {"claim": "B shares had an economic interest equal to 1/30th that of A shares.", "required_terms": ["economic interest", "1/30th", "B shares"], "gold_passage_ids": ["2000_p0012"], "verification_note": "2000 letter; unit=fraction of an A share's economic interest; definition=1/30th for the B shares then outstanding, not voting power or the later post-split ratio."}
+      ],
+      "accept": {"min_claim_coverage": 1.0, "require_valid_citation": true}, "reject": {"forbidden_terms": []},
+      "verification_note": "2000_p0012's share-class footnote explicitly sets the economic-interest ratio at 1/30th; the question fixes the report period to avoid applying a later split.",
+      "ft_context_overlap": true
+    },
+    {
+      "qid": "hv3_22", "question_type": "fact_number", "answerable": true,
+      "years": [2001],
+      "query": "How small was headquarters compared with Berkshire's overall workforce in the 2001 letter?",
+      "gold_passage_ids": ["2001_p0122"], "relevant_ids": ["2001_p0122"],
+      "gold_claims": [
+        {"claim": "Headquarters had 14.8 employees.", "required_terms": ["headquarters", "14.8"], "gold_passage_ids": ["2001_p0122"], "verification_note": "2001 letter; unit=fractional employee-equivalent headcount; definition=14.8 at headquarters with one employee working a four-day week, not 14.8 whole people."},
+        {"claim": "Berkshire's total workforce was 110,000.", "required_terms": ["workforce", "110,000"], "gold_passage_ids": ["2001_p0122"], "verification_note": "2001 letter; unit=employees company-wide; definition=110,000 total workforce after adding about 40,000 during the year, not the number hired."}
+      ],
+      "accept": {"min_claim_coverage": 1.0, "require_valid_citation": true}, "reject": {"forbidden_terms": []},
+      "verification_note": "2001_p0122 separates 110,000 total workforce from 14.8 at headquarters and explains the fractional workweek; neither figure is a headquarters floor-area measurement.",
+      "ft_context_overlap": false
+    },
+    {
+      "qid": "hv3_23", "question_type": "fact_number", "answerable": true,
+      "years": [2002],
+      "query": "What profit turnaround in Berkshire's shoe business was reported for 2002?",
+      "gold_passage_ids": ["2002_p0059"], "relevant_ids": ["2002_p0059"],
+      "gold_claims": [
+        {"claim": "Shoes earned $24 million, an upward swing of $70 million from 2001.", "required_terms": ["shoes", "$24 million", "$70 million"], "gold_passage_ids": ["2002_p0059"], "verification_note": "2002 letter; unit=millions of dollars of shoe-business earnings and year-on-year improvement; definition=$24 million earned, $70 million improvement versus 2001, not $70 million absolute profit."}
+      ],
+      "accept": {"min_claim_coverage": 1.0, "require_valid_citation": true}, "reject": {"forbidden_terms": []},
+      "verification_note": "2002_p0059 states the $24 million shoe earnings and $70 million swing from 2001; the improvement incorporates the turnaround and costs of unwinding Dexter's problems.",
+      "ft_context_overlap": false
+    },
+    {
+      "qid": "hv3_24", "question_type": "fact_number", "answerable": true,
+      "years": [2003],
+      "query": "For the federal tax return mentioned in Buffett's 2003 letter, how many pages were there and how many copies were filed?",
+      "gold_passage_ids": ["2003_p0034"], "relevant_ids": ["2003_p0034"],
+      "gold_claims": [
+        {"claim": "The tax return ran to 8,905 pages and was submitted in two copies.", "required_terms": ["8,905 pages", "two copies", "return"], "gold_passage_ids": ["2003_p0034"], "verification_note": "2003 letter; unit=pages per return and copies filed; definition=8,905 pages with two copies of the 2002 federal tax return, not 8,905 pages across both copies."}
+      ],
+      "accept": {"min_claim_coverage": 1.0, "require_valid_citation": true}, "reject": {"forbidden_terms": []},
+      "verification_note": "2003_p0034 directly contains the page count and two-copy filing; 2003_p0033 explicitly dates that return to tax year 2002 and says the 2003 return was not finalized.",
+      "ft_context_overlap": false
+    },
+    {
+      "qid": "hv3_25", "question_type": "fact_number", "answerable": true,
+      "years": [2004],
+      "query": "How large was the extra fiber-material cost burden on Shaw in 2004?",
+      "gold_passage_ids": ["2004_p0086"], "relevant_ids": ["2004_p0086"],
+      "gold_claims": [
+        {"claim": "Fiber-material price increases added more than $300 million to Shaw's costs.", "required_terms": ["Shaw", "$300 million", "costs"], "gold_passage_ids": ["2004_p0086"], "verification_note": "2004 letter; unit=millions of dollars of additional fiber-material costs; definition=more than $300 million incremental burden, not Shaw's total costs, revenue or earnings."}
+      ],
+      "accept": {"min_claim_coverage": 1.0, "require_valid_citation": true}, "reject": {"forbidden_terms": []},
+      "verification_note": "2004_p0086 explicitly gives the more-than-$300-million added fiber-material cost and distinguishes it from price-response lag and the tangible-equity return.",
+      "ft_context_overlap": true
+    },
+    {
+      "qid": "hv3_26", "question_type": "temporal_comparison", "answerable": true,
+      "years": [2005, 2006],
+      "query": "How did Buffett tie pay to what a manager actually contributes in the 2005 and 2006 letters?",
+      "gold_passage_ids": ["2005_p0099", "2006_p0126"], "relevant_ids": ["2005_p0099", "2006_p0126"],
+      "gold_claims": [
+        {"claim": "Buffett favored options with strike prices adjusted for retained earnings.", "required_terms": ["strike prices", "retained earnings"], "gold_passage_ids": ["2005_p0099"], "verification_note": "2005 letter; unit=qualitative option-design principle; definition=strike-price adjustment for automatically retained earnings, not the claim that such options were widely issued."},
+        {"claim": "Berkshire tied incentives to the operating results for which a given CEO had authority.", "required_terms": ["incentives", "operating results", "authority"], "gold_passage_ids": ["2006_p0126"], "verification_note": "2006 letter; unit=qualitative executive incentive criterion; definition=operating results controlled by the CEO rather than investment-market swings or others' successes."}
+      ],
+      "accept": {"min_claim_coverage": 1.0, "require_valid_citation": true}, "reject": {"forbidden_terms": []},
+      "verification_note": "2005_p0099 discusses adjusting options for retained earnings; 2006_p0126 ties Berkshire incentives to a CEO's operating authority; these are related principles, not evidence of a newly adopted stock-option plan.",
+      "ft_context_overlap": false
+    },
+    {
+      "qid": "hv3_27", "question_type": "temporal_comparison", "answerable": true,
+      "years": [2007, 2008],
+      "query": "Did Berkshire's commitment to completing and keeping acquisitions change between the 2007 Marmon discussion and the 2008 buyer-of-choice explanation?",
+      "gold_passage_ids": ["2007_p0024", "2008_p0037"], "relevant_ids": ["2007_p0024", "2008_p0037"],
+      "gold_claims": [
+        {"claim": "For the Marmon deal, Berkshire would close on the dot despite chaotic financial markets.", "required_terms": ["Marmon", "close on the dot", "financial markets"], "gold_passage_ids": ["2007_p0024"], "verification_note": "2007 letter; unit=qualitative acquisition commitment; definition=certainty of closing the Marmon agreement even in chaotic markets, not the purchase price."},
+        {"claim": "Berkshire's policy was to keep promises and hold the purchased companies through thick and thin.", "required_terms": ["promises", "hold the purchased companies", "thick and thin"], "gold_passage_ids": ["2008_p0037"], "verification_note": "2008 letter; unit=qualitative acquisition-custody policy; definition=keeping promises and retaining bought companies, contrasted with competitors' exit strategies."}
+      ],
+      "accept": {"min_claim_coverage": 1.0, "require_valid_citation": true}, "reject": {"forbidden_terms": []},
+      "verification_note": "2007_p0024 supports the Marmon closing commitment and 2008_p0037 supports the continuing promise/retention policy; neither passage establishes an abandonment of that commitment.",
+      "ft_context_overlap": true
+    },
+    {
+      "qid": "hv3_28", "question_type": "temporal_comparison", "answerable": true,
+      "years": [2004, 2009],
+      "query": "How did MidAmerican Energy's primarily-Iowa electric customer count differ in the 2004 and 2009 letters?",
+      "gold_passage_ids": ["2004_p0020", "2009_p0043"], "relevant_ids": ["2004_p0020", "2009_p0043"],
+      "gold_claims": [
+        {"claim": "MidAmerican Energy served 698,000 electric customers, primarily in Iowa.", "required_terms": ["MidAmerican Energy", "698,000", "electric customers"], "gold_passage_ids": ["2004_p0020"], "verification_note": "2004 letter; unit=electric customers; definition=698,000 MidAmerican Energy customers primarily in Iowa, not UK distribution customers or group ownership percentage."},
+        {"claim": "MidAmerican Energy served 725,000 electric customers, primarily in Iowa.", "required_terms": ["MidAmerican Energy", "725,000", "electric customers"], "gold_passage_ids": ["2009_p0043"], "verification_note": "2009 letter; unit=electric customers; definition=725,000 MidAmerican Energy customers primarily in Iowa, not the Pacific/Rocky Mountain or UK operations."}
+      ],
+      "accept": {"min_claim_coverage": 1.0, "require_valid_citation": true}, "reject": {"forbidden_terms": []},
+      "verification_note": "2004_p0020 and 2009_p0043 use the same primarily-Iowa electric-customer definition for MidAmerican Energy; the other regional customer figures are not substituted.",
+      "ft_context_overlap": false
+    },
+    {
+      "qid": "hv3_29", "question_type": "temporal_comparison", "answerable": true,
+      "years": [2011, 2012],
+      "query": "Across the 2011 and 2012 letters, when did Buffett expect Berkshire to beat the S&P 500 and when did he expect it to trail?",
+      "gold_passage_ids": ["2011_p0029", "2012_p0014"], "relevant_ids": ["2011_p0029", "2012_p0014"],
+      "gold_claims": [
+        {"claim": "Berkshire's book-value performance should outpace the S&P 500 in a bad year and fall short in a strong up-year.", "required_terms": ["book-value performance", "bad year", "strong up-year"], "gold_passage_ids": ["2011_p0029"], "verification_note": "2011 letter; unit=qualitative relative book-value performance; definition=bad stock-market years versus strong up-years, not a guaranteed annual share-price return."},
+        {"claim": "Berkshire's relative performance should be better when the market is down or flat, but fall short in particularly strong years.", "required_terms": ["down or flat", "particularly strong", "fall short"], "gold_passage_ids": ["2012_p0014"], "verification_note": "2012 letter; unit=qualitative relative performance expectation; definition=down/flat market versus particularly strong market, not the claim that Berkshire wins every five-year interval."}
+      ],
+      "accept": {"min_claim_coverage": 1.0, "require_valid_citation": true}, "reject": {"forbidden_terms": []},
+      "verification_note": "2011_p0029 states the bad-year/strong-up-year expectation and 2012_p0014 reiterates it as down-or-flat versus particularly strong; both periods have direct gold evidence.",
+      "ft_context_overlap": true
+    },
+    {
+      "qid": "hv3_30", "question_type": "temporal_comparison", "answerable": true,
+      "years": [2021, 2031],
+      "query": "How do BNSF's earnings in 2021 and 2031 compare?",
+      "gold_passage_ids": ["2021_p0031"], "relevant_ids": ["2021_p0031"],
+      "gold_claims": [
+        {"claim": "BNSF had record earnings of $6 billion in 2021.", "required_terms": ["BNSF", "$6 billion", "2021"], "gold_passage_ids": ["2021_p0031"], "verification_note": "2021 letter; unit=billions of dollars of earnings; definition=$6 billion after interest, taxes, depreciation, amortization and all compensation, not adjusted EBITDA."}
+      ],
+      "expected_coverage_note": "2031 is the missing period: the frozen corpus has no 2031 letter or 2031 text; answer the supported 2021 side and identify the missing evidence without claiming a change or issuing a total refusal.",
+      "accept": {"min_claim_coverage": 1.0, "require_valid_citation": true}, "reject": {"forbidden_terms": []},
+      "verification_note": "2021_p0031 explicitly states BNSF's $6 billion record earnings and its after-all-expenses definition; case-insensitive whole-corpus search for 2031 yields zero hits and no 2031 letter exists.",
+      "ft_context_overlap": false
+    },
+    {
+      "qid": "hv3_31", "question_type": "follow_up", "answerable": true,
+      "years": [2013],
+      "history": [
+        {"role": "user", "content": "What unusual Bank of America position did Buffett describe in the 2013 letter?"},
+        {"role": "assistant", "content": "Berkshire had a right to buy Bank of America shares before its option expired."}
+      ],
+      "query": "How much would exercising that purchase right cost, and how many shares did it cover?",
+      "gold_passage_ids": ["2013_p0091"], "relevant_ids": ["2013_p0091"],
+      "gold_claims": [
+        {"claim": "The Bank of America purchase right covered 700 million shares for $5 billion.", "required_terms": ["Bank of America", "700 million shares", "$5 billion"], "gold_passage_ids": ["2013_p0091"], "verification_note": "2013 letter; unit=number of shares and aggregate exercise dollars; definition=700 million shares purchasable for $5 billion, not the $10.9 billion yearend market value."}
+      ],
+      "accept": {"min_claim_coverage": 1.0, "require_valid_citation": true}, "reject": {"forbidden_terms": []},
+      "verification_note": "2013_p0091 distinguishes the right's 700-million-share/$5-billion exercise terms from the shares' market value; history establishes the referent without revealing the scored amounts.",
+      "ft_context_overlap": false
+    },
+    {
+      "qid": "hv3_32", "question_type": "follow_up", "answerable": true,
+      "years": [2015],
+      "history": [
+        {"role": "user", "content": "Who did Berkshire put in charge of its new specialty insurer, as recalled in 2015?"},
+        {"role": "assistant", "content": "Peter Eastwood was put in charge of Berkshire Hathaway Specialty Insurance, or BHSI."}
+      ],
+      "query": "How much annual premium business had that operation already built?",
+      "gold_passage_ids": ["2015_p0069"], "relevant_ids": ["2015_p0069"],
+      "gold_claims": [
+        {"claim": "BHSI had developed $1 billion of annual premium volume.", "required_terms": ["BHSI", "$1 billion", "annual premium volume"], "gold_passage_ids": ["2015_p0069"], "verification_note": "2015 letter; unit=billions of dollars of annual premiums; definition=BHSI's $1 billion annual premium volume, not float, profit or cumulative premiums since formation."}
+      ],
+      "accept": {"min_claim_coverage": 1.0, "require_valid_citation": true}, "reject": {"forbidden_terms": []},
+      "verification_note": "2015_p0069 explicitly calls the $1 billion figure annual premium volume; history supplies BHSI as the follow-up referent but no amount.",
+      "ft_context_overlap": true
+    },
+    {
+      "qid": "hv3_33", "question_type": "follow_up", "answerable": true,
+      "years": [2018],
+      "history": [
+        {"role": "user", "content": "What other financing source besides insurance float was highlighted in the 2018 letter?"},
+        {"role": "assistant", "content": "Deferred income taxes were another funding source for Berkshire."}
+      ],
+      "query": "Did that financing carry interest while the money remained invested, and how many dollars arose from unrealized equity gains?",
+      "gold_passage_ids": ["2018_p0059"], "relevant_ids": ["2018_p0059"],
+      "gold_claims": [
+        {"claim": "Deferred income taxes were meanwhile interest-free liabilities.", "required_terms": ["deferred income taxes", "interest-free"], "gold_passage_ids": ["2018_p0059"], "verification_note": "2018 letter; unit=qualitative financing cost; definition=deferred income-tax liabilities are interest-free while outstanding, not forgiven tax obligations."},
+        {"claim": "About $14.7 billion of $50.5 billion of deferred taxes arose from unrealized gains in equity holdings.", "required_terms": ["$14.7 billion", "$50.5 billion", "unrealized"], "gold_passage_ids": ["2018_p0059"], "verification_note": "2018 letter; unit=billions of dollars of deferred-tax liabilities; definition=$14.7 billion equity-gain component within $50.5 billion total deferred taxes, not the underlying unrealized gains themselves."}
+      ],
+      "accept": {"min_claim_coverage": 1.0, "require_valid_citation": true}, "reject": {"forbidden_terms": []},
+      "verification_note": "2018_p0059 identifies outstanding tax liabilities as interest-free and separates the $14.7 billion equity-gain component from $50.5 billion total; history does not disclose either amount or cost.",
+      "ft_context_overlap": true
+    },
+    {
+      "qid": "hv3_34", "question_type": "follow_up", "answerable": true,
+      "years": [2023],
+      "history": [
+        {"role": "user", "content": "How did the 2023 letter characterize changes in share trading?"},
+        {"role": "assistant", "content": "Buffett described increasingly casino-like behavior, including in people's homes."}
+      ],
+      "query": "What does he say really motivates those selling investments in that environment?",
+      "gold_passage_ids": ["2023_p0021"], "relevant_ids": ["2023_p0021"],
+      "gold_claims": [
+        {"claim": "Wall Street is driven by feverish activity, at which times whatever foolishness can be marketed will be vigorously marketed.", "required_terms": ["Wall Street", "feverish activity", "vigorously marketed"], "gold_passage_ids": ["2023_p0021"], "verification_note": "2023 letter; unit=qualitative intermediary incentive; definition=activity that stimulates Wall Street marketing, not a numerical forecast or a claim about every market participant."}
+      ],
+      "accept": {"min_claim_coverage": 1.0, "require_valid_citation": true}, "reject": {"forbidden_terms": []},
+      "verification_note": "2023_p0021 distinguishes customers making money from the feverish activity motivating Wall Street and qualifies the marketers as not everyone but always someone; the history only establishes the trading environment.",
+      "ft_context_overlap": true
+    },
+    {
+      "qid": "hv3_35", "question_type": "unanswerable", "answerable": false,
+      "refusal_category": "out_of_domain", "years": [],
+      "query": "How can I make sourdough focaccia with an overnight cold proof?",
+      "gold_passage_ids": [], "relevant_ids": [], "gold_claims": [],
+      "expected_answer": "The retrieved passages do not provide enough evidence to answer this question.",
+      "accept": {"min_claim_coverage": 1.0, "require_exact_refusal": true, "require_valid_citation": false}, "reject": {"forbidden_terms": []},
+      "absence_search_patterns": ["sourdough", "focaccia"],
+      "verification_note": "Whole-corpus case-insensitive searches for sourdough and focaccia each have zero matches; the request is an out-of-domain bread-making procedure with no gold support.",
+      "ft_context_overlap": false
+    },
+    {
+      "qid": "hv3_36", "question_type": "unanswerable", "answerable": false,
+      "refusal_category": "out_of_domain", "years": [],
+      "query": "What temperature should I set for a bearded dragon's basking spot?",
+      "gold_passage_ids": [], "relevant_ids": [], "gold_claims": [],
+      "expected_answer": "The retrieved passages do not provide enough evidence to answer this question.",
+      "accept": {"min_claim_coverage": 1.0, "require_exact_refusal": true, "require_valid_citation": false}, "reject": {"forbidden_terms": []},
+      "absence_search_patterns": ["bearded dragon", "pogona"],
+      "verification_note": "Whole-corpus case-insensitive searches for bearded dragon and pogona each have zero matches; this out-of-domain reptile-husbandry temperature request has no gold support.",
+      "ft_context_overlap": false
+    },
+    {
+      "qid": "hv3_37", "question_type": "unanswerable", "answerable": false,
+      "refusal_category": "unsupported_figure", "years": [],
+      "query": "Using Buffett's 2019 letter, what was Apple's debt-service coverage ratio for that year?",
+      "gold_passage_ids": [], "relevant_ids": [], "gold_claims": [],
+      "expected_answer": "The retrieved passages do not provide enough evidence to answer this question.",
+      "accept": {"min_claim_coverage": 1.0, "require_exact_refusal": true, "require_valid_citation": false}, "reject": {"forbidden_terms": []},
+      "absence_search_patterns": ["debt[\\s-]+service\\s+coverage", "\\bdscr\\b"],
+      "verification_note": "Whole-corpus case-insensitive searches for debt-service/debt service coverage and whole-word DSCR have zero matches; every Apple hit in the 2019 letter (2019_p0024, 2019_p0025, 2019_p0050) was read and gives ownership, retained earnings or investment valuation rather than Apple's debt-service numerator and denominator.",
+      "ft_context_overlap": false
+    },
+    {
+      "qid": "hv3_38", "question_type": "unanswerable", "answerable": false,
+      "refusal_category": "future_absent_year", "years": [],
+      "query": "How much underwriting profit did Berkshire report for 2031?",
+      "gold_passage_ids": [], "relevant_ids": [], "gold_claims": [],
+      "expected_answer": "The retrieved passages do not provide enough evidence to answer this question.",
+      "accept": {"min_claim_coverage": 1.0, "require_exact_refusal": true, "require_valid_citation": false}, "reject": {"forbidden_terms": []},
+      "absence_search_patterns": ["\\b2031\\b"],
+      "verification_note": "Whole-corpus case-insensitive whole-year search for 2031 has zero matches and the corpus ends with the 2024 letter; no 2031 underwriting-profit result exists in the supplied corpus.",
+      "ft_context_overlap": false
+    },
+    {
+      "qid": "hv3_39", "question_type": "unanswerable", "answerable": false,
+      "refusal_category": "false_premise", "years": [],
+      "query": "What purchase price did Berkshire pay when it acquired Spotify, and how was the transaction funded?",
+      "gold_passage_ids": [], "relevant_ids": [], "gold_claims": [],
+      "expected_answer": "The retrieved passages do not provide enough evidence to answer this question.",
+      "accept": {"min_claim_coverage": 1.0, "require_exact_refusal": true, "require_valid_citation": false}, "reject": {"forbidden_terms": []},
+      "absence_search_patterns": ["spotify"],
+      "verification_note": "Whole-corpus case-insensitive search for Spotify has zero matches; no supplied letter supports the premise of a Berkshire acquisition of Spotify, so no price or funding can be asserted.",
+      "ft_context_overlap": false
+    },
+    {
+      "qid": "hv3_40", "question_type": "unanswerable", "answerable": false,
+      "refusal_category": "both_sides_unsupported", "years": [],
+      "query": "What was the difference in 2023 customer acquisition cost per new auto policy between GEICO and Progressive?",
+      "gold_passage_ids": [], "relevant_ids": [], "gold_claims": [],
+      "unsupported_sides": ["GEICO", "Progressive"],
+      "expected_answer": "The retrieved passages do not provide enough evidence to answer this question.",
+      "accept": {"min_claim_coverage": 1.0, "require_exact_refusal": true, "require_valid_citation": false}, "reject": {"forbidden_terms": []},
+      "absence_search_patterns": ["customer\\s+acquisition\\s+cost", "cost\\s+(?:of|per)\\s+(?:acquiring|acquisition)"],
+      "verification_note": "Whole-corpus customer acquisition cost and cost-of/per-acquiring/acquisition searches have zero matches; the only GEICO passage in the 2023 letter, 2023_p0056, has no acquisition-cost figure, and no 2023 passage mentions Progressive; all other progressive substring hits are ordinary adjectives/adverbs, while older GEICO marketing-cost passages concern other years and do not support either 2023 side.",
+      "ft_context_overlap": false
+    }
+  ]
+}
