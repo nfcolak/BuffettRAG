@@ -68,8 +68,8 @@ class GroundedSettings:
     MAX_UNITS: int = 6
     MAX_PER_HIT: int = 2
     MAX_PERIODS: int = 4
-    T_RELEVANT: float = 0.5
-    T_SLOT: float = 0.5
+    T_RELEVANT: float = 0.01
+    T_SLOT: float = 0.001
     DEDUPE_JACCARD: float = 0.8
     GROUP_MAX_TOKENS: int = 200
     NLI_VERIFY: bool = False

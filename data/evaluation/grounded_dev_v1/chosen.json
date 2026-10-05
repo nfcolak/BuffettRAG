@@ -1,0 +1,938 @@
+{
+ "values": {
+  "T_RELEVANT": 0.01,
+  "T_SLOT": 0.001,
+  "MAX_UNITS": 6
+ },
+ "composer": "template",
+ "numeric_guard": "bound",
+ "objective": {
+  "supported_met": 33,
+  "required_claims": 95,
+  "invalid_markers": 0,
+  "answerable": 71,
+  "abstain_answerable": 1,
+  "unanswerable": 9,
+  "correct_refusals": 7,
+  "preexisting_unanswerable": 6,
+  "preexisting_refusals": 6,
+  "adversarial_unanswerable": 3,
+  "adversarial_refusals": 1,
+  "refusals_needed": 5
+ },
+ "constraints": {
+  "zero_invalid_markers": true,
+  "abstentions_le_extractive": true,
+  "correct_refusals_ge_5_6": true,
+  "refusal_denominator": 6,
+  "refusal_rule": "correct refusals >= ceil(5/6 * pre-existing unanswerable dev cases); adversarial refusal cases are reported, never gated",
+  "refusals_needed": 5
+ },
+ "tie_break": "most supported claims; then fewer MAX_UNITS; then higher T_RELEVANT; then higher T_SLOT",
+ "extractive_baseline": {
+  "preexisting_unanswerable": 6,
+  "preexisting_refusals": 4,
+  "adversarial_unanswerable": 3,
+  "adversarial_refusals": 0,
+  "supported_met": 46,
+  "required_claims": 95,
+  "invalid_markers": 0,
+  "answerable": 71,
+  "abstain_answerable": 2,
+  "unanswerable": 9,
+  "correct_refusals": 4,
+  "supported_heldout_v1": 22,
+  "abstain_heldout_v1": 1,
+  "refusals_heldout_v1": 2,
+  "supported_heldout_v2": 11,
+  "abstain_heldout_v2": 1,
+  "refusals_heldout_v2": 2,
+  "supported_answer_benchmark_v3": 8,
+  "abstain_answer_benchmark_v3": 0,
+  "refusals_answer_benchmark_v3": 0,
+  "supported_adversarial_dev": 5,
+  "abstain_adversarial_dev": 0,
+  "refusals_adversarial_dev": 0
+ },
+ "guard_comparison": {
+  "bound": {
+   "supported_met": 33,
+   "invalid_markers": 0,
+   "abstain_answerable": 1,
+   "preexisting_refusals": 6,
+   "adversarial_refusals": 1
+  },
+  "verbatim": {
+   "supported_met": 33,
+   "invalid_markers": 0,
+   "abstain_answerable": 1,
+   "preexisting_refusals": 6,
+   "adversarial_refusals": 1
+  }
+ },
+ "feasible_settings": 12,
+ "grid_size": 60,
+ "grid": {
+  "T_RELEVANT": [
+   0.001,
+   0.01,
+   0.03,
+   0.1,
+   0.35
+  ],
+  "T_SLOT": [
+   0.001,
+   0.01,
+   0.05,
+   0.2
+  ],
+  "MAX_UNITS": [
+   4,
+   6,
+   8
+  ]
+ },
+ "dev": {
+  "sets": {
+   "heldout_v1": 24,
+   "heldout_v2": 40,
+   "answer_benchmark_v3": 8,
+   "adversarial_dev": 8
+  },
+  "answerable": 71,
+  "unanswerable": 9,
+  "unanswerable_qids": [
+   "adv05",
+   "adv07",
+   "adv08",
+   "ho23_unanswerable_quantum",
+   "ho24_unanswerable_sourdough",
+   "hv37",
+   "hv38",
+   "hv39",
+   "hv40"
+  ]
+ },
+ "per_case_at_chosen": [
+  {
+   "qid": "ho01_1977_operating_earnings",
+   "set": "heldout_v1",
+   "supported_met": 2,
+   "required_claims": 2,
+   "abstained": false,
+   "invalid_markers": 0,
+   "correct_refusal": null
+  },
+  {
+   "qid": "ho02_1979_inflation_real_returns",
+   "set": "heldout_v1",
+   "supported_met": 1,
+   "required_claims": 1,
+   "abstained": false,
+   "invalid_markers": 0,
+   "correct_refusal": null
+  },
+  {
+   "qid": "ho03_1982_price_discipline",
+   "set": "heldout_v1",
+   "supported_met": 0,
+   "required_claims": 1,
+   "abstained": false,
+   "invalid_markers": 0,
+   "correct_refusal": null
+  },
+  {
+   "qid": "ho04_1983_goodwill_preference",
+   "set": "heldout_v1",
+   "supported_met": 0,
+   "required_claims": 1,
+   "abstained": false,
+   "invalid_markers": 0,
+   "correct_refusal": null
+  },
+  {
+   "qid": "ho05_1987_mr_market",
+   "set": "heldout_v1",
+   "supported_met": 0,
+   "required_claims": 1,
+   "abstained": false,
+   "invalid_markers": 0,
+   "correct_refusal": null
+  },
+  {
+   "qid": "ho06_1991_salomon_role",
+   "set": "heldout_v1",
+   "supported_met": 0,
+   "required_claims": 1,
+   "abstained": false,
+   "invalid_markers": 0,
+   "correct_refusal": null
+  },
+  {
+   "qid": "ho07_1994_usair_mistake",
+   "set": "heldout_v1",
+   "supported_met": 1,
+   "required_claims": 2,
+   "abstained": false,
+   "invalid_markers": 0,
+   "correct_refusal": null
+  },
+  {
+   "qid": "ho08_1995_geico_distribution",
+   "set": "heldout_v1",
+   "supported_met": 1,
+   "required_claims": 1,
+   "abstained": false,
+   "invalid_markers": 0,
+   "correct_refusal": null
+  },
+  {
+   "qid": "ho09_1999_tech_competence",
+   "set": "heldout_v1",
+   "supported_met": 0,
+   "required_claims": 1,
+   "abstained": false,
+   "invalid_markers": 0,
+   "correct_refusal": null
+  },
+  {
+   "qid": "ho10_2001_float_cost",
+   "set": "heldout_v1",
+   "supported_met": 0,
+   "required_claims": 1,
+   "abstained": false,
+   "invalid_markers": 0,
+   "correct_refusal": null
+  },
+  {
+   "qid": "ho11_2004_currency_contracts",
+   "set": "heldout_v1",
+   "supported_met": 1,
+   "required_claims": 1,
+   "abstained": false,
+   "invalid_markers": 0,
+   "correct_refusal": null
+  },
+  {
+   "qid": "ho12_2006_iscar_ownership",
+   "set": "heldout_v1",
+   "supported_met": 0,
+   "required_claims": 2,
+   "abstained": false,
+   "invalid_markers": 0,
+   "correct_refusal": null
+  },
+  {
+   "qid": "ho13_2007_petrochina_sale",
+   "set": "heldout_v1",
+   "supported_met": 0,
+   "required_claims": 2,
+   "abstained": false,
+   "invalid_markers": 0,
+   "correct_refusal": null
+  },
+  {
+   "qid": "ho14_2013_nv_energy",
+   "set": "heldout_v1",
+   "supported_met": 1,
+   "required_claims": 1,
+   "abstained": false,
+   "invalid_markers": 0,
+   "correct_refusal": null
+  },
+  {
+   "qid": "ho15_2014_dealership_followup",
+   "set": "heldout_v1",
+   "supported_met": 1,
+   "required_claims": 1,
+   "abstained": false,
+   "invalid_markers": 0,
+   "correct_refusal": null
+  },
+  {
+   "qid": "ho16_2017_hurricane_loss",
+   "set": "heldout_v1",
+   "supported_met": 1,
+   "required_claims": 1,
+   "abstained": false,
+   "invalid_markers": 0,
+   "correct_refusal": null
+  },
+  {
+   "qid": "ho17_2019_reinvestment_priority",
+   "set": "heldout_v1",
+   "supported_met": 0,
+   "required_claims": 1,
+   "abstained": false,
+   "invalid_markers": 0,
+   "correct_refusal": null
+  },
+  {
+   "qid": "ho18_2023_munger_architect",
+   "set": "heldout_v1",
+   "supported_met": 0,
+   "required_claims": 1,
+   "abstained": false,
+   "invalid_markers": 0,
+   "correct_refusal": null
+  },
+  {
+   "qid": "ho19_2024_tax_followup",
+   "set": "heldout_v1",
+   "supported_met": 2,
+   "required_claims": 2,
+   "abstained": false,
+   "invalid_markers": 0,
+   "correct_refusal": null
+  },
+  {
+   "qid": "ho20_1977_1985_textile_comparison",
+   "set": "heldout_v1",
+   "supported_met": 0,
+   "required_claims": 2,
+   "abstained": false,
+   "invalid_markers": 0,
+   "correct_refusal": null
+  },
+  {
+   "qid": "ho21_1993_2010_float_comparison",
+   "set": "heldout_v1",
+   "supported_met": 1,
+   "required_claims": 2,
+   "abstained": false,
+   "invalid_markers": 0,
+   "correct_refusal": null
+  },
+  {
+   "qid": "ho22_1988_2022_coca_cola_comparison",
+   "set": "heldout_v1",
+   "supported_met": 2,
+   "required_claims": 3,
+   "abstained": false,
+   "invalid_markers": 0,
+   "correct_refusal": null
+  },
+  {
+   "qid": "ho23_unanswerable_quantum",
+   "set": "heldout_v1",
+   "supported_met": 0,
+   "required_claims": 0,
+   "abstained": true,
+   "invalid_markers": 0,
+   "correct_refusal": true
+  },
+  {
+   "qid": "ho24_unanswerable_sourdough",
+   "set": "heldout_v1",
+   "supported_met": 0,
+   "required_claims": 0,
+   "abstained": true,
+   "invalid_markers": 0,
+   "correct_refusal": true
+  },
+  {
+   "qid": "hv01",
+   "set": "heldout_v2",
+   "supported_met": 0,
+   "required_claims": 1,
+   "abstained": true,
+   "invalid_markers": 0,
+   "correct_refusal": null
+  },
+  {
+   "qid": "hv02",
+   "set": "heldout_v2",
+   "supported_met": 0,
+   "required_claims": 1,
+   "abstained": false,
+   "invalid_markers": 0,
+   "correct_refusal": null
+  },
+  {
+   "qid": "hv03",
+   "set": "heldout_v2",
+   "supported_met": 1,
+   "required_claims": 1,
+   "abstained": false,
+   "invalid_markers": 0,
+   "correct_refusal": null
+  },
+  {
+   "qid": "hv04",
+   "set": "heldout_v2",
+   "supported_met": 0,
+   "required_claims": 1,
+   "abstained": false,
+   "invalid_markers": 0,
+   "correct_refusal": null
+  },
+  {
+   "qid": "hv05",
+   "set": "heldout_v2",
+   "supported_met": 0,
+   "required_claims": 1,
+   "abstained": false,
+   "invalid_markers": 0,
+   "correct_refusal": null
+  },
+  {
+   "qid": "hv06",
+   "set": "heldout_v2",
+   "supported_met": 0,
+   "required_claims": 1,
+   "abstained": false,
+   "invalid_markers": 0,
+   "correct_refusal": null
+  },
+  {
+   "qid": "hv07",
+   "set": "heldout_v2",
+   "supported_met": 0,
+   "required_claims": 1,
+   "abstained": false,
+   "invalid_markers": 0,
+   "correct_refusal": null
+  },
+  {
+   "qid": "hv08",
+   "set": "heldout_v2",
+   "supported_met": 0,
+   "required_claims": 1,
+   "abstained": false,
+   "invalid_markers": 0,
+   "correct_refusal": null
+  },
+  {
+   "qid": "hv09",
+   "set": "heldout_v2",
+   "supported_met": 0,
+   "required_claims": 1,
+   "abstained": false,
+   "invalid_markers": 0,
+   "correct_refusal": null
+  },
+  {
+   "qid": "hv10",
+   "set": "heldout_v2",
+   "supported_met": 0,
+   "required_claims": 1,
+   "abstained": false,
+   "invalid_markers": 0,
+   "correct_refusal": null
+  },
+  {
+   "qid": "hv11",
+   "set": "heldout_v2",
+   "supported_met": 0,
+   "required_claims": 1,
+   "abstained": false,
+   "invalid_markers": 0,
+   "correct_refusal": null
+  },
+  {
+   "qid": "hv12",
+   "set": "heldout_v2",
+   "supported_met": 0,
+   "required_claims": 1,
+   "abstained": false,
+   "invalid_markers": 0,
+   "correct_refusal": null
+  },
+  {
+   "qid": "hv13",
+   "set": "heldout_v2",
+   "supported_met": 0,
+   "required_claims": 1,
+   "abstained": false,
+   "invalid_markers": 0,
+   "correct_refusal": null
+  },
+  {
+   "qid": "hv14",
+   "set": "heldout_v2",
+   "supported_met": 1,
+   "required_claims": 1,
+   "abstained": false,
+   "invalid_markers": 0,
+   "correct_refusal": null
+  },
+  {
+   "qid": "hv15",
+   "set": "heldout_v2",
+   "supported_met": 0,
+   "required_claims": 1,
+   "abstained": false,
+   "invalid_markers": 0,
+   "correct_refusal": null
+  },
+  {
+   "qid": "hv16",
+   "set": "heldout_v2",
+   "supported_met": 1,
+   "required_claims": 1,
+   "abstained": false,
+   "invalid_markers": 0,
+   "correct_refusal": null
+  },
+  {
+   "qid": "hv17",
+   "set": "heldout_v2",
+   "supported_met": 0,
+   "required_claims": 1,
+   "abstained": false,
+   "invalid_markers": 0,
+   "correct_refusal": null
+  },
+  {
+   "qid": "hv18",
+   "set": "heldout_v2",
+   "supported_met": 0,
+   "required_claims": 1,
+   "abstained": false,
+   "invalid_markers": 0,
+   "correct_refusal": null
+  },
+  {
+   "qid": "hv19",
+   "set": "heldout_v2",
+   "supported_met": 0,
+   "required_claims": 1,
+   "abstained": false,
+   "invalid_markers": 0,
+   "correct_refusal": null
+  },
+  {
+   "qid": "hv20",
+   "set": "heldout_v2",
+   "supported_met": 0,
+   "required_claims": 2,
+   "abstained": false,
+   "invalid_markers": 0,
+   "correct_refusal": null
+  },
+  {
+   "qid": "hv21",
+   "set": "heldout_v2",
+   "supported_met": 0,
+   "required_claims": 1,
+   "abstained": false,
+   "invalid_markers": 0,
+   "correct_refusal": null
+  },
+  {
+   "qid": "hv22",
+   "set": "heldout_v2",
+   "supported_met": 0,
+   "required_claims": 1,
+   "abstained": false,
+   "invalid_markers": 0,
+   "correct_refusal": null
+  },
+  {
+   "qid": "hv23",
+   "set": "heldout_v2",
+   "supported_met": 0,
+   "required_claims": 1,
+   "abstained": false,
+   "invalid_markers": 0,
+   "correct_refusal": null
+  },
+  {
+   "qid": "hv24",
+   "set": "heldout_v2",
+   "supported_met": 0,
+   "required_claims": 1,
+   "abstained": false,
+   "invalid_markers": 0,
+   "correct_refusal": null
+  },
+  {
+   "qid": "hv25",
+   "set": "heldout_v2",
+   "supported_met": 0,
+   "required_claims": 1,
+   "abstained": false,
+   "invalid_markers": 0,
+   "correct_refusal": null
+  },
+  {
+   "qid": "hv26",
+   "set": "heldout_v2",
+   "supported_met": 0,
+   "required_claims": 1,
+   "abstained": false,
+   "invalid_markers": 0,
+   "correct_refusal": null
+  },
+  {
+   "qid": "hv27",
+   "set": "heldout_v2",
+   "supported_met": 1,
+   "required_claims": 1,
+   "abstained": false,
+   "invalid_markers": 0,
+   "correct_refusal": null
+  },
+  {
+   "qid": "hv28",
+   "set": "heldout_v2",
+   "supported_met": 1,
+   "required_claims": 2,
+   "abstained": false,
+   "invalid_markers": 0,
+   "correct_refusal": null
+  },
+  {
+   "qid": "hv29",
+   "set": "heldout_v2",
+   "supported_met": 0,
+   "required_claims": 3,
+   "abstained": false,
+   "invalid_markers": 0,
+   "correct_refusal": null
+  },
+  {
+   "qid": "hv30",
+   "set": "heldout_v2",
+   "supported_met": 2,
+   "required_claims": 3,
+   "abstained": false,
+   "invalid_markers": 0,
+   "correct_refusal": null
+  },
+  {
+   "qid": "hv31",
+   "set": "heldout_v2",
+   "supported_met": 0,
+   "required_claims": 3,
+   "abstained": false,
+   "invalid_markers": 0,
+   "correct_refusal": null
+  },
+  {
+   "qid": "hv32",
+   "set": "heldout_v2",
+   "supported_met": 1,
+   "required_claims": 2,
+   "abstained": false,
+   "invalid_markers": 0,
+   "correct_refusal": null
+  },
+  {
+   "qid": "hv33",
+   "set": "heldout_v2",
+   "supported_met": 1,
+   "required_claims": 1,
+   "abstained": false,
+   "invalid_markers": 0,
+   "correct_refusal": null
+  },
+  {
+   "qid": "hv34",
+   "set": "heldout_v2",
+   "supported_met": 0,
+   "required_claims": 1,
+   "abstained": false,
+   "invalid_markers": 0,
+   "correct_refusal": null
+  },
+  {
+   "qid": "hv35",
+   "set": "heldout_v2",
+   "supported_met": 0,
+   "required_claims": 1,
+   "abstained": false,
+   "invalid_markers": 0,
+   "correct_refusal": null
+  },
+  {
+   "qid": "hv36",
+   "set": "heldout_v2",
+   "supported_met": 1,
+   "required_claims": 1,
+   "abstained": false,
+   "invalid_markers": 0,
+   "correct_refusal": null
+  },
+  {
+   "qid": "hv37",
+   "set": "heldout_v2",
+   "supported_met": 0,
+   "required_claims": 0,
+   "abstained": true,
+   "invalid_markers": 0,
+   "correct_refusal": true
+  },
+  {
+   "qid": "hv38",
+   "set": "heldout_v2",
+   "supported_met": 0,
+   "required_claims": 0,
+   "abstained": true,
+   "invalid_markers": 0,
+   "correct_refusal": true
+  },
+  {
+   "qid": "hv39",
+   "set": "heldout_v2",
+   "supported_met": 0,
+   "required_claims": 0,
+   "abstained": true,
+   "invalid_markers": 0,
+   "correct_refusal": true
+  },
+  {
+   "qid": "hv40",
+   "set": "heldout_v2",
+   "supported_met": 0,
+   "required_claims": 0,
+   "abstained": true,
+   "invalid_markers": 0,
+   "correct_refusal": true
+  },
+  {
+   "qid": "aq01_derivatives",
+   "set": "answer_benchmark_v3",
+   "supported_met": 1,
+   "required_claims": 1,
+   "abstained": false,
+   "invalid_markers": 0,
+   "correct_refusal": null
+  },
+  {
+   "qid": "aq02_crisis",
+   "set": "answer_benchmark_v3",
+   "supported_met": 0,
+   "required_claims": 2,
+   "abstained": false,
+   "invalid_markers": 0,
+   "correct_refusal": null
+  },
+  {
+   "qid": "aq03_bnsf",
+   "set": "answer_benchmark_v3",
+   "supported_met": 2,
+   "required_claims": 2,
+   "abstained": false,
+   "invalid_markers": 0,
+   "correct_refusal": null
+  },
+  {
+   "qid": "aq04_apple",
+   "set": "answer_benchmark_v3",
+   "supported_met": 1,
+   "required_claims": 2,
+   "abstained": false,
+   "invalid_markers": 0,
+   "correct_refusal": null
+  },
+  {
+   "qid": "aq05_index",
+   "set": "answer_benchmark_v3",
+   "supported_met": 1,
+   "required_claims": 1,
+   "abstained": false,
+   "invalid_markers": 0,
+   "correct_refusal": null
+  },
+  {
+   "qid": "aq06_dividends",
+   "set": "answer_benchmark_v3",
+   "supported_met": 0,
+   "required_claims": 2,
+   "abstained": false,
+   "invalid_markers": 0,
+   "correct_refusal": null
+  },
+  {
+   "qid": "aq07_see",
+   "set": "answer_benchmark_v3",
+   "supported_met": 0,
+   "required_claims": 1,
+   "abstained": false,
+   "invalid_markers": 0,
+   "correct_refusal": null
+  },
+  {
+   "qid": "aq08_greg_abel",
+   "set": "answer_benchmark_v3",
+   "supported_met": 1,
+   "required_claims": 1,
+   "abstained": false,
+   "invalid_markers": 0,
+   "correct_refusal": null
+  },
+  {
+   "qid": "adv01",
+   "set": "adversarial_dev",
+   "supported_met": 1,
+   "required_claims": 1,
+   "abstained": false,
+   "invalid_markers": 0,
+   "correct_refusal": null
+  },
+  {
+   "qid": "adv02",
+   "set": "adversarial_dev",
+   "supported_met": 0,
+   "required_claims": 2,
+   "abstained": false,
+   "invalid_markers": 0,
+   "correct_refusal": null
+  },
+  {
+   "qid": "adv03",
+   "set": "adversarial_dev",
+   "supported_met": 0,
+   "required_claims": 1,
+   "abstained": false,
+   "invalid_markers": 0,
+   "correct_refusal": null
+  },
+  {
+   "qid": "adv04",
+   "set": "adversarial_dev",
+   "supported_met": 0,
+   "required_claims": 1,
+   "abstained": false,
+   "invalid_markers": 0,
+   "correct_refusal": null
+  },
+  {
+   "qid": "adv05",
+   "set": "adversarial_dev",
+   "supported_met": 0,
+   "required_claims": 0,
+   "abstained": false,
+   "invalid_markers": 0,
+   "correct_refusal": false
+  },
+  {
+   "qid": "adv06",
+   "set": "adversarial_dev",
+   "supported_met": 2,
+   "required_claims": 2,
+   "abstained": false,
+   "invalid_markers": 0,
+   "correct_refusal": null
+  },
+  {
+   "qid": "adv07",
+   "set": "adversarial_dev",
+   "supported_met": 0,
+   "required_claims": 0,
+   "abstained": true,
+   "invalid_markers": 0,
+   "correct_refusal": true
+  },
+  {
+   "qid": "adv08",
+   "set": "adversarial_dev",
+   "supported_met": 0,
+   "required_claims": 0,
+   "abstained": false,
+   "invalid_markers": 0,
+   "correct_refusal": false
+  }
+ ],
+ "code_sha": "e18237d46ace1f8d24cfc5c54fd6762d1f6f55f7",
+ "corpus_sha256": "8263f08958729a77febf0922e7bbc4161bedd5fdb3e9a8b3fc9a64ab681ab5f0",
+ "cases_sha256": {
+  "heldout_v1": "deea734a5b50816283aa671f9c461ce4a16d707cb41e4487c2bdd7935a5ce718",
+  "heldout_v2": "642501e574649d73ebada40740137d52030d051c66f4827c19144a0d4cf5b609",
+  "answer_benchmark_v3": "2832d202750db493cff5e7a38f9353d8e734f5e9d85f0347e5f436f82c94de8a",
+  "adversarial_dev": "259c2ee6258d0ff83a55e7101abda021e3392a46f519cd495487056c52e101fc"
+ },
+ "fix_analysis": {
+  "analysed_setting": {
+   "T_RELEVANT": 0.001,
+   "T_SLOT": 0.001,
+   "MAX_UNITS": 6,
+   "note": "best u6a-calib setting, same dev cases"
+  },
+  "metric_as_committed": {
+   "before_fix": {
+    "supported_claims": 18,
+    "extractive_supported": 46,
+    "extractive_met_grounded_missed": 31,
+    "loss_classes": {
+     "D_selected_not_rendered": 14,
+     "C_scored_not_selected": 10,
+     "F_rendered_but_fails_metric": 7
+    },
+    "template_cuts": {
+     "groups": 80,
+     "entries": 896,
+     "anchor_entries": 272,
+     "groups_anchor_gt3": 40,
+     "cut_max_sentences": 38
+    }
+   },
+   "after_fix": {
+    "supported_claims": 33,
+    "extractive_supported": 46,
+    "extractive_met_grounded_missed": 18,
+    "loss_classes": {
+     "F_rendered_but_fails_metric": 9,
+     "C_scored_not_selected": 8,
+     "D_selected_not_rendered": 1
+    },
+    "template_cuts": {
+     "groups": 80,
+     "entries": 896,
+     "anchor_entries": 421,
+     "groups_anchor_gt3": 67,
+     "cut_max_sentences": 173
+    }
+   }
+  },
+  "metric_with_engine_label_stripped_sensitivity": {
+   "before_fix": {
+    "supported_claims": 30,
+    "extractive_supported": 46,
+    "extractive_met_grounded_missed": 24,
+    "loss_classes": {
+     "D_selected_not_rendered": 13,
+     "C_scored_not_selected": 10,
+     "F_rendered_but_fails_metric": 1
+    },
+    "template_cuts": {
+     "groups": 80,
+     "entries": 896,
+     "anchor_entries": 272,
+     "groups_anchor_gt3": 40,
+     "cut_max_sentences": 38
+    }
+   },
+   "after_fix": {
+    "supported_claims": 46,
+    "extractive_supported": 46,
+    "extractive_met_grounded_missed": 13,
+    "loss_classes": {
+     "F_rendered_but_fails_metric": 4,
+     "C_scored_not_selected": 8,
+     "D_selected_not_rendered": 1
+    },
+    "template_cuts": {
+     "groups": 80,
+     "entries": 896,
+     "anchor_entries": 421,
+     "groups_anchor_gt3": 67,
+     "cut_max_sentences": 173
+    }
+   }
+  },
+  "class_legend": {
+   "A": "gold sentence in no scored window",
+   "B": "gold sentence only a neighbour in a scored window",
+   "C": "gold sentence is an anchor of a scored window that was not selected (MAX_PER_HIT/MAX_UNITS/dedupe)",
+   "D": "selected but not rendered",
+   "F": "rendered but fails the metric"
+  },
+  "causes_fixed": [
+   "group_evidence attributed a sentence to the first window reaching it, so an anchor adjacent to an earlier unit was treated as a neighbour and dropped by the template (10 of 14 D losses)",
+   "template rendered anchors in document order, capped at 3 (40 of 80 groups had more than 3 anchor sentences) instead of best unit score first"
+  ],
+  "gro_max_tokens_char_budget": "not a defect: template already converts at CHARS_PER_TOKEN=4 (budget 800 chars); 0 groups were cut by the character budget before or after"
+ }
+}

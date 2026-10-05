@@ -304,6 +304,9 @@ def test_settings_has_every_frozen_knob_and_loads_env():
         "GROUP_MAX_TOKENS", "NLI_VERIFY", "NLI_MODEL", "NUMERIC_GUARD", "CACHE_DIR",
     }
     assert GroundedSettings().NUMERIC_GUARD == "bound"
+    # frozen by the dev calibration (data/evaluation/grounded_dev_v1/chosen.json)
+    frozen = GroundedSettings()
+    assert (frozen.T_RELEVANT, frozen.T_SLOT, frozen.MAX_UNITS) == (0.01, 0.001, 6)
     assert GroundedSettings(NUMERIC_GUARD="verbatim").NUMERIC_GUARD == "verbatim"
     settings = GroundedSettings.from_env({
         "GROUNDED_COMPOSER": "template", "GROUNDED_MLX_MODEL": "local/mlx",
@@ -356,7 +359,7 @@ def test_settings_rejects_bad_env(env):
     ([], [_unit()], 1, DecisionResult("refuse", ["low_relevance"])),
 ])
 def test_decision_truth_table_is_pure(slots, units, count, expected):
-    settings = GroundedSettings()
+    settings = GroundedSettings(T_RELEVANT=0.5, T_SLOT=0.5)  # the table's cases are written at 0.5
     before = copy.deepcopy((slots, units, settings))
     assert decide(slots, units, settings, context_hit_count=count) == expected
     assert (slots, units, settings) == before

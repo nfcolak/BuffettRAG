@@ -133,7 +133,7 @@ def test_max_per_hit_and_max_units_and_floor():
     hits = [hit(f"Insurance earnings note {chr(97 + i)} was recorded here.", hid=f"h{i}") for i in range(9)]
     plan, _ = plan_for("insurance earnings", hits, MAX_UNITS=5)
     assert len(plan.units) == 5
-    plan, _ = plan_for("insurance earnings", hits[:2] + [hit("Nothing relevant lives in this sentence.")])
+    plan, _ = plan_for("insurance earnings", hits[:2] + [hit("Nothing relevant lives in this sentence.")], T_SLOT=0.5)
     assert len(plan.units) == 2  # fill never admits windows below T_SLOT
 
 
@@ -162,7 +162,7 @@ def test_missing_period_gives_partial_and_missing_quantity_reason():
 
 
 def test_low_relevance_refuses():
-    plan, _ = plan_for("insurance earnings", [hit("Unrelated sentence about nothing here.")])
+    plan, _ = plan_for("insurance earnings", [hit("Unrelated sentence about nothing here.")], T_RELEVANT=0.5)
     assert plan.decision == "refuse" and plan.reasons == ["low_relevance"]
 
 
