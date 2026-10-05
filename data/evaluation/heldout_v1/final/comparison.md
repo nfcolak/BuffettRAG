@@ -4,6 +4,7 @@
 | base llama | 3/24 | 2/31 | 2/2 | 18 | 0 | 1171.486 |
 | round 1 | 5/24 | 4/31 | 2/2 | 7 | 0 | 652.433 |
 | round 2 | 10/24 | 10/31 | 2/2 | 3 | 0 | 1139.950 |
+| round 3 | 6/24 | 6/31 | 2/2 | 4 | 0 | 679.011 |
 
 local: replaces heldout_v1_local_bm25_fixA3.json (accepted 14/24 -> 18/24; delta +4); heldout_v1_local_bm25_fixB.json (accepted 17/24 -> 18/24; delta +1).
 base llama: replaces heldout_v1_llama_base_bm25.json (accepted 3/24 -> 3/24; delta +0).
