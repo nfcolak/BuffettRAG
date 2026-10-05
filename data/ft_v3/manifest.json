@@ -1,0 +1,90 @@
+{
+  "corpus_sha256": "8263f08958729a77febf0922e7bbc4161bedd5fdb3e9a8b3fc9a64ab681ab5f0",
+  "counts_per_split": {
+    "train": 1047,
+    "valid": 118
+  },
+  "counts_per_split_type": {
+    "train": {
+      "answerable": 826,
+      "distractor": 21,
+      "unanswerable": 200
+    },
+    "valid": {
+      "answerable": 94,
+      "distractor": 3,
+      "unanswerable": 21
+    }
+  },
+  "dedup": "normalized question+user history and exact chat SHA256; original v2 split preserved",
+  "excluded_passage_count": 222,
+  "frozen_set_hashes": {
+    "agent/fix-eval:data/evaluation/heldout_v1/answer_benchmark_heldout_v1.json": "deea734a5b50816283aa671f9c461ce4a16d707cb41e4487c2bdd7935a5ce718",
+    "data/evaluation/answer_quality_program/answer_benchmark_v3.json": "2832d202750db493cff5e7a38f9353d8e734f5e9d85f0347e5f436f82c94de8a",
+    "data/evaluation/heldout_v2/answer_benchmark_heldout_v2.json": "642501e574649d73ebada40740137d52030d051c66f4827c19144a0d4cf5b609"
+  },
+  "heldout_v2_exclusion": "required_and_applied_to_new_and_all_reused_examples",
+  "kinds_kept_new": {
+    "followup": 67,
+    "multipart": 172,
+    "single": 223,
+    "temporal": 40,
+    "unanswerable": 98
+  },
+  "mix": {
+    "ft_v2": {
+      "train": 499,
+      "valid": 66
+    },
+    "v3_new": {
+      "train": 548,
+      "valid": 52
+    }
+  },
+  "pilot": false,
+  "prompt_revision": 2,
+  "rejection_reasons": {
+    "blocked_claims": 8,
+    "requested_part_missing_or_source_wording_changed": 61
+  },
+  "reuse": {
+    "candidate_counts": {
+      "train": 560,
+      "valid": 70
+    },
+    "excluded_or_duplicate_reason_counts": {
+      "duplicate_chat_or_question": 5,
+      "frozen_passage_or_neighbor": 22,
+      "legacy_quality_blocked_claims": 34,
+      "legacy_quality_distractor_evidence_sufficient": 4
+    },
+    "input_sha256": {
+      "examples.jsonl": "5dab186ead8d1654bc227173fd96c4cb832d96726916d3b97b14b0c70108efd9",
+      "split_metadata.jsonl": "a8a6f3e48e8ce4755aed059367862e4a7cde60da2764df8d1fa365a5b00791a3",
+      "train.jsonl": "38919e4a50fc6393b53f2160f10ca0f9b17d9b4d7290b5050af070d1840d9b04",
+      "valid.jsonl": "8754a315cc0e79d6a100149b2a5f6a5929f4890e19998c662598471388a8abae"
+    },
+    "kept_counts": {
+      "train": 499,
+      "valid": 66
+    }
+  },
+  "seed": 13,
+  "settings": {
+    "coverage": "all source-derived question obligations, exact numeric units and key content terms, per-sentence source citation",
+    "max_tokens": 600,
+    "temperature": 0.1
+  },
+  "style": "v3",
+  "target_met": true,
+  "target_new_examples": 600,
+  "teacher_id": "/Users/necatifurkancolak/AI-Workplace/Projects/done/BuffettRAG/models/teacher-qwen2.5-7b-mlx4",
+  "teacher_license": "Apache-2.0",
+  "validation_years": [
+    1988,
+    1993,
+    1995,
+    2018,
+    2020
+  ]
+}

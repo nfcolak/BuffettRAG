@@ -1,0 +1,63 @@
+{
+  "answer_attempts": 669,
+  "by_kind": {
+    "followup": {
+      "answer_attempts": 69,
+      "keep_rate": 0.9710144927536232,
+      "kept": 67,
+      "question_jobs": 297,
+      "questions_kept": 69
+    },
+    "multipart": {
+      "answer_attempts": 208,
+      "keep_rate": 0.8269230769230769,
+      "kept": 172,
+      "question_jobs": 297,
+      "questions_kept": 208
+    },
+    "single": {
+      "answer_attempts": 243,
+      "keep_rate": 0.9176954732510288,
+      "kept": 223,
+      "question_jobs": 298,
+      "questions_kept": 243
+    },
+    "temporal": {
+      "answer_attempts": 51,
+      "keep_rate": 0.7843137254901961,
+      "kept": 40,
+      "question_jobs": 297,
+      "questions_kept": 51
+    },
+    "unanswerable": {
+      "answer_attempts": 98,
+      "keep_rate": 1.0,
+      "kept": 98,
+      "question_jobs": 200,
+      "questions_kept": 98
+    }
+  },
+  "estimated_teacher_minutes_for_600_new": 59.81364913936365,
+  "keep_rate": 0.8968609865470852,
+  "new_kept": 600,
+  "output": "/Users/necatifurkancolak/AI-Workplace/Projects/done/BuffettRAG/data/ft_v3",
+  "pilot": false,
+  "question_rejection_reasons": {
+    "duplicate_or_frozen_question": 102,
+    "incomplete_question_parts": 104,
+    "invalid_followup_topic_or_pronoun": 214,
+    "invalid_question": 5,
+    "no_complete_clean_source_sentence": 190,
+    "not_an_interrogative_question": 11,
+    "source_year_missing": 94
+  },
+  "rejection_reasons": {
+    "blocked_claims": 8,
+    "requested_part_missing_or_source_wording_changed": 61
+  },
+  "seconds_per_kept_example": 5.981364913936365,
+  "target_new_examples": 600,
+  "teacher_seconds": 3588.818948361819,
+  "total_new_kept": 600,
+  "wall_seconds": 3613.7081377499853
+}
