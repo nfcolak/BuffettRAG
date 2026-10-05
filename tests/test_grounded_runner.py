@@ -140,8 +140,17 @@ def test_strict_metric_numeric_paraphrase_not_met():
 
 
 def test_strict_metric_label_stripped_only_when_year_supported():
-    assert _met("1999: Float reached $10 billion [1].")
-    assert not _met("1985: Float reached $10 billion [1].")
+    assert _met("In the 1999 letter: Float reached $10 billion [1].")
+    assert not _met("In the 1985 letter: Float reached $10 billion [1].")
+
+
+def test_strict_label_strip_exact_engine_form_only():
+    from src.evaluation.supported_claims import _strip_label
+    h = [SimpleNamespace(id="g1", text="", year=2002)]
+    assert _strip_label("In the 2002 letter: Float rose [1].", h) == "Float rose [1]."
+    assert _strip_label("In 2002, float rose [1].", h) == "In 2002, float rose [1]."
+    assert _strip_label("In 2002: float rose [1].", h) == "In 2002: float rose [1]."
+    assert _strip_label("In the 1985 letter: Float rose [1].", h) == "In the 1985 letter: Float rose [1]."
 
 
 def test_rescore_adds_strict_column_and_checks_identity(tmp_path, monkeypatch):

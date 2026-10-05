@@ -15,7 +15,8 @@ from typing import Any, Dict, List, Optional, Sequence
 from src.evaluation.answer_benchmark import _CITATION_RE, _polarity_and_numbers_agree, is_unanswerable_case
 from src.evaluation.citation_faithfulness import split_sentences
 
-_LABEL_RE = re.compile(r"^\s*(?:In\s+)?((?:19|20)\d{2})\s*[:,]\s+", re.I)
+# Exact engine label (engine.py: f"In the {year} letter:"); colon required, so "In 2002, ..." is never stripped.
+_LABEL_RE = re.compile(r"^\s*In the ((?:19|20)\d{2}) letter:\s+")
 _MARKERS_RE = re.compile(r"\s*\[\d+(?:\s*,\s*\d+)*\]")
 _SRC_SENT_RE = re.compile(r"(?<=[.!?])\s+(?=[A-Z0-9\"'])")
 

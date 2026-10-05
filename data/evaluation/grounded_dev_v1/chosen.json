@@ -7,7 +7,7 @@
  "composer": "template",
  "numeric_guard": "bound",
  "objective": {
-  "supported_met": 33,
+  "supported_met": 46,
   "required_claims": 95,
   "invalid_markers": 0,
   "answerable": 71,
@@ -56,14 +56,14 @@
  },
  "guard_comparison": {
   "bound": {
-   "supported_met": 33,
+   "supported_met": 46,
    "invalid_markers": 0,
    "abstain_answerable": 1,
    "preexisting_refusals": 6,
    "adversarial_refusals": 1
   },
   "verbatim": {
-   "supported_met": 33,
+   "supported_met": 45,
    "invalid_markers": 0,
    "abstain_answerable": 1,
    "preexisting_refusals": 6,
@@ -270,7 +270,7 @@
   {
    "qid": "ho18_2023_munger_architect",
    "set": "heldout_v1",
-   "supported_met": 0,
+   "supported_met": 1,
    "required_claims": 1,
    "abstained": false,
    "invalid_markers": 0,
@@ -288,7 +288,7 @@
   {
    "qid": "ho20_1977_1985_textile_comparison",
    "set": "heldout_v1",
-   "supported_met": 0,
+   "supported_met": 1,
    "required_claims": 2,
    "abstained": false,
    "invalid_markers": 0,
@@ -297,7 +297,7 @@
   {
    "qid": "ho21_1993_2010_float_comparison",
    "set": "heldout_v1",
-   "supported_met": 1,
+   "supported_met": 2,
    "required_claims": 2,
    "abstained": false,
    "invalid_markers": 0,
@@ -306,7 +306,7 @@
   {
    "qid": "ho22_1988_2022_coca_cola_comparison",
    "set": "heldout_v1",
-   "supported_met": 2,
+   "supported_met": 3,
    "required_claims": 3,
    "abstained": false,
    "invalid_markers": 0,
@@ -360,7 +360,7 @@
   {
    "qid": "hv04",
    "set": "heldout_v2",
-   "supported_met": 0,
+   "supported_met": 1,
    "required_claims": 1,
    "abstained": false,
    "invalid_markers": 0,
@@ -387,7 +387,7 @@
   {
    "qid": "hv07",
    "set": "heldout_v2",
-   "supported_met": 0,
+   "supported_met": 1,
    "required_claims": 1,
    "abstained": false,
    "invalid_markers": 0,
@@ -495,7 +495,7 @@
   {
    "qid": "hv19",
    "set": "heldout_v2",
-   "supported_met": 0,
+   "supported_met": 1,
    "required_claims": 1,
    "abstained": false,
    "invalid_markers": 0,
@@ -513,7 +513,7 @@
   {
    "qid": "hv21",
    "set": "heldout_v2",
-   "supported_met": 0,
+   "supported_met": 1,
    "required_claims": 1,
    "abstained": false,
    "invalid_markers": 0,
@@ -522,7 +522,7 @@
   {
    "qid": "hv22",
    "set": "heldout_v2",
-   "supported_met": 0,
+   "supported_met": 1,
    "required_claims": 1,
    "abstained": false,
    "invalid_markers": 0,
@@ -531,7 +531,7 @@
   {
    "qid": "hv23",
    "set": "heldout_v2",
-   "supported_met": 0,
+   "supported_met": 1,
    "required_claims": 1,
    "abstained": false,
    "invalid_markers": 0,
@@ -549,7 +549,7 @@
   {
    "qid": "hv25",
    "set": "heldout_v2",
-   "supported_met": 0,
+   "supported_met": 1,
    "required_claims": 1,
    "abstained": false,
    "invalid_markers": 0,
@@ -594,7 +594,7 @@
   {
    "qid": "hv30",
    "set": "heldout_v2",
-   "supported_met": 2,
+   "supported_met": 3,
    "required_claims": 3,
    "abstained": false,
    "invalid_markers": 0,
@@ -612,7 +612,7 @@
   {
    "qid": "hv32",
    "set": "heldout_v2",
-   "supported_met": 1,
+   "supported_met": 2,
    "required_claims": 2,
    "abstained": false,
    "invalid_markers": 0,
@@ -835,7 +835,7 @@
    "correct_refusal": false
   }
  ],
- "code_sha": "e18237d46ace1f8d24cfc5c54fd6762d1f6f55f7",
+ "code_sha": "ae14f29cd55258926c45bcc12e789c4da69e7675",
  "corpus_sha256": "8263f08958729a77febf0922e7bbc4161bedd5fdb3e9a8b3fc9a64ab681ab5f0",
  "cases_sha256": {
   "heldout_v1": "deea734a5b50816283aa671f9c461ce4a16d707cb41e4487c2bdd7935a5ce718",
@@ -933,6 +933,7 @@
    "group_evidence attributed a sentence to the first window reaching it, so an anchor adjacent to an earlier unit was treated as a neighbour and dropped by the template (10 of 14 D losses)",
    "template rendered anchors in document order, capped at 3 (40 of 80 groups had more than 3 anchor sentences) instead of best unit score first"
   ],
-  "gro_max_tokens_char_budget": "not a defect: template already converts at CHARS_PER_TOKEN=4 (budget 800 chars); 0 groups were cut by the character budget before or after"
+  "gro_max_tokens_char_budget": "not a defect: template already converts at CHARS_PER_TOKEN=4 (budget 800 chars); 0 groups were cut by the character budget before or after",
+  "note_fix_metric": "metric_as_committed figures are pre-fix-metric; chosen.json objective is post-fix-metric (46/95)"
  }
 }
