@@ -104,5 +104,5 @@ def test_rerank_unchanged_on_stub():
     hits = [SearchHit(id=str(i), text=t, metadata={}, score=0.0) for i, t in enumerate(["a", "irrelevant", "c"])]
     out = r.rerank("q", hits, top_k=2)
     assert [h.id for h in out] == ["0", "2"]
-    assert out[0].score == 1.0 and out[1].score == 0.0
+    assert out[0].score == 1.0 and abs(out[1].score - 5 / 7) < 1e-9
     assert r.model.calls == [{}]
