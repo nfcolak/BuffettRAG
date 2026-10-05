@@ -1,0 +1,226 @@
+system,qid,type,required_claim,lexical_met,nli_met,nli_prob,human_verdict,human_note
+extractive local,hv01,opinion,The people running the business should be honest and competent.,yes,yes,0.9947,met,claim buried in context dump
+extractive local,hv02,opinion,Berkshire wanted financial firepower for opportunities when credit was unavailable.,no,no,,not met,
+extractive local,hv03,opinion,Berkshire would rather buy 10% at X per share than 100% at 2X per share.,yes,no,,met,NLI FN
+extractive local,hv04,opinion,The evaluation job falls to investors and managers.,no,no,,not met,
+extractive local,hv05,opinion,Ownership and subsequent utilization of those earnings are all-important.,no,no,,not met,
+extractive local,hv06,opinion,Charlie and Buffett preferred a lumpy 15% over time to a smooth 12%.,no,no,,not met,
+extractive local,hv07,opinion,Options are often inefficient as motivators.,no,yes,0.9954,met,lexical FN; claim buried in context dump
+extractive local,hv08,opinion,Business savvy was the rarest of the director qualities.,no,no,,not met,
+extractive local,hv09,opinion,Monetary and fiscal policies do not create households or eliminate excess housing units.,no,yes,0.9922,met,lexical FN; claim buried in context dump
+extractive local,hv10,opinion,Berkshire favors an enterprise that can deploy additional capital at high returns in the future.,no,no,,not met,
+extractive local,hv11,company,SAFECO's loss reserving was conservative.,no,yes,0.995,met,lexical FN; claim buried in context dump
+extractive local,hv12,company,The purchase of Waumbec Mills was a mistake.,no,no,,not met,"Waumbec only described as bargain; ""mistake"" absent"
+extractive local,hv13,company,"That single store sold more furniture, carpets, and appliances than all Omaha competitors combined.",yes,yes,0.9934,met,
+extractive local,hv14,company,Melvyn and his sister Shirley Toomin took over in 1962.,no,no,,not met,
+extractive local,hv15,company,R. C. Willey's stores were closed on Sunday because Bill and most managers were Mormons.,no,no,,met,lexical FN; NLI FN; claim buried in context dump
+extractive local,hv16,company,Berkshire bought Justin for $570 million in cash.,no,no,,met,lexical FN; NLI FN; claim buried in context dump
+extractive local,hv17,company,Yorkshire Electricity and Northern Electric were MidAmerican's British electricity distributors.,no,no,,met,lexical FN; NLI FN; claim buried in context dump
+extractive local,hv18,company,Berkshire Hathaway Specialty Insurance was led by Peter Eastwood.,no,no,,not met,
+extractive local,hv19,company,"Berkshire issued 272,200 shares to buy General Re.",yes,yes,0.9777,met,
+extractive local,hv20,fact_number,Berkshire purchased 90% of NFM.,no,no,,not met,
+extractive local,hv20,fact_number,Mrs. B received a check for $55 million.,no,no,,not met,
+extractive local,hv21,fact_number,"There were 1,724 charities receiving contributions.",no,no,,not met,
+extractive local,hv22,fact_number,A 15% annual return over the next decade required profits of $10.3 billion.,yes,yes,0.9949,met,
+extractive local,hv23,fact_number,Berkshire paid $315.2 million for Scott Fetzer.,no,no,,not met,
+extractive local,hv24,fact_number,GEICO's float was $4.25 billion.,no,no,,not met,
+extractive local,hv25,fact_number,Kern River moved about 900 million cubic feet of gas a day.,yes,no,,met,"NLI FN; claim buried in context dump; Antecedent ""this line"" missing in answer text; Kern River per source"
+extractive local,hv26,fact_number,Berkshire held $116.0 billion in cash and U.S. Treasury Bills at yearend.,no,yes,0.9949,met,lexical FN; claim buried in context dump
+extractive local,hv27,fact_number,The write-down was $11 billion.,yes,yes,0.9918,met,claim buried in context dump
+extractive local,hv28,temporal_comparison,The combined ratio in 1984 was 134.,no,yes,0.9985,met,"lexical FN; claim buried in context dump; Present via ""134 in 1984 to 111 in 1985"""
+extractive local,hv28,temporal_comparison,The combined ratio in 1985 was 111.,yes,yes,0.9962,met,"claim buried in context dump; Ratio in 1985 present via ""134 in 1984 to 111 in 1985"""
+extractive local,hv29,temporal_comparison,The earlier hurdle was at least $5 million of after-tax earnings.,no,no,,not met,
+extractive local,hv29,temporal_comparison,The later hurdle was at least $75 million of pre-tax earnings.,no,yes,0.5404,met,lexical FN; claim buried in context dump
+extractive local,hv29,temporal_comparison,The later hurdle had an exception for a business that would fit into one of the existing units.,no,no,,met,lexical FN; NLI FN; claim buried in context dump
+extractive local,hv30,temporal_comparison,NetJets' industry share in 2002 was 75%.,no,no,,not met,
+extractive local,hv30,temporal_comparison,The earlier comparison valued the planes clients purchased or leased.,no,no,,not met,
+extractive local,hv30,temporal_comparison,The later figure was 70% of net sales measured by value.,yes,yes,0.9681,met,claim buried in context dump
+extractive local,hv31,temporal_comparison,GEICO was 41% owned by Berkshire in the earlier account.,no,no,,not met,
+extractive local,hv31,temporal_comparison,The GEICO purchase turned the holding into a wholly-owned operating business.,no,no,,not met,
+extractive local,hv31,temporal_comparison,Berkshire acquired the remaining half at the beginning of 1996.,no,no,,not met,
+extractive local,hv32,temporal_comparison,"The earlier used plane was bought for $850,000.",no,no,,met,lexical FN; NLI FN; claim buried in context dump
+extractive local,hv32,temporal_comparison,The replacement used jet cost $6.7 million.,yes,yes,0.9966,met,
+extractive local,hv33,follow_up,The troubled portfolio was sold for 55¢ on the dollar.,yes,yes,0.9969,met,
+extractive local,hv34,follow_up,Berkshire agreed to buy 50% of the holding company.,no,no,,met,lexical FN; NLI FN; claim buried in context dump
+extractive local,hv35,follow_up,Todd Combs brought the company to Buffett's attention.,no,no,,not met,
+extractive local,hv36,follow_up,The first purchases involving the five companies were in July 2019.,yes,yes,0.997,met,
+base llama,hv01,opinion,The people running the business should be honest and competent.,no,no,,not met,
+base llama,hv02,opinion,Berkshire wanted financial firepower for opportunities when credit was unavailable.,no,no,,not met,
+base llama,hv03,opinion,Berkshire would rather buy 10% at X per share than 100% at 2X per share.,no,no,,not met,
+base llama,hv04,opinion,The evaluation job falls to investors and managers.,no,no,,not met,
+base llama,hv05,opinion,Ownership and subsequent utilization of those earnings are all-important.,no,no,,not met,
+base llama,hv06,opinion,Charlie and Buffett preferred a lumpy 15% over time to a smooth 12%.,no,no,,not met,
+base llama,hv07,opinion,Options are often inefficient as motivators.,no,no,,not met,
+base llama,hv08,opinion,Business savvy was the rarest of the director qualities.,no,no,,not met,
+base llama,hv09,opinion,Monetary and fiscal policies do not create households or eliminate excess housing units.,no,no,,not met,
+base llama,hv10,opinion,Berkshire favors an enterprise that can deploy additional capital at high returns in the future.,no,no,,not met,
+base llama,hv11,company,SAFECO's loss reserving was conservative.,no,no,,not met,
+base llama,hv12,company,The purchase of Waumbec Mills was a mistake.,no,no,,not met,
+base llama,hv13,company,"That single store sold more furniture, carpets, and appliances than all Omaha competitors combined.",no,no,,not met,
+base llama,hv14,company,Melvyn and his sister Shirley Toomin took over in 1962.,no,no,,not met,
+base llama,hv15,company,R. C. Willey's stores were closed on Sunday because Bill and most managers were Mormons.,no,no,,not met,
+base llama,hv16,company,Berkshire bought Justin for $570 million in cash.,no,no,,not met,
+base llama,hv17,company,Yorkshire Electricity and Northern Electric were MidAmerican's British electricity distributors.,no,no,,not met,
+base llama,hv18,company,Berkshire Hathaway Specialty Insurance was led by Peter Eastwood.,no,no,,not met,
+base llama,hv19,company,"Berkshire issued 272,200 shares to buy General Re.",no,no,,not met,
+base llama,hv20,fact_number,Berkshire purchased 90% of NFM.,no,no,,not met,
+base llama,hv20,fact_number,Mrs. B received a check for $55 million.,no,no,,not met,
+base llama,hv21,fact_number,"There were 1,724 charities receiving contributions.",no,no,,not met,
+base llama,hv22,fact_number,A 15% annual return over the next decade required profits of $10.3 billion.,no,no,,not met,
+base llama,hv23,fact_number,Berkshire paid $315.2 million for Scott Fetzer.,no,no,,not met,
+base llama,hv24,fact_number,GEICO's float was $4.25 billion.,no,no,,not met,
+base llama,hv25,fact_number,Kern River moved about 900 million cubic feet of gas a day.,no,no,,not met,
+base llama,hv26,fact_number,Berkshire held $116.0 billion in cash and U.S. Treasury Bills at yearend.,no,no,,not met,
+base llama,hv27,fact_number,The write-down was $11 billion.,no,no,,not met,
+base llama,hv28,temporal_comparison,The combined ratio in 1984 was 134.,no,no,,not met,
+base llama,hv28,temporal_comparison,The combined ratio in 1985 was 111.,no,no,,not met,
+base llama,hv29,temporal_comparison,The earlier hurdle was at least $5 million of after-tax earnings.,no,no,,not met,
+base llama,hv29,temporal_comparison,The later hurdle was at least $75 million of pre-tax earnings.,no,no,,not met,
+base llama,hv29,temporal_comparison,The later hurdle had an exception for a business that would fit into one of the existing units.,no,no,,not met,
+base llama,hv30,temporal_comparison,NetJets' industry share in 2002 was 75%.,no,no,,not met,
+base llama,hv30,temporal_comparison,The earlier comparison valued the planes clients purchased or leased.,no,no,,not met,
+base llama,hv30,temporal_comparison,The later figure was 70% of net sales measured by value.,no,no,,not met,
+base llama,hv31,temporal_comparison,GEICO was 41% owned by Berkshire in the earlier account.,no,no,,not met,
+base llama,hv31,temporal_comparison,The GEICO purchase turned the holding into a wholly-owned operating business.,no,no,,not met,
+base llama,hv31,temporal_comparison,Berkshire acquired the remaining half at the beginning of 1996.,no,no,,not met,
+base llama,hv32,temporal_comparison,"The earlier used plane was bought for $850,000.",no,no,,not met,
+base llama,hv32,temporal_comparison,The replacement used jet cost $6.7 million.,no,no,,not met,
+base llama,hv33,follow_up,The troubled portfolio was sold for 55¢ on the dollar.,no,no,,not met,
+base llama,hv34,follow_up,Berkshire agreed to buy 50% of the holding company.,no,no,,not met,
+base llama,hv35,follow_up,Todd Combs brought the company to Buffett's attention.,no,no,,not met,
+base llama,hv36,follow_up,The first purchases involving the five companies were in July 2019.,no,no,,not met,
+round 1,hv01,opinion,The people running the business should be honest and competent.,no,no,,not met,
+round 1,hv02,opinion,Berkshire wanted financial firepower for opportunities when credit was unavailable.,no,no,,not met,
+round 1,hv03,opinion,Berkshire would rather buy 10% at X per share than 100% at 2X per share.,no,no,,not met,
+round 1,hv04,opinion,The evaluation job falls to investors and managers.,no,no,,not met,
+round 1,hv05,opinion,Ownership and subsequent utilization of those earnings are all-important.,no,no,,not met,
+round 1,hv06,opinion,Charlie and Buffett preferred a lumpy 15% over time to a smooth 12%.,no,no,,not met,
+round 1,hv07,opinion,Options are often inefficient as motivators.,no,yes,0.9955,met,lexical FN
+round 1,hv08,opinion,Business savvy was the rarest of the director qualities.,no,no,,met,lexical FN; NLI FN
+round 1,hv09,opinion,Monetary and fiscal policies do not create households or eliminate excess housing units.,no,yes,0.9881,met,lexical FN
+round 1,hv10,opinion,Berkshire favors an enterprise that can deploy additional capital at high returns in the future.,no,no,,not met,
+round 1,hv11,company,SAFECO's loss reserving was conservative.,no,no,,met,lexical FN; NLI FN
+round 1,hv12,company,The purchase of Waumbec Mills was a mistake.,no,no,,met,"lexical FN; NLI FN; Subject ""the purchase"" implicit; question names Waumbec"
+round 1,hv13,company,"That single store sold more furniture, carpets, and appliances than all Omaha competitors combined.",no,no,,not met,
+round 1,hv14,company,Melvyn and his sister Shirley Toomin took over in 1962.,no,no,,not met,
+round 1,hv15,company,R. C. Willey's stores were closed on Sunday because Bill and most managers were Mormons.,no,no,,not met,"Sunday closure stated, Mormon reason missing"
+round 1,hv16,company,Berkshire bought Justin for $570 million in cash.,no,no,,not met,
+round 1,hv17,company,Yorkshire Electricity and Northern Electric were MidAmerican's British electricity distributors.,no,no,,not met,
+round 1,hv18,company,Berkshire Hathaway Specialty Insurance was led by Peter Eastwood.,no,no,,not met,
+round 1,hv19,company,"Berkshire issued 272,200 shares to buy General Re.",no,no,,not met,
+round 1,hv20,fact_number,Berkshire purchased 90% of NFM.,no,no,,not met,
+round 1,hv20,fact_number,Mrs. B received a check for $55 million.,no,no,,not met,
+round 1,hv21,fact_number,"There were 1,724 charities receiving contributions.",no,no,,not met,
+round 1,hv22,fact_number,A 15% annual return over the next decade required profits of $10.3 billion.,no,no,,not met,"Gives $3.9B (earlier figure), not $10.3B"
+round 1,hv23,fact_number,Berkshire paid $315.2 million for Scott Fetzer.,no,no,,not met,
+round 1,hv24,fact_number,GEICO's float was $4.25 billion.,no,no,,not met,
+round 1,hv25,fact_number,Kern River moved about 900 million cubic feet of gas a day.,no,no,,not met,
+round 1,hv26,fact_number,Berkshire held $116.0 billion in cash and U.S. Treasury Bills at yearend.,no,no,,not met,
+round 1,hv27,fact_number,The write-down was $11 billion.,no,no,,not met,
+round 1,hv28,temporal_comparison,The combined ratio in 1984 was 134.,no,no,,not met,
+round 1,hv28,temporal_comparison,The combined ratio in 1985 was 111.,no,no,,not met,
+round 1,hv29,temporal_comparison,The earlier hurdle was at least $5 million of after-tax earnings.,no,no,,not met,
+round 1,hv29,temporal_comparison,The later hurdle was at least $75 million of pre-tax earnings.,no,no,,not met,
+round 1,hv29,temporal_comparison,The later hurdle had an exception for a business that would fit into one of the existing units.,no,no,,not met,
+round 1,hv30,temporal_comparison,NetJets' industry share in 2002 was 75%.,no,no,,not met,
+round 1,hv30,temporal_comparison,The earlier comparison valued the planes clients purchased or leased.,no,no,,not met,
+round 1,hv30,temporal_comparison,The later figure was 70% of net sales measured by value.,no,no,,not met,
+round 1,hv31,temporal_comparison,GEICO was 41% owned by Berkshire in the earlier account.,no,no,,not met,
+round 1,hv31,temporal_comparison,The GEICO purchase turned the holding into a wholly-owned operating business.,no,no,,not met,
+round 1,hv31,temporal_comparison,Berkshire acquired the remaining half at the beginning of 1996.,no,no,,not met,
+round 1,hv32,temporal_comparison,"The earlier used plane was bought for $850,000.",no,no,,not met,
+round 1,hv32,temporal_comparison,The replacement used jet cost $6.7 million.,no,no,,not met,
+round 1,hv33,follow_up,The troubled portfolio was sold for 55¢ on the dollar.,no,no,,not met,
+round 1,hv34,follow_up,Berkshire agreed to buy 50% of the holding company.,no,no,,unsure,"Implies other half = Lemann group, never states Berkshire buys 50%"
+round 1,hv35,follow_up,Todd Combs brought the company to Buffett's attention.,no,no,,not met,
+round 1,hv36,follow_up,The first purchases involving the five companies were in July 2019.,no,no,,not met,
+round 2,hv01,opinion,The people running the business should be honest and competent.,yes,yes,0.9919,met,
+round 2,hv02,opinion,Berkshire wanted financial firepower for opportunities when credit was unavailable.,no,no,,unsure,"Opportunities stated, ""when credit was unavailable"" missing"
+round 2,hv03,opinion,Berkshire would rather buy 10% at X per share than 100% at 2X per share.,no,no,,not met,
+round 2,hv04,opinion,The evaluation job falls to investors and managers.,no,no,,not met,
+round 2,hv05,opinion,Ownership and subsequent utilization of those earnings are all-important.,no,no,,not met,
+round 2,hv06,opinion,Charlie and Buffett preferred a lumpy 15% over time to a smooth 12%.,no,no,,not met,
+round 2,hv07,opinion,Options are often inefficient as motivators.,no,no,,not met,
+round 2,hv08,opinion,Business savvy was the rarest of the director qualities.,no,no,,not met,
+round 2,hv09,opinion,Monetary and fiscal policies do not create households or eliminate excess housing units.,no,yes,0.9884,met,lexical FN
+round 2,hv10,opinion,Berkshire favors an enterprise that can deploy additional capital at high returns in the future.,no,no,,not met,
+round 2,hv11,company,SAFECO's loss reserving was conservative.,no,yes,0.9898,met,lexical FN
+round 2,hv12,company,The purchase of Waumbec Mills was a mistake.,no,no,,not met,
+round 2,hv13,company,"That single store sold more furniture, carpets, and appliances than all Omaha competitors combined.",no,no,,not met,
+round 2,hv14,company,Melvyn and his sister Shirley Toomin took over in 1962.,yes,yes,0.997,met,
+round 2,hv15,company,R. C. Willey's stores were closed on Sunday because Bill and most managers were Mormons.,no,no,,not met,No reason given
+round 2,hv16,company,Berkshire bought Justin for $570 million in cash.,yes,no,,met,NLI FN
+round 2,hv17,company,Yorkshire Electricity and Northern Electric were MidAmerican's British electricity distributors.,yes,no,,met,NLI FN
+round 2,hv18,company,Berkshire Hathaway Specialty Insurance was led by Peter Eastwood.,no,no,,not met,
+round 2,hv19,company,"Berkshire issued 272,200 shares to buy General Re.",no,no,,not met,
+round 2,hv20,fact_number,Berkshire purchased 90% of NFM.,no,no,,not met,
+round 2,hv20,fact_number,Mrs. B received a check for $55 million.,no,no,,not met,
+round 2,hv21,fact_number,"There were 1,724 charities receiving contributions.",no,no,,not met,
+round 2,hv22,fact_number,A 15% annual return over the next decade required profits of $10.3 billion.,yes,yes,0.9952,met,States $10.3B alongside earlier $3.9B; claim present
+round 2,hv23,fact_number,Berkshire paid $315.2 million for Scott Fetzer.,no,no,,not met,
+round 2,hv24,fact_number,GEICO's float was $4.25 billion.,no,no,,not met,
+round 2,hv25,fact_number,Kern River moved about 900 million cubic feet of gas a day.,no,no,,not met,No 900 mmcf figure
+round 2,hv26,fact_number,Berkshire held $116.0 billion in cash and U.S. Treasury Bills at yearend.,no,no,,not met,
+round 2,hv27,fact_number,The write-down was $11 billion.,yes,yes,0.992,met,
+round 2,hv28,temporal_comparison,The combined ratio in 1984 was 134.,no,no,,not met,Retrieval miss: no 1984 ratio
+round 2,hv28,temporal_comparison,The combined ratio in 1985 was 111.,no,no,,not met,Retrieval miss: no 1985 ratio
+round 2,hv29,temporal_comparison,The earlier hurdle was at least $5 million of after-tax earnings.,no,no,,not met,
+round 2,hv29,temporal_comparison,The later hurdle was at least $75 million of pre-tax earnings.,no,no,,not met,
+round 2,hv29,temporal_comparison,The later hurdle had an exception for a business that would fit into one of the existing units.,no,no,,not met,
+round 2,hv30,temporal_comparison,NetJets' industry share in 2002 was 75%.,no,no,,not met,
+round 2,hv30,temporal_comparison,The earlier comparison valued the planes clients purchased or leased.,no,no,,not met,
+round 2,hv30,temporal_comparison,The later figure was 70% of net sales measured by value.,no,no,,not met,
+round 2,hv31,temporal_comparison,GEICO was 41% owned by Berkshire in the earlier account.,no,no,,not met,
+round 2,hv31,temporal_comparison,The GEICO purchase turned the holding into a wholly-owned operating business.,no,no,,not met,
+round 2,hv31,temporal_comparison,Berkshire acquired the remaining half at the beginning of 1996.,no,no,,not met,
+round 2,hv32,temporal_comparison,"The earlier used plane was bought for $850,000.",no,no,,not met,
+round 2,hv32,temporal_comparison,The replacement used jet cost $6.7 million.,no,no,,not met,
+round 2,hv33,follow_up,The troubled portfolio was sold for 55¢ on the dollar.,no,no,,not met,
+round 2,hv34,follow_up,Berkshire agreed to buy 50% of the holding company.,no,no,,unsure,"Implies other half = Lemann group, never states Berkshire buys 50%"
+round 2,hv35,follow_up,Todd Combs brought the company to Buffett's attention.,no,no,,not met,
+round 2,hv36,follow_up,The first purchases involving the five companies were in July 2019.,no,no,,not met,
+round 3,hv01,opinion,The people running the business should be honest and competent.,yes,yes,0.9919,met,
+round 3,hv02,opinion,Berkshire wanted financial firepower for opportunities when credit was unavailable.,no,no,,not met,
+round 3,hv03,opinion,Berkshire would rather buy 10% at X per share than 100% at 2X per share.,no,no,,not met,
+round 3,hv04,opinion,The evaluation job falls to investors and managers.,no,no,,not met,
+round 3,hv05,opinion,Ownership and subsequent utilization of those earnings are all-important.,no,no,,not met,
+round 3,hv06,opinion,Charlie and Buffett preferred a lumpy 15% over time to a smooth 12%.,no,no,,not met,
+round 3,hv07,opinion,Options are often inefficient as motivators.,no,no,,not met,
+round 3,hv08,opinion,Business savvy was the rarest of the director qualities.,no,no,,met,lexical FN; NLI FN
+round 3,hv09,opinion,Monetary and fiscal policies do not create households or eliminate excess housing units.,no,yes,0.9891,met,lexical FN
+round 3,hv10,opinion,Berkshire favors an enterprise that can deploy additional capital at high returns in the future.,no,no,,not met,
+round 3,hv11,company,SAFECO's loss reserving was conservative.,no,no,,not met,
+round 3,hv12,company,The purchase of Waumbec Mills was a mistake.,no,no,,not met,
+round 3,hv13,company,"That single store sold more furniture, carpets, and appliances than all Omaha competitors combined.",no,no,,not met,
+round 3,hv14,company,Melvyn and his sister Shirley Toomin took over in 1962.,no,no,,not met,
+round 3,hv15,company,R. C. Willey's stores were closed on Sunday because Bill and most managers were Mormons.,no,no,,not met,
+round 3,hv16,company,Berkshire bought Justin for $570 million in cash.,no,no,,not met,
+round 3,hv17,company,Yorkshire Electricity and Northern Electric were MidAmerican's British electricity distributors.,no,no,,not met,
+round 3,hv18,company,Berkshire Hathaway Specialty Insurance was led by Peter Eastwood.,no,no,,met,lexical FN; NLI FN
+round 3,hv19,company,"Berkshire issued 272,200 shares to buy General Re.",no,no,,not met,
+round 3,hv20,fact_number,Berkshire purchased 90% of NFM.,no,no,,not met,
+round 3,hv20,fact_number,Mrs. B received a check for $55 million.,no,no,,not met,
+round 3,hv21,fact_number,"There were 1,724 charities receiving contributions.",no,no,,not met,
+round 3,hv22,fact_number,A 15% annual return over the next decade required profits of $10.3 billion.,yes,yes,0.8504,met,
+round 3,hv23,fact_number,Berkshire paid $315.2 million for Scott Fetzer.,no,no,,not met,
+round 3,hv24,fact_number,GEICO's float was $4.25 billion.,no,no,,not met,
+round 3,hv25,fact_number,Kern River moved about 900 million cubic feet of gas a day.,no,no,,not met,"Answer is only ""[5]"" (generation bug)"
+round 3,hv26,fact_number,Berkshire held $116.0 billion in cash and U.S. Treasury Bills at yearend.,no,yes,0.9949,met,lexical FN
+round 3,hv27,fact_number,The write-down was $11 billion.,no,no,,not met,
+round 3,hv28,temporal_comparison,The combined ratio in 1984 was 134.,no,no,,not met,
+round 3,hv28,temporal_comparison,The combined ratio in 1985 was 111.,no,no,,not met,
+round 3,hv29,temporal_comparison,The earlier hurdle was at least $5 million of after-tax earnings.,no,no,,not met,
+round 3,hv29,temporal_comparison,The later hurdle was at least $75 million of pre-tax earnings.,no,no,,not met,
+round 3,hv29,temporal_comparison,The later hurdle had an exception for a business that would fit into one of the existing units.,no,no,,not met,
+round 3,hv30,temporal_comparison,NetJets' industry share in 2002 was 75%.,no,no,,not met,
+round 3,hv30,temporal_comparison,The earlier comparison valued the planes clients purchased or leased.,no,no,,not met,
+round 3,hv30,temporal_comparison,The later figure was 70% of net sales measured by value.,no,no,,not met,
+round 3,hv31,temporal_comparison,GEICO was 41% owned by Berkshire in the earlier account.,no,no,,not met,
+round 3,hv31,temporal_comparison,The GEICO purchase turned the holding into a wholly-owned operating business.,no,no,,not met,
+round 3,hv31,temporal_comparison,Berkshire acquired the remaining half at the beginning of 1996.,no,no,,not met,
+round 3,hv32,temporal_comparison,"The earlier used plane was bought for $850,000.",no,no,,not met,
+round 3,hv32,temporal_comparison,The replacement used jet cost $6.7 million.,no,no,,not met,
+round 3,hv33,follow_up,The troubled portfolio was sold for 55¢ on the dollar.,no,no,,not met,
+round 3,hv34,follow_up,Berkshire agreed to buy 50% of the holding company.,no,no,,not met,
+round 3,hv35,follow_up,Todd Combs brought the company to Buffett's attention.,no,no,,not met,
+round 3,hv36,follow_up,The first purchases involving the five companies were in July 2019.,no,no,,not met,

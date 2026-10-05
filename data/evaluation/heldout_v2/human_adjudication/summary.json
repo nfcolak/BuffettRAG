@@ -1,0 +1,80 @@
+{
+  "set": "heldout_v2",
+  "cases_sha256": "642501e574649d73ebada40740137d52030d051c66f4827c19144a0d4cf5b609",
+  "adjudicator": "user (human)",
+  "date": "2026-10-05",
+  "claim_rows": 225,
+  "verdicts": {
+    "met": 43,
+    "not met": 179,
+    "unsure": 3
+  },
+  "per_system": {
+    "extractive local": {
+      "claims": 45,
+      "human_met": 24,
+      "human_unsure": 0,
+      "lexical_met": 12,
+      "nli_met": 16,
+      "questions_all_claims_human_met": 19,
+      "questions_with_claims": 36
+    },
+    "base llama": {
+      "claims": 45,
+      "human_met": 0,
+      "human_unsure": 0,
+      "lexical_met": 0,
+      "nli_met": 0,
+      "questions_all_claims_human_met": 0,
+      "questions_with_claims": 36
+    },
+    "round 1": {
+      "claims": 45,
+      "human_met": 5,
+      "human_unsure": 1,
+      "lexical_met": 0,
+      "nli_met": 2,
+      "questions_all_claims_human_met": 5,
+      "questions_with_claims": 36
+    },
+    "round 2": {
+      "claims": 45,
+      "human_met": 8,
+      "human_unsure": 2,
+      "lexical_met": 6,
+      "nli_met": 6,
+      "questions_all_claims_human_met": 8,
+      "questions_with_claims": 36
+    },
+    "round 3": {
+      "claims": 45,
+      "human_met": 6,
+      "human_unsure": 0,
+      "lexical_met": 2,
+      "nli_met": 4,
+      "questions_all_claims_human_met": 6,
+      "questions_with_claims": 36
+    }
+  },
+  "vs_human_excluding_unsure": {
+    "lexical": {
+      "tp": 20,
+      "fp": 0,
+      "fn": 23,
+      "tn": 179,
+      "precision": 1.0,
+      "recall": 0.465,
+      "agreement": 0.896
+    },
+    "nli": {
+      "tp": 28,
+      "fp": 0,
+      "fn": 15,
+      "tn": 179,
+      "precision": 1.0,
+      "recall": 0.651,
+      "agreement": 0.932
+    }
+  },
+  "source_sheet_sha256": "e54840381d9baefb7df0fb1cc2606b28e335a2f909d2361ccc11a41bcbb742d5"
+}
