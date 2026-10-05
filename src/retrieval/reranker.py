@@ -12,12 +12,17 @@ Standard usage in the pipeline:
 
 from __future__ import annotations
 
+import threading
 from typing import List, Sequence
 
 import numpy as np
 
 from config import EMBEDDING_DEVICE, RERANKER_MODEL
 from src.storage import SearchHit
+
+# One process-wide lock serialising every inference on a shared reranker
+# (rerank and score_pairs); re-exported by grounded.resources.rerank_lock().
+RERANK_LOCK = threading.RLock()
 
 
 class CrossEncoderReranker:
@@ -44,10 +49,11 @@ class CrossEncoderReranker:
         if not candidates:
             return []
         pairs = [(query, c.text) for c in candidates]
-        raw = np.asarray(
-            self.model.predict(pairs, batch_size=self.batch_size, show_progress_bar=False),
-            dtype=float,
-        )
+        with RERANK_LOCK:
+            raw = np.asarray(
+                self.model.predict(pairs, batch_size=self.batch_size, show_progress_bar=False),
+                dtype=float,
+            )
         # Cross-encoder outputs are uncalibrated (often clustered near 0):
         # min-max normalize within the candidate set so downstream consumers
         # (UI score bars, thresholds) see a meaningful 0..1 spread.
@@ -66,3 +72,22 @@ class CrossEncoderReranker:
                 )
             )
         return reranked
+
+    def score_pairs(self, query: str, texts: Sequence[str]) -> List[float]:
+        """Raw (pre-sigmoid) logits for (query, text) pairs, in input order.
+
+        Passes activation_fn per call; the model's own activation is untouched.
+        """
+        if not texts:
+            return []
+        import torch
+
+        pairs = [(query, t) for t in texts]
+        with RERANK_LOCK:
+            raw = self.model.predict(
+                pairs,
+                batch_size=self.batch_size,
+                show_progress_bar=False,
+                activation_fn=torch.nn.Identity(),
+            )
+        return [float(x) for x in np.asarray(raw, dtype=float).reshape(-1)]
