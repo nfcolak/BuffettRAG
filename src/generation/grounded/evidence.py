@@ -475,24 +475,40 @@ def group_evidence(plan: EvidencePlan, group: str, context_hits: Sequence[Any]) 
     by_eid = {unit.eid: unit for unit in plan.units}
     out: list[GroupEvidence] = []
     seen: set[tuple[int, int]] = set()
-    for eid in plan.groups[group]:
-        unit = by_eid[eid]
+    units = [by_eid[eid] for eid in plan.groups[group]]
+
+    def pieces_of(unit: EvidenceUnit):
         text = _hit_text(context_hits[unit.hit_index])
         window = unit.window
         if text[window.start:window.end] != window.text:
-            raise ValueError(f"context hit {unit.hit_index} no longer matches unit {eid}")
+            raise ValueError(f"context hit {unit.hit_index} no longer matches unit {unit.eid}")
         for start, end, header in _pieces(text):
-            if header or start < window.start or end > window.end or (unit.hit_index, start) in seen:
+            if header or start < window.start or end > window.end:
+                continue
+            salutation = _SALUTATION_RE.match(text, start, end)
+            shown = salutation.end() if salutation else start
+            if shown < end:
+                yield text, start, shown, end
+
+    # A sentence that is some selected unit's own anchor belongs to that unit (the best-scoring
+    # one), even when an earlier neighbouring unit's window reaches it first.
+    owner: dict[tuple[int, int], EvidenceUnit] = {}
+    for unit in units:
+        for _text, start, shown, end in pieces_of(unit):
+            anchor = unit.anchor
+            if shown < anchor.end and anchor.start < end:
+                held = owner.get((unit.hit_index, start))
+                if held is None or unit.score > held.score:
+                    owner[(unit.hit_index, start)] = unit
+    for unit in units:
+        for text, start, shown, end in pieces_of(unit):
+            if (unit.hit_index, start) in seen:
                 continue
             seen.add((unit.hit_index, start))
             # a letter salutation ("To the Stockholders of ...:") is not part of the sentence;
             # the rendered span starts after it, so span.text == text[start:end] still holds
-            salutation = _SALUTATION_RE.match(text, start, end)
-            shown = salutation.end() if salutation else start
-            if shown >= end:
-                continue
             out.append(GroupEvidence(
-                len(out), " ".join(text[shown:end].split()), unit,
+                len(out), " ".join(text[shown:end].split()), owner.get((unit.hit_index, start), unit),
                 SourceSpan(unit.hit_index, shown, end, text[shown:end]),
             ))
     return out

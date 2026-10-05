@@ -225,3 +225,15 @@ def test_group_evidence_strips_letter_salutation_keeping_offsets():
     from src.generation.grounded.types import ComposeRequest
     answer = TemplateComposer().compose(ComposeRequest("sys", "q", evidence)).text
     assert answer.startswith("Operating earnings in 1977 of $21,904,000") and "Stockholders" not in answer
+
+
+def test_group_evidence_sentence_belongs_to_the_unit_whose_anchor_it_is():
+    from src.generation.grounded.template import _is_anchor
+    hits = [hit("Insurance earnings rose sharply this year. Float grew by two billion dollars. "
+                "Operating costs were stable for investors.")]
+    plan, _ = plan_for("insurance earnings float", hits)
+    evidence = group_evidence(plan, next(iter(plan.groups)), hits)
+    anchors = {u.anchor.start for u in plan.units}
+    assert len(plan.units) >= 2 and len(evidence) == 3
+    # every selected unit's own anchor sentence is an anchor entry, however the windows overlap
+    assert {e.source_span.start for e in evidence if _is_anchor(e)} == anchors

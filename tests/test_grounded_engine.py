@@ -133,7 +133,20 @@ def test_template_prefers_anchor_sentences_and_skips_bracket_syntax():
     evidence = [ev(0, "Context sentence about nothing.", anchor=False), ev(1, S1, hit_index=1),
                 ev(2, "See note [3] for details.", hit_index=2)]
     text = TemplateComposer().compose(ComposeRequest(system="s", question="q", evidence=evidence)).text
-    assert text == f"{S1} [2]"
+    # the anchor comes first; the neighbour only follows because sentences and budget remain
+    assert text == f"{S1} [2] Context sentence about nothing. [1]"
+
+
+def test_template_renders_anchors_best_score_first_then_neighbours():
+    texts = ["Alpha beta gamma delta one.", "Epsilon zeta eta theta two.", "Iota kappa lambda mu three.",
+             "Nu xi omicron pi four.", "Rho sigma tau upsilon five."]
+    evidence = [ev(i, t, hit_index=i) for i, t in enumerate(texts)]
+    for entry, score in zip(evidence, (0.2, 0.9, 0.5, 0.9, 0.7)):
+        entry.unit.score = score
+    evidence.append(ev(5, "Phi chi psi omega six.", hit_index=5, anchor=False))
+    evidence[5].unit.score = 1.0
+    text = TemplateComposer().compose(ComposeRequest(system="s", question="q", evidence=evidence)).text
+    assert text == "Epsilon zeta eta theta two. [2] Nu xi omicron pi four. [4] Rho sigma tau upsilon five. [5]"
 
 
 @pytest.mark.parametrize("outputs,error_type,exc,reason", [

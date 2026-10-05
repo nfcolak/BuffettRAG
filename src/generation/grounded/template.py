@@ -2,8 +2,9 @@
 
 The answer is built from verbatim evidence sentences, each followed by its
 local marker [k] (k = local_index + 1). Anchor sentences (those overlapping
-their unit's anchor span) are preferred; neighbour sentences are used only
-when no anchor sentence can be identified. The output obeys a character budget
+their unit's anchor span) come first, best unit score first (ties in document
+order); neighbour sentences follow only while sentences and budget remain.
+The output obeys a character budget
 (max_tokens * CHARS_PER_TOKEN) and at most MAX_SENTENCES sentences; it only
 ever cuts at sentence boundaries, never inside a sentence, so numbers and
 qualifiers stay exactly as in the source. Sentences that contain citation-like
@@ -46,8 +47,10 @@ class TemplateComposer:
 
     def compose(self, req: ComposeRequest) -> ComposeResult:
         usable = [e for e in req.evidence if not _BRACKET_NUMBERS_RE.search(e.text)]
-        anchors = [e for e in usable if e.source_span is not None and _is_anchor(e)]
-        chosen_pool = anchors or usable
+        # best unit score first (ties: document order); neighbours only after every anchor
+        ranked = sorted(usable, key=lambda e: (-e.unit.score, e.unit.hit_index, e.local_index))
+        anchors = [e for e in ranked if e.source_span is not None and _is_anchor(e)]
+        chosen_pool = anchors + [e for e in ranked if e not in anchors]
         budget = req.max_tokens * CHARS_PER_TOKEN
         parts: list[str] = []
         seen: set[str] = set()

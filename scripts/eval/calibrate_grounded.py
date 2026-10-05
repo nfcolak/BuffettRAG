@@ -60,6 +60,7 @@ CACHE_NAME = "calibrate_scores_v1.json"
 _MARKER_RE = re.compile(r"\[([^\[\]\n]*)\]")
 _MARKER_BODY_RE = re.compile(r"\d+(?:\s*,\s*\d+)*")
 SETTING_KEYS = ("T_RELEVANT", "T_SLOT", "MAX_UNITS")
+ADVERSARIAL_SET = "adversarial_dev"
 
 
 # --------------------------------------------------------------------------- helpers
@@ -236,7 +237,13 @@ class Scorer:
 def aggregate(rows: List[Dict[str, Any]]) -> Dict[str, Any]:
     answerable = [r for r in rows if not r["unanswerable"]]
     unans = [r for r in rows if r["unanswerable"]]
+    pre = [r for r in unans if r["set"] != ADVERSARIAL_SET]
+    adv = [r for r in unans if r["set"] == ADVERSARIAL_SET]
     out = {
+        "preexisting_unanswerable": len(pre),
+        "preexisting_refusals": sum(r["correct_refusal"] is True for r in pre),
+        "adversarial_unanswerable": len(adv),
+        "adversarial_refusals": sum(r["correct_refusal"] is True for r in adv),
         "supported_met": sum(r["supported_met"] for r in rows),
         "required_claims": sum(r["required_claims"] for r in rows),
         "invalid_markers": sum(r["invalid_markers"] for r in rows),
@@ -327,10 +334,12 @@ def _floats(text: str) -> List[float]:
 
 
 def feasibility(agg: Dict[str, Any], ext_abstain: int) -> Dict[str, Any]:
-    need = math.ceil(5 * agg["unanswerable"] / 6)
+    # plan section 6: correct refusals >= 5/6 of the PRE-EXISTING unanswerable dev cases; the dev-only
+    # adversarial refusal cases are reported separately and are never part of the gate
+    need = math.ceil(5 * agg["preexisting_unanswerable"] / 6)
     return {"zero_invalid": agg["invalid_markers"] == 0,
             "abstain_ok": agg["abstain_answerable"] <= ext_abstain,
-            "refusals_ok": agg["correct_refusals"] >= need, "refusals_needed": need}
+            "refusals_ok": agg["preexisting_refusals"] >= need, "refusals_needed": need}
 
 
 def stage_grid(args) -> int:
@@ -360,7 +369,8 @@ def stage_grid(args) -> int:
         results.append((agg, rows))
         print(f"T_REL={tr} T_SLOT={ts} UNITS={mu} supported={agg['supported_met']}/{agg['required_claims']} "
               f"invalid={agg['invalid_markers']} abstain={agg['abstain_answerable']}/{agg['answerable']} "
-              f"refusals={agg['correct_refusals']}/{agg['unanswerable']} feasible={agg['feasible']} "
+              f"refusals={agg['preexisting_refusals']}/{agg['preexisting_unanswerable']}"
+              f" adv_refusals={agg['adversarial_refusals']}/{agg['adversarial_unanswerable']} feasible={agg['feasible']} "
               f"t={time.perf_counter() - start:.0f}s", flush=True)
 
     feasible = [(a, r) for a, r in results if a["feasible"]]
@@ -379,12 +389,14 @@ def stage_grid(args) -> int:
             agg["feasible"] = agg["zero_invalid"] and agg["abstain_ok"] and agg["refusals_ok"]
             rows_out.append(agg)
 
-    OUT_DIR.mkdir(parents=True, exist_ok=True)
+    out_dir = Path(args.out_dir)
+    out_dir.mkdir(parents=True, exist_ok=True)
     columns = ["T_RELEVANT", "T_SLOT", "MAX_UNITS", "NUMERIC_GUARD", "supported_met", "required_claims",
                "invalid_markers", "answerable", "abstain_answerable", "unanswerable", "correct_refusals",
+               "preexisting_unanswerable", "preexisting_refusals", "adversarial_unanswerable", "adversarial_refusals",
                "refusals_needed", "zero_invalid", "abstain_ok", "refusals_ok", "feasible"]
     columns += [c for name in DEV_SETS for c in (f"supported_{name}", f"abstain_{name}", f"refusals_{name}")]
-    with (OUT_DIR / "grid.csv").open("w", newline="", encoding="utf-8") as handle:
+    with (out_dir / "grid.csv").open("w", newline="", encoding="utf-8") as handle:
         writer = csv.DictWriter(handle, fieldnames=columns, extrasaction="ignore")
         writer.writeheader()
         writer.writerows(rows_out)
@@ -396,12 +408,13 @@ def stage_grid(args) -> int:
     if chosen is None:
         def violation(a):
             return (a["invalid_markers"] > 0, max(0, a["abstain_answerable"] - ext_agg["abstain_answerable"])
-                    + max(0, a["refusals_needed"] - a["correct_refusals"]), -a["supported_met"])
+                    + max(0, a["refusals_needed"] - a["preexisting_refusals"]), -a["supported_met"])
         closest = sorted((a for a, _ in results), key=violation)[:5]
         print("BLOCKED-NO-FEASIBLE; closest settings:")
         for a in closest:
             print({k: a[k] for k in SETTING_KEYS + ("supported_met", "invalid_markers", "abstain_answerable",
-                                                      "correct_refusals", "unanswerable")})
+                                                      "preexisting_refusals", "preexisting_unanswerable",
+                                                      "adversarial_refusals", "adversarial_unanswerable")})
         (Path(args.run_dir) / "blocked.json").write_text(json.dumps(
             {"extractive": ext_agg, "closest": closest, "dev": dev_summary, "grid": grid_axes}), encoding="utf-8")
         return 2
@@ -414,18 +427,23 @@ def stage_grid(args) -> int:
         "values": {k: best[k] for k in SETTING_KEYS},
         "composer": "template", "numeric_guard": "bound",
         "objective": {k: best[k] for k in ("supported_met", "required_claims", "invalid_markers", "answerable",
-                                           "abstain_answerable", "unanswerable", "correct_refusals", "refusals_needed")},
+                                           "abstain_answerable", "unanswerable", "correct_refusals", "preexisting_unanswerable",
+                                           "preexisting_refusals", "adversarial_unanswerable", "adversarial_refusals",
+                                           "refusals_needed")},
         "constraints": {"zero_invalid_markers": best["zero_invalid"],
                         "abstentions_le_extractive": best["abstain_ok"],
                         "correct_refusals_ge_5_6": best["refusals_ok"],
-                        "refusal_denominator": best["unanswerable"],
+                        "refusal_denominator": best["preexisting_unanswerable"],
+                        "refusal_rule": "correct refusals >= ceil(5/6 * pre-existing unanswerable dev cases); "
+                                        "adversarial refusal cases are reported, never gated",
                         "refusals_needed": best["refusals_needed"]},
         "tie_break": "most supported claims; then fewer MAX_UNITS; then higher T_RELEVANT; then higher T_SLOT",
         "extractive_baseline": ext_agg,
         "guard_comparison": {"bound": {k: best[k] for k in ("supported_met", "invalid_markers", "abstain_answerable",
-                                                            "correct_refusals")},
+                                                            "preexisting_refusals", "adversarial_refusals")},
                              "verbatim": {k: verbatim[k] for k in ("supported_met", "invalid_markers",
-                                                                   "abstain_answerable", "correct_refusals")}},
+                                                                   "abstain_answerable", "preexisting_refusals",
+                                                                   "adversarial_refusals")}},
         "feasible_settings": len(feasible), "grid_size": len(results), "grid": grid_axes,
         "dev": dev_summary,
         "per_case_at_chosen": per_case,
@@ -433,7 +451,9 @@ def stage_grid(args) -> int:
         "corpus_sha256": corpus_sha,
         "cases_sha256": {n: hashlib.sha256(p.read_bytes()).hexdigest() for n, p in DEV_SETS.items()},
     }
-    (OUT_DIR / "chosen.json").write_text(json.dumps(document, indent=1) + "\n", encoding="utf-8")
+    if args.extra_json:
+        document.update(json.loads(Path(args.extra_json).read_text(encoding="utf-8")))
+    (out_dir / "chosen.json").write_text(json.dumps(document, indent=1) + "\n", encoding="utf-8")
     print("CHOSEN", json.dumps(document["values"]), json.dumps(document["objective"]))
     print("guard comparison", json.dumps(document["guard_comparison"]))
     return 0
@@ -442,13 +462,20 @@ def stage_grid(args) -> int:
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     parser.add_argument("stage", choices=["scores", "grid"])
-    parser.add_argument("--run-dir", default=str(ROOT.parent / "_runs" / "u6a-calib"))
-    parser.add_argument("--t-relevant", default="0.2,0.35,0.5,0.65,0.8")
-    parser.add_argument("--t-slot", default="0.2,0.35,0.5,0.65")
+    parser.add_argument("--run-dir", default=str(ROOT.parent / "_runs" / "u6b-fix"))
+    parser.add_argument("--t-relevant", default="0.001,0.01,0.03,0.1,0.35")
+    parser.add_argument("--t-slot", default="0.001,0.01,0.05,0.2")
+    parser.add_argument("--out-dir", default=str(OUT_DIR))
+    parser.add_argument("--extra-json", default=None, help="merged into chosen.json (loss analysis)")
+    parser.add_argument("--strip-engine-labels", action="store_true",
+                        help="sensitivity only: the metric also strips the engine label 'In the YYYY letter:'")
     parser.add_argument("--max-units", default="4,6,8")
     parser.add_argument("--code-sha", default=None)
     args = parser.parse_args()
     Path(args.run_dir).mkdir(parents=True, exist_ok=True)
+    if args.strip_engine_labels:
+        import src.evaluation.supported_claims as metric
+        metric._LABEL_RE = re.compile(r"^\s*(?:In\s+(?:the\s+)?)?((?:19|20)\d{2})(?:\s+letters?)?\s*[:,]\s+", re.I)
     return stage_scores(args) if args.stage == "scores" else stage_grid(args)
 
 
