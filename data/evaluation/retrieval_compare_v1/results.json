@@ -1,5 +1,5 @@
 {
-  "corpus": "/Users/necatifurkancolak/AI-Workplace/Projects/done/BuffettRAG/.worktrees/fin-ret-cmp/data/processed/chunks_v3_paragraph.jsonl",
+  "corpus": "data/processed/chunks_v3_paragraph.jsonl",
   "corpus_sha256": "8263f08958729a77febf0922e7bbc4161bedd5fdb3e9a8b3fc9a64ab681ab5f0",
   "rank_depth": 20,
   "fetch_k": 30,

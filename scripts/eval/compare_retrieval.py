@@ -43,6 +43,14 @@ def device() -> str:
     return "mps" if torch.backends.mps.is_available() else "cpu"
 
 
+def _rel(p):
+    p = Path(p).resolve()
+    try:
+        return p.relative_to(ROOT).as_posix()
+    except ValueError:
+        return str(p)
+
+
 def corpus_embeddings(model_name, docs, corpus_sha, cache_dir, batch_size):
     from sentence_transformers import SentenceTransformer
     slug = model_name.replace("/", "__")
@@ -181,7 +189,7 @@ def main():
 
     args.out_dir.mkdir(parents=True, exist_ok=True)
     (args.out_dir / "results.json").write_text(json.dumps({
-        "corpus": str(args.corpus), "corpus_sha256": corpus_sha, "rank_depth": RANK_DEPTH,
+        "corpus": _rel(args.corpus), "corpus_sha256": corpus_sha, "rank_depth": RANK_DEPTH,
         "fetch_k": RETRIEVAL_FETCH_K, "rerank_candidates": RERANK_CANDIDATES,
         "hn_cases": [str(p) for p in args.hn_cases], "configs": results,
     }, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")

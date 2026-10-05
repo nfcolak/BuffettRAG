@@ -7,6 +7,7 @@ The model is loaded lazily on first use, never at import time.
 from __future__ import annotations
 
 import json
+import os
 import re
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Sequence
@@ -17,7 +18,7 @@ from src.retrieval.context import _walk_neighbors
 from src.storage import StoredDoc
 
 ROOT = Path(__file__).resolve().parents[2]
-MODEL_DIR = Path("/Users/necatifurkancolak/AI-Workplace/Projects/done/BuffettRAG/models/nli-deberta-v3-base")
+MODEL_DIR = Path(os.environ.get("NLI_MODEL_DIR") or ROOT / "models" / "nli-deberta-v3-base")
 CHUNKS_FILE = ROOT / "data" / "processed" / "chunks_v3_paragraph.jsonl"
 ENTAIL_THRESHOLD = 0.5
 WINDOW_TOKENS = 400

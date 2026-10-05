@@ -3,7 +3,7 @@
 All systems used the frozen paragraph-v3 corpus, BM25 retrieval, temperature 0, and saved raw answers. The local provider is extractive, not a generative LLM. Acceptance denominators are scored answers; claims denominators are required claims. Citation support is NLI-supported cited sentences divided by all cited sentences in answerable cases; N/A means no cited sentences.
 
 | System | Lexical accepted | NLI accepted | Lexical claims met | NLI claims met | Citation support rate | Correct refusals | Unexpected refusals | Provider failures | Mean latency ms |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | extractive local | 11/40 | 13/40 | 12/45 | 16/45 | 0.980 (198/202) | 2/4 | 1 | 0 | 50.101 |
 | base llama | 4/40 | 4/40 | 0/45 | 0/45 | N/A (0/0) | 4/4 | 30 | 0 | 4951.930 |
 | round 1 | 3/40 | 4/40 | 0/45 | 2/45 | 0.833 (15/18) | 3/4 | 13 | 0 | 1964.117 |
