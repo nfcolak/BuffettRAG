@@ -48,3 +48,6 @@ frontend/dist/
 # Local model weights (GGUF)
 models/
 /models
+
+# Grounded benchmark caches
+data/evaluation/grounded_cache/
