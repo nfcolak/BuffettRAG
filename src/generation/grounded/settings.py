@@ -11,7 +11,11 @@ SCORER_DEVICE="auto" defers the mps-if-available, otherwise CPU decision to lazy
 resource loading, keeping this module torch-free. NLI_MODEL=None is valid only
 when NLI_VERIFY is false; enabling the dev-only ablation requires an explicit
 local model path. MAX_UNITS is the calibration range [4, 8], MAX_PERIODS <= 4,
-MAX_PER_HIT <= 2, MAX_WINDOWS <= 48, and GROUP_MAX_TOKENS <= 200. Reservations
+MAX_PER_HIT <= 2, MAX_WINDOWS <= 48, and GROUP_MAX_TOKENS <= 200.
+NUMERIC_GUARD selects the verifier's R1 rule: "verbatim" (a sentence with any
+quantity must equal a cited source sentence) or "bound" (numeric paraphrase
+allowed when every quantity, its order, qualifiers and context stay bound to
+one cited source sentence). Reservations
 must fit the window budget, and units must fit that budget as well.
 """
 
@@ -70,6 +74,7 @@ class GroundedSettings:
     GROUP_MAX_TOKENS: int = 200
     NLI_VERIFY: bool = False
     NLI_MODEL: Path | str | None = None
+    NUMERIC_GUARD: str = "bound"
     CACHE_DIR: Path | str = _CHECKOUT / "data/evaluation/grounded_cache"
 
     def __post_init__(self) -> None:
@@ -79,6 +84,8 @@ class GroundedSettings:
             r"auto|cpu|mps|cuda(?::\d+)?", self.SCORER_DEVICE
         ):
             raise ValueError("SCORER_DEVICE must be auto, cpu, mps, cuda or cuda:<index>")
+        if self.NUMERIC_GUARD not in ("verbatim", "bound"):
+            raise ValueError("NUMERIC_GUARD must be verbatim or bound")
         _integer("MAX_WINDOWS", self.MAX_WINDOWS, 1, 48)
         _integer("SLOT_RESERVE", self.SLOT_RESERVE, 1, self.MAX_WINDOWS)
         _integer("MAX_UNITS", self.MAX_UNITS, 4, 8)

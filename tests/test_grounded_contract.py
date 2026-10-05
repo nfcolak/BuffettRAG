@@ -264,6 +264,7 @@ def test_settings_devices(device):
     {"T_SLOT": -0.01}, {"T_SLOT": 1.01}, {"T_SLOT": float("inf")},
     {"DEDUPE_JACCARD": -0.01}, {"DEDUPE_JACCARD": 1.01}, {"DEDUPE_JACCARD": True},
     {"NLI_VERIFY": 1}, {"NLI_VERIFY": True},
+    {"NUMERIC_GUARD": "strict"}, {"NUMERIC_GUARD": ""}, {"NUMERIC_GUARD": None},
     {"MLX_MODEL": ""}, {"LLAMA_MODEL": " "}, {"NLI_MODEL": ""}, {"CACHE_DIR": ""},
     {"MAX_WINDOWS": 8},
     {"MAX_WINDOWS": 4, "MAX_PERIODS": 1, "SLOT_RESERVE": 1, "MAX_UNITS": 8},
@@ -300,8 +301,10 @@ def test_settings_has_every_frozen_knob_and_loads_env():
     assert {item.name for item in fields(GroundedSettings)} == {
         "COMPOSER", "MLX_MODEL", "LLAMA_MODEL", "SCORER_DEVICE", "MAX_WINDOWS", "SLOT_RESERVE",
         "MAX_UNITS", "MAX_PER_HIT", "MAX_PERIODS", "T_RELEVANT", "T_SLOT", "DEDUPE_JACCARD",
-        "GROUP_MAX_TOKENS", "NLI_VERIFY", "NLI_MODEL", "CACHE_DIR",
+        "GROUP_MAX_TOKENS", "NLI_VERIFY", "NLI_MODEL", "NUMERIC_GUARD", "CACHE_DIR",
     }
+    assert GroundedSettings().NUMERIC_GUARD == "bound"
+    assert GroundedSettings(NUMERIC_GUARD="verbatim").NUMERIC_GUARD == "verbatim"
     settings = GroundedSettings.from_env({
         "GROUNDED_COMPOSER": "template", "GROUNDED_MLX_MODEL": "local/mlx",
         "GROUNDED_LLAMA_MODEL": "local/model.gguf", "GROUNDED_SCORER_DEVICE": "cpu",
@@ -309,7 +312,9 @@ def test_settings_has_every_frozen_knob_and_loads_env():
         "GROUNDED_MAX_PER_HIT": "1", "GROUNDED_MAX_PERIODS": "4", "GROUNDED_T_RELEVANT": "0.3",
         "GROUNDED_T_SLOT": "0.6", "GROUNDED_DEDUPE_JACCARD": "0.8", "GROUNDED_GROUP_MAX_TOKENS": "100",
         "GROUNDED_NLI_VERIFY": "1", "GROUNDED_NLI_MODEL": "local/nli", "GROUNDED_CACHE_DIR": "local/cache",
+        "GROUNDED_NUMERIC_GUARD": "verbatim",
     })
+    assert settings.NUMERIC_GUARD == "verbatim"
     assert settings.COMPOSER == "template" and settings.MAX_UNITS == 8
     assert settings.T_RELEVANT == 0.3 and settings.T_SLOT == 0.6
     assert settings.NLI_VERIFY is True and settings.NLI_MODEL.is_absolute()
@@ -318,7 +323,7 @@ def test_settings_has_every_frozen_knob_and_loads_env():
 @pytest.mark.parametrize("env", [
     {"GROUNDED_NLI_VERIFY": "true"}, {"GROUNDED_MAX_UNITS": "6.5"},
     {"GROUNDED_MAX_UNITS": "-1"}, {"GROUNDED_T_SLOT": "nan"},
-    {"GROUNDED_COMPOSER": " MLX "},
+    {"GROUNDED_COMPOSER": " MLX "}, {"GROUNDED_NUMERIC_GUARD": "loose"},
 ])
 def test_settings_rejects_bad_env(env):
     with pytest.raises(ValueError):

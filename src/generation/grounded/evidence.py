@@ -71,6 +71,9 @@ _LABEL_BEFORE_RE = re.compile(
     r"\b(?:pages?|pp?\.?|notes?|items?|sections?|tables?|figures?|exhibits?|chapters?|no\.?)\s*$",
     re.I,
 )
+_SALUTATION_RE = re.compile(
+    r"(?:To|Dear)\s+(?:the\s+)?(?:Stockholders|Shareholders|Shareowners|Owners|Partners)\b[^:]{0,120}:\s*"
+)
 _MIN_ANCHOR_WORDS = 3
 _MAX_HEADER_WORDS = 12
 
@@ -482,8 +485,14 @@ def group_evidence(plan: EvidencePlan, group: str, context_hits: Sequence[Any]) 
             if header or start < window.start or end > window.end or (unit.hit_index, start) in seen:
                 continue
             seen.add((unit.hit_index, start))
+            # a letter salutation ("To the Stockholders of ...:") is not part of the sentence;
+            # the rendered span starts after it, so span.text == text[start:end] still holds
+            salutation = _SALUTATION_RE.match(text, start, end)
+            shown = salutation.end() if salutation else start
+            if shown >= end:
+                continue
             out.append(GroupEvidence(
-                len(out), " ".join(text[start:end].split()), unit,
-                SourceSpan(unit.hit_index, start, end, text[start:end]),
+                len(out), " ".join(text[shown:end].split()), unit,
+                SourceSpan(unit.hit_index, shown, end, text[shown:end]),
             ))
     return out

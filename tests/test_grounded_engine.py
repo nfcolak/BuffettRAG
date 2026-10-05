@@ -241,31 +241,68 @@ R1_CASES = [
 ]
 
 
+GUARD_MODES = ["verbatim", "bound"]
+
+
+@pytest.mark.parametrize("mode", GUARD_MODES)
 @pytest.mark.parametrize("name,source,answer", R1_CASES, ids=[c[0] for c in R1_CASES])
-def test_numeric_guard_rejects_paraphrases(name, source, answer):
+def test_numeric_guard_rejects_paraphrases(name, source, answer, mode):
     evidence = [ev(0, source)]
     # the legacy validator alone would let (most of) these through; the guard is what rejects them
-    verifier = DeterministicVerifier()
+    verifier = DeterministicVerifier(mode)
     outcome = verifier.verify_detailed(answer, evidence)
     assert outcome.sentences == []
     assert sum(outcome.dropped.values()) == 1
     assert verifier.verify(f"{source} [1]", evidence), "verbatim copy must pass"
 
 
-def test_numeric_guard_catches_what_legacy_accepts():
+@pytest.mark.parametrize("mode", GUARD_MODES)
+def test_numeric_guard_catches_what_legacy_accepts(mode):
     source = "Berkshire's book value rose 23.8% in a year when the industry's rose only 10.0%."
     answer = "Berkshire's book value rose 10.0% in a year when the industry's rose only 23.8%. [1]"
     evidence = [ev(0, source)]
     assert validate_and_filter_answer(answer, evidence).safe_answer
-    assert DeterministicVerifier().verify_detailed(answer, evidence).dropped == {"numeric_guard": 1}
+    assert DeterministicVerifier(mode).verify_detailed(answer, evidence).dropped == {"numeric_guard": 1}
 
 
-def test_invented_number_rejected_and_citation_normalisation_accepts_verbatim():
+@pytest.mark.parametrize("mode", GUARD_MODES)
+def test_invented_number_rejected_and_citation_normalisation_accepts_verbatim(mode):
     evidence = [ev(0, S1)]
-    verifier = DeterministicVerifier()
+    verifier = DeterministicVerifier(mode)
     assert verifier.verify("Berkshire's book value per share rose 31.0% in 1985. [1]", evidence) == []
     spaced = "Berkshire’s   book value per share rose 23.8% in 1985 [1]."
     assert len(verifier.verify(spaced, evidence)) == 1
+
+
+# real smoke sentences (smoke_mlx rows): correct paraphrases that "verbatim" drops and "bound" accepts
+SMOKE_1977_SOURCE = ("To the Stockholders of Berkshire Hathaway Inc.: Operating earnings in 1977 of $21,904,000, "
+                     "or $22.54 per share, were moderately better than anticipated a year ago.")
+SMOKE_1977_ANSWER = "Operating earnings in 1977 were $21,904,000, or $22.54 per share [1]."
+SMOKE_1979_SOURCE = ("Just as the original 3% savings bond, a 5% passbook savings account or an 8% U.S. Treasury "
+                     "Note have, in turn, been transformed by inflation into financial instruments that chew up, "
+                     "rather than enhance, purchasing power over their investment lives, a business earning 20% "
+                     "on capital can produce a negative real return for its owners under inflationary conditions "
+                     "not much more severe than presently prevail.")
+SMOKE_1979_ANSWER = ("Yes, a business earning 20% on capital can produce a negative real return for its owners "
+                     "under inflationary conditions not much more severe than those presently prevailing. [1]")
+
+
+@pytest.mark.parametrize("source,answer", [(SMOKE_1977_SOURCE, SMOKE_1977_ANSWER),
+                                           (SMOKE_1979_SOURCE, SMOKE_1979_ANSWER)], ids=["ho01_1977", "ho02_1979"])
+def test_bound_guard_accepts_faithful_numeric_paraphrase(source, answer):
+    evidence = [ev(0, source)]
+    assert DeterministicVerifier("verbatim").verify_detailed(answer, evidence).dropped == {"numeric_guard": 1}
+    outcome = DeterministicVerifier("bound").verify_detailed(answer, evidence)
+    assert [v.text for v in outcome.sentences] == [answer] and outcome.dropped == {}
+
+
+def test_numeric_guard_default_is_bound_and_validated(monkeypatch):
+    monkeypatch.delenv("GROUNDED_NUMERIC_GUARD", raising=False)
+    assert DeterministicVerifier().numeric_guard == "bound"
+    monkeypatch.setenv("GROUNDED_NUMERIC_GUARD", "verbatim")
+    assert DeterministicVerifier().numeric_guard == "verbatim"
+    with pytest.raises(ValueError):
+        DeterministicVerifier("loose")
 
 
 def test_verifier_checks_only_the_cited_group_sentence():

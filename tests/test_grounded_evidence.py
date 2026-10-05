@@ -208,3 +208,20 @@ def test_scorer_length_mismatch_raises():
     with pytest.raises(ValueError):
         plan_for("insurance earnings", [hit("Insurance earnings rose. Earnings stayed strong. Float grew too.")],
                  scorer=Bad())
+
+
+def test_group_evidence_strips_letter_salutation_keeping_offsets():
+    text = ("To the Stockholders of Berkshire Hathaway Inc.:\n\nOperating earnings in 1977 of $21,904,000, "
+            "or $22.54 per\nshare, were moderately better than anticipated a year ago. Insurance earnings rose.")
+    hits = [hit(text, 1977)]
+    plan, _ = plan_for("What were operating earnings in 1977?", hits)
+    evidence = group_evidence(plan, next(iter(plan.groups)), hits)
+    assert evidence and all("Stockholders" not in e.text and "Inc.:" not in e.text for e in evidence)
+    assert evidence[0].text.startswith("Operating earnings in 1977 of $21,904,000")
+    for e in evidence:
+        assert e.source_span.text == text[e.source_span.start:e.source_span.end]
+        assert " ".join(e.source_span.text.split()) == e.text
+    from src.generation.grounded.template import TemplateComposer
+    from src.generation.grounded.types import ComposeRequest
+    answer = TemplateComposer().compose(ComposeRequest("sys", "q", evidence)).text
+    assert answer.startswith("Operating earnings in 1977 of $21,904,000") and "Stockholders" not in answer
