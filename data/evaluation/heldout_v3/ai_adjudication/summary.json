@@ -1,0 +1,102 @@
+{
+  "set": "heldout_v3",
+  "adjudicator": "AI (two independent Claude Sonnet 5.5 judges, high and medium effort; not human)",
+  "rule": "final = verdict when both judges agree; otherwise 'disputed' (excluded from precision/recall, shown as a range)",
+  "claims": {
+    "rows": 123,
+    "judge_agreement": 0.992,
+    "cohen_kappa": 0.983,
+    "final_verdicts": {
+      "not met": 72,
+      "met": 50,
+      "disputed": 1
+    },
+    "per_system": {
+      "extractive (arm 1)": {
+        "claims": 41,
+        "ai_met": 22,
+        "ai_disputed": 1,
+        "ai_unsure": 0,
+        "lexical_met": 14,
+        "nli_met": 19,
+        "strict_met": 13,
+        "ai_met_range": "22-23",
+        "questions_with_claims": 34,
+        "questions_all_claims_ai_met": 18
+      },
+      "7B old path (arm 4)": {
+        "claims": 41,
+        "ai_met": 6,
+        "ai_disputed": 0,
+        "ai_unsure": 0,
+        "lexical_met": 4,
+        "nli_met": 5,
+        "strict_met": 4,
+        "ai_met_range": "6-6",
+        "questions_with_claims": 34,
+        "questions_all_claims_ai_met": 6
+      },
+      "grounded 7B (arm 5)": {
+        "claims": 41,
+        "ai_met": 22,
+        "ai_disputed": 0,
+        "ai_unsure": 0,
+        "lexical_met": 16,
+        "nli_met": 17,
+        "strict_met": 15,
+        "ai_met_range": "22-22",
+        "questions_with_claims": 34,
+        "questions_all_claims_ai_met": 18
+      }
+    }
+  },
+  "auto_checks_vs_ai": {
+    "lexical": {
+      "tp": 34,
+      "fp": 0,
+      "fn": 16,
+      "precision": 1.0,
+      "recall": 0.68
+    },
+    "nli": {
+      "tp": 41,
+      "fp": 0,
+      "fn": 9,
+      "precision": 1.0,
+      "recall": 0.82
+    },
+    "strict": {
+      "tp": 32,
+      "fp": 0,
+      "fn": 18,
+      "precision": 1.0,
+      "recall": 0.64
+    }
+  },
+  "unanswerable": {
+    "rows": 18,
+    "judge_agreement": 1.0,
+    "per_system": {
+      "extractive (arm 1)": {
+        "rows": 6,
+        "ai_correct_refusal": 3,
+        "ai_disputed": 0,
+        "auto_refusal": 3
+      },
+      "7B old path (arm 4)": {
+        "rows": 6,
+        "ai_correct_refusal": 6,
+        "ai_disputed": 0,
+        "auto_refusal": 6
+      },
+      "grounded 7B (arm 5)": {
+        "rows": 6,
+        "ai_correct_refusal": 3,
+        "ai_disputed": 0,
+        "auto_refusal": 3
+      }
+    }
+  },
+  "default_decision": "No default change: extractive (arm 1) stays the production answer system. AI-judged claims met: extractive 22-23/41, grounded 7B 22/41, 7B old path 6/41; correct refusals 3/6, 3/6, 6/6. Grounded 7B does not beat extractive on claims or refusals and is ~100x slower (warm p95 6.7 s vs 0.05 s in U7). The U7 screen verdict (not a candidate) stands.",
+  "caveat": "Both judges are the same model family (Claude Sonnet 5.5), so agreement may be optimistic; verdicts are AI, not human."
+}

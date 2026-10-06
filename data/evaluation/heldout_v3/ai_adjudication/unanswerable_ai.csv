@@ -1,0 +1,19 @@
+row_id,system,qid,auto_refusal,judge_a,judge_a_note,judge_b,judge_b_note,ai_final
+u001,extractive (arm 1),hv3_35,no,wrong,Dumps unrelated letter passages for a cooking question.,wrong,Dumps unrelated letter passages instead of declining.,wrong
+u002,7B old path (arm 4),hv3_35,yes,correct refusal,"Declines, says passages lack evidence.",correct refusal,Declines: passages do not provide enough evidence.,correct refusal
+u003,grounded 7B (arm 5),hv3_35,yes,correct refusal,"Declines, says passages lack evidence.",correct refusal,Declines: passages do not provide enough evidence.,correct refusal
+u004,extractive (arm 1),hv3_36,yes,correct refusal,"Declines, says passages lack evidence.",correct refusal,Declines: passages do not provide enough evidence.,correct refusal
+u005,7B old path (arm 4),hv3_36,yes,correct refusal,"Declines, says passages lack evidence.",correct refusal,Declines: passages do not provide enough evidence.,correct refusal
+u006,grounded 7B (arm 5),hv3_36,yes,correct refusal,"Declines, says passages lack evidence.",correct refusal,Declines: passages do not provide enough evidence.,correct refusal
+u007,extractive (arm 1),hv3_37,yes,correct refusal,"Declines, says passages lack evidence.",correct refusal,Declines: passages do not provide enough evidence.,correct refusal
+u008,7B old path (arm 4),hv3_37,yes,correct refusal,"Declines, says passages lack evidence.",correct refusal,Declines: passages do not provide enough evidence.,correct refusal
+u009,grounded 7B (arm 5),hv3_37,no,wrong,Dumps unrelated letter table instead of declining; no coverage ratio exists.,wrong,Dumps a 2019 ownership table; no refusal.,wrong
+u010,extractive (arm 1),hv3_38,no,wrong,Dumps unrelated underwriting passages for a future year 2031 instead of declining.,wrong,Dumps unrelated underwriting text; does not decline.,wrong
+u011,7B old path (arm 4),hv3_38,yes,correct refusal,"Declines, says passages lack evidence.",correct refusal,Declines: passages do not provide enough evidence.,correct refusal
+u012,grounded 7B (arm 5),hv3_38,no,wrong,Dumps unrelated underwriting passages instead of declining for 2031.,wrong,Answers with other-year underwriting text; no refusal.,wrong
+u013,extractive (arm 1),hv3_39,no,wrong,Dumps unrelated acquisition-accounting passages for Spotify instead of declining.,wrong,Dumps unrelated purchase-accounting text; does not decline.,wrong
+u014,7B old path (arm 4),hv3_39,yes,correct refusal,"Declines, says passages lack evidence.",correct refusal,Declines: passages do not provide enough evidence.,correct refusal
+u015,grounded 7B (arm 5),hv3_39,yes,correct refusal,"Declines, says passages lack evidence.",correct refusal,Declines: passages do not provide enough evidence.,correct refusal
+u016,extractive (arm 1),hv3_40,yes,correct refusal,"Declines, says passages lack evidence.",correct refusal,Declines: passages do not provide enough evidence.,correct refusal
+u017,7B old path (arm 4),hv3_40,yes,correct refusal,"Declines, says passages lack evidence.",correct refusal,Declines: passages do not provide enough evidence.,correct refusal
+u018,grounded 7B (arm 5),hv3_40,no,wrong,Dumps unrelated operating earnings table instead of declining.,wrong,Dumps operating-earnings table; no refusal.,wrong
