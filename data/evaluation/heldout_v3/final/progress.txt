@@ -1,0 +1,15 @@
+START local_extractive 2026-10-06T13:08:50Z load=5.77 3.82 3.50
+END local_extractive exit=0 seconds=6 2026-10-06T13:08:56Z
+START llama_base 2026-10-06T13:08:56Z load=5.11 3.75 3.48
+END llama_base exit=0 seconds=32 2026-10-06T13:09:28Z
+START llama_ftr2 2026-10-06T13:09:28Z load=5.54 3.94 3.56
+END llama_ftr2 exit=0 seconds=31 2026-10-06T13:09:59Z
+START mlx7b_oldpath 2026-10-06T13:09:59Z load=3.79 3.67 3.47
+END mlx7b_oldpath exit=0 seconds=117 2026-10-06T13:11:56Z
+START grounded_mlx7b 2026-10-06T13:11:56Z load=14.66 6.58 4.56
+END grounded_mlx7b exit=0 seconds=117 2026-10-06T13:13:53Z
+START grounded_template 2026-10-06T13:13:53Z load=6.29 5.98 4.57
+END grounded_template exit=0 seconds=66 2026-10-06T13:14:59Z
+START grounded_llama_ftr2 2026-10-06T13:14:59Z load=3.32 5.19 4.38
+END grounded_llama_ftr2 exit=0 seconds=82 2026-10-06T13:16:21Z
+ALL_DONE any_fail=0 2026-10-06T13:16:21Z

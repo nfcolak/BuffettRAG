@@ -1,0 +1,3266 @@
+{
+ "schema_version": 1,
+ "set": "heldout_v3",
+ "retrieval": "bm25",
+ "temperature": 0.0,
+ "cases": 40,
+ "cases_sha256": "23f3a71930ce761412a1366e313bd319c5c36ec9454538ca1f0b9d4beea1baf3",
+ "metric": "strict supported claims (src.evaluation.supported_claims via calibrate_grounded.Scorer)",
+ "machine_load_note": "shared machine, other agents active; load average at start of the run 5.77 3.82 3.50, per-arm values below (3-15)",
+ "load_per_arm_start": [
+  "local_extractive 5.77 3.82 3.50",
+  "llama_base 5.11 3.75 3.48",
+  "llama_ftr2 5.54 3.94 3.56",
+  "mlx7b_oldpath 3.79 3.67 3.47",
+  "grounded_mlx7b 14.66 6.58 4.56",
+  "grounded_template 6.29 5.98 4.57",
+  "grounded_llama_ftr2 3.32 5.19 4.38"
+ ],
+ "types": [
+  "opinion",
+  "company",
+  "fact_number",
+  "temporal_comparison",
+  "follow_up",
+  "unanswerable"
+ ],
+ "arms": {
+  "1": {
+   "arm": 1,
+   "name": "local_extractive",
+   "label": "extractive",
+   "provider": "local",
+   "composer": null,
+   "cases_run": 40,
+   "scored_answers": 40,
+   "lexical_accepted": 14,
+   "nli_accepted": 17,
+   "strict_supported_claims_met": 13,
+   "strict_required_claims": 41,
+   "strict_hits_source": [
+    "rebuilt_context"
+   ],
+   "context_rebuild_validation": null,
+   "strict_from_rescore_nli": null,
+   "strict_matches_rescore_nli": null,
+   "lexical_claims_met": 14,
+   "nli_claims_met": 19,
+   "nli_required_claims": 41,
+   "invalid_markers": 0,
+   "unsupported_extra_sentences": 74,
+   "content_sentences_answerable": 236,
+   "unanswerable_cases": 6,
+   "correct_refusals": 3,
+   "unexpected_refusals": 3,
+   "answerable_cases": 34,
+   "abstain_answerable_incl_notes": 6,
+   "abstain_answerable_qids": [
+    {
+     "qid": "hv3_02",
+     "refusal": true
+    },
+    {
+     "qid": "hv3_10",
+     "refusal": true
+    },
+    {
+     "qid": "hv3_19",
+     "refusal": true
+    },
+    {
+     "qid": "hv3_26",
+     "refusal": false
+    },
+    {
+     "qid": "hv3_27",
+     "refusal": false
+    },
+    {
+     "qid": "hv3_29",
+     "refusal": false
+    }
+   ],
+   "fallback": null,
+   "per_type": {
+    "company": {
+     "cases": 8,
+     "supported_met": 6,
+     "required_claims": 9
+    },
+    "fact_number": {
+     "cases": 8,
+     "supported_met": 1,
+     "required_claims": 9
+    },
+    "follow_up": {
+     "cases": 4,
+     "supported_met": 2,
+     "required_claims": 5
+    },
+    "opinion": {
+     "cases": 9,
+     "supported_met": 3,
+     "required_claims": 9
+    },
+    "temporal_comparison": {
+     "cases": 5,
+     "supported_met": 1,
+     "required_claims": 9
+    },
+    "unanswerable": {
+     "cases": 6,
+     "supported_met": 0,
+     "required_claims": 0
+    }
+   },
+   "provider_failures": 0,
+   "provider_error_events": 0,
+   "provider_failures_by_stage_type": {},
+   "latency_ms": {
+    "all": {
+     "n": 40,
+     "p50": 41.2,
+     "p95": 51.0
+    },
+    "warm": {
+     "n": 39,
+     "p50": 41.0,
+     "p95": 51.2
+    },
+    "cold": {
+     "n": 1,
+     "p50": 43.5,
+     "p95": 43.5
+    },
+    "setup_ms": 181.663
+   },
+   "effective": {
+    "model": "embedded-extractive-v1",
+    "resolved_provider": "local",
+    "model_path": null,
+    "temperature_requested": 0.0,
+    "temperature_manifest": null,
+    "device": null,
+    "nli_device": "mps",
+    "grounded_settings": null,
+    "code_sha": null,
+    "code_dirty": null,
+    "resumes": null
+   }
+  },
+  "2": {
+   "arm": 2,
+   "name": "llama_base",
+   "label": "llama base 1.5B",
+   "provider": "llama",
+   "composer": null,
+   "cases_run": 40,
+   "scored_answers": 40,
+   "lexical_accepted": 7,
+   "nli_accepted": 6,
+   "strict_supported_claims_met": 1,
+   "strict_required_claims": 41,
+   "strict_hits_source": [
+    "rebuilt_context"
+   ],
+   "context_rebuild_validation": null,
+   "strict_from_rescore_nli": null,
+   "strict_matches_rescore_nli": null,
+   "lexical_claims_met": 1,
+   "nli_claims_met": 0,
+   "nli_required_claims": 41,
+   "invalid_markers": 0,
+   "unsupported_extra_sentences": 12,
+   "content_sentences_answerable": 14,
+   "unanswerable_cases": 6,
+   "correct_refusals": 6,
+   "unexpected_refusals": 26,
+   "answerable_cases": 34,
+   "abstain_answerable_incl_notes": 32,
+   "abstain_answerable_qids": [
+    {
+     "qid": "hv3_01",
+     "refusal": true
+    },
+    {
+     "qid": "hv3_02",
+     "refusal": true
+    },
+    {
+     "qid": "hv3_04",
+     "refusal": true
+    },
+    {
+     "qid": "hv3_05",
+     "refusal": true
+    },
+    {
+     "qid": "hv3_06",
+     "refusal": true
+    },
+    {
+     "qid": "hv3_08",
+     "refusal": true
+    },
+    {
+     "qid": "hv3_09",
+     "refusal": true
+    },
+    {
+     "qid": "hv3_10",
+     "refusal": true
+    },
+    {
+     "qid": "hv3_11",
+     "refusal": true
+    },
+    {
+     "qid": "hv3_12",
+     "refusal": true
+    },
+    {
+     "qid": "hv3_13",
+     "refusal": true
+    },
+    {
+     "qid": "hv3_14",
+     "refusal": true
+    },
+    {
+     "qid": "hv3_15",
+     "refusal": true
+    },
+    {
+     "qid": "hv3_16",
+     "refusal": true
+    },
+    {
+     "qid": "hv3_17",
+     "refusal": true
+    },
+    {
+     "qid": "hv3_18",
+     "refusal": true
+    },
+    {
+     "qid": "hv3_19",
+     "refusal": true
+    },
+    {
+     "qid": "hv3_20",
+     "refusal": false
+    },
+    {
+     "qid": "hv3_21",
+     "refusal": true
+    },
+    {
+     "qid": "hv3_22",
+     "refusal": true
+    },
+    {
+     "qid": "hv3_23",
+     "refusal": true
+    },
+    {
+     "qid": "hv3_24",
+     "refusal": true
+    },
+    {
+     "qid": "hv3_25",
+     "refusal": true
+    },
+    {
+     "qid": "hv3_26",
+     "refusal": false
+    },
+    {
+     "qid": "hv3_27",
+     "refusal": false
+    },
+    {
+     "qid": "hv3_28",
+     "refusal": false
+    },
+    {
+     "qid": "hv3_29",
+     "refusal": false
+    },
+    {
+     "qid": "hv3_30",
+     "refusal": false
+    },
+    {
+     "qid": "hv3_31",
+     "refusal": true
+    },
+    {
+     "qid": "hv3_32",
+     "refusal": true
+    },
+    {
+     "qid": "hv3_33",
+     "refusal": true
+    },
+    {
+     "qid": "hv3_34",
+     "refusal": true
+    }
+   ],
+   "fallback": null,
+   "per_type": {
+    "company": {
+     "cases": 8,
+     "supported_met": 0,
+     "required_claims": 9
+    },
+    "fact_number": {
+     "cases": 8,
+     "supported_met": 0,
+     "required_claims": 9
+    },
+    "follow_up": {
+     "cases": 4,
+     "supported_met": 0,
+     "required_claims": 5
+    },
+    "opinion": {
+     "cases": 9,
+     "supported_met": 1,
+     "required_claims": 9
+    },
+    "temporal_comparison": {
+     "cases": 5,
+     "supported_met": 0,
+     "required_claims": 9
+    },
+    "unanswerable": {
+     "cases": 6,
+     "supported_met": 0,
+     "required_claims": 0
+    }
+   },
+   "provider_failures": 0,
+   "provider_error_events": 0,
+   "provider_failures_by_stage_type": {},
+   "latency_ms": {
+    "all": {
+     "n": 40,
+     "p50": 716.3,
+     "p95": 1694.9
+    },
+    "warm": {
+     "n": 39,
+     "p50": 713.4,
+     "p95": 1590.1
+    },
+    "cold": {
+     "n": 1,
+     "p50": 2178.5,
+     "p95": 2178.5
+    },
+    "setup_ms": 183.878
+   },
+   "effective": {
+    "model": "qwen2.5-1.5b-instruct-q4_k_m.gguf",
+    "resolved_provider": "llama",
+    "model_path": null,
+    "temperature_requested": 0.0,
+    "temperature_manifest": null,
+    "device": null,
+    "nli_device": "mps",
+    "grounded_settings": null,
+    "code_sha": null,
+    "code_dirty": null,
+    "resumes": null
+   }
+  },
+  "3": {
+   "arm": 3,
+   "name": "llama_ftr2",
+   "label": "llama FT-r2 1.5B",
+   "provider": "llama",
+   "composer": null,
+   "cases_run": 40,
+   "scored_answers": 40,
+   "lexical_accepted": 7,
+   "nli_accepted": 6,
+   "strict_supported_claims_met": 1,
+   "strict_required_claims": 41,
+   "strict_hits_source": [
+    "rebuilt_context"
+   ],
+   "context_rebuild_validation": null,
+   "strict_from_rescore_nli": null,
+   "strict_matches_rescore_nli": null,
+   "lexical_claims_met": 1,
+   "nli_claims_met": 0,
+   "nli_required_claims": 41,
+   "invalid_markers": 0,
+   "unsupported_extra_sentences": 12,
+   "content_sentences_answerable": 14,
+   "unanswerable_cases": 6,
+   "correct_refusals": 6,
+   "unexpected_refusals": 26,
+   "answerable_cases": 34,
+   "abstain_answerable_incl_notes": 32,
+   "abstain_answerable_qids": [
+    {
+     "qid": "hv3_01",
+     "refusal": true
+    },
+    {
+     "qid": "hv3_02",
+     "refusal": true
+    },
+    {
+     "qid": "hv3_04",
+     "refusal": true
+    },
+    {
+     "qid": "hv3_05",
+     "refusal": true
+    },
+    {
+     "qid": "hv3_06",
+     "refusal": true
+    },
+    {
+     "qid": "hv3_08",
+     "refusal": true
+    },
+    {
+     "qid": "hv3_09",
+     "refusal": true
+    },
+    {
+     "qid": "hv3_10",
+     "refusal": true
+    },
+    {
+     "qid": "hv3_11",
+     "refusal": true
+    },
+    {
+     "qid": "hv3_12",
+     "refusal": true
+    },
+    {
+     "qid": "hv3_13",
+     "refusal": true
+    },
+    {
+     "qid": "hv3_14",
+     "refusal": true
+    },
+    {
+     "qid": "hv3_15",
+     "refusal": true
+    },
+    {
+     "qid": "hv3_16",
+     "refusal": true
+    },
+    {
+     "qid": "hv3_17",
+     "refusal": true
+    },
+    {
+     "qid": "hv3_18",
+     "refusal": true
+    },
+    {
+     "qid": "hv3_19",
+     "refusal": true
+    },
+    {
+     "qid": "hv3_20",
+     "refusal": false
+    },
+    {
+     "qid": "hv3_21",
+     "refusal": true
+    },
+    {
+     "qid": "hv3_22",
+     "refusal": true
+    },
+    {
+     "qid": "hv3_23",
+     "refusal": true
+    },
+    {
+     "qid": "hv3_24",
+     "refusal": true
+    },
+    {
+     "qid": "hv3_25",
+     "refusal": true
+    },
+    {
+     "qid": "hv3_26",
+     "refusal": false
+    },
+    {
+     "qid": "hv3_27",
+     "refusal": false
+    },
+    {
+     "qid": "hv3_28",
+     "refusal": false
+    },
+    {
+     "qid": "hv3_29",
+     "refusal": false
+    },
+    {
+     "qid": "hv3_30",
+     "refusal": false
+    },
+    {
+     "qid": "hv3_31",
+     "refusal": true
+    },
+    {
+     "qid": "hv3_32",
+     "refusal": true
+    },
+    {
+     "qid": "hv3_33",
+     "refusal": true
+    },
+    {
+     "qid": "hv3_34",
+     "refusal": true
+    }
+   ],
+   "fallback": null,
+   "per_type": {
+    "company": {
+     "cases": 8,
+     "supported_met": 0,
+     "required_claims": 9
+    },
+    "fact_number": {
+     "cases": 8,
+     "supported_met": 0,
+     "required_claims": 9
+    },
+    "follow_up": {
+     "cases": 4,
+     "supported_met": 0,
+     "required_claims": 5
+    },
+    "opinion": {
+     "cases": 9,
+     "supported_met": 1,
+     "required_claims": 9
+    },
+    "temporal_comparison": {
+     "cases": 5,
+     "supported_met": 0,
+     "required_claims": 9
+    },
+    "unanswerable": {
+     "cases": 6,
+     "supported_met": 0,
+     "required_claims": 0
+    }
+   },
+   "provider_failures": 0,
+   "provider_error_events": 0,
+   "provider_failures_by_stage_type": {},
+   "latency_ms": {
+    "all": {
+     "n": 40,
+     "p50": 714.3,
+     "p95": 1681.9
+    },
+    "warm": {
+     "n": 39,
+     "p50": 698.3,
+     "p95": 1508.7
+    },
+    "cold": {
+     "n": 1,
+     "p50": 1966.3,
+     "p95": 1966.3
+    },
+    "setup_ms": 189.773
+   },
+   "effective": {
+    "model": "qwen2.5-1.5b-instruct-q4_k_m.gguf",
+    "resolved_provider": "llama",
+    "model_path": null,
+    "temperature_requested": 0.0,
+    "temperature_manifest": null,
+    "device": null,
+    "nli_device": "mps",
+    "grounded_settings": null,
+    "code_sha": null,
+    "code_dirty": null,
+    "resumes": null
+   }
+  },
+  "4": {
+   "arm": 4,
+   "name": "mlx7b_oldpath",
+   "label": "mlx 7B old path",
+   "provider": "mlx",
+   "composer": null,
+   "cases_run": 40,
+   "scored_answers": 40,
+   "lexical_accepted": 10,
+   "nli_accepted": 9,
+   "strict_supported_claims_met": 4,
+   "strict_required_claims": 41,
+   "strict_hits_source": [
+    "rebuilt_context"
+   ],
+   "context_rebuild_validation": null,
+   "strict_from_rescore_nli": null,
+   "strict_matches_rescore_nli": null,
+   "lexical_claims_met": 4,
+   "nli_claims_met": 5,
+   "nli_required_claims": 41,
+   "invalid_markers": 0,
+   "unsupported_extra_sentences": 12,
+   "content_sentences_answerable": 22,
+   "unanswerable_cases": 6,
+   "correct_refusals": 6,
+   "unexpected_refusals": 21,
+   "answerable_cases": 34,
+   "abstain_answerable_incl_notes": 27,
+   "abstain_answerable_qids": [
+    {
+     "qid": "hv3_01",
+     "refusal": true
+    },
+    {
+     "qid": "hv3_02",
+     "refusal": true
+    },
+    {
+     "qid": "hv3_04",
+     "refusal": true
+    },
+    {
+     "qid": "hv3_05",
+     "refusal": true
+    },
+    {
+     "qid": "hv3_06",
+     "refusal": true
+    },
+    {
+     "qid": "hv3_07",
+     "refusal": true
+    },
+    {
+     "qid": "hv3_08",
+     "refusal": true
+    },
+    {
+     "qid": "hv3_10",
+     "refusal": true
+    },
+    {
+     "qid": "hv3_12",
+     "refusal": true
+    },
+    {
+     "qid": "hv3_15",
+     "refusal": true
+    },
+    {
+     "qid": "hv3_16",
+     "refusal": true
+    },
+    {
+     "qid": "hv3_17",
+     "refusal": true
+    },
+    {
+     "qid": "hv3_18",
+     "refusal": true
+    },
+    {
+     "qid": "hv3_19",
+     "refusal": true
+    },
+    {
+     "qid": "hv3_20",
+     "refusal": false
+    },
+    {
+     "qid": "hv3_21",
+     "refusal": true
+    },
+    {
+     "qid": "hv3_22",
+     "refusal": true
+    },
+    {
+     "qid": "hv3_23",
+     "refusal": true
+    },
+    {
+     "qid": "hv3_26",
+     "refusal": false
+    },
+    {
+     "qid": "hv3_27",
+     "refusal": false
+    },
+    {
+     "qid": "hv3_28",
+     "refusal": false
+    },
+    {
+     "qid": "hv3_29",
+     "refusal": false
+    },
+    {
+     "qid": "hv3_30",
+     "refusal": false
+    },
+    {
+     "qid": "hv3_31",
+     "refusal": true
+    },
+    {
+     "qid": "hv3_32",
+     "refusal": true
+    },
+    {
+     "qid": "hv3_33",
+     "refusal": true
+    },
+    {
+     "qid": "hv3_34",
+     "refusal": true
+    }
+   ],
+   "fallback": null,
+   "per_type": {
+    "company": {
+     "cases": 8,
+     "supported_met": 2,
+     "required_claims": 9
+    },
+    "fact_number": {
+     "cases": 8,
+     "supported_met": 1,
+     "required_claims": 9
+    },
+    "follow_up": {
+     "cases": 4,
+     "supported_met": 0,
+     "required_claims": 5
+    },
+    "opinion": {
+     "cases": 9,
+     "supported_met": 1,
+     "required_claims": 9
+    },
+    "temporal_comparison": {
+     "cases": 5,
+     "supported_met": 0,
+     "required_claims": 9
+    },
+    "unanswerable": {
+     "cases": 6,
+     "supported_met": 0,
+     "required_claims": 0
+    }
+   },
+   "provider_failures": 0,
+   "provider_error_events": 0,
+   "provider_failures_by_stage_type": {},
+   "latency_ms": {
+    "all": {
+     "n": 40,
+     "p50": 3146.7,
+     "p95": 4520.1
+    },
+    "warm": {
+     "n": 39,
+     "p50": 3137.1,
+     "p95": 4353.8
+    },
+    "cold": {
+     "n": 1,
+     "p50": 6667.8,
+     "p95": 6667.8
+    },
+    "setup_ms": 203.413
+   },
+   "effective": {
+    "model": "teacher-qwen2.5-7b-mlx4",
+    "resolved_provider": "mlx",
+    "model_path": "/Users/necatifurkancolak/AI-Workplace/Projects/done/BuffettRAG/models/teacher-qwen2.5-7b-mlx4",
+    "temperature_requested": 0.0,
+    "temperature_manifest": {
+     "requested": 0.0,
+     "asserted_at_provider": true,
+     "provider_attr": 0.0
+    },
+    "device": {
+     "machine": "arm64",
+     "platform": "macOS-27.0.1-arm64-arm-64bit",
+     "torch_mps": true
+    },
+    "nli_device": "mps",
+    "grounded_settings": null,
+    "code_sha": "7a4e8f6f4a604d55c849421d9ffa54bcfb83f4c8",
+    "code_dirty": true,
+    "resumes": []
+   }
+  },
+  "5": {
+   "arm": 5,
+   "name": "grounded_mlx7b",
+   "label": "grounded + mlx 7B",
+   "provider": "grounded",
+   "composer": "mlx",
+   "cases_run": 40,
+   "scored_answers": 40,
+   "lexical_accepted": 16,
+   "nli_accepted": 7,
+   "strict_supported_claims_met": 15,
+   "strict_required_claims": 41,
+   "strict_hits_source": [
+    "context_snapshot"
+   ],
+   "context_rebuild_validation": {
+    "rows_checked": 40,
+    "rows_identical": 40
+   },
+   "strict_from_rescore_nli": 15,
+   "strict_matches_rescore_nli": true,
+   "lexical_claims_met": 16,
+   "nli_claims_met": 17,
+   "nli_required_claims": 41,
+   "invalid_markers": 0,
+   "unsupported_extra_sentences": 24,
+   "content_sentences_answerable": 76,
+   "unanswerable_cases": 6,
+   "correct_refusals": 3,
+   "unexpected_refusals": 5,
+   "answerable_cases": 34,
+   "abstain_answerable_incl_notes": 5,
+   "abstain_answerable_qids": [
+    {
+     "qid": "hv3_02",
+     "refusal": true
+    },
+    {
+     "qid": "hv3_05",
+     "refusal": true
+    },
+    {
+     "qid": "hv3_10",
+     "refusal": true
+    },
+    {
+     "qid": "hv3_19",
+     "refusal": true
+    },
+    {
+     "qid": "hv3_26",
+     "refusal": true
+    }
+   ],
+   "fallback": {
+    "groups_composed": 36,
+    "groups_fallback_to_template": 25,
+    "fallback_rate": 0.6944,
+    "reasons": {
+     "verifier_rejected": 10,
+     "model_refused": 15
+    },
+    "answer_decisions": {
+     "answer": 32,
+     "refuse": 8
+    }
+   },
+   "per_type": {
+    "company": {
+     "cases": 8,
+     "supported_met": 7,
+     "required_claims": 9
+    },
+    "fact_number": {
+     "cases": 8,
+     "supported_met": 4,
+     "required_claims": 9
+    },
+    "follow_up": {
+     "cases": 4,
+     "supported_met": 1,
+     "required_claims": 5
+    },
+    "opinion": {
+     "cases": 9,
+     "supported_met": 2,
+     "required_claims": 9
+    },
+    "temporal_comparison": {
+     "cases": 5,
+     "supported_met": 1,
+     "required_claims": 9
+    },
+    "unanswerable": {
+     "cases": 6,
+     "supported_met": 0,
+     "required_claims": 0
+    }
+   },
+   "provider_failures": 0,
+   "provider_error_events": 0,
+   "provider_failures_by_stage_type": {},
+   "latency_ms": {
+    "all": {
+     "n": 40,
+     "p50": 2410.2,
+     "p95": 6636.6
+    },
+    "warm": {
+     "n": 39,
+     "p50": 2396.6,
+     "p95": 6695.3
+    },
+    "cold": {
+     "n": 1,
+     "p50": 5794.3,
+     "p95": 5794.3
+    },
+    "setup_ms": 187.858
+   },
+   "effective": {
+    "model": "grounded:mlx:teacher-qwen2.5-7b-mlx4",
+    "resolved_provider": "grounded",
+    "model_path": "/Users/necatifurkancolak/AI-Workplace/Projects/done/BuffettRAG/models/teacher-qwen2.5-7b-mlx4",
+    "temperature_requested": 0.0,
+    "temperature_manifest": {
+     "requested": 0.0,
+     "asserted_at_provider": true,
+     "provider_attr": 0.0
+    },
+    "device": {
+     "machine": "arm64",
+     "platform": "macOS-27.0.1-arm64-arm-64bit",
+     "torch_mps": true
+    },
+    "nli_device": "mps",
+    "grounded_settings": {
+     "MAX_UNITS": 6,
+     "T_RELEVANT": 0.01,
+     "T_SLOT": 0.001,
+     "NUMERIC_GUARD": "bound"
+    },
+    "code_sha": "7a4e8f6f4a604d55c849421d9ffa54bcfb83f4c8",
+    "code_dirty": true,
+    "resumes": []
+   }
+  },
+  "6": {
+   "arm": 6,
+   "name": "grounded_template",
+   "label": "grounded + template",
+   "provider": "grounded",
+   "composer": "template",
+   "cases_run": 40,
+   "scored_answers": 40,
+   "lexical_accepted": 14,
+   "nli_accepted": 9,
+   "strict_supported_claims_met": 14,
+   "strict_required_claims": 41,
+   "strict_hits_source": [
+    "context_snapshot"
+   ],
+   "context_rebuild_validation": {
+    "rows_checked": 40,
+    "rows_identical": 40
+   },
+   "strict_from_rescore_nli": 14,
+   "strict_matches_rescore_nli": true,
+   "lexical_claims_met": 14,
+   "nli_claims_met": 16,
+   "nli_required_claims": 41,
+   "invalid_markers": 0,
+   "unsupported_extra_sentences": 25,
+   "content_sentences_answerable": 95,
+   "unanswerable_cases": 6,
+   "correct_refusals": 3,
+   "unexpected_refusals": 5,
+   "answerable_cases": 34,
+   "abstain_answerable_incl_notes": 5,
+   "abstain_answerable_qids": [
+    {
+     "qid": "hv3_02",
+     "refusal": true
+    },
+    {
+     "qid": "hv3_05",
+     "refusal": true
+    },
+    {
+     "qid": "hv3_10",
+     "refusal": true
+    },
+    {
+     "qid": "hv3_19",
+     "refusal": true
+    },
+    {
+     "qid": "hv3_26",
+     "refusal": true
+    }
+   ],
+   "fallback": {
+    "groups_composed": 36,
+    "groups_fallback_to_template": 0,
+    "fallback_rate": 0.0,
+    "reasons": {},
+    "answer_decisions": {
+     "answer": 32,
+     "refuse": 8
+    }
+   },
+   "per_type": {
+    "company": {
+     "cases": 8,
+     "supported_met": 7,
+     "required_claims": 9
+    },
+    "fact_number": {
+     "cases": 8,
+     "supported_met": 4,
+     "required_claims": 9
+    },
+    "follow_up": {
+     "cases": 4,
+     "supported_met": 1,
+     "required_claims": 5
+    },
+    "opinion": {
+     "cases": 9,
+     "supported_met": 1,
+     "required_claims": 9
+    },
+    "temporal_comparison": {
+     "cases": 5,
+     "supported_met": 1,
+     "required_claims": 9
+    },
+    "unanswerable": {
+     "cases": 6,
+     "supported_met": 0,
+     "required_claims": 0
+    }
+   },
+   "provider_failures": 0,
+   "provider_error_events": 0,
+   "provider_failures_by_stage_type": {},
+   "latency_ms": {
+    "all": {
+     "n": 40,
+     "p50": 1042.8,
+     "p95": 4979.9
+    },
+    "warm": {
+     "n": 39,
+     "p50": 1035.4,
+     "p95": 4981.5
+    },
+    "cold": {
+     "n": 1,
+     "p50": 2842.3,
+     "p95": 2842.3
+    },
+    "setup_ms": 202.502
+   },
+   "effective": {
+    "model": "grounded:template",
+    "resolved_provider": "grounded",
+    "model_path": null,
+    "temperature_requested": 0.0,
+    "temperature_manifest": {
+     "requested": 0.0,
+     "asserted_at_provider": true,
+     "provider_attr": 0.0
+    },
+    "device": {
+     "machine": "arm64",
+     "platform": "macOS-27.0.1-arm64-arm-64bit",
+     "torch_mps": true
+    },
+    "nli_device": "mps",
+    "grounded_settings": {
+     "MAX_UNITS": 6,
+     "T_RELEVANT": 0.01,
+     "T_SLOT": 0.001,
+     "NUMERIC_GUARD": "bound"
+    },
+    "code_sha": "7a4e8f6f4a604d55c849421d9ffa54bcfb83f4c8",
+    "code_dirty": true,
+    "resumes": []
+   }
+  },
+  "7": {
+   "arm": 7,
+   "name": "grounded_llama_ftr2",
+   "label": "grounded + llama FT-r2",
+   "provider": "grounded",
+   "composer": "llama",
+   "cases_run": 40,
+   "scored_answers": 40,
+   "lexical_accepted": 14,
+   "nli_accepted": 8,
+   "strict_supported_claims_met": 14,
+   "strict_required_claims": 41,
+   "strict_hits_source": [
+    "context_snapshot"
+   ],
+   "context_rebuild_validation": {
+    "rows_checked": 40,
+    "rows_identical": 40
+   },
+   "strict_from_rescore_nli": 14,
+   "strict_matches_rescore_nli": true,
+   "lexical_claims_met": 14,
+   "nli_claims_met": 14,
+   "nli_required_claims": 41,
+   "invalid_markers": 0,
+   "unsupported_extra_sentences": 24,
+   "content_sentences_answerable": 85,
+   "unanswerable_cases": 6,
+   "correct_refusals": 3,
+   "unexpected_refusals": 5,
+   "answerable_cases": 34,
+   "abstain_answerable_incl_notes": 5,
+   "abstain_answerable_qids": [
+    {
+     "qid": "hv3_02",
+     "refusal": true
+    },
+    {
+     "qid": "hv3_05",
+     "refusal": true
+    },
+    {
+     "qid": "hv3_10",
+     "refusal": true
+    },
+    {
+     "qid": "hv3_19",
+     "refusal": true
+    },
+    {
+     "qid": "hv3_26",
+     "refusal": true
+    }
+   ],
+   "fallback": {
+    "groups_composed": 36,
+    "groups_fallback_to_template": 28,
+    "fallback_rate": 0.7778,
+    "reasons": {
+     "verifier_rejected": 14,
+     "model_refused": 14
+    },
+    "answer_decisions": {
+     "answer": 32,
+     "refuse": 8
+    }
+   },
+   "per_type": {
+    "company": {
+     "cases": 8,
+     "supported_met": 6,
+     "required_claims": 9
+    },
+    "fact_number": {
+     "cases": 8,
+     "supported_met": 4,
+     "required_claims": 9
+    },
+    "follow_up": {
+     "cases": 4,
+     "supported_met": 1,
+     "required_claims": 5
+    },
+    "opinion": {
+     "cases": 9,
+     "supported_met": 1,
+     "required_claims": 9
+    },
+    "temporal_comparison": {
+     "cases": 5,
+     "supported_met": 2,
+     "required_claims": 9
+    },
+    "unanswerable": {
+     "cases": 6,
+     "supported_met": 0,
+     "required_claims": 0
+    }
+   },
+   "provider_failures": 0,
+   "provider_error_events": 0,
+   "provider_failures_by_stage_type": {},
+   "latency_ms": {
+    "all": {
+     "n": 40,
+     "p50": 1479.2,
+     "p95": 5366.1
+    },
+    "warm": {
+     "n": 39,
+     "p50": 1465.1,
+     "p95": 5368.2
+    },
+    "cold": {
+     "n": 1,
+     "p50": 3275.1,
+     "p95": 3275.1
+    },
+    "setup_ms": 186.843
+   },
+   "effective": {
+    "model": "grounded:llama:buffett-qwen2.5-1.5b-ft-r2-q4_k_m.gguf",
+    "resolved_provider": "grounded",
+    "model_path": "/Users/necatifurkancolak/AI-Workplace/Projects/done/BuffettRAG/models/ft/round2/buffett-qwen2.5-1.5b-ft-r2-q4_k_m.gguf",
+    "temperature_requested": 0.0,
+    "temperature_manifest": {
+     "requested": 0.0,
+     "asserted_at_provider": true,
+     "provider_attr": 0.0
+    },
+    "device": {
+     "machine": "arm64",
+     "platform": "macOS-27.0.1-arm64-arm-64bit",
+     "torch_mps": true
+    },
+    "nli_device": "mps",
+    "grounded_settings": {
+     "MAX_UNITS": 6,
+     "T_RELEVANT": 0.01,
+     "T_SLOT": 0.001,
+     "NUMERIC_GUARD": "bound"
+    },
+    "code_sha": "7a4e8f6f4a604d55c849421d9ffa54bcfb83f4c8",
+    "code_dirty": true,
+    "resumes": []
+   }
+  }
+ },
+ "screening": {
+  "rule": "plan section 7, applied literally to arm 5; engineering screen, not a statistical test (40 blind cases, per-type differences of 1-2 claims are noise)",
+  "conditions": [
+   {
+    "condition": "supported claims met: arm5 >= arm1 + 3 AND arm5 >= arm4",
+    "pass": false,
+    "detail": "arm5=15, arm1=13 (need >= 16), arm4=4 (need >= 4)"
+   },
+   {
+    "condition": "correct refusals = all genuine refusal cases",
+    "pass": false,
+    "detail": "arm5 correct refusals=3/6"
+   },
+   {
+    "condition": "abstentions on answerable <= arm1",
+    "pass": true,
+    "detail": "arm5=5, arm1=6"
+   },
+   {
+    "condition": "zero invalid markers",
+    "pass": true,
+    "detail": "arm5=0"
+   },
+   {
+    "condition": "zero provider failures",
+    "pass": true,
+    "detail": "arm5 failed cases=0, error events=0"
+   },
+   {
+    "condition": "no type with fewer supported claims than arm1 by more than 1",
+    "pass": true,
+    "detail": "per type arm5 vs arm1: opinion 2 vs 3, company 7 vs 6, fact_number 4 vs 1, temporal_comparison 1 vs 1, follow_up 1 vs 2"
+   },
+   {
+    "condition": "warm p95 <= 8 s",
+    "pass": true,
+    "detail": "arm5 warm p95=6695.3 ms (n warm=39)"
+   }
+  ],
+  "verdict": "not a candidate"
+ },
+ "paired": {
+  "arm5_vs_arm1": [
+   {
+    "qid": "hv3_01",
+    "type": "opinion",
+    "required": 1,
+    "arm5": 0,
+    "arm1": 0,
+    "delta": 0
+   },
+   {
+    "qid": "hv3_02",
+    "type": "opinion",
+    "required": 1,
+    "arm5": 0,
+    "arm1": 0,
+    "delta": 0
+   },
+   {
+    "qid": "hv3_03",
+    "type": "opinion",
+    "required": 1,
+    "arm5": 0,
+    "arm1": 1,
+    "delta": -1
+   },
+   {
+    "qid": "hv3_04",
+    "type": "opinion",
+    "required": 1,
+    "arm5": 1,
+    "arm1": 1,
+    "delta": 0
+   },
+   {
+    "qid": "hv3_05",
+    "type": "opinion",
+    "required": 1,
+    "arm5": 0,
+    "arm1": 0,
+    "delta": 0
+   },
+   {
+    "qid": "hv3_06",
+    "type": "opinion",
+    "required": 1,
+    "arm5": 0,
+    "arm1": 0,
+    "delta": 0
+   },
+   {
+    "qid": "hv3_07",
+    "type": "opinion",
+    "required": 1,
+    "arm5": 0,
+    "arm1": 0,
+    "delta": 0
+   },
+   {
+    "qid": "hv3_08",
+    "type": "opinion",
+    "required": 1,
+    "arm5": 0,
+    "arm1": 0,
+    "delta": 0
+   },
+   {
+    "qid": "hv3_09",
+    "type": "opinion",
+    "required": 1,
+    "arm5": 1,
+    "arm1": 1,
+    "delta": 0
+   },
+   {
+    "qid": "hv3_10",
+    "type": "company",
+    "required": 1,
+    "arm5": 0,
+    "arm1": 0,
+    "delta": 0
+   },
+   {
+    "qid": "hv3_11",
+    "type": "company",
+    "required": 1,
+    "arm5": 1,
+    "arm1": 1,
+    "delta": 0
+   },
+   {
+    "qid": "hv3_12",
+    "type": "company",
+    "required": 1,
+    "arm5": 1,
+    "arm1": 1,
+    "delta": 0
+   },
+   {
+    "qid": "hv3_13",
+    "type": "company",
+    "required": 1,
+    "arm5": 1,
+    "arm1": 1,
+    "delta": 0
+   },
+   {
+    "qid": "hv3_14",
+    "type": "company",
+    "required": 1,
+    "arm5": 1,
+    "arm1": 1,
+    "delta": 0
+   },
+   {
+    "qid": "hv3_15",
+    "type": "company",
+    "required": 1,
+    "arm5": 1,
+    "arm1": 1,
+    "delta": 0
+   },
+   {
+    "qid": "hv3_16",
+    "type": "company",
+    "required": 1,
+    "arm5": 0,
+    "arm1": 1,
+    "delta": -1
+   },
+   {
+    "qid": "hv3_17",
+    "type": "company",
+    "required": 2,
+    "arm5": 2,
+    "arm1": 0,
+    "delta": 2
+   },
+   {
+    "qid": "hv3_18",
+    "type": "fact_number",
+    "required": 1,
+    "arm5": 1,
+    "arm1": 0,
+    "delta": 1
+   },
+   {
+    "qid": "hv3_19",
+    "type": "fact_number",
+    "required": 1,
+    "arm5": 0,
+    "arm1": 0,
+    "delta": 0
+   },
+   {
+    "qid": "hv3_20",
+    "type": "fact_number",
+    "required": 1,
+    "arm5": 0,
+    "arm1": 0,
+    "delta": 0
+   },
+   {
+    "qid": "hv3_21",
+    "type": "fact_number",
+    "required": 1,
+    "arm5": 0,
+    "arm1": 0,
+    "delta": 0
+   },
+   {
+    "qid": "hv3_22",
+    "type": "fact_number",
+    "required": 2,
+    "arm5": 2,
+    "arm1": 1,
+    "delta": 1
+   },
+   {
+    "qid": "hv3_23",
+    "type": "fact_number",
+    "required": 1,
+    "arm5": 0,
+    "arm1": 0,
+    "delta": 0
+   },
+   {
+    "qid": "hv3_24",
+    "type": "fact_number",
+    "required": 1,
+    "arm5": 0,
+    "arm1": 0,
+    "delta": 0
+   },
+   {
+    "qid": "hv3_25",
+    "type": "fact_number",
+    "required": 1,
+    "arm5": 1,
+    "arm1": 0,
+    "delta": 1
+   },
+   {
+    "qid": "hv3_26",
+    "type": "temporal_comparison",
+    "required": 2,
+    "arm5": 0,
+    "arm1": 0,
+    "delta": 0
+   },
+   {
+    "qid": "hv3_27",
+    "type": "temporal_comparison",
+    "required": 2,
+    "arm5": 0,
+    "arm1": 0,
+    "delta": 0
+   },
+   {
+    "qid": "hv3_28",
+    "type": "temporal_comparison",
+    "required": 2,
+    "arm5": 1,
+    "arm1": 1,
+    "delta": 0
+   },
+   {
+    "qid": "hv3_29",
+    "type": "temporal_comparison",
+    "required": 2,
+    "arm5": 0,
+    "arm1": 0,
+    "delta": 0
+   },
+   {
+    "qid": "hv3_30",
+    "type": "temporal_comparison",
+    "required": 1,
+    "arm5": 0,
+    "arm1": 0,
+    "delta": 0
+   },
+   {
+    "qid": "hv3_31",
+    "type": "follow_up",
+    "required": 1,
+    "arm5": 0,
+    "arm1": 0,
+    "delta": 0
+   },
+   {
+    "qid": "hv3_32",
+    "type": "follow_up",
+    "required": 1,
+    "arm5": 1,
+    "arm1": 1,
+    "delta": 0
+   },
+   {
+    "qid": "hv3_33",
+    "type": "follow_up",
+    "required": 2,
+    "arm5": 0,
+    "arm1": 1,
+    "delta": -1
+   },
+   {
+    "qid": "hv3_34",
+    "type": "follow_up",
+    "required": 1,
+    "arm5": 0,
+    "arm1": 0,
+    "delta": 0
+   }
+  ],
+  "arm5_vs_arm4": [
+   {
+    "qid": "hv3_01",
+    "type": "opinion",
+    "required": 1,
+    "arm5": 0,
+    "arm4": 0,
+    "delta": 0
+   },
+   {
+    "qid": "hv3_02",
+    "type": "opinion",
+    "required": 1,
+    "arm5": 0,
+    "arm4": 0,
+    "delta": 0
+   },
+   {
+    "qid": "hv3_03",
+    "type": "opinion",
+    "required": 1,
+    "arm5": 0,
+    "arm4": 0,
+    "delta": 0
+   },
+   {
+    "qid": "hv3_04",
+    "type": "opinion",
+    "required": 1,
+    "arm5": 1,
+    "arm4": 0,
+    "delta": 1
+   },
+   {
+    "qid": "hv3_05",
+    "type": "opinion",
+    "required": 1,
+    "arm5": 0,
+    "arm4": 0,
+    "delta": 0
+   },
+   {
+    "qid": "hv3_06",
+    "type": "opinion",
+    "required": 1,
+    "arm5": 0,
+    "arm4": 0,
+    "delta": 0
+   },
+   {
+    "qid": "hv3_07",
+    "type": "opinion",
+    "required": 1,
+    "arm5": 0,
+    "arm4": 0,
+    "delta": 0
+   },
+   {
+    "qid": "hv3_08",
+    "type": "opinion",
+    "required": 1,
+    "arm5": 0,
+    "arm4": 0,
+    "delta": 0
+   },
+   {
+    "qid": "hv3_09",
+    "type": "opinion",
+    "required": 1,
+    "arm5": 1,
+    "arm4": 1,
+    "delta": 0
+   },
+   {
+    "qid": "hv3_10",
+    "type": "company",
+    "required": 1,
+    "arm5": 0,
+    "arm4": 0,
+    "delta": 0
+   },
+   {
+    "qid": "hv3_11",
+    "type": "company",
+    "required": 1,
+    "arm5": 1,
+    "arm4": 1,
+    "delta": 0
+   },
+   {
+    "qid": "hv3_12",
+    "type": "company",
+    "required": 1,
+    "arm5": 1,
+    "arm4": 0,
+    "delta": 1
+   },
+   {
+    "qid": "hv3_13",
+    "type": "company",
+    "required": 1,
+    "arm5": 1,
+    "arm4": 0,
+    "delta": 1
+   },
+   {
+    "qid": "hv3_14",
+    "type": "company",
+    "required": 1,
+    "arm5": 1,
+    "arm4": 1,
+    "delta": 0
+   },
+   {
+    "qid": "hv3_15",
+    "type": "company",
+    "required": 1,
+    "arm5": 1,
+    "arm4": 0,
+    "delta": 1
+   },
+   {
+    "qid": "hv3_16",
+    "type": "company",
+    "required": 1,
+    "arm5": 0,
+    "arm4": 0,
+    "delta": 0
+   },
+   {
+    "qid": "hv3_17",
+    "type": "company",
+    "required": 2,
+    "arm5": 2,
+    "arm4": 0,
+    "delta": 2
+   },
+   {
+    "qid": "hv3_18",
+    "type": "fact_number",
+    "required": 1,
+    "arm5": 1,
+    "arm4": 0,
+    "delta": 1
+   },
+   {
+    "qid": "hv3_19",
+    "type": "fact_number",
+    "required": 1,
+    "arm5": 0,
+    "arm4": 0,
+    "delta": 0
+   },
+   {
+    "qid": "hv3_20",
+    "type": "fact_number",
+    "required": 1,
+    "arm5": 0,
+    "arm4": 0,
+    "delta": 0
+   },
+   {
+    "qid": "hv3_21",
+    "type": "fact_number",
+    "required": 1,
+    "arm5": 0,
+    "arm4": 0,
+    "delta": 0
+   },
+   {
+    "qid": "hv3_22",
+    "type": "fact_number",
+    "required": 2,
+    "arm5": 2,
+    "arm4": 0,
+    "delta": 2
+   },
+   {
+    "qid": "hv3_23",
+    "type": "fact_number",
+    "required": 1,
+    "arm5": 0,
+    "arm4": 0,
+    "delta": 0
+   },
+   {
+    "qid": "hv3_24",
+    "type": "fact_number",
+    "required": 1,
+    "arm5": 0,
+    "arm4": 0,
+    "delta": 0
+   },
+   {
+    "qid": "hv3_25",
+    "type": "fact_number",
+    "required": 1,
+    "arm5": 1,
+    "arm4": 1,
+    "delta": 0
+   },
+   {
+    "qid": "hv3_26",
+    "type": "temporal_comparison",
+    "required": 2,
+    "arm5": 0,
+    "arm4": 0,
+    "delta": 0
+   },
+   {
+    "qid": "hv3_27",
+    "type": "temporal_comparison",
+    "required": 2,
+    "arm5": 0,
+    "arm4": 0,
+    "delta": 0
+   },
+   {
+    "qid": "hv3_28",
+    "type": "temporal_comparison",
+    "required": 2,
+    "arm5": 1,
+    "arm4": 0,
+    "delta": 1
+   },
+   {
+    "qid": "hv3_29",
+    "type": "temporal_comparison",
+    "required": 2,
+    "arm5": 0,
+    "arm4": 0,
+    "delta": 0
+   },
+   {
+    "qid": "hv3_30",
+    "type": "temporal_comparison",
+    "required": 1,
+    "arm5": 0,
+    "arm4": 0,
+    "delta": 0
+   },
+   {
+    "qid": "hv3_31",
+    "type": "follow_up",
+    "required": 1,
+    "arm5": 0,
+    "arm4": 0,
+    "delta": 0
+   },
+   {
+    "qid": "hv3_32",
+    "type": "follow_up",
+    "required": 1,
+    "arm5": 1,
+    "arm4": 0,
+    "delta": 1
+   },
+   {
+    "qid": "hv3_33",
+    "type": "follow_up",
+    "required": 2,
+    "arm5": 0,
+    "arm4": 0,
+    "delta": 0
+   },
+   {
+    "qid": "hv3_34",
+    "type": "follow_up",
+    "required": 1,
+    "arm5": 0,
+    "arm4": 0,
+    "delta": 0
+   }
+  ]
+ },
+ "per_case_strict": {
+  "1": {
+   "hv3_01": {
+    "type": "opinion",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_02": {
+    "type": "opinion",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_03": {
+    "type": "opinion",
+    "supported_met": 1,
+    "required_claims": 1
+   },
+   "hv3_04": {
+    "type": "opinion",
+    "supported_met": 1,
+    "required_claims": 1
+   },
+   "hv3_05": {
+    "type": "opinion",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_06": {
+    "type": "opinion",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_07": {
+    "type": "opinion",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_08": {
+    "type": "opinion",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_09": {
+    "type": "opinion",
+    "supported_met": 1,
+    "required_claims": 1
+   },
+   "hv3_10": {
+    "type": "company",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_11": {
+    "type": "company",
+    "supported_met": 1,
+    "required_claims": 1
+   },
+   "hv3_12": {
+    "type": "company",
+    "supported_met": 1,
+    "required_claims": 1
+   },
+   "hv3_13": {
+    "type": "company",
+    "supported_met": 1,
+    "required_claims": 1
+   },
+   "hv3_14": {
+    "type": "company",
+    "supported_met": 1,
+    "required_claims": 1
+   },
+   "hv3_15": {
+    "type": "company",
+    "supported_met": 1,
+    "required_claims": 1
+   },
+   "hv3_16": {
+    "type": "company",
+    "supported_met": 1,
+    "required_claims": 1
+   },
+   "hv3_17": {
+    "type": "company",
+    "supported_met": 0,
+    "required_claims": 2
+   },
+   "hv3_18": {
+    "type": "fact_number",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_19": {
+    "type": "fact_number",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_20": {
+    "type": "fact_number",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_21": {
+    "type": "fact_number",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_22": {
+    "type": "fact_number",
+    "supported_met": 1,
+    "required_claims": 2
+   },
+   "hv3_23": {
+    "type": "fact_number",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_24": {
+    "type": "fact_number",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_25": {
+    "type": "fact_number",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_26": {
+    "type": "temporal_comparison",
+    "supported_met": 0,
+    "required_claims": 2
+   },
+   "hv3_27": {
+    "type": "temporal_comparison",
+    "supported_met": 0,
+    "required_claims": 2
+   },
+   "hv3_28": {
+    "type": "temporal_comparison",
+    "supported_met": 1,
+    "required_claims": 2
+   },
+   "hv3_29": {
+    "type": "temporal_comparison",
+    "supported_met": 0,
+    "required_claims": 2
+   },
+   "hv3_30": {
+    "type": "temporal_comparison",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_31": {
+    "type": "follow_up",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_32": {
+    "type": "follow_up",
+    "supported_met": 1,
+    "required_claims": 1
+   },
+   "hv3_33": {
+    "type": "follow_up",
+    "supported_met": 1,
+    "required_claims": 2
+   },
+   "hv3_34": {
+    "type": "follow_up",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_35": {
+    "type": "unanswerable",
+    "supported_met": 0,
+    "required_claims": 0
+   },
+   "hv3_36": {
+    "type": "unanswerable",
+    "supported_met": 0,
+    "required_claims": 0
+   },
+   "hv3_37": {
+    "type": "unanswerable",
+    "supported_met": 0,
+    "required_claims": 0
+   },
+   "hv3_38": {
+    "type": "unanswerable",
+    "supported_met": 0,
+    "required_claims": 0
+   },
+   "hv3_39": {
+    "type": "unanswerable",
+    "supported_met": 0,
+    "required_claims": 0
+   },
+   "hv3_40": {
+    "type": "unanswerable",
+    "supported_met": 0,
+    "required_claims": 0
+   }
+  },
+  "2": {
+   "hv3_01": {
+    "type": "opinion",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_02": {
+    "type": "opinion",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_03": {
+    "type": "opinion",
+    "supported_met": 1,
+    "required_claims": 1
+   },
+   "hv3_04": {
+    "type": "opinion",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_05": {
+    "type": "opinion",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_06": {
+    "type": "opinion",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_07": {
+    "type": "opinion",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_08": {
+    "type": "opinion",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_09": {
+    "type": "opinion",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_10": {
+    "type": "company",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_11": {
+    "type": "company",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_12": {
+    "type": "company",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_13": {
+    "type": "company",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_14": {
+    "type": "company",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_15": {
+    "type": "company",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_16": {
+    "type": "company",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_17": {
+    "type": "company",
+    "supported_met": 0,
+    "required_claims": 2
+   },
+   "hv3_18": {
+    "type": "fact_number",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_19": {
+    "type": "fact_number",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_20": {
+    "type": "fact_number",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_21": {
+    "type": "fact_number",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_22": {
+    "type": "fact_number",
+    "supported_met": 0,
+    "required_claims": 2
+   },
+   "hv3_23": {
+    "type": "fact_number",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_24": {
+    "type": "fact_number",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_25": {
+    "type": "fact_number",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_26": {
+    "type": "temporal_comparison",
+    "supported_met": 0,
+    "required_claims": 2
+   },
+   "hv3_27": {
+    "type": "temporal_comparison",
+    "supported_met": 0,
+    "required_claims": 2
+   },
+   "hv3_28": {
+    "type": "temporal_comparison",
+    "supported_met": 0,
+    "required_claims": 2
+   },
+   "hv3_29": {
+    "type": "temporal_comparison",
+    "supported_met": 0,
+    "required_claims": 2
+   },
+   "hv3_30": {
+    "type": "temporal_comparison",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_31": {
+    "type": "follow_up",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_32": {
+    "type": "follow_up",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_33": {
+    "type": "follow_up",
+    "supported_met": 0,
+    "required_claims": 2
+   },
+   "hv3_34": {
+    "type": "follow_up",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_35": {
+    "type": "unanswerable",
+    "supported_met": 0,
+    "required_claims": 0
+   },
+   "hv3_36": {
+    "type": "unanswerable",
+    "supported_met": 0,
+    "required_claims": 0
+   },
+   "hv3_37": {
+    "type": "unanswerable",
+    "supported_met": 0,
+    "required_claims": 0
+   },
+   "hv3_38": {
+    "type": "unanswerable",
+    "supported_met": 0,
+    "required_claims": 0
+   },
+   "hv3_39": {
+    "type": "unanswerable",
+    "supported_met": 0,
+    "required_claims": 0
+   },
+   "hv3_40": {
+    "type": "unanswerable",
+    "supported_met": 0,
+    "required_claims": 0
+   }
+  },
+  "3": {
+   "hv3_01": {
+    "type": "opinion",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_02": {
+    "type": "opinion",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_03": {
+    "type": "opinion",
+    "supported_met": 1,
+    "required_claims": 1
+   },
+   "hv3_04": {
+    "type": "opinion",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_05": {
+    "type": "opinion",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_06": {
+    "type": "opinion",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_07": {
+    "type": "opinion",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_08": {
+    "type": "opinion",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_09": {
+    "type": "opinion",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_10": {
+    "type": "company",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_11": {
+    "type": "company",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_12": {
+    "type": "company",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_13": {
+    "type": "company",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_14": {
+    "type": "company",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_15": {
+    "type": "company",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_16": {
+    "type": "company",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_17": {
+    "type": "company",
+    "supported_met": 0,
+    "required_claims": 2
+   },
+   "hv3_18": {
+    "type": "fact_number",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_19": {
+    "type": "fact_number",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_20": {
+    "type": "fact_number",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_21": {
+    "type": "fact_number",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_22": {
+    "type": "fact_number",
+    "supported_met": 0,
+    "required_claims": 2
+   },
+   "hv3_23": {
+    "type": "fact_number",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_24": {
+    "type": "fact_number",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_25": {
+    "type": "fact_number",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_26": {
+    "type": "temporal_comparison",
+    "supported_met": 0,
+    "required_claims": 2
+   },
+   "hv3_27": {
+    "type": "temporal_comparison",
+    "supported_met": 0,
+    "required_claims": 2
+   },
+   "hv3_28": {
+    "type": "temporal_comparison",
+    "supported_met": 0,
+    "required_claims": 2
+   },
+   "hv3_29": {
+    "type": "temporal_comparison",
+    "supported_met": 0,
+    "required_claims": 2
+   },
+   "hv3_30": {
+    "type": "temporal_comparison",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_31": {
+    "type": "follow_up",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_32": {
+    "type": "follow_up",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_33": {
+    "type": "follow_up",
+    "supported_met": 0,
+    "required_claims": 2
+   },
+   "hv3_34": {
+    "type": "follow_up",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_35": {
+    "type": "unanswerable",
+    "supported_met": 0,
+    "required_claims": 0
+   },
+   "hv3_36": {
+    "type": "unanswerable",
+    "supported_met": 0,
+    "required_claims": 0
+   },
+   "hv3_37": {
+    "type": "unanswerable",
+    "supported_met": 0,
+    "required_claims": 0
+   },
+   "hv3_38": {
+    "type": "unanswerable",
+    "supported_met": 0,
+    "required_claims": 0
+   },
+   "hv3_39": {
+    "type": "unanswerable",
+    "supported_met": 0,
+    "required_claims": 0
+   },
+   "hv3_40": {
+    "type": "unanswerable",
+    "supported_met": 0,
+    "required_claims": 0
+   }
+  },
+  "4": {
+   "hv3_01": {
+    "type": "opinion",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_02": {
+    "type": "opinion",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_03": {
+    "type": "opinion",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_04": {
+    "type": "opinion",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_05": {
+    "type": "opinion",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_06": {
+    "type": "opinion",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_07": {
+    "type": "opinion",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_08": {
+    "type": "opinion",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_09": {
+    "type": "opinion",
+    "supported_met": 1,
+    "required_claims": 1
+   },
+   "hv3_10": {
+    "type": "company",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_11": {
+    "type": "company",
+    "supported_met": 1,
+    "required_claims": 1
+   },
+   "hv3_12": {
+    "type": "company",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_13": {
+    "type": "company",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_14": {
+    "type": "company",
+    "supported_met": 1,
+    "required_claims": 1
+   },
+   "hv3_15": {
+    "type": "company",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_16": {
+    "type": "company",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_17": {
+    "type": "company",
+    "supported_met": 0,
+    "required_claims": 2
+   },
+   "hv3_18": {
+    "type": "fact_number",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_19": {
+    "type": "fact_number",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_20": {
+    "type": "fact_number",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_21": {
+    "type": "fact_number",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_22": {
+    "type": "fact_number",
+    "supported_met": 0,
+    "required_claims": 2
+   },
+   "hv3_23": {
+    "type": "fact_number",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_24": {
+    "type": "fact_number",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_25": {
+    "type": "fact_number",
+    "supported_met": 1,
+    "required_claims": 1
+   },
+   "hv3_26": {
+    "type": "temporal_comparison",
+    "supported_met": 0,
+    "required_claims": 2
+   },
+   "hv3_27": {
+    "type": "temporal_comparison",
+    "supported_met": 0,
+    "required_claims": 2
+   },
+   "hv3_28": {
+    "type": "temporal_comparison",
+    "supported_met": 0,
+    "required_claims": 2
+   },
+   "hv3_29": {
+    "type": "temporal_comparison",
+    "supported_met": 0,
+    "required_claims": 2
+   },
+   "hv3_30": {
+    "type": "temporal_comparison",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_31": {
+    "type": "follow_up",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_32": {
+    "type": "follow_up",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_33": {
+    "type": "follow_up",
+    "supported_met": 0,
+    "required_claims": 2
+   },
+   "hv3_34": {
+    "type": "follow_up",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_35": {
+    "type": "unanswerable",
+    "supported_met": 0,
+    "required_claims": 0
+   },
+   "hv3_36": {
+    "type": "unanswerable",
+    "supported_met": 0,
+    "required_claims": 0
+   },
+   "hv3_37": {
+    "type": "unanswerable",
+    "supported_met": 0,
+    "required_claims": 0
+   },
+   "hv3_38": {
+    "type": "unanswerable",
+    "supported_met": 0,
+    "required_claims": 0
+   },
+   "hv3_39": {
+    "type": "unanswerable",
+    "supported_met": 0,
+    "required_claims": 0
+   },
+   "hv3_40": {
+    "type": "unanswerable",
+    "supported_met": 0,
+    "required_claims": 0
+   }
+  },
+  "5": {
+   "hv3_01": {
+    "type": "opinion",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_02": {
+    "type": "opinion",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_03": {
+    "type": "opinion",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_04": {
+    "type": "opinion",
+    "supported_met": 1,
+    "required_claims": 1
+   },
+   "hv3_05": {
+    "type": "opinion",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_06": {
+    "type": "opinion",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_07": {
+    "type": "opinion",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_08": {
+    "type": "opinion",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_09": {
+    "type": "opinion",
+    "supported_met": 1,
+    "required_claims": 1
+   },
+   "hv3_10": {
+    "type": "company",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_11": {
+    "type": "company",
+    "supported_met": 1,
+    "required_claims": 1
+   },
+   "hv3_12": {
+    "type": "company",
+    "supported_met": 1,
+    "required_claims": 1
+   },
+   "hv3_13": {
+    "type": "company",
+    "supported_met": 1,
+    "required_claims": 1
+   },
+   "hv3_14": {
+    "type": "company",
+    "supported_met": 1,
+    "required_claims": 1
+   },
+   "hv3_15": {
+    "type": "company",
+    "supported_met": 1,
+    "required_claims": 1
+   },
+   "hv3_16": {
+    "type": "company",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_17": {
+    "type": "company",
+    "supported_met": 2,
+    "required_claims": 2
+   },
+   "hv3_18": {
+    "type": "fact_number",
+    "supported_met": 1,
+    "required_claims": 1
+   },
+   "hv3_19": {
+    "type": "fact_number",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_20": {
+    "type": "fact_number",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_21": {
+    "type": "fact_number",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_22": {
+    "type": "fact_number",
+    "supported_met": 2,
+    "required_claims": 2
+   },
+   "hv3_23": {
+    "type": "fact_number",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_24": {
+    "type": "fact_number",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_25": {
+    "type": "fact_number",
+    "supported_met": 1,
+    "required_claims": 1
+   },
+   "hv3_26": {
+    "type": "temporal_comparison",
+    "supported_met": 0,
+    "required_claims": 2
+   },
+   "hv3_27": {
+    "type": "temporal_comparison",
+    "supported_met": 0,
+    "required_claims": 2
+   },
+   "hv3_28": {
+    "type": "temporal_comparison",
+    "supported_met": 1,
+    "required_claims": 2
+   },
+   "hv3_29": {
+    "type": "temporal_comparison",
+    "supported_met": 0,
+    "required_claims": 2
+   },
+   "hv3_30": {
+    "type": "temporal_comparison",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_31": {
+    "type": "follow_up",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_32": {
+    "type": "follow_up",
+    "supported_met": 1,
+    "required_claims": 1
+   },
+   "hv3_33": {
+    "type": "follow_up",
+    "supported_met": 0,
+    "required_claims": 2
+   },
+   "hv3_34": {
+    "type": "follow_up",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_35": {
+    "type": "unanswerable",
+    "supported_met": 0,
+    "required_claims": 0
+   },
+   "hv3_36": {
+    "type": "unanswerable",
+    "supported_met": 0,
+    "required_claims": 0
+   },
+   "hv3_37": {
+    "type": "unanswerable",
+    "supported_met": 0,
+    "required_claims": 0
+   },
+   "hv3_38": {
+    "type": "unanswerable",
+    "supported_met": 0,
+    "required_claims": 0
+   },
+   "hv3_39": {
+    "type": "unanswerable",
+    "supported_met": 0,
+    "required_claims": 0
+   },
+   "hv3_40": {
+    "type": "unanswerable",
+    "supported_met": 0,
+    "required_claims": 0
+   }
+  },
+  "6": {
+   "hv3_01": {
+    "type": "opinion",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_02": {
+    "type": "opinion",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_03": {
+    "type": "opinion",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_04": {
+    "type": "opinion",
+    "supported_met": 1,
+    "required_claims": 1
+   },
+   "hv3_05": {
+    "type": "opinion",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_06": {
+    "type": "opinion",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_07": {
+    "type": "opinion",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_08": {
+    "type": "opinion",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_09": {
+    "type": "opinion",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_10": {
+    "type": "company",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_11": {
+    "type": "company",
+    "supported_met": 1,
+    "required_claims": 1
+   },
+   "hv3_12": {
+    "type": "company",
+    "supported_met": 1,
+    "required_claims": 1
+   },
+   "hv3_13": {
+    "type": "company",
+    "supported_met": 1,
+    "required_claims": 1
+   },
+   "hv3_14": {
+    "type": "company",
+    "supported_met": 1,
+    "required_claims": 1
+   },
+   "hv3_15": {
+    "type": "company",
+    "supported_met": 1,
+    "required_claims": 1
+   },
+   "hv3_16": {
+    "type": "company",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_17": {
+    "type": "company",
+    "supported_met": 2,
+    "required_claims": 2
+   },
+   "hv3_18": {
+    "type": "fact_number",
+    "supported_met": 1,
+    "required_claims": 1
+   },
+   "hv3_19": {
+    "type": "fact_number",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_20": {
+    "type": "fact_number",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_21": {
+    "type": "fact_number",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_22": {
+    "type": "fact_number",
+    "supported_met": 2,
+    "required_claims": 2
+   },
+   "hv3_23": {
+    "type": "fact_number",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_24": {
+    "type": "fact_number",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_25": {
+    "type": "fact_number",
+    "supported_met": 1,
+    "required_claims": 1
+   },
+   "hv3_26": {
+    "type": "temporal_comparison",
+    "supported_met": 0,
+    "required_claims": 2
+   },
+   "hv3_27": {
+    "type": "temporal_comparison",
+    "supported_met": 0,
+    "required_claims": 2
+   },
+   "hv3_28": {
+    "type": "temporal_comparison",
+    "supported_met": 1,
+    "required_claims": 2
+   },
+   "hv3_29": {
+    "type": "temporal_comparison",
+    "supported_met": 0,
+    "required_claims": 2
+   },
+   "hv3_30": {
+    "type": "temporal_comparison",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_31": {
+    "type": "follow_up",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_32": {
+    "type": "follow_up",
+    "supported_met": 1,
+    "required_claims": 1
+   },
+   "hv3_33": {
+    "type": "follow_up",
+    "supported_met": 0,
+    "required_claims": 2
+   },
+   "hv3_34": {
+    "type": "follow_up",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_35": {
+    "type": "unanswerable",
+    "supported_met": 0,
+    "required_claims": 0
+   },
+   "hv3_36": {
+    "type": "unanswerable",
+    "supported_met": 0,
+    "required_claims": 0
+   },
+   "hv3_37": {
+    "type": "unanswerable",
+    "supported_met": 0,
+    "required_claims": 0
+   },
+   "hv3_38": {
+    "type": "unanswerable",
+    "supported_met": 0,
+    "required_claims": 0
+   },
+   "hv3_39": {
+    "type": "unanswerable",
+    "supported_met": 0,
+    "required_claims": 0
+   },
+   "hv3_40": {
+    "type": "unanswerable",
+    "supported_met": 0,
+    "required_claims": 0
+   }
+  },
+  "7": {
+   "hv3_01": {
+    "type": "opinion",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_02": {
+    "type": "opinion",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_03": {
+    "type": "opinion",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_04": {
+    "type": "opinion",
+    "supported_met": 1,
+    "required_claims": 1
+   },
+   "hv3_05": {
+    "type": "opinion",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_06": {
+    "type": "opinion",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_07": {
+    "type": "opinion",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_08": {
+    "type": "opinion",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_09": {
+    "type": "opinion",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_10": {
+    "type": "company",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_11": {
+    "type": "company",
+    "supported_met": 1,
+    "required_claims": 1
+   },
+   "hv3_12": {
+    "type": "company",
+    "supported_met": 1,
+    "required_claims": 1
+   },
+   "hv3_13": {
+    "type": "company",
+    "supported_met": 1,
+    "required_claims": 1
+   },
+   "hv3_14": {
+    "type": "company",
+    "supported_met": 1,
+    "required_claims": 1
+   },
+   "hv3_15": {
+    "type": "company",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_16": {
+    "type": "company",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_17": {
+    "type": "company",
+    "supported_met": 2,
+    "required_claims": 2
+   },
+   "hv3_18": {
+    "type": "fact_number",
+    "supported_met": 1,
+    "required_claims": 1
+   },
+   "hv3_19": {
+    "type": "fact_number",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_20": {
+    "type": "fact_number",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_21": {
+    "type": "fact_number",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_22": {
+    "type": "fact_number",
+    "supported_met": 2,
+    "required_claims": 2
+   },
+   "hv3_23": {
+    "type": "fact_number",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_24": {
+    "type": "fact_number",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_25": {
+    "type": "fact_number",
+    "supported_met": 1,
+    "required_claims": 1
+   },
+   "hv3_26": {
+    "type": "temporal_comparison",
+    "supported_met": 0,
+    "required_claims": 2
+   },
+   "hv3_27": {
+    "type": "temporal_comparison",
+    "supported_met": 0,
+    "required_claims": 2
+   },
+   "hv3_28": {
+    "type": "temporal_comparison",
+    "supported_met": 2,
+    "required_claims": 2
+   },
+   "hv3_29": {
+    "type": "temporal_comparison",
+    "supported_met": 0,
+    "required_claims": 2
+   },
+   "hv3_30": {
+    "type": "temporal_comparison",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_31": {
+    "type": "follow_up",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_32": {
+    "type": "follow_up",
+    "supported_met": 1,
+    "required_claims": 1
+   },
+   "hv3_33": {
+    "type": "follow_up",
+    "supported_met": 0,
+    "required_claims": 2
+   },
+   "hv3_34": {
+    "type": "follow_up",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_35": {
+    "type": "unanswerable",
+    "supported_met": 0,
+    "required_claims": 0
+   },
+   "hv3_36": {
+    "type": "unanswerable",
+    "supported_met": 0,
+    "required_claims": 0
+   },
+   "hv3_37": {
+    "type": "unanswerable",
+    "supported_met": 0,
+    "required_claims": 0
+   },
+   "hv3_38": {
+    "type": "unanswerable",
+    "supported_met": 0,
+    "required_claims": 0
+   },
+   "hv3_39": {
+    "type": "unanswerable",
+    "supported_met": 0,
+    "required_claims": 0
+   },
+   "hv3_40": {
+    "type": "unanswerable",
+    "supported_met": 0,
+    "required_claims": 0
+   }
+  }
+ }
+}

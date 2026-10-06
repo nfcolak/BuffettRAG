@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "started_utc": "2026-10-06T13:13:57.262475+00:00",
+  "code_sha": "7a4e8f6f4a604d55c849421d9ffa54bcfb83f4c8",
+  "code_dirty": true,
+  "corpus": "/Users/necatifurkancolak/AI-Workplace/Projects/done/BuffettRAG/.worktrees/u7-blind-s/data/processed/chunks_v3_paragraph.jsonl",
+  "corpus_sha256": "8263f08958729a77febf0922e7bbc4161bedd5fdb3e9a8b3fc9a64ab681ab5f0",
+  "cases": "/Users/necatifurkancolak/AI-Workplace/Projects/done/BuffettRAG/.worktrees/u7-blind-s/data/evaluation/heldout_v3/answer_benchmark_heldout_v3.json",
+  "cases_sha256": "23f3a71930ce761412a1366e313bd319c5c36ec9454538ca1f0b9d4beea1baf3",
+  "provider": "grounded",
+  "composer": "template",
+  "retrieval": "bm25",
+  "model": null,
+  "effective_settings": {
+    "COMPOSER": "template",
+    "MLX_MODEL": "/Users/necatifurkancolak/AI-Workplace/Projects/done/BuffettRAG/models/teacher-qwen2.5-7b-mlx4",
+    "LLAMA_MODEL": "/Users/necatifurkancolak/AI-Workplace/Projects/done/BuffettRAG/models/qwen2.5-1.5b-gguf/qwen2.5-1.5b-instruct-q4_k_m.gguf",
+    "SCORER_DEVICE": "auto",
+    "MAX_WINDOWS": 48,
+    "SLOT_RESERVE": 6,
+    "MAX_UNITS": 6,
+    "MAX_PER_HIT": 2,
+    "MAX_PERIODS": 4,
+    "T_RELEVANT": 0.01,
+    "T_SLOT": 0.001,
+    "DEDUPE_JACCARD": 0.8,
+    "GROUP_MAX_TOKENS": 200,
+    "NLI_VERIFY": false,
+    "NLI_MODEL": null,
+    "NUMERIC_GUARD": "bound",
+    "CACHE_DIR": "/Users/necatifurkancolak/AI-Workplace/Projects/done/BuffettRAG/.worktrees/u7-blind-s/data/evaluation/grounded_cache"
+  },
+  "temperature": {
+    "requested": 0.0,
+    "asserted_at_provider": true,
+    "provider_attr": 0.0
+  },
+  "library_versions": {
+    "python": "3.12.13",
+    "mlx": "0.32.3",
+    "mlx-lm": "0.32.0",
+    "llama-cpp-python": "0.3.36",
+    "torch": "2.14.1",
+    "transformers": "5.18.0",
+    "sentence-transformers": "6.1.0"
+  },
+  "device": {
+    "machine": "arm64",
+    "platform": "macOS-27.0.1-arm64-arm-64bit",
+    "torch_mps": true
+  },
+  "initialization_failure": null,
+  "resumes": []
+}
