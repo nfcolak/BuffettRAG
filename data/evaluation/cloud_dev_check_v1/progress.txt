@@ -1,0 +1,13 @@
+START extractive_main 2026-10-06T14:35:06Z
+END extractive_main exit=0 seconds=25
+START extractive_lead 2026-10-06T14:35:31Z
+END extractive_lead exit=0 seconds=26
+START llama_ftr2_guard 2026-10-06T14:35:57Z
+END llama_ftr2_guard exit=0 seconds=2989
+START llama_base 2026-10-06T15:25:46Z
+END llama_base exit=0 seconds=2939
+ALL_DONE 2026-10-06T16:14:45Z
+RERUN llama_ftr2_guard: first run used the base model (model path not applied); discarded
+START llama_ftr2_guard 2026-10-06T16:27:11Z
+END llama_ftr2_guard exit=0 seconds=2580
+ALL_DONE 2026-10-06T17:10:11Z
