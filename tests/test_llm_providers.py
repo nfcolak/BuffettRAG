@@ -170,15 +170,11 @@ def test_relevance_normalizes_inflection_and_percent_notation():
     assert citations
 
 
-@pytest.mark.parametrize("context, required", [
-    ("These changes reduced idle handling. Storage capacity reached 47 crates.",
-     "Storage capacity reached 47 crates."),
-    ("No shipments went to local customers. The delivery schedule remained unchanged.",
-     "No shipments went to local customers."),
-])
-def test_local_reserves_ranked_context_for_top_retrieved_anchor(context, required):
+def test_local_leads_with_best_sentence_then_at_most_two_supporting():
     hits = [
-        SearchHit("primary", "Orchard exports expanded storage capacity. " + context, {}, 1.0),
+        SearchHit("primary", "Orchard exports expanded storage capacity. "
+                  "No shipments went to local customers. "
+                  "The delivery schedule remained unchanged.", {}, 1.0),
         SearchHit("secondary", "Exports expanded storage capacity at the depot. "
                   "The loading crew used reinforced containers. "
                   "The warehouse opened before dawn.", {}, 0.9),
@@ -190,15 +186,25 @@ def test_local_reserves_ranked_context_for_top_retrieved_anchor(context, require
     ]
     question = "How did orchard exports improve storage capacity?"
     answer = LocalProvider().generate(build_cited_prompt(question, hits))
-    assert required + " [1]" in answer
-    assert "Orchard exports expanded storage capacity. [1]" in answer
-    assert "Exports expanded storage capacity at the depot. [2]" in answer
-    assert "Orchard exports improve storage capacity. [3]" in answer
-    assert "[4]" not in answer
-    assert len(answer.split("\n\n")) == 6
-    assert len(answer) <= 300 * 4
+    lead, _, support = answer.partition("\n\n")
+    assert lead == "Orchard exports improve storage capacity. [3]"
+    assert support == ("Orchard exports expanded storage capacity. [1] "
+                       "Exports expanded storage capacity at the depot. [2]")
+    # Neighbours with no question term and no figure are filler.
+    assert "road network" not in answer
+    assert "No shipments" not in answer
     from src.evaluation.claim_validator import validate_and_filter_answer
     assert validate_and_filter_answer(answer, hits).safe_answer == answer
+
+
+def test_local_supports_lead_with_following_figure():
+    hits = [SearchHit("p", "The railroad acquisition closed in February. "
+                      "The purchase price was $34 billion. "
+                      "Weather in the region stayed mild.", {}, 1.0)]
+    question = "When did the railroad acquisition close?"
+    answer = LocalProvider().generate(build_cited_prompt(question, hits))
+    assert answer == ("The railroad acquisition closed in February. [1]\n\n"
+                      "The purchase price was $34 billion. [1]")
 
 
 if __name__ == "__main__":
