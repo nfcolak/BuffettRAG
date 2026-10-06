@@ -31,7 +31,7 @@ from src.services.ask_flow import is_citation_only  # noqa: E402
 from src.storage import SearchHit, load_chunks_as_docs  # noqa: E402
 
 CASES_PATH = ROOT / "data/evaluation/grounded_dev_v1/confirm/dev_cases.json"
-ARMS = [  # (name, label, code)
+ARMS = [  # (name, label, code); the informational arm gets strict scoring only
     ("extractive_main", "extractive, main code (old)", "main"),
     ("extractive_lead", "extractive, task A (lead + <=2 supporting)", "branch"),
     ("extractive_lead_unstemmed", "info: task A with the original unstemmed ranking", "branch, one line changed"),
@@ -85,48 +85,90 @@ def rebuild_contexts(provider_name, cases, docs):
 
 
 _NLI = None
-_NLI_BATCH = 8
+_NLI_BATCH = 16
 
 
 def nli_scorer():
-    """NliScorer whose premise windows run in batches of _NLI_BATCH.
+    """NliScorer that batches premise windows: same numbers, bounded memory, far fewer forward calls.
 
-    The stock scorer pads every window of a premise into one batch, which exhausted this machine's memory on long
-    premises. The result is the same: max P(entailment) over windows where entailment is the argmax label.
+    The stock scorer pads every window of one premise into a single batch (this exhausted the machine's memory on
+    long premises) and scores each 1-3 sentence window of a cited block in its own call (hours per arm on CPU).
+    Here every (premise window, hypothesis) pair of a support check runs in batches of _NLI_BATCH; the result per
+    premise is unchanged: max P(entailment) over its windows where entailment is the argmax label, cached per
+    (premise, hypothesis) exactly as before.
     """
     global _NLI
     if _NLI is None:
+        from src.evaluation.citation_faithfulness import split_sentences
         from src.evaluation.nli_scorer import NliScorer
 
         class BatchedNliScorer(NliScorer):
-            def entail_prob(self, premise: str, hypothesis: str) -> float:
-                key = (premise, hypothesis)
-                if key in self._cache:
-                    return self._cache[key]
-                best = 0.0
-                if premise.strip() and hypothesis.strip():
-                    torch = self._torch
-                    wins = self._windows(premise, hypothesis)
-                    for start in range(0, len(wins), _NLI_BATCH):
-                        part = wins[start:start + _NLI_BATCH]
-                        enc = self.tok(part, [hypothesis] * len(part), truncation=True, max_length=512,
-                                       padding=True, return_tensors="pt").to(self.device)
-                        with torch.no_grad():
-                            probs = torch.softmax(self.model(**enc).logits.float(), dim=-1).cpu()
-                        for row in probs:
-                            if int(row.argmax()) == self.entail_idx:
-                                best = max(best, float(row[self.entail_idx]))
-                self._cache[key] = best
-                return best
+            def _entail_many(self, premises, hypothesis):
+                todo = [p for p in dict.fromkeys(premises)
+                        if (p, hypothesis) not in self._cache]
+                pairs = []
+                for p in todo:
+                    if p.strip() and hypothesis.strip():
+                        pairs += [(p, w) for w in self._windows(p, hypothesis)]
+                best = {p: 0.0 for p in todo}
+                torch = self._torch
+                for start in range(0, len(pairs), _NLI_BATCH):
+                    part = pairs[start:start + _NLI_BATCH]
+                    enc = self.tok([w for _, w in part], [hypothesis] * len(part), truncation=True, max_length=512,
+                                   padding=True, return_tensors="pt").to(self.device)
+                    with torch.no_grad():
+                        probs = torch.softmax(self.model(**enc).logits.float(), dim=-1).cpu()
+                    for (p, _), row in zip(part, probs):
+                        if int(row.argmax()) == self.entail_idx:
+                            best[p] = max(best[p], float(row[self.entail_idx]))
+                for p, value in best.items():
+                    self._cache[(p, hypothesis)] = value
+                return max((self._cache[(p, hypothesis)] for p in premises), default=0.0)
+
+            def entail_prob(self, premise, hypothesis):
+                return self._entail_many([premise], hypothesis)
+
+            def support_prob(self, block, sentence):
+                if not block.strip() or not sentence.strip():
+                    return 0.0
+                if self._norm(sentence) and self._norm(sentence) in self._norm(block):
+                    return 1.0
+                bs = [x for x in split_sentences(block) if x.strip()]
+                premises = [block] + [" ".join(bs[i:i + n]) for n in (1, 2, 3)
+                                      for i in range(max(0, len(bs) - n + 1))]
+                return self._entail_many(premises, sentence)
+
+            def score_row(self, row, case):
+                out = super().score_row(row, case)
+                self.rows_done = getattr(self, "rows_done", 0) + 1
+                if self.rows_done % 10 == 0:
+                    print(f"  nli rows scored: {self.rows_done}", flush=True)
+                return out
 
         _NLI = BatchedNliScorer()
     return _NLI
 
 
-def summarize_arm(name, label, code, cases, docs, contexts):
+def rescore_first(name, max_cases):
+    """NLI-rescore the first max_cases rows of an arm; writes <arm>.nli.json next to this file."""
+    import shutil
+    import tempfile
+    result = json.loads((HERE / f"{name}.json").read_text(encoding="utf-8"))
+    result["rows"] = result["rows"][:max_cases]
+    result["summary"]["accepted"] = sum(bool((r.get("score") or {}).get("accepted")) for r in result["rows"])
+    with tempfile.TemporaryDirectory() as tmp:
+        path = Path(tmp) / f"{name}.json"
+        path.write_text(json.dumps(result), encoding="utf-8")
+        summary = rescore(path, CASES_PATH, scorer=nli_scorer())
+        shutil.move(str(path.with_suffix(".nli.json")), HERE / f"{name}.nli.json")
+    return summary
+
+
+def summarize_arm(name, label, code, cases, docs, contexts, max_cases, with_nli):
     result = json.loads((HERE / f"{name}.json").read_text(encoding="utf-8"))
     print(f"scoring {name}", flush=True)
-    nli = rescore(HERE / f"{name}.json", CASES_PATH, scorer=nli_scorer())
+    nli = rescore_first(name, max_cases) if with_nli else None
+    first = {row["qid"] for row in result["rows"][:max_cases]}
     provider = result["answer_engine"]["provider"]
     if provider not in contexts:
         contexts[provider] = rebuild_contexts(provider, cases, docs)
@@ -134,8 +176,16 @@ def summarize_arm(name, label, code, cases, docs, contexts):
     scorer = Scorer()
     met = required = id_mismatch = correct_refusals = unanswerable = unexpected = abstain = answerable = 0
     citation_only, citation_only_qids, latencies = 0, [], []
+    all_met = all_required = 0
     for row in result["rows"]:
         case = dict(cases[row["qid"]])
+        if row.get("status") == "scored" and not is_unanswerable_case(case):
+            claims = supported_claims_met(case, row.get("answer") or "", row.get("citations") or [],
+                                          rebuilt[row["qid"]])
+            all_met += sum(c["met"] for c in claims)
+            all_required += len(claims)
+        if row["qid"] not in first:
+            continue
         latencies += [row["latency_ms"]] if row.get("latency_ms") is not None else []
         raws = row.get("raw_answers") or []
         if provider != "local" and any(is_citation_only(format_answer_markdown(strip_chat_artifacts(r))) for r in raws):
@@ -159,10 +209,14 @@ def summarize_arm(name, label, code, cases, docs, contexts):
     return {
         "name": name, "label": label, "code": code, "provider": provider,
         "model": result["answer_engine"].get("model"),
-        "cases_run": result["summary"]["cases_run"], "scored_answers": result["summary"]["scored_answers"],
-        "lexical_accepted": result["summary"]["accepted"], "nli_accepted": nli["nli_accepted"],
-        "nli_claims_met": nli["nli_required_claims_met"], "nli_required_claims": nli["required_claims"],
+        "cases_run": result["summary"]["cases_run"], "cases_scored_here": len(first),
+        "scored_answers": sum(r.get("status") == "scored" for r in result["rows"][:max_cases]),
+        "lexical_accepted": sum(bool((r.get("score") or {}).get("accepted")) for r in result["rows"][:max_cases]),
+        "nli_accepted": nli["nli_accepted"] if nli else None,
+        "nli_claims_met": nli["nli_required_claims_met"] if nli else None,
+        "nli_required_claims": nli["required_claims"] if nli else None,
         "strict_supported_claims_met": met, "strict_required_claims": required,
+        "strict_all_cases_met": all_met, "strict_all_cases_required": all_required,
         "context_id_mismatches": id_mismatch,
         "unanswerable_cases": unanswerable, "correct_refusals": correct_refusals,
         "answerable_cases": answerable, "unexpected_refusals": unexpected, "abstain_answerable": abstain,
@@ -170,7 +224,7 @@ def summarize_arm(name, label, code, cases, docs, contexts):
         "citation_only_qids": citation_only_qids,
         "provider_failures": result["summary"]["provider_failures"],
         "latency_ms": {"n": len(latencies), "p50": pct(latencies, 0.5), "p95": pct(latencies, 0.95),
-                       "mean": result["summary"]["mean_latency_ms"]},
+                       "mean": round(sum(latencies) / len(latencies), 1) if latencies else None},
     }
 
 
@@ -183,16 +237,21 @@ def render_md(out) -> str:
          f"BM25 retrieval, temperature 0, CPU only (`LLM_GPU_LAYERS=0`, {out['cpu_note']}), one arm after another, "
          f"fresh process each, `--save-raw`. {out['scope_note']}\n",
          "Engineering read-out for the owner, not a statistical test; no default setting was changed on these numbers.\n",
-         "| arm | strict supported claims met/required | NLI accepted | lexical accepted | correct refusals | "
-         "unexpected refusals | citation-only answers caught by guard | provider failures | p50 latency ms | p95 latency ms |",
-         "|---|---|---|---|---|---|---|---|---|---|"]
+         f"Columns are over the first {out['max_cases']} cases of every arm except the last strict column, which "
+         "covers all 80 cases.\n",
+         f"| arm | strict supported claims met/required (first {out['max_cases']}) | NLI accepted | lexical accepted | "
+         "correct refusals | unexpected refusals | citation-only answers caught by guard | provider failures | "
+         "p50 latency ms | p95 latency ms | strict met/required (all 80) |",
+         "|---|---|---|---|---|---|---|---|---|---|---|"]
     for i, a in enumerate(out["arms"], 1):
         caught = "n/a" if a["citation_only_caught_by_guard"] is None else a["citation_only_caught_by_guard"]
         L.append("| " + " | ".join(str(x) for x in [
             f"{i} {a['label']}", f"{a['strict_supported_claims_met']}/{a['strict_required_claims']}",
-            f"{a['nli_accepted']}/{a['scored_answers']}", f"{a['lexical_accepted']}/{a['scored_answers']}",
+            "not scored" if a["nli_accepted"] is None else f"{a['nli_accepted']}/{a['scored_answers']}",
+            f"{a['lexical_accepted']}/{a['scored_answers']}",
             f"{a['correct_refusals']}/{a['unanswerable_cases']}", f"{a['unexpected_refusals']}/{a['answerable_cases']}",
-            caught, a["provider_failures"], a["latency_ms"]["p50"], a["latency_ms"]["p95"]]) + " |")
+            caught, a["provider_failures"], a["latency_ms"]["p50"], a["latency_ms"]["p95"],
+            f"{a['strict_all_cases_met']}/{a['strict_all_cases_required']}"]) + " |")
     L.append("")
     L.append("Definitions. Strict supported claim: a gold claim met by an answer sentence that matches lexically and "
              "whose cited gold hit passes the deterministic verifier (`src.evaluation.supported_claims`), scored against "
@@ -214,16 +273,19 @@ def main() -> None:
     import os
     ap = argparse.ArgumentParser()
     ap.add_argument("--scope-note", default="All cases run for every arm.")
+    ap.add_argument("--max-cases", type=int, default=80, help="score only the first N cases of every arm")
     args = ap.parse_args()
     cases_doc = json.loads(CASES_PATH.read_text(encoding="utf-8"))
     cases = {c["qid"]: c for c in cases_doc["cases"]}
     from config import CHUNKS_V3_FILE
     docs = load_chunks_as_docs(CHUNKS_V3_FILE)
     contexts: dict = {}
-    arms = [summarize_arm(name, label, code, cases, docs, contexts) for name, label, code in ARMS]
+    arms = [summarize_arm(name, label, code, cases, docs, contexts, args.max_cases,
+                          with_nli=not name.endswith("_unstemmed")) for name, label, code in ARMS]
     out = {"n_cases": len(cases), "cases": str(CASES_PATH.relative_to(ROOT)),
            "cases_sha256": hashlib.sha256(CASES_PATH.read_bytes()).hexdigest(),
-           "cpu_note": f"{os.cpu_count()} vCPU", "scope_note": args.scope_note, "arms": arms}
+           "cpu_note": f"{os.cpu_count()} vCPU", "scope_note": args.scope_note,
+           "max_cases": args.max_cases, "arms": arms}
     (HERE / "summary.json").write_text(json.dumps(out, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     (HERE / "comparison.md").write_text(render_md(out), encoding="utf-8")
     print(render_md(out))
