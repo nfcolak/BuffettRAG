@@ -34,6 +34,7 @@ CASES_PATH = ROOT / "data/evaluation/grounded_dev_v1/confirm/dev_cases.json"
 ARMS = [  # (name, label, code)
     ("extractive_main", "extractive, main code (old)", "main"),
     ("extractive_lead", "extractive, task A (lead + <=2 supporting)", "branch"),
+    ("extractive_lead_unstemmed", "info: task A with the original unstemmed ranking", "branch, one line changed"),
     ("llama_ftr2_guard", "llama FT-r2 1.5B, task B guard", "branch"),
     ("llama_base", "llama base Qwen2.5-1.5B", "branch"),
 ]

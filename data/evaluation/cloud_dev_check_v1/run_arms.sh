@@ -24,8 +24,12 @@ run_arm() {
     > "$OUT/logs/$name.log" 2>&1
   echo "END $name exit=$? seconds=$(( $(date +%s) - t0 ))" >> "$OUT/progress.txt"
 }
-run_arm extractive_main "$MAIN_CHECKOUT" --provider local
-run_arm extractive_lead . --provider local
-run_arm llama_ftr2_guard . --provider llama --model-path "$FTR2"
-run_arm llama_base . --provider llama --model-path "$BASE"
+# --model-path alone is not enough: LlamaCppProvider binds config.LLM_MODEL_PATH as a default
+# argument at import, so the model must also be selected through the environment.
+ARMS=${ARMS:-"extractive_main extractive_lead llama_ftr2_guard llama_base"}
+want() { [[ " $ARMS " == *" $1 "* ]]; }
+want extractive_main && run_arm extractive_main "$MAIN_CHECKOUT" --provider local
+want extractive_lead && run_arm extractive_lead . --provider local
+want llama_ftr2_guard && LLM_MODEL_PATH="$FTR2" run_arm llama_ftr2_guard . --provider llama --model-path "$FTR2"
+want llama_base && LLM_MODEL_PATH="$BASE" run_arm llama_base . --provider llama --model-path "$BASE"
 echo "ALL_DONE $(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$OUT/progress.txt"
