@@ -1,8 +1,7 @@
 """Embedded local answer engine (no external API).
 
-A deliberately lightweight extractive engine: it leads with the passage sentence
-that best answers the question, adds at most two supporting sentences, and
-returns them verbatim with [n] citations.
+A deliberately lightweight extractive engine: it picks the passage sentences
+that best match the question and returns them verbatim with [n] citations.
 It needs no API key, no network access and no model weights, so the app can
 run fully offline. Answer quality is intentionally below cloud LLMs -- it
 selects and quotes, it does not reason or paraphrase.
@@ -37,7 +36,8 @@ _STOPWORDS = frozenset(
     compare comparison toward""".split()
 )
 
-_MAX_SUPPORTING = 2
+_MAX_ANCHORS = 3
+_MAX_SENTENCES = 6
 _CONTEXT_RADIUS = 2
 _CHARS_PER_TOKEN = 4
 _MIN_QUESTION_OVERLAP = 0.30
@@ -56,8 +56,8 @@ def _content_words(text: str) -> List[str]:
 
 
 def _relevance_words(text: str) -> set[str]:
-    # Stemmed terms drive both the sufficiency check and sentence ranking, so
-    # "pay"/"paying" and "fund"/"funds" count as the same question term.
+    # Morphological recall belongs in the sufficiency check. Applying it to
+    # extractive ranking changes tied anchors and can lose their explanations.
     return {_STEMMER.stem(word) for word in _content_words(text)}
 
 
@@ -119,6 +119,9 @@ class LocalProvider:
         if not query_words:
             return REFUSAL_LINE
 
+        # Select a few high-overlap anchor sentences from distinct passages,
+        # then include nearby sentences from the same passage. Facts such as a
+        # quantity or consequence often follow the sentence that names the event.
         passage_sentences: List[List[str]] = []
         scored: List[Tuple[float, int, int, int, str]] = []
         best_overlap = 0.0
@@ -127,7 +130,7 @@ class LocalProvider:
             passage_sentences.append(sentences)
             best_overlap = max(best_overlap, _best_question_overlap(relevance_words, sentences))
             for position, sentence in enumerate(sentences):
-                overlap = len(relevance_words & _relevance_words(sentence))
+                overlap = len(query_words & set(_content_words(sentence)))
                 if overlap == 0:
                     continue
                 quantities = set(_NUMBER_RE.findall(sentence))
@@ -141,72 +144,70 @@ class LocalProvider:
             return REFUSAL_LINE
 
         scored.sort(key=lambda item: item[0], reverse=True)
-        budget = (max_new_tokens or 300) * _CHARS_PER_TOKEN
-
-        def rendered(number: int, sentence: str) -> int:
-            return len(sentence) + len(str(number)) + 3
-
-        # Lead with the single best answering sentence, then add at most
-        # _MAX_SUPPORTING cited sentences. A longer extract buries the answer.
-        lead = None
-        for score, rank, number, position, sentence in scored:
-            if rendered(number, sentence) <= budget:
-                lead = (rank, number, position, sentence)
-                break
-        if lead is None:
-            return REFUSAL_LINE
-        lead_rank, lead_number, lead_position, lead_sentence = lead
-        used_chars = rendered(lead_number, lead_sentence) + 2  # paragraph break
-
-        # Support candidates, in priority order: the lead's best neighbour (a
-        # quantity or consequence often follows the sentence naming the event),
-        # then the best sentences from other passages, then any remaining match.
-        sentence_scores = {(rank, position): score for score, rank, _, position, _ in scored}
-        lead_sentences = passage_sentences[lead_rank]
-        neighbors = []
-        for distance in range(1, _CONTEXT_RADIUS + 1):
-            for neighbor in (lead_position - distance, lead_position + distance):
-                if 0 <= neighbor < len(lead_sentences):
-                    # The neighbour's own relevance, not the lead's; on ties
-                    # prefer nearer context, then a concrete figure, then the
-                    # following sentence.
-                    neighbors.append((sentence_scores.get((lead_rank, neighbor), 0.0), -distance,
-                                      bool(_NUMBER_RE.search(lead_sentences[neighbor])), neighbor, neighbor))
-        candidates: List[Tuple[int, int, int]] = []
-        best_neighbor = max(neighbors, default=None)
-        # A neighbour with no question term and no figure is filler, not support.
-        if best_neighbor and (best_neighbor[0] > 0 or best_neighbor[2]):
-            candidates.append((lead_rank, lead_number, best_neighbor[4]))
-        candidates += [(rank, number, position) for _, rank, number, position, _ in scored
-                       if rank != lead_rank]
-        candidates += [(rank, number, position) for _, rank, number, position, _ in scored
-                       if rank == lead_rank]
-
-        supporting: List[Tuple[int, int, str]] = []
-        seen_locations = {(lead_rank, lead_position)}
-        seen_sentences = {re.sub(r"\W+", "", lead_sentence.lower())}
+        anchors: List[Tuple[float, int, int, int]] = []
         seen_passages = set()
-        for rank, number, position in candidates:
+        seen_sentences = set()
+        for score, rank, number, position, sentence in scored:
+            fingerprint = re.sub(r"\W+", "", sentence.lower())
+            if rank in seen_passages or fingerprint in seen_sentences:
+                continue
+            anchors.append((score, rank, number, position))
+            seen_passages.add(rank)
+            seen_sentences.add(fingerprint)
+            if len(anchors) >= _MAX_ANCHORS:
+                break
+
+        # Reserve the best local explanation from the highest-ranked retrieved
+        # anchor passage before global fill. One reservation prevents crowding
+        # without spending all remaining slots on lower-ranked passages' context.
+        candidates: List[Tuple[float, int, int, int]] = [item[:4] for item in scored]
+        sentence_scores = {(rank, position): score for score, rank, _, position, _ in scored}
+        context_locations = set()
+        top_anchor_rank = min(rank for _, rank, _, _ in anchors)
+        for score, rank, number, position in anchors:
+            sentences = passage_sentences[rank]
+            neighbors = []
+            for distance in range(1, _CONTEXT_RADIUS + 1):
+                for neighbor in (position - distance, position + distance):
+                    if 0 <= neighbor < len(sentences):
+                        candidates.append((score - distance * 0.1, rank, number, neighbor))
+                        # Use the neighbor's own relevance, not the anchor's
+                        # inherited score; prefer nearer context on ties.
+                        neighbors.append((sentence_scores.get((rank, neighbor), 0.0),
+                                          -distance, -neighbor, neighbor))
+            if neighbors and rank == top_anchor_rank:
+                context_locations.add((rank, max(neighbors)[3]))
+        anchor_locations = {(rank, position) for _, rank, _, position in anchors}
+        candidates.sort(key=lambda item: (
+            2 if (item[1], item[3]) in anchor_locations else
+            1 if (item[1], item[3]) in context_locations else 0,
+            -item[1] if (item[1], item[3]) in context_locations else item[0],
+            item[0],
+        ), reverse=True)
+
+        budget = (max_new_tokens or 300) * _CHARS_PER_TOKEN
+        picked: List[Tuple[int, int, str]] = []
+        used_chars = 0
+        seen_locations = set()
+        seen_sentences = set()
+        for _, rank, number, position in candidates:
+            location = (rank, position)
             sentence = passage_sentences[rank][position]
             fingerprint = re.sub(r"\W+", "", sentence.lower())
-            if (rank, position) in seen_locations or fingerprint in seen_sentences:
+            if location in seen_locations or fingerprint in seen_sentences:
                 continue
-            # One supporting sentence per other passage keeps the support diverse.
-            if rank != lead_rank and rank in seen_passages:
+            rendered_length = len(sentence) + len(str(number)) + 3
+            separator_length = 2 if picked else 0
+            if used_chars + separator_length + rendered_length > budget:
                 continue
-            separator_length = 1 if supporting else 0
-            if used_chars + separator_length + rendered(number, sentence) > budget:
-                continue
-            supporting.append((number, position, sentence))
-            seen_locations.add((rank, position))
+            picked.append((number, position, sentence))
+            seen_locations.add(location)
             seen_sentences.add(fingerprint)
-            seen_passages.add(rank)
-            used_chars += separator_length + rendered(number, sentence)
-            if len(supporting) >= _MAX_SUPPORTING:
+            used_chars += separator_length + rendered_length
+            if len(picked) >= _MAX_SENTENCES:
                 break
 
-        answer = f"{lead_sentence} [{lead_number}]"
-        if supporting:
-            supporting.sort(key=lambda item: (item[0], item[1]))
-            answer += "\n\n" + " ".join(f"{sentence} [{number}]" for number, _, sentence in supporting)
-        return answer
+        if not picked:
+            return REFUSAL_LINE
+        picked.sort(key=lambda item: (item[0], item[1]))
+        return "\n\n".join(f"{sentence} [{number}]" for number, _, sentence in picked)

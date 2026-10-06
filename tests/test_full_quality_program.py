@@ -296,11 +296,7 @@ def test_v3_offline_answer_benchmark_accepts_all_curated_cases():
         Path("data/evaluation/answer_quality_program/answer_benchmark_v3.json"),
     )
     assert result["n_cases"] == 8
-    # The extractive answer is the best sentence plus at most two supporting
-    # ones. aq04 needs that lead plus claims from two further passages; it
-    # keeps the $5.6 billion claim but not the second-passage one.
-    assert result["accepted"] == 7
-    assert [row["qid"] for row in result["rows"] if not row["accepted"]] == ["aq04_apple"]
+    assert result["accepted"] == 8
     assert len(result["corpus_sha256"]) == 64
     assert len(result["cases_sha256"]) == 64
     assert result["answer_engine"] == {"provider": "local", "model": "embedded-extractive-v1"}
