@@ -84,9 +84,49 @@ def rebuild_contexts(provider_name, cases, docs):
     return out
 
 
+_NLI = None
+_NLI_BATCH = 8
+
+
+def nli_scorer():
+    """NliScorer whose premise windows run in batches of _NLI_BATCH.
+
+    The stock scorer pads every window of a premise into one batch, which exhausted this machine's memory on long
+    premises. The result is the same: max P(entailment) over windows where entailment is the argmax label.
+    """
+    global _NLI
+    if _NLI is None:
+        from src.evaluation.nli_scorer import NliScorer
+
+        class BatchedNliScorer(NliScorer):
+            def entail_prob(self, premise: str, hypothesis: str) -> float:
+                key = (premise, hypothesis)
+                if key in self._cache:
+                    return self._cache[key]
+                best = 0.0
+                if premise.strip() and hypothesis.strip():
+                    torch = self._torch
+                    wins = self._windows(premise, hypothesis)
+                    for start in range(0, len(wins), _NLI_BATCH):
+                        part = wins[start:start + _NLI_BATCH]
+                        enc = self.tok(part, [hypothesis] * len(part), truncation=True, max_length=512,
+                                       padding=True, return_tensors="pt").to(self.device)
+                        with torch.no_grad():
+                            probs = torch.softmax(self.model(**enc).logits.float(), dim=-1).cpu()
+                        for row in probs:
+                            if int(row.argmax()) == self.entail_idx:
+                                best = max(best, float(row[self.entail_idx]))
+                self._cache[key] = best
+                return best
+
+        _NLI = BatchedNliScorer()
+    return _NLI
+
+
 def summarize_arm(name, label, code, cases, docs, contexts):
     result = json.loads((HERE / f"{name}.json").read_text(encoding="utf-8"))
-    nli = rescore(HERE / f"{name}.json", CASES_PATH)
+    print(f"scoring {name}", flush=True)
+    nli = rescore(HERE / f"{name}.json", CASES_PATH, scorer=nli_scorer())
     provider = result["answer_engine"]["provider"]
     if provider not in contexts:
         contexts[provider] = rebuild_contexts(provider, cases, docs)
