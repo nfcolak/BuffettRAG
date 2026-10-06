@@ -207,5 +207,20 @@ def test_local_supports_lead_with_following_figure():
                       "The purchase price was $34 billion. [1]")
 
 
+def test_citation_only_generation_falls_back_to_extractive_answer():
+    from src.services.ask_flow import _generate_answer, is_citation_only
+    hits = [SearchHit("p", "Derivatives are financial weapons of mass destruction.", {}, 1.0)]
+    question = "What did Buffett say about derivatives?"
+    prompt = build_cited_prompt(question, hits)
+    assert is_citation_only(" [5]. ") and is_citation_only("[1] Yes [2].")
+    assert not is_citation_only("Derivatives are dangerous. [1]")
+    provider = mock.Mock(provider_name="llama")
+    provider.generate.return_value = "[1]"
+    answer, citations = _generate_answer(provider, prompt, hits, 100, query=question)
+    assert answer == "Derivatives are financial weapons of mass destruction. [1]"
+    assert answer == LocalProvider().generate(prompt, max_new_tokens=100)
+    assert citations
+
+
 if __name__ == "__main__":
     unittest.main()
