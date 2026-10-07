@@ -37,7 +37,10 @@ ARMS = [  # (name, label, code)
     ("extractive_lead_unstemmed", "info: task A with the original unstemmed ranking", "branch, one line changed"),
     ("llama_ftr2_guard", "llama FT-r2 1.5B, task B guard", "branch"),
     ("llama_base", "llama base Qwen2.5-1.5B", "branch"),
+    ("llama7b_base", "llama base Qwen2.5-7B", "branch"),
+    ("llama7b_ft", "llama FT-r1 7B (ft_v3, LoRA)", "branch"),
 ]
+OPTIONAL_ARMS = {"llama7b_base", "llama7b_ft"}  # scored only when their output file exists
 
 
 def pct(values, q):
@@ -220,7 +223,8 @@ def main() -> None:
     from config import CHUNKS_V3_FILE
     docs = load_chunks_as_docs(CHUNKS_V3_FILE)
     contexts: dict = {}
-    arms = [summarize_arm(name, label, code, cases, docs, contexts) for name, label, code in ARMS]
+    arms = [summarize_arm(name, label, code, cases, docs, contexts) for name, label, code in ARMS
+            if name not in OPTIONAL_ARMS or (HERE / f"{name}.json").exists()]
     out = {"n_cases": len(cases), "cases": str(CASES_PATH.relative_to(ROOT)),
            "cases_sha256": hashlib.sha256(CASES_PATH.read_bytes()).hexdigest(),
            "cpu_note": f"{os.cpu_count()} vCPU", "scope_note": args.scope_note, "arms": arms}
