@@ -33,7 +33,7 @@ def recorded_hashes(manifest):
                 walk(val, path + [str(key)])
         elif isinstance(node, str) and len(node) == 64 and all(c in "0123456789abcdef" for c in node):
             text = "/".join(path).lower()
-            if "frozen" in text or "corpus" in text:
+            if any(w in text for w in ("frozen", "corpus", "reuse", "input")):
                 return
             for split in ("train", "valid"):
                 if split in text and ("sha" in text or "hash" in text):
