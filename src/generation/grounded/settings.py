@@ -60,7 +60,7 @@ class GroundedSettings:
     COMPOSER: str = "auto"
     MLX_MODEL: Path | str = _MODEL_CHECKOUT / "models/teacher-qwen2.5-7b-mlx4"
     LLAMA_MODEL: Path | str = (
-        _MODEL_CHECKOUT / "models/qwen2.5-1.5b-gguf/qwen2.5-1.5b-instruct-q4_k_m.gguf"
+        _MODEL_CHECKOUT / "models/ft/7b_r1/buffett-qwen2.5-7b-ft-r1-q4_k_m.gguf"
     )
     SCORER_DEVICE: str = "auto"
     MAX_WINDOWS: int = 48

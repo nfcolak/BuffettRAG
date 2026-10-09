@@ -15,7 +15,12 @@ logger = logging.getLogger(__name__)
 
 
 def create_llm_provider(provider: Optional[str] = None) -> LLMProvider:
-    """Create the embedded provider: ``llama`` (default), ``local`` (extractive), ``mlx`` or ``grounded``."""
+    """Create the answer provider: ``llama`` (default), ``mlx`` or ``grounded``.
+
+    The extractive engine (``local``) is no longer selectable; it is only the internal
+    fallback returned when the llama model file or ``llama_cpp`` is unavailable.
+    Evaluation code that needs it constructs ``LocalProvider()`` directly.
+    """
     selected = (provider or DEFAULT_LLM_PROVIDER).strip().lower()
 
     if selected == "llama":
@@ -28,7 +33,10 @@ def create_llm_provider(provider: Optional[str] = None) -> LLMProvider:
         return LlamaCppProvider()
 
     if selected == "local":
-        return LocalProvider()
+        raise ValueError(
+            "The extractive engine is no longer a selectable answer provider; use 'llama' "
+            "(it remains only as the internal fallback)."
+        )
 
     # Factory-local imports: grounded/mlx stay out of the import graph of old providers.
     if selected == "grounded":

@@ -30,7 +30,7 @@ from src.evaluation.answer_benchmark import (
     is_unanswerable_case,
     validate_fixture_ids,
 )
-from src.generation.providers import create_llm_provider
+from src.generation.providers import LocalProvider, create_llm_provider
 from src.generation.prompt import REFUSAL_LINE
 from src.retrieval.context import build_doc_lookup
 from src.retrieval.retriever import Retriever
@@ -363,7 +363,10 @@ def run(
         config.LLM_TEMPERATURE = temperature
         if model_path is not None and (composer or provider) == "llama":
             config.LLM_MODEL_PATH = Path(model_path)
-        created = create_llm_provider(provider=provider)
+        if provider == "local":
+            created = LocalProvider()  # evaluation-only: extractive engine for comparisons
+        else:
+            created = create_llm_provider(provider=provider)
         if hasattr(created, "temperature"):
             created.temperature = temperature  # default arg was bound at import time
             if created.temperature != temperature:

@@ -41,15 +41,22 @@ class LLMProviderTests(unittest.TestCase):
             provider = create_llm_provider(provider="llama")
         self.assertIsInstance(provider, LocalProvider)
 
-    def test_factory_creates_local_provider(self) -> None:
-        provider = create_llm_provider(provider="local")
+    def test_factory_rejects_local_as_selectable_provider(self) -> None:
+        with self.assertRaisesRegex(ValueError, "no longer a selectable"):
+            create_llm_provider(provider="local")
+
+    def test_default_model_path_is_7b_ft_r1(self) -> None:
+        self.assertEqual(config.LLM_MODEL_PATH.name, "buffett-qwen2.5-7b-ft-r1-q4_k_m.gguf")
+
+    def test_local_provider_direct_construction(self) -> None:
+        provider = LocalProvider()
         self.assertIsInstance(provider, LocalProvider)
         self.assertEqual(provider.provider_name, "local")
         self.assertEqual(provider.model, "embedded-extractive-v1")
 
     def test_factory_has_no_api_key_or_model_parameters(self) -> None:
         with self.assertRaises(TypeError):
-            create_llm_provider(provider="local", api_key="x")  # type: ignore[call-arg]
+            create_llm_provider(provider="llama", api_key="x")  # type: ignore[call-arg]
 
     def test_factory_rejects_external_and_unknown_providers(self) -> None:
         for name in ("openai", "anthropic", "openrouter", "unknown"):

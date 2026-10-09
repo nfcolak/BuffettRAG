@@ -605,7 +605,7 @@ def test_live_runner_separates_provider_failure_without_leaking_error(monkeypatc
         model = "unit-failure"
         def generate(self, *_args, **_kwargs):
             raise RuntimeError("provider body containing a secret must not be persisted")
-    monkeypatch.setattr(runner, "create_llm_provider", lambda **_kwargs: FailingProvider())
+    monkeypatch.setattr(runner, "LocalProvider", lambda: FailingProvider())  # --provider local builds LocalProvider directly
     result = runner.run(provider="local", retrieval="bm25", max_cases=1)
     assert result["summary"]["provider_failures"] == 1
     assert result["summary"]["scored_answers"] == 0

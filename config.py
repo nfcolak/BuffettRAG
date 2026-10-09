@@ -125,7 +125,7 @@ ANSWER_CONTEXT_MAX_CHARS = int(os.getenv("ANSWER_CONTEXT_MAX_CHARS", "9000"))
 # Max candidates sent to the cross-encoder (cost is linear in this).
 RERANK_CANDIDATES = int(os.getenv("RERANK_CANDIDATES", "15"))
 # Query expansion: "auto" (only when first-pass evidence is weak) | "always" | "off"
-# Defaults to "off": a 1.5B embedded model produces unreliable expansions.
+# Defaults to "off": a small embedded model produces unreliable expansions.
 EXPANSION_MODE = os.getenv("EXPANSION_MODE", "off").strip().lower()
 
 # Reranker
@@ -136,10 +136,11 @@ RERANK_TOP_K = 8
 # Generation
 # -----------------------------------------------------------------------------
 LLM_MAX_NEW_TOKENS = 900
-# Providers: "llama" (embedded llama.cpp GGUF model) | "local" (extractive, no model).
+# Providers: "llama" (embedded llama.cpp GGUF model) | "mlx" | "grounded". The extractive engine ("local") is an internal fallback only,
+# not selectable.
 # No external API is used anywhere.
 DEFAULT_LLM_PROVIDER = os.getenv("DEFAULT_LLM_PROVIDER", "llama").strip().lower()
-LLM_MODEL_PATH = Path(os.getenv("LLM_MODEL_PATH", "models/qwen2.5-1.5b-gguf/qwen2.5-1.5b-instruct-q4_k_m.gguf"))
+LLM_MODEL_PATH = Path(os.getenv("LLM_MODEL_PATH", "models/ft/7b_r1/buffett-qwen2.5-7b-ft-r1-q4_k_m.gguf"))
 if not LLM_MODEL_PATH.is_absolute():
     LLM_MODEL_PATH = BASE_DIR / LLM_MODEL_PATH
 LLM_N_CTX = int(os.getenv("LLM_N_CTX", "8192"))

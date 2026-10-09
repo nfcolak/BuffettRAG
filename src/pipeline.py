@@ -44,7 +44,7 @@ from src.generation.compare import comparison_periods, generate_comparison_answe
 from src.generation.evidence_gate import assess_evidence
 from src.retrieval.query_expansion import build_followup_retrieval_query
 from src.evaluation.claim_validator import validate_and_filter_answer
-from src.generation.providers import LLMProvider, create_llm_provider
+from src.generation.providers import LLMProvider, LocalProvider, create_llm_provider
 from src.storage.index_manifest import ensure_index_identity, write_index_identity
 from src.retrieval import CrossEncoderReranker, Retriever
 from src.retrieval.context import build_doc_lookup, expand_hits_with_neighbors, fit_context_to_llm
@@ -120,7 +120,12 @@ class BuffettRAGPipeline:
             reranker=reranker,
         )
 
-        llm = create_llm_provider(provider=cfg.llm_provider) if cfg.use_llm else None
+        if not cfg.use_llm:
+            llm = None
+        elif cfg.llm_provider == "local":
+            llm = LocalProvider()  # evaluation-only: extractive engine is not factory-selectable
+        else:
+            llm = create_llm_provider(provider=cfg.llm_provider)
         return cls(retriever=retriever, docs_by_id=build_doc_lookup(docs), llm=llm)
 
     # --------------------------------------------------------------- query API

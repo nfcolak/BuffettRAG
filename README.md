@@ -1,6 +1,6 @@
 # BuffettRAG
 
-BuffettRAG answers questions about Warren Buffett's Berkshire Hathaway shareholder letters (1977 to 2024) with sentence-level citations back to the source passages. All 48 letters are indexed as 5,831 paragraph-aware records with source hashes and neighbour provenance. A FastAPI backend runs hybrid retrieval and cross-encoder reranking, an embedded local LLM (llama.cpp, Qwen2.5-1.5B-Instruct GGUF) writes the answer from the retrieved passages alone, and a React frontend renders the answer next to the passages it cites.
+BuffettRAG answers questions about Warren Buffett's Berkshire Hathaway shareholder letters (1977 to 2024) with sentence-level citations back to the source passages. All 48 letters are indexed as 5,831 paragraph-aware records with source hashes and neighbour provenance. A FastAPI backend runs hybrid retrieval and cross-encoder reranking, an embedded local LLM (llama.cpp, Qwen2.5-7B-Instruct fine-tuned with LoRA, GGUF) writes the answer from the retrieved passages alone, and a React frontend renders the answer next to the passages it cites.
 
 ## How a question is answered
 
@@ -69,15 +69,11 @@ The first backend start downloads the embedding model (~440MB) and the reranker 
 
 ## Embedded answer model
 
-Answers come from a small model that runs inside the backend process through llama.cpp (`llama-cpp-python`): Qwen2.5-1.5B-Instruct, 4-bit GGUF (`q4_k_m`, about 1.1GB). **No external API keys are used anywhere**: no OpenAI, Anthropic or OpenRouter calls, no per-request provider or key fields, and the frontend stores no keys.
+Answers come from a small model that runs inside the backend process through llama.cpp (`llama-cpp-python`): Qwen2.5-7B-Instruct fine-tuned with LoRA on Kaggle (FT-r1), 4-bit GGUF (`q4_k_m`, about 4.7 GB). Without the file the backend falls back to the internal extractive engine. **No external API keys are used anywhere**: no OpenAI, Anthropic or OpenRouter calls, no per-request provider or key fields, and the frontend stores no keys.
 
-Download the weights once (they are git-ignored under `models/`):
+The GGUF is produced by the Kaggle/Colab LoRA notebook under `colab/`, is not downloadable, and is git-ignored; place it at `models/ft/7b_r1/buffett-qwen2.5-7b-ft-r1-q4_k_m.gguf`.
 
-```bash
-hf download Qwen/Qwen2.5-1.5B-Instruct-GGUF qwen2.5-1.5b-instruct-q4_k_m.gguf --local-dir models/qwen2.5-1.5b-gguf
-```
-
-Providers: `llama` (default) and `local` (the extractive engine, no model needed). If `llama` is selected but the model file is missing or `llama_cpp` cannot be imported, the factory logs one line and falls back to `local`.
+Providers: `llama` (default), `grounded`, `mlx`. The extractive engine is an internal fallback only, not selectable: if `llama` is selected but the model file is missing or `llama_cpp` cannot be imported, the factory logs one line and falls back to it.
 
 Latency: with Metal (`LLM_GPU_LAYERS=-1`) an answer takes a few seconds. On a CPU-only server (`LLM_GPU_LAYERS=0`) expect roughly 10 to 40 seconds per answer depending on cores. To keep the prompt inside what a 1.5B model handles, the prompt uses only the first `LLM_CONTEXT_PASSAGES` expanded passages (5 by default, 8 for 7B GGUF files), each cut around its anchor chunk to `LLM_PASSAGE_MAX_CHARS`, and trailing passages are dropped until the prompt fits `LLM_N_CTX` minus the answer budget (4 chars per token estimate). Citation numbers always match the passages shown.
 
@@ -100,7 +96,7 @@ The current runner uses `data/ft_v2/` and stores stage markers and model artifac
 The fine-tuned GGUF files are not published: they are git-ignored under `models/ft/`. To serve a locally generated round-2 model:
 
 ```bash
-LLM_MODEL_PATH=models/ft/round2/buffett-qwen2.5-1.5b-ft-r2-q4_k_m.gguf uvicorn src.services.backend_app:app --host 0.0.0.0 --port 8000
+LLM_MODEL_PATH=models/ft/7b_r1/buffett-qwen2.5-7b-ft-r1-q4_k_m.gguf uvicorn src.services.backend_app:app --host 0.0.0.0 --port 8000
 ```
 
 ## Configuration
@@ -109,8 +105,8 @@ Everything is set through environment variables, read in `config.py`.
 
 | Variable | Default | Purpose |
 |---|---|---|
-| `DEFAULT_LLM_PROVIDER` | `llama` | `llama` (embedded GGUF model) or `local` (extractive engine) |
-| `LLM_MODEL_PATH` | `models/qwen2.5-1.5b-gguf/qwen2.5-1.5b-instruct-q4_k_m.gguf` | GGUF file, relative to the repo root |
+| `DEFAULT_LLM_PROVIDER` | `llama` | `llama` (embedded GGUF model), `grounded` or `mlx` |
+| `LLM_MODEL_PATH` | `models/ft/7b_r1/buffett-qwen2.5-7b-ft-r1-q4_k_m.gguf` | GGUF file, relative to the repo root |
 | `LLM_N_CTX` | `8192` | Context window |
 | `LLM_N_THREADS` | `0` | CPU threads (0 = auto) |
 | `LLM_TEMPERATURE` | `0.1` | Sampling temperature (seed is fixed) |
@@ -199,4 +195,4 @@ PYTHON_DOTENV_DISABLED=1 python scripts/index/audit_corpus.py
 
 ## Limitations
 
-The 1.5B embedded model is weaker than large hosted models: it can miss nuance and refuse more often, and claim validation drops unsupported sentences. The corpus is English only, and answers are only as current as the 2024 letter. The letters themselves are copyright Berkshire Hathaway and are included here for research use; the originals are published at berkshirehathaway.com.
+The embedded model is smaller than large hosted models: it can miss nuance and refuse more often, and claim validation drops unsupported sentences. The corpus is English only, and answers are only as current as the 2024 letter. The letters themselves are copyright Berkshire Hathaway and are included here for research use; the originals are published at berkshirehathaway.com.
