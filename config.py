@@ -146,8 +146,11 @@ LLM_N_CTX = int(os.getenv("LLM_N_CTX", "8192"))
 LLM_N_THREADS = int(os.getenv("LLM_N_THREADS", "0"))  # 0 = auto
 LLM_TEMPERATURE = float(os.getenv("LLM_TEMPERATURE", "0.1"))
 LLM_GPU_LAYERS = int(os.getenv("LLM_GPU_LAYERS", "-1"))  # -1 = all (Metal); 0 = CPU only
-# A small CPU model cannot take 8 x 9000-char passages: cap what the prompt carries.
-LLM_CONTEXT_PASSAGES = int(os.getenv("LLM_CONTEXT_PASSAGES", "5"))
+# A small CPU model cannot take 8 long passages, so cap the prompt at 5. 7B GGUF
+# models get 8: the dev check (80 cases) showed fewer unneeded refusals (13 -> 9 of
+# 71) with no metric loss.
+_DEFAULT_CONTEXT_PASSAGES = "8" if "7b" in LLM_MODEL_PATH.name.lower() else "5"
+LLM_CONTEXT_PASSAGES = int(os.getenv("LLM_CONTEXT_PASSAGES", _DEFAULT_CONTEXT_PASSAGES))
 LLM_PASSAGE_MAX_CHARS = int(os.getenv("LLM_PASSAGE_MAX_CHARS", "1800"))
 
 # Grounded provider (DEFAULT_LLM_PROVIDER=grounded). Knob names, ranges and built-in

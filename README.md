@@ -79,7 +79,7 @@ hf download Qwen/Qwen2.5-1.5B-Instruct-GGUF qwen2.5-1.5b-instruct-q4_k_m.gguf --
 
 Providers: `llama` (default) and `local` (the extractive engine, no model needed). If `llama` is selected but the model file is missing or `llama_cpp` cannot be imported, the factory logs one line and falls back to `local`.
 
-Latency: with Metal (`LLM_GPU_LAYERS=-1`) an answer takes a few seconds. On a CPU-only server (`LLM_GPU_LAYERS=0`) expect roughly 10 to 40 seconds per answer depending on cores. To keep the prompt inside what a 1.5B model handles, the prompt uses only the first `LLM_CONTEXT_PASSAGES` expanded passages, each cut around its anchor chunk to `LLM_PASSAGE_MAX_CHARS`, and trailing passages are dropped until the prompt fits `LLM_N_CTX` minus the answer budget (4 chars per token estimate). Citation numbers always match the passages shown.
+Latency: with Metal (`LLM_GPU_LAYERS=-1`) an answer takes a few seconds. On a CPU-only server (`LLM_GPU_LAYERS=0`) expect roughly 10 to 40 seconds per answer depending on cores. To keep the prompt inside what a 1.5B model handles, the prompt uses only the first `LLM_CONTEXT_PASSAGES` expanded passages (5 by default, 8 for 7B GGUF files), each cut around its anchor chunk to `LLM_PASSAGE_MAX_CHARS`, and trailing passages are dropped until the prompt fits `LLM_N_CTX` minus the answer budget (4 chars per token estimate). Citation numbers always match the passages shown.
 
 Query expansion is off by default (`EXPANSION_MODE=off`): a 1.5B model proposes unreliable keywords. Set `auto` or `always` only if you accept that.
 
@@ -115,7 +115,7 @@ Everything is set through environment variables, read in `config.py`.
 | `LLM_N_THREADS` | `0` | CPU threads (0 = auto) |
 | `LLM_TEMPERATURE` | `0.1` | Sampling temperature (seed is fixed) |
 | `LLM_GPU_LAYERS` | `-1` | `-1` all layers on Metal/GPU, `0` CPU only |
-| `LLM_CONTEXT_PASSAGES` | `5` | Passages placed in the prompt for the llama provider |
+| `LLM_CONTEXT_PASSAGES` | `5` (8 for 7B GGUF files) | Passages placed in the prompt for the llama provider |
 | `LLM_PASSAGE_MAX_CHARS` | `1800` | Per-passage character cap for the llama provider |
 | `VECTOR_BACKEND` | `pgvector` | `pgvector`, `chroma`, or `faiss` |
 | `PGHOST`, `PGPORT`, `PGUSER`, `PGPASSWORD`, `PGDATABASE`, `PG_TABLE` | localhost defaults | Postgres connection for pgvector |
