@@ -129,3 +129,123 @@ def test_heldout_v4_checker_output_is_validated(tmp_path):
     checker.write_text('print("not json")\n')
     with pytest.raises(RuntimeError, match='refusing'):
         round4.heldout_v4_excluded_ids(checker)
+
+
+# ------------------------------------------------------------------ v4 question writing (fake teacher, no model)
+class ScriptedTeacher:
+    def __init__(self, *outputs, finish='stop'):
+        self.outputs, self.calls, self.finish = list(outputs), [], finish
+
+    def generate(self, messages, key, max_tokens=350, temperature=.2):
+        self.calls.append((key, [dict(m) for m in messages]))
+        return self.outputs.pop(0), {'tokens': 10, 'seconds': 1., 'generation_tps': 1., 'finish_reason': self.finish}
+
+
+def _lookup(*texts):
+    docs = {}
+    for index, (year, text) in enumerate(texts):
+        ident = f'{year}_p{index:04d}'
+        docs[ident] = SimpleNamespace(id=ident, text=text, metadata={'year': year})
+    return docs
+
+
+FOLLOWUP_DOC = ('Berkshire sold its textile operations in 1985 after years of losses. Management concluded that the capital was better used '
+                'elsewhere in the insurance business. The decision was difficult but clearly correct for owners.')
+TEMPORAL_DOCS = [(1990, 'Junk bonds were sold to investors who ignored the credit risk of the issuers. Many of them later defaulted badly during the recession.'),
+                 (2000, 'Junk bonds became a smaller part of the market after the defaults of the early period. Buyers demanded much higher yields than before.')]
+
+
+def _job(kind, lookup, **extra):
+    ids = list(lookup)
+    base = {'id': f'v4:{kind}:0000', 'kind': kind, 'source_id': ids[0], 'split': 'train', 'type': 'answerable'}
+    if kind == 'temporal':
+        base.update(topic='junk bonds', source_ids=ids)
+    return {**base, **extra}
+
+
+def _json(**obj):
+    import json
+    return json.dumps(obj)
+
+
+GOOD_FOLLOWUP = _json(question='Why did Berkshire decide to sell it after the losses?', topic='the textile operations',
+                      parts=[{'ask': 'why it was sold', 'evidence_id': 'E1'}])
+STANDALONE_FOLLOWUP = _json(question='Which year did Berkshire sell its textile operations?', topic='the textile operations',
+                            parts=[{'ask': 'the year of the sale', 'evidence_id': 'E1'}])
+GOOD_TEMPORAL = _json(question='How did the 1990 and 2000 letters describe junk bonds?', topic='',
+                      parts=[{'ask': 'junk bonds in 1990', 'evidence_id': 'E1'}, {'ask': 'junk bonds in 2000', 'evidence_id': 'E2'}])
+ONE_YEAR_TEMPORAL = _json(question='What does the 1990 letter say about junk bonds?', topic='',
+                          parts=[{'ask': 'junk bonds in 1990', 'evidence_id': 'E1'}, {'ask': 'junk bonds in 2000', 'evidence_id': 'E2'}])
+
+
+def test_followup_prompt_has_worked_example_and_good_first_answer_needs_no_retry():
+    lookup = _lookup((1985, FOLLOWUP_DOC))
+    teacher = ScriptedTeacher(GOOD_FOLLOWUP)
+    row, record = round4.synthesize(teacher, _job('followup', lookup), lookup, {}, set())
+    assert row and record['kept'] == 1 and len(teacher.calls) == 1
+    prompt = teacher.calls[0][1][1]['content']
+    assert 'EXAMPLE answer' in prompt and 'it, they, that, this or their' in prompt and 'must NOT name the topic' in prompt
+    assert row['style'] == 'v4' and row['origin'] == 'v4_new' and row['history'][0]['content'].startswith("Let's discuss the textile operations")
+
+
+def test_followup_without_pronoun_gets_one_retry_naming_the_rule_and_is_kept_when_fixed():
+    lookup = _lookup((1985, FOLLOWUP_DOC))
+    teacher = ScriptedTeacher(STANDALONE_FOLLOWUP, GOOD_FOLLOWUP)
+    row, record = round4.synthesize(teacher, _job('followup', lookup), lookup, {}, set())
+    assert row and record['retry'] and record['first_reason'] == 'invalid_followup_topic_or_pronoun'
+    assert [key for key, _ in teacher.calls] == ['v4:followup:0000:question', 'v4:followup:0000:question:retry']
+    retry = teacher.calls[1][1]
+    assert retry[2] == {'role': 'assistant', 'content': STANDALONE_FOLLOWUP}
+    assert 'invalid_followup_topic_or_pronoun' in retry[3]['content'] and 'it, they, that, this or their' in retry[3]['content']
+    assert record['seconds'] == 2.
+
+
+def test_retry_is_capped_at_one_and_checks_stay_strict():
+    lookup = _lookup((1985, FOLLOWUP_DOC))
+    teacher = ScriptedTeacher(STANDALONE_FOLLOWUP, STANDALONE_FOLLOWUP, GOOD_FOLLOWUP)
+    row, record = round4.synthesize(teacher, _job('followup', lookup), lookup, {}, set())
+    assert row is None and record['reason'] == 'invalid_followup_topic_or_pronoun' and len(teacher.calls) == 2
+
+
+def test_temporal_needs_both_years_and_retry_names_them():
+    lookup = _lookup(*TEMPORAL_DOCS)
+    teacher = ScriptedTeacher(ONE_YEAR_TEMPORAL, GOOD_TEMPORAL)
+    row, record = round4.synthesize(teacher, _job('temporal', lookup), lookup, {}, set())
+    assert row and record['first_reason'] == 'source_year_missing'
+    assert '1990 and 2000' in teacher.calls[1][1][3]['content']
+    assert '1990 and 2000 letters' in teacher.calls[0][1][1]['content'] or '1991 and 2003' in teacher.calls[0][1][1]['content']
+    assert round4.round3.source_evidence(_job('temporal', lookup), lookup), 'fixture must give two clean topic sentences'
+    teacher = ScriptedTeacher(ONE_YEAR_TEMPORAL, ONE_YEAR_TEMPORAL)
+    row, record = round4.synthesize(teacher, _job('temporal', lookup), lookup, {}, set())
+    assert row is None and record['reason'] == 'source_year_missing' and len(teacher.calls) == 2
+
+
+def test_non_rule_failures_are_not_retried_and_other_kinds_keep_the_round3_prompt():
+    lookup = _lookup((1985, FOLLOWUP_DOC))
+    first, _ = round4.synthesize(ScriptedTeacher(GOOD_FOLLOWUP), _job('followup', lookup), lookup, {}, set())
+    teacher = ScriptedTeacher(GOOD_FOLLOWUP)
+    row, _ = round4.synthesize(teacher, _job('followup', lookup), lookup, {}, {round4.round3.fingerprint(first)})
+    assert row is None and len(teacher.calls) == 1, 'duplicate question is not a rule the teacher can fix'
+    teacher = ScriptedTeacher(_json(question='What did Berkshire conclude about the capital in 1985?', parts=[{'ask': 'conclusion', 'evidence_id': 'E1'}]))
+    row, _ = round4.synthesize(teacher, _job('single', lookup), lookup, {}, set())
+    assert row and len(teacher.calls) == 1 and 'EXAMPLE' not in teacher.calls[0][1][1]['content']
+
+
+def test_budget_stop_is_not_retried():
+    lookup = _lookup((1985, FOLLOWUP_DOC))
+    teacher = ScriptedTeacher('', finish='budget')
+    row, record = round4.synthesize(teacher, _job('followup', lookup), lookup, {}, set())
+    assert row is None and record['finish_reason'] == 'budget' and len(teacher.calls) == 1
+
+
+def test_temporal_plan_only_picks_pairs_whose_both_years_have_a_clean_topic_sentence(corpus):
+    _, lookup = corpus
+    docs = list(lookup.values())
+    quotas = {'single': 0, 'multipart': 0, 'followup': 0, 'temporal': 12, 'refusal': 0}
+    plan = round4.build_plan(docs, {1999}, {'frozen_set_hashes': {}}, quotas, 1.)
+    jobs = [j for j in plan['jobs'] if j['kind'] == 'temporal']
+    assert len(jobs) >= 6
+    for job in jobs:
+        evidence = round4.round3.source_evidence(job, lookup)
+        assert len(evidence) == 2 and evidence[0]['year'] != evidence[1]['year'], job
+        assert all(job['topic'] in e['sentence'].lower() for e in evidence)

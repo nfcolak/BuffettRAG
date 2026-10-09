@@ -249,6 +249,33 @@ def scale_mix(mix, target):
     return {key: max(1, round(value * target / total)) for key, value in mix.items()}
 
 
+def has_topic_sentence(doc, topic, cache):
+    """True if round3.source_evidence finds a clean sentence of `doc` that contains `topic` (the temporal rule)."""
+    key = (topic, doc.id)
+    if key not in cache:
+        cache[key] = bool(round3.source_evidence({'kind': 'temporal', 'topic': topic, 'source_id': doc.id}, {doc.id: doc}))
+    return cache[key]
+
+
+def clean_topic_pair(topic, docs, rng, cache):
+    """Two docs of different years that each have a topic-matching clean sentence, or None.
+
+    Temporal jobs used to pair any two docs mentioning the topic in their first 1600 chars; half of them
+    then failed source_evidence because the mention was not in a complete, clean sentence.
+    """
+    docs = list(docs)
+    rng.shuffle(docs)
+    first = None
+    for doc in docs:
+        if not has_topic_sentence(doc, topic, cache):
+            continue
+        if first is None:
+            first = doc
+        elif doc.metadata['year'] != first.metadata['year']:
+            return first, doc
+    return None
+
+
 def build_plan(docs, valid_years, identity, quotas, oversample):
     rng = random.Random(common.SEED + 4)
     prose = [d for d in docs if len(d.text) >= 250 and sum(c.isalpha() for c in d.text) / len(d.text) > .60]
@@ -262,7 +289,7 @@ def build_plan(docs, valid_years, identity, quotas, oversample):
                 topics[topic].append(doc)
     templates = unavailable_templates()
     rng.shuffle(templates)
-    used, cursors = set(), Counter()
+    used, cursors, clean_cache = set(), Counter(), {}
 
     def next_doc(split):
         while cursors[split] < len(by_split[split]):
@@ -294,11 +321,13 @@ def build_plan(docs, valid_years, identity, quotas, oversample):
                     ds = [d for d in ds if d.id not in used and (int(d.metadata['year']) in valid_years) == (split == 'valid')]
                     if len({d.metadata['year'] for d in ds}) > 1:
                         viable.append((topic, ds))
-                if not viable:
+                pair = None
+                while viable and pair is None:
+                    topic, ds = viable.pop(rng.randrange(len(viable)))
+                    pair = clean_topic_pair(topic, ds, rng, clean_cache)
+                if pair is None:
                     break
-                topic, ds = rng.choice(viable)
-                a = rng.choice(ds)
-                b = rng.choice([d for d in ds if d.metadata['year'] != a.metadata['year']])
+                a, b = pair
                 used.update((a.id, b.id))
                 job.update(topic=topic, source_id=a.id, source_ids=[a.id, b.id])
             else:
@@ -318,10 +347,81 @@ def build_plan(docs, valid_years, identity, quotas, oversample):
 
 
 # ------------------------------------------------------------------ question synthesis
+QUESTION_SYSTEM = 'Write grounded user questions as valid JSON only.'
+QUESTION_RULES = {
+    'followup': (
+        'Write the user\'s NEXT chat message in a conversation. The conversation so far is only "Let\'s discuss <topic>.", '
+        'so the message must refer to the topic ONLY with the word it, they, that, this or their and must NOT name the topic. '
+        '"topic" is a short noun phrase for the subject of E1. The question asks the one specific fact E1 states.\n'
+        'EXAMPLE sources: [{"id":"E1","year":1994,"sentence":"The bakery sold 4,000 loaves a day in 1994."}]\n'
+        'EXAMPLE answer: {"question":"How many loaves did it sell each day?","topic":"the bakery\'s daily sales",'
+        '"parts":[{"ask":"loaves sold per day","evidence_id":"E1"}]}\n'
+        'Wrong (standalone, no it/they/that): "How many loaves did the bakery sell each day?"'),
+    'temporal': (
+        'Write ONE question that compares two letters. It must name BOTH source years literally and ask what each letter '
+        'states about the shared subject. Never ask for a calculated change. Give one part per evidence item (E1 and E2).\n'
+        'EXAMPLE sources: [{"id":"E1","year":1991,"sentence":"Retiree health costs are not funded in advance."},'
+        '{"id":"E2","year":2003,"sentence":"Retiree health costs are now recorded as a liability."}]\n'
+        'EXAMPLE answer: {"question":"How did the 1991 and 2003 letters describe retiree health costs?","topic":"",'
+        '"parts":[{"ask":"how the 1991 letter treats retiree health costs","evidence_id":"E1"},'
+        '{"ask":"how the 2003 letter treats retiree health costs","evidence_id":"E2"}]}\n'
+        'Wrong (names only one year): "What does the 1991 letter say about retiree health costs compared to later?"'),
+}
+RETRYABLE = {'invalid_question', 'not_an_interrogative_question', 'invalid_followup_topic_or_pronoun', 'source_year_missing',
+             'invalid_question_parts', 'incomplete_question_parts'}
+
+
+def question_prompt_v4(job, evidence):
+    return (QUESTION_RULES[job['kind']] + '\nUse only these source sentences, not outside facts. Preserve concrete names and key topic words. '
+            'Ask a genuine interrogative question beginning What, Which, How, Why, Who or When; never paste an answer statement '
+            'and add a question mark. Return ONLY JSON: {"question":"...?","topic":"...","parts":[{"ask":"...","evidence_id":"E1"}]} '
+            'with every evidence_id exactly once.\nSOURCE SENTENCES:\n' + json.dumps(evidence, ensure_ascii=False))
+
+
+def retry_message(reason, job, evidence):
+    years = ' and '.join(str(e['year']) for e in evidence)
+    ids = ', '.join(e['id'] for e in evidence)
+    rules = {
+        'invalid_followup_topic_or_pronoun': 'a follow-up needs a non-empty "topic" noun phrase and a question that contains it, they, that, this or their '
+                                             'instead of naming the topic',
+        'source_year_missing': f'the question must contain every source year literally: {years}',
+        'invalid_question_parts': 'every entry of "parts" needs a non-empty "ask" string',
+        'incomplete_question_parts': f'"parts" must hold exactly one entry for each of {ids}',
+    }
+    rule = rules.get(reason, '"question" must be one interrogative sentence of 20-600 characters that starts with What, Which, How, Why, Who or When '
+                             'and ends with ?')
+    return f'REJECTED ({reason}): {rule}. Rewrite the JSON so it obeys this rule; return ONLY the JSON object.'
+
+
+def synthesize_v4_question(teacher, job, lookup, frozen, known):
+    """Follow-up / temporal questions: instruction plus worked example, and one retry naming the broken rule."""
+    evidence = round3.source_evidence(job, lookup)
+    if not evidence:
+        return None, {'id': job['id'], 'kind': job['kind'], 'kept': 0, 'reason': 'no_complete_clean_source_sentence', 'seconds': 0.}
+    messages = [{'role': 'system', 'content': QUESTION_SYSTEM}, {'role': 'user', 'content': question_prompt_v4(job, evidence)}]
+    raw, metrics = teacher.generate(messages, job['id'] + ':question', max_tokens=360, temperature=.1)
+    row, record = round3.build_question(job, evidence, raw, metrics, frozen, known)
+    if metrics.get('finish_reason') == 'budget' or row or record.get('reason') not in RETRYABLE:
+        return row, record
+    messages += [{'role': 'assistant', 'content': raw}, {'role': 'user', 'content': retry_message(record['reason'], job, evidence)}]
+    raw2, metrics2 = teacher.generate(messages, job['id'] + ':question:retry', max_tokens=360, temperature=.1)
+    if metrics2.get('finish_reason') == 'budget':
+        return None, {**record, **metrics2}
+    row, retried = round3.build_question(job, evidence, raw2, metrics2, frozen, known)
+    retried.update(retry=True, first_reason=record['reason'], first_raw=raw,
+                   seconds=metrics.get('seconds', 0.) + metrics2.get('seconds', 0.), tokens=metrics.get('tokens', 0) + metrics2.get('tokens', 0))
+    return row, retried
+
+
 def synthesize(teacher, job, lookup, frozen, known):
     """Round-3 question synthesis (evidence-obligation parts) relabelled for v4."""
     if job['kind'] == 'multipart' and job.get('variant') == 'partial':
         return synthesize_partial(teacher, job, lookup, frozen, known)
+    if job['kind'] in QUESTION_RULES:
+        row, record = synthesize_v4_question(teacher, job, lookup, frozen, known)
+        if row:
+            row.update(style='v4', origin='v4_new')
+        return row, record
     shadow = {**job, 'kind': 'single', 'type': 'answerable'} if job['kind'] == 'distractor' else job
     row, record = round3.synthesize(teacher, shadow, lookup, frozen, known)
     record['kind'] = job['kind']

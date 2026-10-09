@@ -219,6 +219,11 @@ def synthesize(teacher, job, lookup, frozen, known):
                   '\nSOURCE SENTENCES:\n' + json.dumps(evidence, ensure_ascii=False))
     raw, metrics = teacher.generate([{'role': 'system', 'content': 'Write grounded user questions as valid JSON only.'},
                                      {'role': 'user', 'content': prompt}], job['id'] + ':question', max_tokens=360, temperature=.1)
+    return build_question(job, evidence, raw, metrics, frozen, known)
+
+
+def build_question(job, evidence, raw, metrics, frozen, known):
+    """Strict checks on a teacher-written question (shared with the v4 retry path); (row, record)."""
     record = {'id': job['id'], 'kind': job['kind'], 'kept': 0, 'raw': raw, **metrics}
     obj = _json_object(raw)
     question = obj.get('question', '')
