@@ -1,0 +1,1705 @@
+{
+ "schema_version": 1,
+ "set": "heldout_v3",
+ "retrieval": "bm25",
+ "temperature": 0.0,
+ "cases": 40,
+ "cases_sha256": "23f3a71930ce761412a1366e313bd319c5c36ec9454538ca1f0b9d4beea1baf3",
+ "preregistration": "Artifacts/BuffettRAG/heldout7b/PREREGISTRATION.md (written before the run; copied here)",
+ "device": "local Mac, llama.cpp Metal (LLM_GPU_LAYERS=-1); latency not comparable with U7 arms",
+ "progress": [
+  "START llama7b_base 2026-10-09T10:50:39Z load=3.70 3.31 3.18",
+  "END llama7b_base exit=0 seconds=172 2026-10-09T10:53:31Z",
+  "START llama7b_ft 2026-10-09T10:53:31Z load=5.32 4.94 3.91",
+  "END llama7b_ft exit=0 seconds=154 2026-10-09T10:56:05Z",
+  "ALL_DONE any_fail=0 2026-10-09T10:56:05Z"
+ ],
+ "types": [
+  "opinion",
+  "company",
+  "fact_number",
+  "temporal_comparison",
+  "follow_up",
+  "unanswerable"
+ ],
+ "arms": {
+  "1": {
+   "arm": 1,
+   "name": "local_extractive",
+   "label": "extractive (U7 reference, not re-run)",
+   "provider": "local",
+   "composer": null,
+   "cases_run": 40,
+   "scored_answers": 40,
+   "lexical_accepted": 14,
+   "nli_accepted": 17,
+   "strict_supported_claims_met": 13,
+   "strict_required_claims": 41,
+   "strict_hits_source": [
+    "rebuilt_context"
+   ],
+   "context_rebuild_validation": null,
+   "strict_from_rescore_nli": null,
+   "strict_matches_rescore_nli": null,
+   "lexical_claims_met": 14,
+   "nli_claims_met": 19,
+   "nli_required_claims": 41,
+   "invalid_markers": 0,
+   "unsupported_extra_sentences": 74,
+   "content_sentences_answerable": 236,
+   "unanswerable_cases": 6,
+   "correct_refusals": 3,
+   "unexpected_refusals": 3,
+   "answerable_cases": 34,
+   "abstain_answerable_incl_notes": 6,
+   "abstain_answerable_qids": [
+    {
+     "qid": "hv3_02",
+     "refusal": true
+    },
+    {
+     "qid": "hv3_10",
+     "refusal": true
+    },
+    {
+     "qid": "hv3_19",
+     "refusal": true
+    },
+    {
+     "qid": "hv3_26",
+     "refusal": false
+    },
+    {
+     "qid": "hv3_27",
+     "refusal": false
+    },
+    {
+     "qid": "hv3_29",
+     "refusal": false
+    }
+   ],
+   "fallback": null,
+   "per_type": {
+    "company": {
+     "cases": 8,
+     "supported_met": 6,
+     "required_claims": 9
+    },
+    "fact_number": {
+     "cases": 8,
+     "supported_met": 1,
+     "required_claims": 9
+    },
+    "follow_up": {
+     "cases": 4,
+     "supported_met": 2,
+     "required_claims": 5
+    },
+    "opinion": {
+     "cases": 9,
+     "supported_met": 3,
+     "required_claims": 9
+    },
+    "temporal_comparison": {
+     "cases": 5,
+     "supported_met": 1,
+     "required_claims": 9
+    },
+    "unanswerable": {
+     "cases": 6,
+     "supported_met": 0,
+     "required_claims": 0
+    }
+   },
+   "provider_failures": 0,
+   "provider_error_events": 0,
+   "provider_failures_by_stage_type": {},
+   "latency_ms": {
+    "all": {
+     "n": 40,
+     "p50": 41.2,
+     "p95": 51.0
+    },
+    "warm": {
+     "n": 39,
+     "p50": 41.0,
+     "p95": 51.2
+    },
+    "cold": {
+     "n": 1,
+     "p50": 43.5,
+     "p95": 43.5
+    },
+    "setup_ms": 181.663
+   },
+   "effective": {
+    "model": "embedded-extractive-v1",
+    "resolved_provider": "local",
+    "model_path": null,
+    "temperature_requested": 0.0,
+    "temperature_manifest": null,
+    "device": null,
+    "nli_device": "mps",
+    "grounded_settings": null,
+    "code_sha": null,
+    "code_dirty": null,
+    "resumes": null
+   },
+   "source_dir": "data/evaluation/heldout_v3/final"
+  },
+  "8": {
+   "arm": 8,
+   "name": "llama7b_base",
+   "label": "llama 7B base (Kaggle q4_k_m)",
+   "provider": "llama",
+   "composer": null,
+   "cases_run": 40,
+   "scored_answers": 40,
+   "lexical_accepted": 9,
+   "nli_accepted": 11,
+   "strict_supported_claims_met": 2,
+   "strict_required_claims": 41,
+   "strict_hits_source": [
+    "rebuilt_context"
+   ],
+   "context_rebuild_validation": null,
+   "strict_from_rescore_nli": null,
+   "strict_matches_rescore_nli": null,
+   "lexical_claims_met": 3,
+   "nli_claims_met": 5,
+   "nli_required_claims": 41,
+   "invalid_markers": 0,
+   "unsupported_extra_sentences": 12,
+   "content_sentences_answerable": 19,
+   "unanswerable_cases": 6,
+   "correct_refusals": 6,
+   "unexpected_refusals": 21,
+   "answerable_cases": 34,
+   "abstain_answerable_incl_notes": 27,
+   "abstain_answerable_qids": [
+    {
+     "qid": "hv3_01",
+     "refusal": true
+    },
+    {
+     "qid": "hv3_02",
+     "refusal": true
+    },
+    {
+     "qid": "hv3_03",
+     "refusal": true
+    },
+    {
+     "qid": "hv3_04",
+     "refusal": true
+    },
+    {
+     "qid": "hv3_05",
+     "refusal": true
+    },
+    {
+     "qid": "hv3_06",
+     "refusal": true
+    },
+    {
+     "qid": "hv3_07",
+     "refusal": true
+    },
+    {
+     "qid": "hv3_08",
+     "refusal": true
+    },
+    {
+     "qid": "hv3_09",
+     "refusal": true
+    },
+    {
+     "qid": "hv3_10",
+     "refusal": true
+    },
+    {
+     "qid": "hv3_12",
+     "refusal": true
+    },
+    {
+     "qid": "hv3_15",
+     "refusal": true
+    },
+    {
+     "qid": "hv3_16",
+     "refusal": true
+    },
+    {
+     "qid": "hv3_17",
+     "refusal": true
+    },
+    {
+     "qid": "hv3_19",
+     "refusal": true
+    },
+    {
+     "qid": "hv3_20",
+     "refusal": false
+    },
+    {
+     "qid": "hv3_22",
+     "refusal": true
+    },
+    {
+     "qid": "hv3_23",
+     "refusal": true
+    },
+    {
+     "qid": "hv3_24",
+     "refusal": true
+    },
+    {
+     "qid": "hv3_26",
+     "refusal": false
+    },
+    {
+     "qid": "hv3_27",
+     "refusal": false
+    },
+    {
+     "qid": "hv3_28",
+     "refusal": false
+    },
+    {
+     "qid": "hv3_29",
+     "refusal": false
+    },
+    {
+     "qid": "hv3_30",
+     "refusal": false
+    },
+    {
+     "qid": "hv3_31",
+     "refusal": true
+    },
+    {
+     "qid": "hv3_32",
+     "refusal": true
+    },
+    {
+     "qid": "hv3_34",
+     "refusal": true
+    }
+   ],
+   "fallback": null,
+   "per_type": {
+    "company": {
+     "cases": 8,
+     "supported_met": 2,
+     "required_claims": 9
+    },
+    "fact_number": {
+     "cases": 8,
+     "supported_met": 0,
+     "required_claims": 9
+    },
+    "follow_up": {
+     "cases": 4,
+     "supported_met": 0,
+     "required_claims": 5
+    },
+    "opinion": {
+     "cases": 9,
+     "supported_met": 0,
+     "required_claims": 9
+    },
+    "temporal_comparison": {
+     "cases": 5,
+     "supported_met": 0,
+     "required_claims": 9
+    },
+    "unanswerable": {
+     "cases": 6,
+     "supported_met": 0,
+     "required_claims": 0
+    }
+   },
+   "provider_failures": 0,
+   "provider_error_events": 0,
+   "provider_failures_by_stage_type": {},
+   "latency_ms": {
+    "all": {
+     "n": 40,
+     "p50": 4531.5,
+     "p95": 7730.1
+    },
+    "warm": {
+     "n": 39,
+     "p50": 4493.2,
+     "p95": 7190.7
+    },
+    "cold": {
+     "n": 1,
+     "p50": 9047.2,
+     "p95": 9047.2
+    },
+    "setup_ms": 276.818
+   },
+   "effective": {
+    "model": "qwen2.5-7b-instruct-q4_k_m.gguf",
+    "resolved_provider": "llama",
+    "model_path": null,
+    "temperature_requested": 0.0,
+    "temperature_manifest": null,
+    "device": null,
+    "nli_device": "mps",
+    "grounded_settings": null,
+    "code_sha": null,
+    "code_dirty": null,
+    "resumes": null
+   },
+   "source_dir": "data/evaluation/heldout_v3/ft7b_r1"
+  },
+  "9": {
+   "arm": 9,
+   "name": "llama7b_ft",
+   "label": "llama 7B FT-r1 (Kaggle q4_k_m)",
+   "provider": "llama",
+   "composer": null,
+   "cases_run": 40,
+   "scored_answers": 40,
+   "lexical_accepted": 19,
+   "nli_accepted": 16,
+   "strict_supported_claims_met": 14,
+   "strict_required_claims": 41,
+   "strict_hits_source": [
+    "rebuilt_context"
+   ],
+   "context_rebuild_validation": null,
+   "strict_from_rescore_nli": null,
+   "strict_matches_rescore_nli": null,
+   "lexical_claims_met": 15,
+   "nli_claims_met": 14,
+   "nli_required_claims": 41,
+   "invalid_markers": 0,
+   "unsupported_extra_sentences": 13,
+   "content_sentences_answerable": 40,
+   "unanswerable_cases": 6,
+   "correct_refusals": 6,
+   "unexpected_refusals": 8,
+   "answerable_cases": 34,
+   "abstain_answerable_incl_notes": 13,
+   "abstain_answerable_qids": [
+    {
+     "qid": "hv3_02",
+     "refusal": true
+    },
+    {
+     "qid": "hv3_06",
+     "refusal": true
+    },
+    {
+     "qid": "hv3_08",
+     "refusal": true
+    },
+    {
+     "qid": "hv3_09",
+     "refusal": true
+    },
+    {
+     "qid": "hv3_10",
+     "refusal": true
+    },
+    {
+     "qid": "hv3_19",
+     "refusal": true
+    },
+    {
+     "qid": "hv3_26",
+     "refusal": false
+    },
+    {
+     "qid": "hv3_27",
+     "refusal": false
+    },
+    {
+     "qid": "hv3_28",
+     "refusal": false
+    },
+    {
+     "qid": "hv3_29",
+     "refusal": false
+    },
+    {
+     "qid": "hv3_30",
+     "refusal": false
+    },
+    {
+     "qid": "hv3_33",
+     "refusal": true
+    },
+    {
+     "qid": "hv3_34",
+     "refusal": true
+    }
+   ],
+   "fallback": null,
+   "per_type": {
+    "company": {
+     "cases": 8,
+     "supported_met": 8,
+     "required_claims": 9
+    },
+    "fact_number": {
+     "cases": 8,
+     "supported_met": 4,
+     "required_claims": 9
+    },
+    "follow_up": {
+     "cases": 4,
+     "supported_met": 1,
+     "required_claims": 5
+    },
+    "opinion": {
+     "cases": 9,
+     "supported_met": 1,
+     "required_claims": 9
+    },
+    "temporal_comparison": {
+     "cases": 5,
+     "supported_met": 0,
+     "required_claims": 9
+    },
+    "unanswerable": {
+     "cases": 6,
+     "supported_met": 0,
+     "required_claims": 0
+    }
+   },
+   "provider_failures": 0,
+   "provider_error_events": 0,
+   "provider_failures_by_stage_type": {},
+   "latency_ms": {
+    "all": {
+     "n": 40,
+     "p50": 4298.5,
+     "p95": 6682.6
+    },
+    "warm": {
+     "n": 39,
+     "p50": 4279.1,
+     "p95": 6342.1
+    },
+    "cold": {
+     "n": 1,
+     "p50": 12392.6,
+     "p95": 12392.6
+    },
+    "setup_ms": 273.953
+   },
+   "effective": {
+    "model": "buffett-qwen2.5-7b-ft-r1-q4_k_m.gguf",
+    "resolved_provider": "llama",
+    "model_path": null,
+    "temperature_requested": 0.0,
+    "temperature_manifest": null,
+    "device": null,
+    "nli_device": "mps",
+    "grounded_settings": null,
+    "code_sha": null,
+    "code_dirty": null,
+    "resumes": null
+   },
+   "source_dir": "data/evaluation/heldout_v3/ft7b_r1"
+  }
+ },
+ "screening": {
+  "rule": "pre-registered: U7 plan section 7 applied to arm 9, comparator arm 4 replaced by arm 8; engineering screen, not a statistical test",
+  "conditions": [
+   {
+    "condition": "strict supported claims: arm9 >= arm1 + 3 AND arm9 >= arm8",
+    "pass": false,
+    "detail": "arm9=14, arm1=13 (need >= 16), arm8=2"
+   },
+   {
+    "condition": "correct refusals = all genuine unanswerable cases",
+    "pass": true,
+    "detail": "arm9 correct refusals=6/6"
+   },
+   {
+    "condition": "abstentions on answerable <= arm1",
+    "pass": false,
+    "detail": "arm9=13, arm1=6"
+   },
+   {
+    "condition": "zero invalid markers",
+    "pass": true,
+    "detail": "arm9=0"
+   },
+   {
+    "condition": "zero provider failures",
+    "pass": true,
+    "detail": "arm9 failed cases=0, error events=0"
+   },
+   {
+    "condition": "no question type with fewer strict claims than arm1 by more than 1",
+    "pass": false,
+    "detail": "opinion: arm9=1 < arm1=3 - 1"
+   }
+  ],
+  "verdict": "not a candidate"
+ },
+ "paired": {
+  "arm9_vs_arm1": [
+   {
+    "qid": "hv3_01",
+    "type": "opinion",
+    "required": 1,
+    "arm9": 0,
+    "arm1": 0,
+    "delta": 0
+   },
+   {
+    "qid": "hv3_02",
+    "type": "opinion",
+    "required": 1,
+    "arm9": 0,
+    "arm1": 0,
+    "delta": 0
+   },
+   {
+    "qid": "hv3_03",
+    "type": "opinion",
+    "required": 1,
+    "arm9": 1,
+    "arm1": 1,
+    "delta": 0
+   },
+   {
+    "qid": "hv3_04",
+    "type": "opinion",
+    "required": 1,
+    "arm9": 0,
+    "arm1": 1,
+    "delta": -1
+   },
+   {
+    "qid": "hv3_05",
+    "type": "opinion",
+    "required": 1,
+    "arm9": 0,
+    "arm1": 0,
+    "delta": 0
+   },
+   {
+    "qid": "hv3_06",
+    "type": "opinion",
+    "required": 1,
+    "arm9": 0,
+    "arm1": 0,
+    "delta": 0
+   },
+   {
+    "qid": "hv3_07",
+    "type": "opinion",
+    "required": 1,
+    "arm9": 0,
+    "arm1": 0,
+    "delta": 0
+   },
+   {
+    "qid": "hv3_08",
+    "type": "opinion",
+    "required": 1,
+    "arm9": 0,
+    "arm1": 0,
+    "delta": 0
+   },
+   {
+    "qid": "hv3_09",
+    "type": "opinion",
+    "required": 1,
+    "arm9": 0,
+    "arm1": 1,
+    "delta": -1
+   },
+   {
+    "qid": "hv3_10",
+    "type": "company",
+    "required": 1,
+    "arm9": 0,
+    "arm1": 0,
+    "delta": 0
+   },
+   {
+    "qid": "hv3_11",
+    "type": "company",
+    "required": 1,
+    "arm9": 1,
+    "arm1": 1,
+    "delta": 0
+   },
+   {
+    "qid": "hv3_12",
+    "type": "company",
+    "required": 1,
+    "arm9": 1,
+    "arm1": 1,
+    "delta": 0
+   },
+   {
+    "qid": "hv3_13",
+    "type": "company",
+    "required": 1,
+    "arm9": 1,
+    "arm1": 1,
+    "delta": 0
+   },
+   {
+    "qid": "hv3_14",
+    "type": "company",
+    "required": 1,
+    "arm9": 1,
+    "arm1": 1,
+    "delta": 0
+   },
+   {
+    "qid": "hv3_15",
+    "type": "company",
+    "required": 1,
+    "arm9": 1,
+    "arm1": 1,
+    "delta": 0
+   },
+   {
+    "qid": "hv3_16",
+    "type": "company",
+    "required": 1,
+    "arm9": 1,
+    "arm1": 1,
+    "delta": 0
+   },
+   {
+    "qid": "hv3_17",
+    "type": "company",
+    "required": 2,
+    "arm9": 2,
+    "arm1": 0,
+    "delta": 2
+   },
+   {
+    "qid": "hv3_18",
+    "type": "fact_number",
+    "required": 1,
+    "arm9": 1,
+    "arm1": 0,
+    "delta": 1
+   },
+   {
+    "qid": "hv3_19",
+    "type": "fact_number",
+    "required": 1,
+    "arm9": 0,
+    "arm1": 0,
+    "delta": 0
+   },
+   {
+    "qid": "hv3_20",
+    "type": "fact_number",
+    "required": 1,
+    "arm9": 0,
+    "arm1": 0,
+    "delta": 0
+   },
+   {
+    "qid": "hv3_21",
+    "type": "fact_number",
+    "required": 1,
+    "arm9": 1,
+    "arm1": 0,
+    "delta": 1
+   },
+   {
+    "qid": "hv3_22",
+    "type": "fact_number",
+    "required": 2,
+    "arm9": 1,
+    "arm1": 1,
+    "delta": 0
+   },
+   {
+    "qid": "hv3_23",
+    "type": "fact_number",
+    "required": 1,
+    "arm9": 0,
+    "arm1": 0,
+    "delta": 0
+   },
+   {
+    "qid": "hv3_24",
+    "type": "fact_number",
+    "required": 1,
+    "arm9": 0,
+    "arm1": 0,
+    "delta": 0
+   },
+   {
+    "qid": "hv3_25",
+    "type": "fact_number",
+    "required": 1,
+    "arm9": 1,
+    "arm1": 0,
+    "delta": 1
+   },
+   {
+    "qid": "hv3_26",
+    "type": "temporal_comparison",
+    "required": 2,
+    "arm9": 0,
+    "arm1": 0,
+    "delta": 0
+   },
+   {
+    "qid": "hv3_27",
+    "type": "temporal_comparison",
+    "required": 2,
+    "arm9": 0,
+    "arm1": 0,
+    "delta": 0
+   },
+   {
+    "qid": "hv3_28",
+    "type": "temporal_comparison",
+    "required": 2,
+    "arm9": 0,
+    "arm1": 1,
+    "delta": -1
+   },
+   {
+    "qid": "hv3_29",
+    "type": "temporal_comparison",
+    "required": 2,
+    "arm9": 0,
+    "arm1": 0,
+    "delta": 0
+   },
+   {
+    "qid": "hv3_30",
+    "type": "temporal_comparison",
+    "required": 1,
+    "arm9": 0,
+    "arm1": 0,
+    "delta": 0
+   },
+   {
+    "qid": "hv3_31",
+    "type": "follow_up",
+    "required": 1,
+    "arm9": 0,
+    "arm1": 0,
+    "delta": 0
+   },
+   {
+    "qid": "hv3_32",
+    "type": "follow_up",
+    "required": 1,
+    "arm9": 1,
+    "arm1": 1,
+    "delta": 0
+   },
+   {
+    "qid": "hv3_33",
+    "type": "follow_up",
+    "required": 2,
+    "arm9": 0,
+    "arm1": 1,
+    "delta": -1
+   },
+   {
+    "qid": "hv3_34",
+    "type": "follow_up",
+    "required": 1,
+    "arm9": 0,
+    "arm1": 0,
+    "delta": 0
+   }
+  ],
+  "arm9_vs_arm8": [
+   {
+    "qid": "hv3_01",
+    "type": "opinion",
+    "required": 1,
+    "arm9": 0,
+    "arm8": 0,
+    "delta": 0
+   },
+   {
+    "qid": "hv3_02",
+    "type": "opinion",
+    "required": 1,
+    "arm9": 0,
+    "arm8": 0,
+    "delta": 0
+   },
+   {
+    "qid": "hv3_03",
+    "type": "opinion",
+    "required": 1,
+    "arm9": 1,
+    "arm8": 0,
+    "delta": 1
+   },
+   {
+    "qid": "hv3_04",
+    "type": "opinion",
+    "required": 1,
+    "arm9": 0,
+    "arm8": 0,
+    "delta": 0
+   },
+   {
+    "qid": "hv3_05",
+    "type": "opinion",
+    "required": 1,
+    "arm9": 0,
+    "arm8": 0,
+    "delta": 0
+   },
+   {
+    "qid": "hv3_06",
+    "type": "opinion",
+    "required": 1,
+    "arm9": 0,
+    "arm8": 0,
+    "delta": 0
+   },
+   {
+    "qid": "hv3_07",
+    "type": "opinion",
+    "required": 1,
+    "arm9": 0,
+    "arm8": 0,
+    "delta": 0
+   },
+   {
+    "qid": "hv3_08",
+    "type": "opinion",
+    "required": 1,
+    "arm9": 0,
+    "arm8": 0,
+    "delta": 0
+   },
+   {
+    "qid": "hv3_09",
+    "type": "opinion",
+    "required": 1,
+    "arm9": 0,
+    "arm8": 0,
+    "delta": 0
+   },
+   {
+    "qid": "hv3_10",
+    "type": "company",
+    "required": 1,
+    "arm9": 0,
+    "arm8": 0,
+    "delta": 0
+   },
+   {
+    "qid": "hv3_11",
+    "type": "company",
+    "required": 1,
+    "arm9": 1,
+    "arm8": 1,
+    "delta": 0
+   },
+   {
+    "qid": "hv3_12",
+    "type": "company",
+    "required": 1,
+    "arm9": 1,
+    "arm8": 0,
+    "delta": 1
+   },
+   {
+    "qid": "hv3_13",
+    "type": "company",
+    "required": 1,
+    "arm9": 1,
+    "arm8": 0,
+    "delta": 1
+   },
+   {
+    "qid": "hv3_14",
+    "type": "company",
+    "required": 1,
+    "arm9": 1,
+    "arm8": 1,
+    "delta": 0
+   },
+   {
+    "qid": "hv3_15",
+    "type": "company",
+    "required": 1,
+    "arm9": 1,
+    "arm8": 0,
+    "delta": 1
+   },
+   {
+    "qid": "hv3_16",
+    "type": "company",
+    "required": 1,
+    "arm9": 1,
+    "arm8": 0,
+    "delta": 1
+   },
+   {
+    "qid": "hv3_17",
+    "type": "company",
+    "required": 2,
+    "arm9": 2,
+    "arm8": 0,
+    "delta": 2
+   },
+   {
+    "qid": "hv3_18",
+    "type": "fact_number",
+    "required": 1,
+    "arm9": 1,
+    "arm8": 0,
+    "delta": 1
+   },
+   {
+    "qid": "hv3_19",
+    "type": "fact_number",
+    "required": 1,
+    "arm9": 0,
+    "arm8": 0,
+    "delta": 0
+   },
+   {
+    "qid": "hv3_20",
+    "type": "fact_number",
+    "required": 1,
+    "arm9": 0,
+    "arm8": 0,
+    "delta": 0
+   },
+   {
+    "qid": "hv3_21",
+    "type": "fact_number",
+    "required": 1,
+    "arm9": 1,
+    "arm8": 0,
+    "delta": 1
+   },
+   {
+    "qid": "hv3_22",
+    "type": "fact_number",
+    "required": 2,
+    "arm9": 1,
+    "arm8": 0,
+    "delta": 1
+   },
+   {
+    "qid": "hv3_23",
+    "type": "fact_number",
+    "required": 1,
+    "arm9": 0,
+    "arm8": 0,
+    "delta": 0
+   },
+   {
+    "qid": "hv3_24",
+    "type": "fact_number",
+    "required": 1,
+    "arm9": 0,
+    "arm8": 0,
+    "delta": 0
+   },
+   {
+    "qid": "hv3_25",
+    "type": "fact_number",
+    "required": 1,
+    "arm9": 1,
+    "arm8": 0,
+    "delta": 1
+   },
+   {
+    "qid": "hv3_26",
+    "type": "temporal_comparison",
+    "required": 2,
+    "arm9": 0,
+    "arm8": 0,
+    "delta": 0
+   },
+   {
+    "qid": "hv3_27",
+    "type": "temporal_comparison",
+    "required": 2,
+    "arm9": 0,
+    "arm8": 0,
+    "delta": 0
+   },
+   {
+    "qid": "hv3_28",
+    "type": "temporal_comparison",
+    "required": 2,
+    "arm9": 0,
+    "arm8": 0,
+    "delta": 0
+   },
+   {
+    "qid": "hv3_29",
+    "type": "temporal_comparison",
+    "required": 2,
+    "arm9": 0,
+    "arm8": 0,
+    "delta": 0
+   },
+   {
+    "qid": "hv3_30",
+    "type": "temporal_comparison",
+    "required": 1,
+    "arm9": 0,
+    "arm8": 0,
+    "delta": 0
+   },
+   {
+    "qid": "hv3_31",
+    "type": "follow_up",
+    "required": 1,
+    "arm9": 0,
+    "arm8": 0,
+    "delta": 0
+   },
+   {
+    "qid": "hv3_32",
+    "type": "follow_up",
+    "required": 1,
+    "arm9": 1,
+    "arm8": 0,
+    "delta": 1
+   },
+   {
+    "qid": "hv3_33",
+    "type": "follow_up",
+    "required": 2,
+    "arm9": 0,
+    "arm8": 0,
+    "delta": 0
+   },
+   {
+    "qid": "hv3_34",
+    "type": "follow_up",
+    "required": 1,
+    "arm9": 0,
+    "arm8": 0,
+    "delta": 0
+   }
+  ]
+ },
+ "per_case_strict": {
+  "1": {
+   "hv3_01": {
+    "type": "opinion",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_02": {
+    "type": "opinion",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_03": {
+    "type": "opinion",
+    "supported_met": 1,
+    "required_claims": 1
+   },
+   "hv3_04": {
+    "type": "opinion",
+    "supported_met": 1,
+    "required_claims": 1
+   },
+   "hv3_05": {
+    "type": "opinion",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_06": {
+    "type": "opinion",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_07": {
+    "type": "opinion",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_08": {
+    "type": "opinion",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_09": {
+    "type": "opinion",
+    "supported_met": 1,
+    "required_claims": 1
+   },
+   "hv3_10": {
+    "type": "company",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_11": {
+    "type": "company",
+    "supported_met": 1,
+    "required_claims": 1
+   },
+   "hv3_12": {
+    "type": "company",
+    "supported_met": 1,
+    "required_claims": 1
+   },
+   "hv3_13": {
+    "type": "company",
+    "supported_met": 1,
+    "required_claims": 1
+   },
+   "hv3_14": {
+    "type": "company",
+    "supported_met": 1,
+    "required_claims": 1
+   },
+   "hv3_15": {
+    "type": "company",
+    "supported_met": 1,
+    "required_claims": 1
+   },
+   "hv3_16": {
+    "type": "company",
+    "supported_met": 1,
+    "required_claims": 1
+   },
+   "hv3_17": {
+    "type": "company",
+    "supported_met": 0,
+    "required_claims": 2
+   },
+   "hv3_18": {
+    "type": "fact_number",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_19": {
+    "type": "fact_number",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_20": {
+    "type": "fact_number",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_21": {
+    "type": "fact_number",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_22": {
+    "type": "fact_number",
+    "supported_met": 1,
+    "required_claims": 2
+   },
+   "hv3_23": {
+    "type": "fact_number",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_24": {
+    "type": "fact_number",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_25": {
+    "type": "fact_number",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_26": {
+    "type": "temporal_comparison",
+    "supported_met": 0,
+    "required_claims": 2
+   },
+   "hv3_27": {
+    "type": "temporal_comparison",
+    "supported_met": 0,
+    "required_claims": 2
+   },
+   "hv3_28": {
+    "type": "temporal_comparison",
+    "supported_met": 1,
+    "required_claims": 2
+   },
+   "hv3_29": {
+    "type": "temporal_comparison",
+    "supported_met": 0,
+    "required_claims": 2
+   },
+   "hv3_30": {
+    "type": "temporal_comparison",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_31": {
+    "type": "follow_up",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_32": {
+    "type": "follow_up",
+    "supported_met": 1,
+    "required_claims": 1
+   },
+   "hv3_33": {
+    "type": "follow_up",
+    "supported_met": 1,
+    "required_claims": 2
+   },
+   "hv3_34": {
+    "type": "follow_up",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_35": {
+    "type": "unanswerable",
+    "supported_met": 0,
+    "required_claims": 0
+   },
+   "hv3_36": {
+    "type": "unanswerable",
+    "supported_met": 0,
+    "required_claims": 0
+   },
+   "hv3_37": {
+    "type": "unanswerable",
+    "supported_met": 0,
+    "required_claims": 0
+   },
+   "hv3_38": {
+    "type": "unanswerable",
+    "supported_met": 0,
+    "required_claims": 0
+   },
+   "hv3_39": {
+    "type": "unanswerable",
+    "supported_met": 0,
+    "required_claims": 0
+   },
+   "hv3_40": {
+    "type": "unanswerable",
+    "supported_met": 0,
+    "required_claims": 0
+   }
+  },
+  "8": {
+   "hv3_01": {
+    "type": "opinion",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_02": {
+    "type": "opinion",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_03": {
+    "type": "opinion",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_04": {
+    "type": "opinion",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_05": {
+    "type": "opinion",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_06": {
+    "type": "opinion",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_07": {
+    "type": "opinion",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_08": {
+    "type": "opinion",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_09": {
+    "type": "opinion",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_10": {
+    "type": "company",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_11": {
+    "type": "company",
+    "supported_met": 1,
+    "required_claims": 1
+   },
+   "hv3_12": {
+    "type": "company",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_13": {
+    "type": "company",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_14": {
+    "type": "company",
+    "supported_met": 1,
+    "required_claims": 1
+   },
+   "hv3_15": {
+    "type": "company",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_16": {
+    "type": "company",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_17": {
+    "type": "company",
+    "supported_met": 0,
+    "required_claims": 2
+   },
+   "hv3_18": {
+    "type": "fact_number",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_19": {
+    "type": "fact_number",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_20": {
+    "type": "fact_number",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_21": {
+    "type": "fact_number",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_22": {
+    "type": "fact_number",
+    "supported_met": 0,
+    "required_claims": 2
+   },
+   "hv3_23": {
+    "type": "fact_number",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_24": {
+    "type": "fact_number",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_25": {
+    "type": "fact_number",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_26": {
+    "type": "temporal_comparison",
+    "supported_met": 0,
+    "required_claims": 2
+   },
+   "hv3_27": {
+    "type": "temporal_comparison",
+    "supported_met": 0,
+    "required_claims": 2
+   },
+   "hv3_28": {
+    "type": "temporal_comparison",
+    "supported_met": 0,
+    "required_claims": 2
+   },
+   "hv3_29": {
+    "type": "temporal_comparison",
+    "supported_met": 0,
+    "required_claims": 2
+   },
+   "hv3_30": {
+    "type": "temporal_comparison",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_31": {
+    "type": "follow_up",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_32": {
+    "type": "follow_up",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_33": {
+    "type": "follow_up",
+    "supported_met": 0,
+    "required_claims": 2
+   },
+   "hv3_34": {
+    "type": "follow_up",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_35": {
+    "type": "unanswerable",
+    "supported_met": 0,
+    "required_claims": 0
+   },
+   "hv3_36": {
+    "type": "unanswerable",
+    "supported_met": 0,
+    "required_claims": 0
+   },
+   "hv3_37": {
+    "type": "unanswerable",
+    "supported_met": 0,
+    "required_claims": 0
+   },
+   "hv3_38": {
+    "type": "unanswerable",
+    "supported_met": 0,
+    "required_claims": 0
+   },
+   "hv3_39": {
+    "type": "unanswerable",
+    "supported_met": 0,
+    "required_claims": 0
+   },
+   "hv3_40": {
+    "type": "unanswerable",
+    "supported_met": 0,
+    "required_claims": 0
+   }
+  },
+  "9": {
+   "hv3_01": {
+    "type": "opinion",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_02": {
+    "type": "opinion",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_03": {
+    "type": "opinion",
+    "supported_met": 1,
+    "required_claims": 1
+   },
+   "hv3_04": {
+    "type": "opinion",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_05": {
+    "type": "opinion",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_06": {
+    "type": "opinion",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_07": {
+    "type": "opinion",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_08": {
+    "type": "opinion",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_09": {
+    "type": "opinion",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_10": {
+    "type": "company",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_11": {
+    "type": "company",
+    "supported_met": 1,
+    "required_claims": 1
+   },
+   "hv3_12": {
+    "type": "company",
+    "supported_met": 1,
+    "required_claims": 1
+   },
+   "hv3_13": {
+    "type": "company",
+    "supported_met": 1,
+    "required_claims": 1
+   },
+   "hv3_14": {
+    "type": "company",
+    "supported_met": 1,
+    "required_claims": 1
+   },
+   "hv3_15": {
+    "type": "company",
+    "supported_met": 1,
+    "required_claims": 1
+   },
+   "hv3_16": {
+    "type": "company",
+    "supported_met": 1,
+    "required_claims": 1
+   },
+   "hv3_17": {
+    "type": "company",
+    "supported_met": 2,
+    "required_claims": 2
+   },
+   "hv3_18": {
+    "type": "fact_number",
+    "supported_met": 1,
+    "required_claims": 1
+   },
+   "hv3_19": {
+    "type": "fact_number",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_20": {
+    "type": "fact_number",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_21": {
+    "type": "fact_number",
+    "supported_met": 1,
+    "required_claims": 1
+   },
+   "hv3_22": {
+    "type": "fact_number",
+    "supported_met": 1,
+    "required_claims": 2
+   },
+   "hv3_23": {
+    "type": "fact_number",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_24": {
+    "type": "fact_number",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_25": {
+    "type": "fact_number",
+    "supported_met": 1,
+    "required_claims": 1
+   },
+   "hv3_26": {
+    "type": "temporal_comparison",
+    "supported_met": 0,
+    "required_claims": 2
+   },
+   "hv3_27": {
+    "type": "temporal_comparison",
+    "supported_met": 0,
+    "required_claims": 2
+   },
+   "hv3_28": {
+    "type": "temporal_comparison",
+    "supported_met": 0,
+    "required_claims": 2
+   },
+   "hv3_29": {
+    "type": "temporal_comparison",
+    "supported_met": 0,
+    "required_claims": 2
+   },
+   "hv3_30": {
+    "type": "temporal_comparison",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_31": {
+    "type": "follow_up",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_32": {
+    "type": "follow_up",
+    "supported_met": 1,
+    "required_claims": 1
+   },
+   "hv3_33": {
+    "type": "follow_up",
+    "supported_met": 0,
+    "required_claims": 2
+   },
+   "hv3_34": {
+    "type": "follow_up",
+    "supported_met": 0,
+    "required_claims": 1
+   },
+   "hv3_35": {
+    "type": "unanswerable",
+    "supported_met": 0,
+    "required_claims": 0
+   },
+   "hv3_36": {
+    "type": "unanswerable",
+    "supported_met": 0,
+    "required_claims": 0
+   },
+   "hv3_37": {
+    "type": "unanswerable",
+    "supported_met": 0,
+    "required_claims": 0
+   },
+   "hv3_38": {
+    "type": "unanswerable",
+    "supported_met": 0,
+    "required_claims": 0
+   },
+   "hv3_39": {
+    "type": "unanswerable",
+    "supported_met": 0,
+    "required_claims": 0
+   },
+   "hv3_40": {
+    "type": "unanswerable",
+    "supported_met": 0,
+    "required_claims": 0
+   }
+  }
+ }
+}

@@ -1,0 +1,5 @@
+START llama7b_base 2026-10-09T10:50:39Z load=3.70 3.31 3.18
+END llama7b_base exit=0 seconds=172 2026-10-09T10:53:31Z
+START llama7b_ft 2026-10-09T10:53:31Z load=5.32 4.94 3.91
+END llama7b_ft exit=0 seconds=154 2026-10-09T10:56:05Z
+ALL_DONE any_fail=0 2026-10-09T10:56:05Z

@@ -1,0 +1,68 @@
+{
+  "set": "heldout_v3",
+  "arms": {
+    "8": "llama7b_base",
+    "9": "llama7b_ft"
+  },
+  "adjudicator": "AI (two independent Claude Sonnet 5.5 sub-agents on the subscription, high and medium effort; not human)",
+  "blinding": "systems shown as 'system P'/'system Q' in shuffled row order; no automatic-check columns",
+  "rule": "final = verdict when both judges agree; otherwise 'disputed' (excluded from precision/recall, shown as a range)",
+  "caveat": "both judges share a model family, so agreement may be optimistic",
+  "claims": {
+    "rows": 82,
+    "judge_agreement": 1.0,
+    "cohen_kappa": 1.0,
+    "per_arm": {
+      "llama7b_base": {
+        "claims": 41,
+        "ai_met": 5,
+        "ai_disputed": 0,
+        "ai_unsure": 0,
+        "strict_met": 2,
+        "ai_met_range": "5-5",
+        "questions_with_claims": 34,
+        "questions_all_claims_ai_met": 5,
+        "strict_vs_ai": {
+          "tp": 2,
+          "fp": 0,
+          "fn": 3
+        }
+      },
+      "llama7b_ft": {
+        "claims": 41,
+        "ai_met": 20,
+        "ai_disputed": 0,
+        "ai_unsure": 0,
+        "strict_met": 14,
+        "ai_met_range": "20-20",
+        "questions_with_claims": 34,
+        "questions_all_claims_ai_met": 18,
+        "strict_vs_ai": {
+          "tp": 14,
+          "fp": 0,
+          "fn": 6
+        }
+      }
+    }
+  },
+  "unanswerable": {
+    "rows": 12,
+    "judge_agreement": 1.0,
+    "per_arm": {
+      "llama7b_ft": {
+        "rows": 6,
+        "ai_correct_refusal": 6,
+        "ai_disputed": 0,
+        "auto_correct_refusal": 6
+      },
+      "llama7b_base": {
+        "rows": 6,
+        "ai_correct_refusal": 6,
+        "ai_disputed": 0,
+        "auto_correct_refusal": 6
+      }
+    }
+  },
+  "reference_u7_ai_adjudication": "extractive (arm 1) AI-met 22-23/41 claims, correct refusals 3/6 (data/evaluation/heldout_v3/ai_adjudication/summary.json)",
+  "default_decision": "No default change from this adjudication; the production default stays extractive unless the user decides otherwise."
+}

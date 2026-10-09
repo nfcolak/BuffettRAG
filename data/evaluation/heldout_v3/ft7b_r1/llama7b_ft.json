@@ -1,0 +1,4175 @@
+{
+  "schema_version": 1,
+  "mode": "offline_bm25_embedded_llama",
+  "execution_path": "src.services.backend_app.ask (no HTTP server)",
+  "live_provider_run": true,
+  "corpus": "data/processed/chunks_v3_paragraph.jsonl",
+  "corpus_sha256": "8263f08958729a77febf0922e7bbc4161bedd5fdb3e9a8b3fc9a64ab681ab5f0",
+  "cases": "data/evaluation/heldout_v3/answer_benchmark_heldout_v3.json",
+  "cases_sha256": "23f3a71930ce761412a1366e313bd319c5c36ec9454538ca1f0b9d4beea1baf3",
+  "frozen": true,
+  "answer_engine": {
+    "provider": "llama",
+    "model": "buffett-qwen2.5-7b-ft-r1-q4_k_m.gguf",
+    "resolved_provider": "llama",
+    "temperature": 0.0,
+    "temperature_applies": true
+  },
+  "retrieval": "bm25",
+  "setup_latency_ms": 273.953,
+  "fixture_validation": {
+    "checked_fixture_ids": 38,
+    "missing_fixture_ids": [],
+    "missing_fixture_id_count": 0
+  },
+  "summary": {
+    "fixture_cases": 40,
+    "cases_run": 40,
+    "cases_skipped": 0,
+    "scored_answers": 40,
+    "provider_failures": 0,
+    "provider_error_events": 0,
+    "accepted": 19,
+    "rejected": 21,
+    "acceptance_rate": 0.475,
+    "unanswerable_cases": 6,
+    "unanswerable_scored": 6,
+    "correct_refusals": 6,
+    "unexpected_refusals": 8,
+    "required_claims": 41,
+    "required_claims_met": 15,
+    "missing_fixture_ids": 0,
+    "mean_latency_ms": 3695.977
+  },
+  "rows": [
+    {
+      "qid": "hv3_01",
+      "query": "Why did buying SAFECO shares look preferable to starting an insurer from scratch in Buffett's 1978 assessment?",
+      "history": [],
+      "question_type": "opinion",
+      "answer": "We paid less than 100 cents on the dollar for the best company in the business, when far more than 100 cents on the dollar is being paid for mediocre companies in corporate transactions. [2] SAFECO is a much better insurance operation than our own (although we believe certain segments of ours are much better than average), is better than one we could develop and, similarly, is far better than any in which we might negotiate purchase of a controlling interest. [2]",
+      "citations": [
+        {
+          "marker": "[2]",
+          "passage_indices": [
+            1
+          ],
+          "raw_numbers": [
+            2
+          ],
+          "invalid_numbers": [],
+          "passage_ids": [
+            "1978_p0039"
+          ],
+          "years": [
+            1978
+          ],
+          "sources": [
+            "buffet_1978.txt"
+          ]
+        },
+        {
+          "marker": "[2]",
+          "passage_indices": [
+            1
+          ],
+          "raw_numbers": [
+            2
+          ],
+          "invalid_numbers": [],
+          "passage_ids": [
+            "1978_p0039"
+          ],
+          "years": [
+            1978
+          ],
+          "sources": [
+            "buffet_1978.txt"
+          ]
+        }
+      ],
+      "passage_ids": [
+        "1978_p0042",
+        "1978_p0039",
+        "1978_p0040",
+        "1978_p0041",
+        "1978_p0026"
+      ],
+      "retrieved_passage_ids": [
+        "1978_p0042",
+        "1978_p0039",
+        "1978_p0040",
+        "1978_p0041",
+        "1978_p0026",
+        "1978_p0036",
+        "1978_p0037",
+        "1978_p0011"
+      ],
+      "required_claim_hits": [
+        {
+          "claim": "Berkshire purchased SAFECO at substantially under book value, whereas a new operation could not be started at less than 100 cents on the dollar.",
+          "met": false,
+          "supporting_sentences": [],
+          "required_terms": [
+            "SAFECO",
+            "under book value",
+            "100 cents"
+          ],
+          "accepted_passage_ids": [
+            "1978_p0040"
+          ],
+          "supporting_passage_ids": []
+        }
+      ],
+      "refusal_correct": null,
+      "score": {
+        "qid": "hv3_01",
+        "accepted": false,
+        "claim_coverage": 0.0,
+        "claims": [
+          {
+            "claim": "Berkshire purchased SAFECO at substantially under book value, whereas a new operation could not be started at less than 100 cents on the dollar.",
+            "met": false,
+            "supporting_sentences": [],
+            "required_terms": [
+              "SAFECO",
+              "under book value",
+              "100 cents"
+            ],
+            "accepted_passage_ids": [
+              "1978_p0040"
+            ],
+            "supporting_passage_ids": []
+          }
+        ],
+        "cited_passage_ids": [
+          "1978_p0039"
+        ],
+        "has_gold_citation": false,
+        "forbidden_terms_found": [],
+        "refusal_correct": null
+      },
+      "provider_failures": [],
+      "provider_calls": 1,
+      "model_requests": [
+        {
+          "model": "buffett-qwen2.5-7b-ft-r1-q4_k_m.gguf",
+          "temperature": 0.0
+        }
+      ],
+      "used_filter": {
+        "year": 1978
+      },
+      "reranked": false,
+      "raw_answers": [
+        "We paid less than 100 cents on the dollar for the best company in the business, when far more than 100 cents on the dollar is being paid for mediocre companies in corporate transactions. [2] SAFECO is a much better insurance operation than our own (although we believe certain segments of ours are much better than average), is better than one we could develop and, similarly, is far better than any in which we might negotiate purchase of a controlling interest. [2]"
+      ],
+      "status": "scored",
+      "latency_ms": 12392.606
+    },
+    {
+      "qid": "hv3_02",
+      "query": "What distorted managerial incentives did Buffett identify in 1981 when he discussed corporate league tables?",
+      "history": [],
+      "question_type": "opinion",
+      "answer": "The retrieved passages do not provide enough evidence to answer this question.",
+      "citations": [],
+      "passage_ids": [
+        "1981_p0000",
+        "1981_p0018",
+        "1981_p0009",
+        "1981_p0012",
+        "1981_p0067"
+      ],
+      "retrieved_passage_ids": [
+        "1981_p0000",
+        "1981_p0018",
+        "1981_p0009",
+        "1981_p0012",
+        "1981_p0067",
+        "1981_p0046",
+        "1981_p0017",
+        "1981_p0025"
+      ],
+      "required_claim_hits": [
+        {
+          "claim": "Organizations compensate managers far more by size than other yardsticks, with managers focusing on sales rankings rather than profitability.",
+          "met": false,
+          "supporting_sentences": [],
+          "required_terms": [
+            "compensate",
+            "size",
+            "profitability"
+          ],
+          "accepted_passage_ids": [
+            "1981_p0007"
+          ],
+          "supporting_passage_ids": []
+        }
+      ],
+      "refusal_correct": null,
+      "score": {
+        "qid": "hv3_02",
+        "accepted": false,
+        "claim_coverage": 0.0,
+        "claims": [
+          {
+            "claim": "Organizations compensate managers far more by size than other yardsticks, with managers focusing on sales rankings rather than profitability.",
+            "met": false,
+            "supporting_sentences": [],
+            "required_terms": [
+              "compensate",
+              "size",
+              "profitability"
+            ],
+            "accepted_passage_ids": [
+              "1981_p0007"
+            ],
+            "supporting_passage_ids": []
+          }
+        ],
+        "cited_passage_ids": [],
+        "has_gold_citation": false,
+        "forbidden_terms_found": [],
+        "refusal_correct": null
+      },
+      "provider_failures": [],
+      "provider_calls": 0,
+      "model_requests": [],
+      "used_filter": {
+        "year": 1981
+      },
+      "reranked": false,
+      "raw_answers": [],
+      "status": "scored",
+      "latency_ms": 98.029
+    },
+    {
+      "qid": "hv3_03",
+      "query": "In 1984, what conditions did Buffett think buyers should use to test an insurer's promise to pay?",
+      "history": [],
+      "question_type": "opinion",
+      "answer": "The value of that promise should be appraised against the possibility of adversity, not prosperity. [1]\nAt a minimum, the promise should appear able to withstand a prolonged combination of depressed financial markets and exceptionally unfavorable underwriting results. [1]",
+      "citations": [
+        {
+          "marker": "[1]",
+          "passage_indices": [
+            0
+          ],
+          "raw_numbers": [
+            1
+          ],
+          "invalid_numbers": [],
+          "passage_ids": [
+            "1984_p0060"
+          ],
+          "years": [
+            1984
+          ],
+          "sources": [
+            "buffet_1984.txt"
+          ]
+        },
+        {
+          "marker": "[1]",
+          "passage_indices": [
+            0
+          ],
+          "raw_numbers": [
+            1
+          ],
+          "invalid_numbers": [],
+          "passage_ids": [
+            "1984_p0060"
+          ],
+          "years": [
+            1984
+          ],
+          "sources": [
+            "buffet_1984.txt"
+          ]
+        }
+      ],
+      "passage_ids": [
+        "1984_p0060",
+        "1984_p0068",
+        "1984_p0133",
+        "1984_p0099",
+        "1984_p0110"
+      ],
+      "retrieved_passage_ids": [
+        "1984_p0060",
+        "1984_p0068",
+        "1984_p0133",
+        "1984_p0099",
+        "1984_p0110",
+        "1984_p0073",
+        "1984_p0136",
+        "1984_p0042"
+      ],
+      "required_claim_hits": [
+        {
+          "claim": "An insurance promise should withstand depressed financial markets and exceptionally unfavorable underwriting results.",
+          "met": true,
+          "supporting_sentences": [
+            "At a minimum, the promise should appear able to withstand a prolonged combination of depressed financial markets and exceptionally unfavorable underwriting results. [1]"
+          ],
+          "required_terms": [
+            "promise",
+            "depressed financial markets",
+            "underwriting results"
+          ],
+          "accepted_passage_ids": [
+            "1984_p0060"
+          ],
+          "supporting_passage_ids": [
+            "1984_p0060"
+          ]
+        }
+      ],
+      "refusal_correct": null,
+      "score": {
+        "qid": "hv3_03",
+        "accepted": true,
+        "claim_coverage": 1.0,
+        "claims": [
+          {
+            "claim": "An insurance promise should withstand depressed financial markets and exceptionally unfavorable underwriting results.",
+            "met": true,
+            "supporting_sentences": [
+              "At a minimum, the promise should appear able to withstand a prolonged combination of depressed financial markets and exceptionally unfavorable underwriting results. [1]"
+            ],
+            "required_terms": [
+              "promise",
+              "depressed financial markets",
+              "underwriting results"
+            ],
+            "accepted_passage_ids": [
+              "1984_p0060"
+            ],
+            "supporting_passage_ids": [
+              "1984_p0060"
+            ]
+          }
+        ],
+        "cited_passage_ids": [
+          "1984_p0060"
+        ],
+        "has_gold_citation": true,
+        "forbidden_terms_found": [],
+        "refusal_correct": null
+      },
+      "provider_failures": [],
+      "provider_calls": 1,
+      "model_requests": [
+        {
+          "model": "buffett-qwen2.5-7b-ft-r1-q4_k_m.gguf",
+          "temperature": 0.0
+        }
+      ],
+      "used_filter": {
+        "year": 1984
+      },
+      "reranked": false,
+      "raw_answers": [
+        "The value of that promise should be appraised against the possibility of adversity, not prosperity. [1]\nAt a minimum, the promise should appear able to withstand a prolonged combination of depressed financial markets and exceptionally unfavorable underwriting results. [1]"
+      ],
+      "status": "scored",
+      "latency_ms": 5573.727
+    },
+    {
+      "qid": "hv3_04",
+      "query": "What hiring standard did Buffett endorse through David Ogilvy's analogy in the 1986 letter?",
+      "history": [],
+      "question_type": "opinion",
+      "answer": "We subscribe to the philosophy of Ogilvy & Mather’s founding genius, David Ogilvy: \"If each of us hires people who are smaller than we are, we shall become a company of dwarfs. [1]",
+      "citations": [
+        {
+          "marker": "[1]",
+          "passage_indices": [
+            0
+          ],
+          "raw_numbers": [
+            1
+          ],
+          "invalid_numbers": [],
+          "passage_ids": [
+            "1986_p0006"
+          ],
+          "years": [
+            1986
+          ],
+          "sources": [
+            "buffet_1986.txt"
+          ]
+        }
+      ],
+      "passage_ids": [
+        "1986_p0006",
+        "1986_p0043",
+        "1986_p0110",
+        "1986_p0072",
+        "1986_p0030"
+      ],
+      "retrieved_passage_ids": [
+        "1986_p0006",
+        "1986_p0043",
+        "1986_p0110",
+        "1986_p0072",
+        "1986_p0030",
+        "1986_p0122",
+        "1986_p0073",
+        "1986_p0126"
+      ],
+      "required_claim_hits": [
+        {
+          "claim": "A company becomes a company of giants if each leader hires people who are bigger than the leader.",
+          "met": false,
+          "supporting_sentences": [],
+          "required_terms": [
+            "hires people",
+            "bigger",
+            "giants"
+          ],
+          "accepted_passage_ids": [
+            "1986_p0006"
+          ],
+          "supporting_passage_ids": []
+        }
+      ],
+      "refusal_correct": null,
+      "score": {
+        "qid": "hv3_04",
+        "accepted": false,
+        "claim_coverage": 0.0,
+        "claims": [
+          {
+            "claim": "A company becomes a company of giants if each leader hires people who are bigger than the leader.",
+            "met": false,
+            "supporting_sentences": [],
+            "required_terms": [
+              "hires people",
+              "bigger",
+              "giants"
+            ],
+            "accepted_passage_ids": [
+              "1986_p0006"
+            ],
+            "supporting_passage_ids": []
+          }
+        ],
+        "cited_passage_ids": [
+          "1986_p0006"
+        ],
+        "has_gold_citation": false,
+        "forbidden_terms_found": [],
+        "refusal_correct": null
+      },
+      "provider_failures": [],
+      "provider_calls": 1,
+      "model_requests": [
+        {
+          "model": "buffett-qwen2.5-7b-ft-r1-q4_k_m.gguf",
+          "temperature": 0.0
+        }
+      ],
+      "used_filter": {
+        "year": 1986
+      },
+      "reranked": false,
+      "raw_answers": [
+        "We subscribe to the philosophy of Ogilvy & Mather’s founding genius, David Ogilvy: \"If each of us hires people who are smaller than we are, we shall become a company of dwarfs. [1]"
+      ],
+      "status": "scored",
+      "latency_ms": 5858.659
+    },
+    {
+      "qid": "hv3_05",
+      "query": "How did Buffett judge the practice of expanding staffing in good times and cutting necessary work in bad times in 1987?",
+      "history": [],
+      "question_type": "opinion",
+      "answer": "That kind of yo-yo approach is neither business-like nor humane. [1]",
+      "citations": [
+        {
+          "marker": "[1]",
+          "passage_indices": [
+            0
+          ],
+          "raw_numbers": [
+            1
+          ],
+          "invalid_numbers": [],
+          "passage_ids": [
+            "1987_p0030"
+          ],
+          "years": [
+            1987
+          ],
+          "sources": [
+            "buffet_1987.txt"
+          ]
+        }
+      ],
+      "passage_ids": [
+        "1987_p0030",
+        "1987_p0108",
+        "1987_p0047",
+        "1987_p0024",
+        "1987_p0115"
+      ],
+      "retrieved_passage_ids": [
+        "1987_p0030",
+        "1987_p0108",
+        "1987_p0047",
+        "1987_p0024",
+        "1987_p0115",
+        "1987_p0006",
+        "1987_p0067",
+        "1987_p0027"
+      ],
+      "required_claim_hits": [
+        {
+          "claim": "Adding unneeded people when profits boom and cutting essential people when profitability shrinks is neither business-like nor humane.",
+          "met": false,
+          "supporting_sentences": [],
+          "required_terms": [
+            "unneeded people",
+            "essential people",
+            "humane"
+          ],
+          "accepted_passage_ids": [
+            "1987_p0030"
+          ],
+          "supporting_passage_ids": []
+        }
+      ],
+      "refusal_correct": null,
+      "score": {
+        "qid": "hv3_05",
+        "accepted": false,
+        "claim_coverage": 0.0,
+        "claims": [
+          {
+            "claim": "Adding unneeded people when profits boom and cutting essential people when profitability shrinks is neither business-like nor humane.",
+            "met": false,
+            "supporting_sentences": [],
+            "required_terms": [
+              "unneeded people",
+              "essential people",
+              "humane"
+            ],
+            "accepted_passage_ids": [
+              "1987_p0030"
+            ],
+            "supporting_passage_ids": []
+          }
+        ],
+        "cited_passage_ids": [
+          "1987_p0030"
+        ],
+        "has_gold_citation": false,
+        "forbidden_terms_found": [],
+        "refusal_correct": null
+      },
+      "provider_failures": [],
+      "provider_calls": 1,
+      "model_requests": [
+        {
+          "model": "buffett-qwen2.5-7b-ft-r1-q4_k_m.gguf",
+          "temperature": 0.0
+        }
+      ],
+      "used_filter": {
+        "year": 1987
+      },
+      "reranked": false,
+      "raw_answers": [
+        "That kind of yo-yo approach is neither business-like nor humane. [1]"
+      ],
+      "status": "scored",
+      "latency_ms": 4787.527
+    },
+    {
+      "qid": "hv3_06",
+      "query": "Why was widespread belief in efficient-market theory useful to Graham-style investors, as Buffett saw it in 1988?",
+      "history": [],
+      "question_type": "opinion",
+      "answer": "The retrieved passages do not provide enough evidence to answer this question.",
+      "citations": [],
+      "passage_ids": [
+        "1988_p0108",
+        "1988_p0100",
+        "1988_p0101",
+        "1988_p0102",
+        "1988_p0103"
+      ],
+      "retrieved_passage_ids": [
+        "1988_p0108",
+        "1988_p0100",
+        "1988_p0101",
+        "1988_p0102",
+        "1988_p0103",
+        "1988_p0117",
+        "1988_p0116",
+        "1988_p0106"
+      ],
+      "required_claim_hits": [
+        {
+          "claim": "Graham-style investors gained an advantage from opponents taught that it was useless to even try.",
+          "met": false,
+          "supporting_sentences": [],
+          "required_terms": [
+            "advantage",
+            "opponents",
+            "useless"
+          ],
+          "accepted_passage_ids": [
+            "1988_p0107"
+          ],
+          "supporting_passage_ids": []
+        }
+      ],
+      "refusal_correct": null,
+      "score": {
+        "qid": "hv3_06",
+        "accepted": false,
+        "claim_coverage": 0.0,
+        "claims": [
+          {
+            "claim": "Graham-style investors gained an advantage from opponents taught that it was useless to even try.",
+            "met": false,
+            "supporting_sentences": [],
+            "required_terms": [
+              "advantage",
+              "opponents",
+              "useless"
+            ],
+            "accepted_passage_ids": [
+              "1988_p0107"
+            ],
+            "supporting_passage_ids": []
+          }
+        ],
+        "cited_passage_ids": [],
+        "has_gold_citation": false,
+        "forbidden_terms_found": [],
+        "refusal_correct": null
+      },
+      "provider_failures": [],
+      "provider_calls": 1,
+      "model_requests": [
+        {
+          "model": "buffett-qwen2.5-7b-ft-r1-q4_k_m.gguf",
+          "temperature": 0.0
+        }
+      ],
+      "used_filter": {
+        "year": 1988
+      },
+      "reranked": false,
+      "raw_answers": [
+        "The retrieved passages do not provide enough evidence to answer this question."
+      ],
+      "status": "scored",
+      "latency_ms": 4415.886
+    },
+    {
+      "qid": "hv3_07",
+      "query": "In Buffett's 1990 explanation, what underpinned the value of Berkshire's convertible preferred holdings besides the conversion feature?",
+      "history": [],
+      "question_type": "opinion",
+      "answer": "The point you should keep in mind is that most of the value of our convertible preferreds is derived from their fixed-income characteristics. [1] By their logic, that is, our Salomon preferred, convertible into common at $38, would be worth 60% of face value if Salomon common were selling at $22.80. [1]",
+      "citations": [
+        {
+          "marker": "[1]",
+          "passage_indices": [
+            0
+          ],
+          "raw_numbers": [
+            1
+          ],
+          "invalid_numbers": [],
+          "passage_ids": [
+            "1990_p0105"
+          ],
+          "years": [
+            1990
+          ],
+          "sources": [
+            "buffet_1990.txt"
+          ]
+        },
+        {
+          "marker": "[1]",
+          "passage_indices": [
+            0
+          ],
+          "raw_numbers": [
+            1
+          ],
+          "invalid_numbers": [],
+          "passage_ids": [
+            "1990_p0105"
+          ],
+          "years": [
+            1990
+          ],
+          "sources": [
+            "buffet_1990.txt"
+          ]
+        }
+      ],
+      "passage_ids": [
+        "1990_p0105",
+        "1990_p0100",
+        "1990_p0106",
+        "1990_p0104",
+        "1990_p0139"
+      ],
+      "retrieved_passage_ids": [
+        "1990_p0105",
+        "1990_p0100",
+        "1990_p0106",
+        "1990_p0104",
+        "1990_p0139",
+        "1990_p0001",
+        "1990_p0089",
+        "1990_p0099"
+      ],
+      "required_claim_hits": [
+        {
+          "claim": "Most of the value of Berkshire's convertible preferreds came from their fixed-income characteristics.",
+          "met": false,
+          "supporting_sentences": [],
+          "required_terms": [
+            "most of the value",
+            "convertible preferreds",
+            "fixed-income characteristics"
+          ],
+          "accepted_passage_ids": [
+            "1990_p0106"
+          ],
+          "supporting_passage_ids": []
+        }
+      ],
+      "refusal_correct": null,
+      "score": {
+        "qid": "hv3_07",
+        "accepted": false,
+        "claim_coverage": 0.0,
+        "claims": [
+          {
+            "claim": "Most of the value of Berkshire's convertible preferreds came from their fixed-income characteristics.",
+            "met": false,
+            "supporting_sentences": [],
+            "required_terms": [
+              "most of the value",
+              "convertible preferreds",
+              "fixed-income characteristics"
+            ],
+            "accepted_passage_ids": [
+              "1990_p0106"
+            ],
+            "supporting_passage_ids": []
+          }
+        ],
+        "cited_passage_ids": [
+          "1990_p0105"
+        ],
+        "has_gold_citation": false,
+        "forbidden_terms_found": [],
+        "refusal_correct": null
+      },
+      "provider_failures": [],
+      "provider_calls": 1,
+      "model_requests": [
+        {
+          "model": "buffett-qwen2.5-7b-ft-r1-q4_k_m.gguf",
+          "temperature": 0.0
+        }
+      ],
+      "used_filter": {
+        "year": 1990
+      },
+      "reranked": false,
+      "raw_answers": [
+        "The point you should keep in mind is that most of the value of our convertible preferreds is derived from their fixed-income characteristics. [1] By their logic, that is, our Salomon preferred, convertible into common at $38, would be worth 60% of face value if Salomon common were selling at $22.80. [1]"
+      ],
+      "status": "scored",
+      "latency_ms": 5751.188
+    },
+    {
+      "qid": "hv3_08",
+      "query": "When did Buffett consider business expansion harmful to shareholders, according to his 1992 discussion?",
+      "history": [],
+      "question_type": "opinion",
+      "answer": "The retrieved passages do not provide enough evidence to answer this question.",
+      "citations": [],
+      "passage_ids": [
+        "1992_p0030",
+        "1992_p0118",
+        "1992_p0057",
+        "1992_p0060",
+        "1992_p0076"
+      ],
+      "retrieved_passage_ids": [
+        "1992_p0030",
+        "1992_p0118",
+        "1992_p0057",
+        "1992_p0060",
+        "1992_p0076",
+        "1992_p0044",
+        "1992_p0000",
+        "1992_p0036"
+      ],
+      "required_claim_hits": [
+        {
+          "claim": "Growth in a low-return business requiring incremental funds hurts the investor.",
+          "met": false,
+          "supporting_sentences": [],
+          "required_terms": [
+            "low-return",
+            "incremental funds",
+            "hurts"
+          ],
+          "accepted_passage_ids": [
+            "1992_p0068"
+          ],
+          "supporting_passage_ids": []
+        }
+      ],
+      "refusal_correct": null,
+      "score": {
+        "qid": "hv3_08",
+        "accepted": false,
+        "claim_coverage": 0.0,
+        "claims": [
+          {
+            "claim": "Growth in a low-return business requiring incremental funds hurts the investor.",
+            "met": false,
+            "supporting_sentences": [],
+            "required_terms": [
+              "low-return",
+              "incremental funds",
+              "hurts"
+            ],
+            "accepted_passage_ids": [
+              "1992_p0068"
+            ],
+            "supporting_passage_ids": []
+          }
+        ],
+        "cited_passage_ids": [],
+        "has_gold_citation": false,
+        "forbidden_terms_found": [],
+        "refusal_correct": null
+      },
+      "provider_failures": [],
+      "provider_calls": 1,
+      "model_requests": [
+        {
+          "model": "buffett-qwen2.5-7b-ft-r1-q4_k_m.gguf",
+          "temperature": 0.0
+        }
+      ],
+      "used_filter": {
+        "year": 1992
+      },
+      "reranked": false,
+      "raw_answers": [
+        "The retrieved passages do not provide enough evidence to answer this question."
+      ],
+      "status": "scored",
+      "latency_ms": 4435.481
+    },
+    {
+      "qid": "hv3_09",
+      "query": "What danger to the CEO personally did Buffett associate with misleading owners in the 2024 letter?",
+      "history": [],
+      "question_type": "opinion",
+      "answer": "The retrieved passages do not provide enough evidence to answer this question.",
+      "citations": [],
+      "passage_ids": [
+        "2024_p0064",
+        "2024_p0012",
+        "2024_p0063",
+        "2024_p0011",
+        "2024_p0021"
+      ],
+      "retrieved_passage_ids": [
+        "2024_p0064",
+        "2024_p0012",
+        "2024_p0063",
+        "2024_p0011",
+        "2024_p0021",
+        "2024_p0016",
+        "2024_p0003",
+        "2024_p0031"
+      ],
+      "required_claim_hits": [
+        {
+          "claim": "If you start fooling your shareholders, you will soon believe your own baloney and end up fooling yourself.",
+          "met": false,
+          "supporting_sentences": [],
+          "required_terms": [
+            "fooling your shareholders",
+            "believe",
+            "fooling yourself"
+          ],
+          "accepted_passage_ids": [
+            "2024_p0003"
+          ],
+          "supporting_passage_ids": []
+        }
+      ],
+      "refusal_correct": null,
+      "score": {
+        "qid": "hv3_09",
+        "accepted": false,
+        "claim_coverage": 0.0,
+        "claims": [
+          {
+            "claim": "If you start fooling your shareholders, you will soon believe your own baloney and end up fooling yourself.",
+            "met": false,
+            "supporting_sentences": [],
+            "required_terms": [
+              "fooling your shareholders",
+              "believe",
+              "fooling yourself"
+            ],
+            "accepted_passage_ids": [
+              "2024_p0003"
+            ],
+            "supporting_passage_ids": []
+          }
+        ],
+        "cited_passage_ids": [],
+        "has_gold_citation": false,
+        "forbidden_terms_found": [],
+        "refusal_correct": null
+      },
+      "provider_failures": [],
+      "provider_calls": 0,
+      "model_requests": [],
+      "used_filter": {
+        "year": 2024
+      },
+      "reranked": false,
+      "raw_answers": [],
+      "status": "scored",
+      "latency_ms": 61.048
+    },
+    {
+      "qid": "hv3_10",
+      "query": "Which part of Berkshire surprised Buffett on the upside in his 1977 operations review?",
+      "history": [],
+      "question_type": "company",
+      "answer": "The retrieved passages do not provide enough evidence to answer this question.",
+      "citations": [],
+      "passage_ids": [
+        "1977_p0008",
+        "1977_p0025",
+        "1977_p0018",
+        "1977_p0032",
+        "1977_p0005"
+      ],
+      "retrieved_passage_ids": [
+        "1977_p0008",
+        "1977_p0025",
+        "1977_p0018",
+        "1977_p0032",
+        "1977_p0005",
+        "1977_p0019",
+        "1977_p0017",
+        "1977_p0012"
+      ],
+      "required_claim_hits": [
+        {
+          "claim": "Insurance operations led by National Indemnity Company were even better than Buffett's optimistic expectations.",
+          "met": false,
+          "supporting_sentences": [],
+          "required_terms": [
+            "insurance operations",
+            "National Indemnity Company",
+            "expectations"
+          ],
+          "accepted_passage_ids": [
+            "1977_p0001"
+          ],
+          "supporting_passage_ids": []
+        }
+      ],
+      "refusal_correct": null,
+      "score": {
+        "qid": "hv3_10",
+        "accepted": false,
+        "claim_coverage": 0.0,
+        "claims": [
+          {
+            "claim": "Insurance operations led by National Indemnity Company were even better than Buffett's optimistic expectations.",
+            "met": false,
+            "supporting_sentences": [],
+            "required_terms": [
+              "insurance operations",
+              "National Indemnity Company",
+              "expectations"
+            ],
+            "accepted_passage_ids": [
+              "1977_p0001"
+            ],
+            "supporting_passage_ids": []
+          }
+        ],
+        "cited_passage_ids": [],
+        "has_gold_citation": false,
+        "forbidden_terms_found": [],
+        "refusal_correct": null
+      },
+      "provider_failures": [],
+      "provider_calls": 0,
+      "model_requests": [],
+      "used_filter": {
+        "year": 1977
+      },
+      "reranked": false,
+      "raw_answers": [],
+      "status": "scored",
+      "latency_ms": 40.539
+    },
+    {
+      "qid": "hv3_11",
+      "query": "What was George Young's reinsurance unit doing well and poorly in Berkshire's 1979 account?",
+      "history": [],
+      "question_type": "company",
+      "answer": "Our reinsurance division, led by George Young, continues to give us reasonably satisfactory overall results after allowing for investment income, but underwriting performance remains unsatisfactory. [1] It will be hard for us to be a whole lot smarter than the crowd and thus our reinsurance activity may decline substantially during the projected prolonged period of extraordinary competition. [1]",
+      "citations": [
+        {
+          "marker": "[1]",
+          "passage_indices": [
+            0
+          ],
+          "raw_numbers": [
+            1
+          ],
+          "invalid_numbers": [],
+          "passage_ids": [
+            "1979_p0032"
+          ],
+          "years": [
+            1979
+          ],
+          "sources": [
+            "buffet_1979.txt"
+          ]
+        },
+        {
+          "marker": "[1]",
+          "passage_indices": [
+            0
+          ],
+          "raw_numbers": [
+            1
+          ],
+          "invalid_numbers": [],
+          "passage_ids": [
+            "1979_p0032"
+          ],
+          "years": [
+            1979
+          ],
+          "sources": [
+            "buffet_1979.txt"
+          ]
+        }
+      ],
+      "passage_ids": [
+        "1979_p0032",
+        "1979_p0034",
+        "1979_p0000",
+        "1979_p0004",
+        "1979_p0020"
+      ],
+      "retrieved_passage_ids": [
+        "1979_p0032",
+        "1979_p0034",
+        "1979_p0000",
+        "1979_p0004",
+        "1979_p0020",
+        "1979_p0017",
+        "1979_p0001",
+        "1979_p0002"
+      ],
+      "required_claim_hits": [
+        {
+          "claim": "Overall results after allowing for investment income were reasonably satisfactory, but underwriting performance remained unsatisfactory.",
+          "met": true,
+          "supporting_sentences": [
+            "Our reinsurance division, led by George Young, continues to give us reasonably satisfactory overall results after allowing for investment income, but underwriting performance remains unsatisfactory. [1]"
+          ],
+          "required_terms": [
+            "investment income",
+            "underwriting performance",
+            "unsatisfactory"
+          ],
+          "accepted_passage_ids": [
+            "1979_p0032"
+          ],
+          "supporting_passage_ids": [
+            "1979_p0032"
+          ]
+        }
+      ],
+      "refusal_correct": null,
+      "score": {
+        "qid": "hv3_11",
+        "accepted": true,
+        "claim_coverage": 1.0,
+        "claims": [
+          {
+            "claim": "Overall results after allowing for investment income were reasonably satisfactory, but underwriting performance remained unsatisfactory.",
+            "met": true,
+            "supporting_sentences": [
+              "Our reinsurance division, led by George Young, continues to give us reasonably satisfactory overall results after allowing for investment income, but underwriting performance remains unsatisfactory. [1]"
+            ],
+            "required_terms": [
+              "investment income",
+              "underwriting performance",
+              "unsatisfactory"
+            ],
+            "accepted_passage_ids": [
+              "1979_p0032"
+            ],
+            "supporting_passage_ids": [
+              "1979_p0032"
+            ]
+          }
+        ],
+        "cited_passage_ids": [
+          "1979_p0032"
+        ],
+        "has_gold_citation": true,
+        "forbidden_terms_found": [],
+        "refusal_correct": null
+      },
+      "provider_failures": [],
+      "provider_calls": 1,
+      "model_requests": [
+        {
+          "model": "buffett-qwen2.5-7b-ft-r1-q4_k_m.gguf",
+          "temperature": 0.0
+        }
+      ],
+      "used_filter": {
+        "year": 1979
+      },
+      "reranked": false,
+      "raw_answers": [
+        "Our reinsurance division, led by George Young, continues to give us reasonably satisfactory overall results after allowing for investment income, but underwriting performance remains unsatisfactory. [1] It will be hard for us to be a whole lot smarter than the crowd and thus our reinsurance activity may decline substantially during the projected prolonged period of extraordinary competition. [1]"
+      ],
+      "status": "scored",
+      "latency_ms": 6295.731
+    },
+    {
+      "qid": "hv3_12",
+      "query": "Where did Berkshire put Insurance Company of Iowa after stopping its underwriting there, according to the 1980 letter?",
+      "history": [],
+      "question_type": "company",
+      "answer": "Late in the fall we abandoned underwriting in that state, and have merged the company into Cornhusker Casualty. [1]",
+      "citations": [
+        {
+          "marker": "[1]",
+          "passage_indices": [
+            0
+          ],
+          "raw_numbers": [
+            1
+          ],
+          "invalid_numbers": [],
+          "passage_ids": [
+            "1980_p0067"
+          ],
+          "years": [
+            1980
+          ],
+          "sources": [
+            "buffet_1980.txt"
+          ]
+        }
+      ],
+      "passage_ids": [
+        "1980_p0067",
+        "1980_p0048",
+        "1980_p0055",
+        "1980_p0063",
+        "1980_p0028"
+      ],
+      "retrieved_passage_ids": [
+        "1980_p0067",
+        "1980_p0048",
+        "1980_p0055",
+        "1980_p0063",
+        "1980_p0028",
+        "1980_p0069",
+        "1980_p0010",
+        "1980_p0082"
+      ],
+      "required_claim_hits": [
+        {
+          "claim": "Insurance Company of Iowa was merged into Cornhusker Casualty.",
+          "met": true,
+          "supporting_sentences": [
+            "Late in the fall we abandoned underwriting in that state, and have merged the company into Cornhusker Casualty. [1]"
+          ],
+          "required_terms": [
+            "merged",
+            "Cornhusker",
+            "Casualty"
+          ],
+          "accepted_passage_ids": [
+            "1980_p0067"
+          ],
+          "supporting_passage_ids": [
+            "1980_p0067"
+          ]
+        }
+      ],
+      "refusal_correct": null,
+      "score": {
+        "qid": "hv3_12",
+        "accepted": true,
+        "claim_coverage": 1.0,
+        "claims": [
+          {
+            "claim": "Insurance Company of Iowa was merged into Cornhusker Casualty.",
+            "met": true,
+            "supporting_sentences": [
+              "Late in the fall we abandoned underwriting in that state, and have merged the company into Cornhusker Casualty. [1]"
+            ],
+            "required_terms": [
+              "merged",
+              "Cornhusker",
+              "Casualty"
+            ],
+            "accepted_passage_ids": [
+              "1980_p0067"
+            ],
+            "supporting_passage_ids": [
+              "1980_p0067"
+            ]
+          }
+        ],
+        "cited_passage_ids": [
+          "1980_p0067"
+        ],
+        "has_gold_citation": true,
+        "forbidden_terms_found": [],
+        "refusal_correct": null
+      },
+      "provider_failures": [],
+      "provider_calls": 1,
+      "model_requests": [
+        {
+          "model": "buffett-qwen2.5-7b-ft-r1-q4_k_m.gguf",
+          "temperature": 0.0
+        }
+      ],
+      "used_filter": {
+        "year": 1980
+      },
+      "reranked": false,
+      "raw_answers": [
+        "Late in the fall we abandoned underwriting in that state, and have merged the company into Cornhusker Casualty. [1]"
+      ],
+      "status": "scored",
+      "latency_ms": 4458.595
+    },
+    {
+      "qid": "hv3_13",
+      "query": "What operating-cost and customer-service strengths did NFM and Borsheim's share in Buffett's 1989 account?",
+      "history": [],
+      "question_type": "company",
+      "answer": "NFM and Borsheim's follow precisely the same formula for success: (1) unparalleled depth and breadth of merchandise at one location; (2) the lowest operating costs in the business; (3) the shrewdest of buying, made possible in part by the huge volumes purchased; (4) gross margins, and therefore prices, far below competitors'; and (5) friendly personalized service with family members on hand at all times. [1]",
+      "citations": [
+        {
+          "marker": "[1]",
+          "passage_indices": [
+            0
+          ],
+          "raw_numbers": [
+            1
+          ],
+          "invalid_numbers": [],
+          "passage_ids": [
+            "1989_p0038"
+          ],
+          "years": [
+            1989
+          ],
+          "sources": [
+            "buffet_1989.txt"
+          ]
+        }
+      ],
+      "passage_ids": [
+        "1989_p0038",
+        "1989_p0039",
+        "1989_p0048",
+        "1989_p0024",
+        "1989_p0027"
+      ],
+      "retrieved_passage_ids": [
+        "1989_p0038",
+        "1989_p0039",
+        "1989_p0048",
+        "1989_p0024",
+        "1989_p0027",
+        "1989_p0018",
+        "1989_p0054",
+        "1989_p0035"
+      ],
+      "required_claim_hits": [
+        {
+          "claim": "NFM and Borsheim's paired the lowest operating costs in the business with friendly personalized service.",
+          "met": true,
+          "supporting_sentences": [
+            "NFM and Borsheim's follow precisely the same formula for success: (1) unparalleled depth and breadth of merchandise at one location; (2) the lowest operating costs in the business; (3) the shrewdest of buying, made possible in part by the huge volumes purchased; (4) gross margins, and therefore prices, far below competitors'; and (5) friendly personalized service with family members on hand at all times. [1]"
+          ],
+          "required_terms": [
+            "Borsheim's",
+            "lowest operating costs",
+            "friendly personalized service"
+          ],
+          "accepted_passage_ids": [
+            "1989_p0038"
+          ],
+          "supporting_passage_ids": [
+            "1989_p0038"
+          ]
+        }
+      ],
+      "refusal_correct": null,
+      "score": {
+        "qid": "hv3_13",
+        "accepted": true,
+        "claim_coverage": 1.0,
+        "claims": [
+          {
+            "claim": "NFM and Borsheim's paired the lowest operating costs in the business with friendly personalized service.",
+            "met": true,
+            "supporting_sentences": [
+              "NFM and Borsheim's follow precisely the same formula for success: (1) unparalleled depth and breadth of merchandise at one location; (2) the lowest operating costs in the business; (3) the shrewdest of buying, made possible in part by the huge volumes purchased; (4) gross margins, and therefore prices, far below competitors'; and (5) friendly personalized service with family members on hand at all times. [1]"
+            ],
+            "required_terms": [
+              "Borsheim's",
+              "lowest operating costs",
+              "friendly personalized service"
+            ],
+            "accepted_passage_ids": [
+              "1989_p0038"
+            ],
+            "supporting_passage_ids": [
+              "1989_p0038"
+            ]
+          }
+        ],
+        "cited_passage_ids": [
+          "1989_p0038"
+        ],
+        "has_gold_citation": true,
+        "forbidden_terms_found": [],
+        "refusal_correct": null
+      },
+      "provider_failures": [],
+      "provider_calls": 1,
+      "model_requests": [
+        {
+          "model": "buffett-qwen2.5-7b-ft-r1-q4_k_m.gguf",
+          "temperature": 0.0
+        }
+      ],
+      "used_filter": {
+        "year": 1989
+      },
+      "reranked": false,
+      "raw_answers": [
+        "NFM and Borsheim's follow precisely the same formula for success: (1) unparalleled depth and breadth of merchandise at one location; (2) the lowest operating costs in the business; (3) the shrewdest of buying, made possible in part by the huge volumes purchased; (4) gross margins, and therefore prices, far below competitors'; and (5) friendly personalized service with family members on hand at all times. [1]"
+      ],
+      "status": "scored",
+      "latency_ms": 6911.709
+    },
+    {
+      "qid": "hv3_14",
+      "query": "Why was the Guinness holding a geographic milestone for Berkshire in the 1991 letter?",
+      "history": [],
+      "question_type": "company",
+      "answer": "Our Guinness holding represents Berkshire's first significant investment in a company domiciled outside the United States. [1]",
+      "citations": [
+        {
+          "marker": "[1]",
+          "passage_indices": [
+            0
+          ],
+          "raw_numbers": [
+            1
+          ],
+          "invalid_numbers": [],
+          "passage_ids": [
+            "1991_p0073"
+          ],
+          "years": [
+            1991
+          ],
+          "sources": [
+            "buffet_1991.txt"
+          ]
+        }
+      ],
+      "passage_ids": [
+        "1991_p0073",
+        "1991_p0071",
+        "1991_p0063",
+        "1991_p0082",
+        "1991_p0035"
+      ],
+      "retrieved_passage_ids": [
+        "1991_p0073",
+        "1991_p0071",
+        "1991_p0063",
+        "1991_p0082",
+        "1991_p0035",
+        "1991_p0081",
+        "1991_p0066",
+        "1991_p0090"
+      ],
+      "required_claim_hits": [
+        {
+          "claim": "Guinness was Berkshire's first significant investment in a company domiciled outside the United States.",
+          "met": true,
+          "supporting_sentences": [
+            "Our Guinness holding represents Berkshire's first significant investment in a company domiciled outside the United States. [1]"
+          ],
+          "required_terms": [
+            "Guinness",
+            "domiciled outside",
+            "United States"
+          ],
+          "accepted_passage_ids": [
+            "1991_p0073"
+          ],
+          "supporting_passage_ids": [
+            "1991_p0073"
+          ]
+        }
+      ],
+      "refusal_correct": null,
+      "score": {
+        "qid": "hv3_14",
+        "accepted": true,
+        "claim_coverage": 1.0,
+        "claims": [
+          {
+            "claim": "Guinness was Berkshire's first significant investment in a company domiciled outside the United States.",
+            "met": true,
+            "supporting_sentences": [
+              "Our Guinness holding represents Berkshire's first significant investment in a company domiciled outside the United States. [1]"
+            ],
+            "required_terms": [
+              "Guinness",
+              "domiciled outside",
+              "United States"
+            ],
+            "accepted_passage_ids": [
+              "1991_p0073"
+            ],
+            "supporting_passage_ids": [
+              "1991_p0073"
+            ]
+          }
+        ],
+        "cited_passage_ids": [
+          "1991_p0073"
+        ],
+        "has_gold_citation": true,
+        "forbidden_terms_found": [],
+        "refusal_correct": null
+      },
+      "provider_failures": [],
+      "provider_calls": 1,
+      "model_requests": [
+        {
+          "model": "buffett-qwen2.5-7b-ft-r1-q4_k_m.gguf",
+          "temperature": 0.0
+        }
+      ],
+      "used_filter": {
+        "year": 1991
+      },
+      "reranked": false,
+      "raw_answers": [
+        "Our Guinness holding represents Berkshire's first significant investment in a company domiciled outside the United States. [1]"
+      ],
+      "status": "scored",
+      "latency_ms": 4329.172
+    },
+    {
+      "qid": "hv3_15",
+      "query": "Who ran Berkshire's workers' compensation business in the 1993 insurance update?",
+      "history": [],
+      "question_type": "company",
+      "answer": "Our workers' compensation business, headed by Brad Kinstler; [1]",
+      "citations": [
+        {
+          "marker": "[1]",
+          "passage_indices": [
+            0
+          ],
+          "raw_numbers": [
+            1
+          ],
+          "invalid_numbers": [],
+          "passage_ids": [
+            "1993_p0055"
+          ],
+          "years": [
+            1993
+          ],
+          "sources": [
+            "buffet_1993.txt"
+          ]
+        }
+      ],
+      "passage_ids": [
+        "1993_p0055",
+        "1993_p0003",
+        "1993_p0022",
+        "1993_p0045",
+        "1993_p0034"
+      ],
+      "retrieved_passage_ids": [
+        "1993_p0055",
+        "1993_p0003",
+        "1993_p0022",
+        "1993_p0045",
+        "1993_p0034",
+        "1993_p0062",
+        "1993_p0049",
+        "1993_p0102"
+      ],
+      "required_claim_hits": [
+        {
+          "claim": "Brad Kinstler headed Berkshire's workers' compensation business.",
+          "met": true,
+          "supporting_sentences": [
+            "Our workers' compensation business, headed by Brad Kinstler; [1]"
+          ],
+          "required_terms": [
+            "Brad Kinstler",
+            "workers' compensation"
+          ],
+          "accepted_passage_ids": [
+            "1993_p0055"
+          ],
+          "supporting_passage_ids": [
+            "1993_p0055"
+          ]
+        }
+      ],
+      "refusal_correct": null,
+      "score": {
+        "qid": "hv3_15",
+        "accepted": true,
+        "claim_coverage": 1.0,
+        "claims": [
+          {
+            "claim": "Brad Kinstler headed Berkshire's workers' compensation business.",
+            "met": true,
+            "supporting_sentences": [
+              "Our workers' compensation business, headed by Brad Kinstler; [1]"
+            ],
+            "required_terms": [
+              "Brad Kinstler",
+              "workers' compensation"
+            ],
+            "accepted_passage_ids": [
+              "1993_p0055"
+            ],
+            "supporting_passage_ids": [
+              "1993_p0055"
+            ]
+          }
+        ],
+        "cited_passage_ids": [
+          "1993_p0055"
+        ],
+        "has_gold_citation": true,
+        "forbidden_terms_found": [],
+        "refusal_correct": null
+      },
+      "provider_failures": [],
+      "provider_calls": 1,
+      "model_requests": [
+        {
+          "model": "buffett-qwen2.5-7b-ft-r1-q4_k_m.gguf",
+          "temperature": 0.0
+        }
+      ],
+      "used_filter": {
+        "year": 1993
+      },
+      "reranked": false,
+      "raw_answers": [
+        "Our workers' compensation business, headed by Brad Kinstler; [1]"
+      ],
+      "status": "scored",
+      "latency_ms": 3793.349
+    },
+    {
+      "qid": "hv3_16",
+      "query": "What electronics-focused addition to Nebraska Furniture Mart was highlighted in the 1994 letter?",
+      "history": [],
+      "question_type": "company",
+      "answer": "I hope you make a special effort to visit the Nebraska Furniture Mart because it has opened the Mega Mart, a true retailing marvel that sells electronics, appliances, computers, CD's, cameras and audio equipment. [1]",
+      "citations": [
+        {
+          "marker": "[1]",
+          "passage_indices": [
+            0
+          ],
+          "raw_numbers": [
+            1
+          ],
+          "invalid_numbers": [],
+          "passage_ids": [
+            "1994_p0101"
+          ],
+          "years": [
+            1994
+          ],
+          "sources": [
+            "buffet_1994.txt"
+          ]
+        }
+      ],
+      "passage_ids": [
+        "1994_p0101",
+        "1994_p0077",
+        "1994_p0048",
+        "1994_p0049",
+        "1994_p0009"
+      ],
+      "retrieved_passage_ids": [
+        "1994_p0101",
+        "1994_p0077",
+        "1994_p0048",
+        "1994_p0049",
+        "1994_p0009",
+        "1994_p0063",
+        "1994_p0094",
+        "1994_p0083"
+      ],
+      "required_claim_hits": [
+        {
+          "claim": "Nebraska Furniture Mart had opened the Mega Mart selling electronics, appliances, computers, CD's, cameras and audio equipment.",
+          "met": true,
+          "supporting_sentences": [
+            "I hope you make a special effort to visit the Nebraska Furniture Mart because it has opened the Mega Mart, a true retailing marvel that sells electronics, appliances, computers, CD's, cameras and audio equipment. [1]"
+          ],
+          "required_terms": [
+            "Mega Mart",
+            "electronics",
+            "appliances"
+          ],
+          "accepted_passage_ids": [
+            "1994_p0101"
+          ],
+          "supporting_passage_ids": [
+            "1994_p0101"
+          ]
+        }
+      ],
+      "refusal_correct": null,
+      "score": {
+        "qid": "hv3_16",
+        "accepted": true,
+        "claim_coverage": 1.0,
+        "claims": [
+          {
+            "claim": "Nebraska Furniture Mart had opened the Mega Mart selling electronics, appliances, computers, CD's, cameras and audio equipment.",
+            "met": true,
+            "supporting_sentences": [
+              "I hope you make a special effort to visit the Nebraska Furniture Mart because it has opened the Mega Mart, a true retailing marvel that sells electronics, appliances, computers, CD's, cameras and audio equipment. [1]"
+            ],
+            "required_terms": [
+              "Mega Mart",
+              "electronics",
+              "appliances"
+            ],
+            "accepted_passage_ids": [
+              "1994_p0101"
+            ],
+            "supporting_passage_ids": [
+              "1994_p0101"
+            ]
+          }
+        ],
+        "cited_passage_ids": [
+          "1994_p0101"
+        ],
+        "has_gold_citation": true,
+        "forbidden_terms_found": [],
+        "refusal_correct": null
+      },
+      "provider_failures": [],
+      "provider_calls": 1,
+      "model_requests": [
+        {
+          "model": "buffett-qwen2.5-7b-ft-r1-q4_k_m.gguf",
+          "temperature": 0.0
+        }
+      ],
+      "used_filter": {
+        "year": 1994
+      },
+      "reranked": false,
+      "raw_answers": [
+        "I hope you make a special effort to visit the Nebraska Furniture Mart because it has opened the Mega Mart, a true retailing marvel that sells electronics, appliances, computers, CD's, cameras and audio equipment. [1]"
+      ],
+      "status": "scored",
+      "latency_ms": 5962.657
+    },
+    {
+      "qid": "hv3_17",
+      "query": "How large was R.C. Willey's Utah furniture footprint by 1995, and what were its annual sales?",
+      "history": [],
+      "question_type": "company",
+      "answer": "Aided by his brother, Sheldon, Bill has built the company to its 1995 sales volume of $257 million, and it now accounts for over 50% of the furniture business in Utah. [1] R.C. Willey is an amazing story. [1]",
+      "citations": [
+        {
+          "marker": "[1]",
+          "passage_indices": [
+            0
+          ],
+          "raw_numbers": [
+            1
+          ],
+          "invalid_numbers": [],
+          "passage_ids": [
+            "1995_p0024"
+          ],
+          "years": [
+            1995
+          ],
+          "sources": [
+            "buffet_1995.txt"
+          ]
+        },
+        {
+          "marker": "[1]",
+          "passage_indices": [
+            0
+          ],
+          "raw_numbers": [
+            1
+          ],
+          "invalid_numbers": [],
+          "passage_ids": [
+            "1995_p0024"
+          ],
+          "years": [
+            1995
+          ],
+          "sources": [
+            "buffet_1995.txt"
+          ]
+        }
+      ],
+      "passage_ids": [
+        "1995_p0024",
+        "1995_p0023",
+        "1995_p0022",
+        "1995_p0071",
+        "1995_p0001"
+      ],
+      "retrieved_passage_ids": [
+        "1995_p0024",
+        "1995_p0023",
+        "1995_p0022",
+        "1995_p0071",
+        "1995_p0001",
+        "1995_p0021",
+        "1995_p0064",
+        "1995_p0120"
+      ],
+      "required_claim_hits": [
+        {
+          "claim": "R.C. Willey accounted for over 50% of the furniture business in Utah.",
+          "met": true,
+          "supporting_sentences": [
+            "Aided by his brother, Sheldon, Bill has built the company to its 1995 sales volume of $257 million, and it now accounts for over 50% of the furniture business in Utah. [1]"
+          ],
+          "required_terms": [
+            "50%",
+            "furniture business",
+            "Utah"
+          ],
+          "accepted_passage_ids": [
+            "1995_p0024"
+          ],
+          "supporting_passage_ids": [
+            "1995_p0024"
+          ]
+        },
+        {
+          "claim": "R.C. Willey's 1995 sales volume was $257 million.",
+          "met": true,
+          "supporting_sentences": [
+            "Aided by his brother, Sheldon, Bill has built the company to its 1995 sales volume of $257 million, and it now accounts for over 50% of the furniture business in Utah. [1]"
+          ],
+          "required_terms": [
+            "1995",
+            "sales volume",
+            "$257 million"
+          ],
+          "accepted_passage_ids": [
+            "1995_p0024"
+          ],
+          "supporting_passage_ids": [
+            "1995_p0024"
+          ]
+        }
+      ],
+      "refusal_correct": null,
+      "score": {
+        "qid": "hv3_17",
+        "accepted": true,
+        "claim_coverage": 1.0,
+        "claims": [
+          {
+            "claim": "R.C. Willey accounted for over 50% of the furniture business in Utah.",
+            "met": true,
+            "supporting_sentences": [
+              "Aided by his brother, Sheldon, Bill has built the company to its 1995 sales volume of $257 million, and it now accounts for over 50% of the furniture business in Utah. [1]"
+            ],
+            "required_terms": [
+              "50%",
+              "furniture business",
+              "Utah"
+            ],
+            "accepted_passage_ids": [
+              "1995_p0024"
+            ],
+            "supporting_passage_ids": [
+              "1995_p0024"
+            ]
+          },
+          {
+            "claim": "R.C. Willey's 1995 sales volume was $257 million.",
+            "met": true,
+            "supporting_sentences": [
+              "Aided by his brother, Sheldon, Bill has built the company to its 1995 sales volume of $257 million, and it now accounts for over 50% of the furniture business in Utah. [1]"
+            ],
+            "required_terms": [
+              "1995",
+              "sales volume",
+              "$257 million"
+            ],
+            "accepted_passage_ids": [
+              "1995_p0024"
+            ],
+            "supporting_passage_ids": [
+              "1995_p0024"
+            ]
+          }
+        ],
+        "cited_passage_ids": [
+          "1995_p0024"
+        ],
+        "has_gold_citation": true,
+        "forbidden_terms_found": [],
+        "refusal_correct": null
+      },
+      "provider_failures": [],
+      "provider_calls": 1,
+      "model_requests": [
+        {
+          "model": "buffett-qwen2.5-7b-ft-r1-q4_k_m.gguf",
+          "temperature": 0.0
+        }
+      ],
+      "used_filter": {
+        "year": 1995
+      },
+      "reranked": false,
+      "raw_answers": [
+        "Aided by his brother, Sheldon, Bill has built the company to its 1995 sales volume of $257 million, and it now accounts for over 50% of the furniture business in Utah. [1] R.C. Willey is an amazing story. [1]"
+      ],
+      "status": "scored",
+      "latency_ms": 5896.213
+    },
+    {
+      "qid": "hv3_18",
+      "query": "How extensive was Dairy Queen's store network when Berkshire announced the deal in the 1997 letter?",
+      "history": [],
+      "question_type": "fact_number",
+      "answer": "There are 5,792 Dairy Queen stores operating in 23 countries -- all but a handful run by franchisees -- and in addition IDQ franchises 409 Orange Julius operations and 43 Karmelkorn operations. [3]",
+      "citations": [
+        {
+          "marker": "[3]",
+          "passage_indices": [
+            2
+          ],
+          "raw_numbers": [
+            3
+          ],
+          "invalid_numbers": [],
+          "passage_ids": [
+            "1997_p0074"
+          ],
+          "years": [
+            1997
+          ],
+          "sources": [
+            "buffet_1997.txt"
+          ]
+        }
+      ],
+      "passage_ids": [
+        "1997_p0119",
+        "1997_p0069",
+        "1997_p0074",
+        "1997_p0120",
+        "1997_p0076"
+      ],
+      "retrieved_passage_ids": [
+        "1997_p0119",
+        "1997_p0069",
+        "1997_p0074",
+        "1997_p0120",
+        "1997_p0076",
+        "1997_p0123",
+        "1997_p0045",
+        "1997_p0073"
+      ],
+      "required_claim_hits": [
+        {
+          "claim": "There were 5,792 Dairy Queen stores operating in 23 countries.",
+          "met": true,
+          "supporting_sentences": [
+            "There are 5,792 Dairy Queen stores operating in 23 countries -- all but a handful run by franchisees -- and in addition IDQ franchises 409 Orange Julius operations and 43 Karmelkorn operations. [3]"
+          ],
+          "required_terms": [
+            "5,792",
+            "Dairy Queen",
+            "23 countries"
+          ],
+          "accepted_passage_ids": [
+            "1997_p0074"
+          ],
+          "supporting_passage_ids": [
+            "1997_p0074"
+          ]
+        }
+      ],
+      "refusal_correct": null,
+      "score": {
+        "qid": "hv3_18",
+        "accepted": true,
+        "claim_coverage": 1.0,
+        "claims": [
+          {
+            "claim": "There were 5,792 Dairy Queen stores operating in 23 countries.",
+            "met": true,
+            "supporting_sentences": [
+              "There are 5,792 Dairy Queen stores operating in 23 countries -- all but a handful run by franchisees -- and in addition IDQ franchises 409 Orange Julius operations and 43 Karmelkorn operations. [3]"
+            ],
+            "required_terms": [
+              "5,792",
+              "Dairy Queen",
+              "23 countries"
+            ],
+            "accepted_passage_ids": [
+              "1997_p0074"
+            ],
+            "supporting_passage_ids": [
+              "1997_p0074"
+            ]
+          }
+        ],
+        "cited_passage_ids": [
+          "1997_p0074"
+        ],
+        "has_gold_citation": true,
+        "forbidden_terms_found": [],
+        "refusal_correct": null
+      },
+      "provider_failures": [],
+      "provider_calls": 1,
+      "model_requests": [
+        {
+          "model": "buffett-qwen2.5-7b-ft-r1-q4_k_m.gguf",
+          "temperature": 0.0
+        }
+      ],
+      "used_filter": {
+        "year": 1997
+      },
+      "reranked": false,
+      "raw_answers": [
+        "There are 5,792 Dairy Queen stores operating in 23 countries -- all but a handful run by franchisees -- and in addition IDQ franchises 409 Orange Julius operations and 43 Karmelkorn operations. [3]"
+      ],
+      "status": "scored",
+      "latency_ms": 5365.384
+    },
+    {
+      "qid": "hv3_19",
+      "query": "How much seating capacity had Berkshire lined up across its two meeting venues in the 1998 letter?",
+      "history": [],
+      "question_type": "fact_number",
+      "answer": "The retrieved passages do not provide enough evidence to answer this question.",
+      "citations": [],
+      "passage_ids": [
+        "1998_p0096",
+        "1998_p0021",
+        "1998_p0097",
+        "1998_p0099",
+        "1998_p0107"
+      ],
+      "retrieved_passage_ids": [
+        "1998_p0096",
+        "1998_p0021",
+        "1998_p0097",
+        "1998_p0099",
+        "1998_p0107",
+        "1998_p0102",
+        "1998_p0086",
+        "1998_p0007"
+      ],
+      "required_claim_hits": [
+        {
+          "claim": "Aksarben Coliseum held about 14,000, while the Holiday Convention Centre could seat an additional 5,000.",
+          "met": false,
+          "supporting_sentences": [],
+          "required_terms": [
+            "14,000",
+            "5,000",
+            "Holiday Convention Centre"
+          ],
+          "accepted_passage_ids": [
+            "1998_p0096"
+          ],
+          "supporting_passage_ids": []
+        }
+      ],
+      "refusal_correct": null,
+      "score": {
+        "qid": "hv3_19",
+        "accepted": false,
+        "claim_coverage": 0.0,
+        "claims": [
+          {
+            "claim": "Aksarben Coliseum held about 14,000, while the Holiday Convention Centre could seat an additional 5,000.",
+            "met": false,
+            "supporting_sentences": [],
+            "required_terms": [
+              "14,000",
+              "5,000",
+              "Holiday Convention Centre"
+            ],
+            "accepted_passage_ids": [
+              "1998_p0096"
+            ],
+            "supporting_passage_ids": []
+          }
+        ],
+        "cited_passage_ids": [],
+        "has_gold_citation": false,
+        "forbidden_terms_found": [],
+        "refusal_correct": null
+      },
+      "provider_failures": [],
+      "provider_calls": 0,
+      "model_requests": [],
+      "used_filter": {
+        "year": 1998
+      },
+      "reranked": false,
+      "raw_answers": [],
+      "status": "scored",
+      "latency_ms": 42.206
+    },
+    {
+      "qid": "hv3_20",
+      "query": "What budget did Buffett foresee for GEICO's advertising in 2000 when he wrote the 1999 letter?",
+      "history": [],
+      "question_type": "fact_number",
+      "answer": "In 2000: Last year I enthusiastically told you that we would step up our expenditures on advertising in 2000 and that the added dollars were the best investment that GEICO could make. [4]\n\nIn 1999: Nevertheless, I want to emphasize that a major percentage of the $300-$350 million we will spend in 2000 on advertising, as well as large additional costs [6].",
+      "citations": [
+        {
+          "marker": "[4]",
+          "passage_indices": [
+            3
+          ],
+          "raw_numbers": [
+            4
+          ],
+          "invalid_numbers": [],
+          "passage_ids": [
+            "2000_p0054"
+          ],
+          "years": [
+            2000
+          ],
+          "sources": [
+            "buffet_2000.pdf"
+          ]
+        },
+        {
+          "marker": "[6]",
+          "passage_indices": [
+            5
+          ],
+          "raw_numbers": [
+            6
+          ],
+          "invalid_numbers": [],
+          "passage_ids": [
+            "1999_p0040"
+          ],
+          "years": [
+            1999
+          ],
+          "sources": [
+            "buffet_1999.pdf"
+          ]
+        }
+      ],
+      "passage_ids": [
+        "2000_p0065",
+        "2000_p0064",
+        "2000_p0066",
+        "2000_p0054",
+        "2000_p0053",
+        "1999_p0040",
+        "1999_p0039",
+        "1999_p0041",
+        "1999_p0031",
+        "1999_p0030"
+      ],
+      "retrieved_passage_ids": [
+        "2000_p0065",
+        "1999_p0040",
+        "2000_p0054",
+        "1999_p0031",
+        "2000_p0088",
+        "1999_p0035",
+        "2000_p0008",
+        "1999_p0032"
+      ],
+      "required_claim_hits": [
+        {
+          "claim": "The planned advertising expenditure in 2000 was $300-$350 million.",
+          "met": true,
+          "supporting_sentences": [
+            "In 1999: Nevertheless, I want to emphasize that a major percentage of the $300-$350 million we will spend in 2000 on advertising, as well as large additional costs [6]."
+          ],
+          "required_terms": [
+            "2000",
+            "$300-$350 million",
+            "advertising"
+          ],
+          "accepted_passage_ids": [
+            "1999_p0040"
+          ],
+          "supporting_passage_ids": [
+            "1999_p0040"
+          ]
+        }
+      ],
+      "refusal_correct": null,
+      "score": {
+        "qid": "hv3_20",
+        "accepted": true,
+        "claim_coverage": 1.0,
+        "claims": [
+          {
+            "claim": "The planned advertising expenditure in 2000 was $300-$350 million.",
+            "met": true,
+            "supporting_sentences": [
+              "In 1999: Nevertheless, I want to emphasize that a major percentage of the $300-$350 million we will spend in 2000 on advertising, as well as large additional costs [6]."
+            ],
+            "required_terms": [
+              "2000",
+              "$300-$350 million",
+              "advertising"
+            ],
+            "accepted_passage_ids": [
+              "1999_p0040"
+            ],
+            "supporting_passage_ids": [
+              "1999_p0040"
+            ]
+          }
+        ],
+        "cited_passage_ids": [
+          "1999_p0040",
+          "2000_p0054"
+        ],
+        "has_gold_citation": true,
+        "forbidden_terms_found": [],
+        "refusal_correct": null
+      },
+      "provider_failures": [],
+      "provider_calls": 2,
+      "model_requests": [
+        {
+          "model": "buffett-qwen2.5-7b-ft-r1-q4_k_m.gguf",
+          "temperature": 0.0
+        },
+        {
+          "model": "buffett-qwen2.5-7b-ft-r1-q4_k_m.gguf",
+          "temperature": 0.0
+        }
+      ],
+      "used_filter": {
+        "multi_subquery": [
+          {
+            "year": 2000
+          },
+          {
+            "year": 1999
+          }
+        ]
+      },
+      "reranked": false,
+      "raw_answers": [
+        "Last year I enthusiastically told you that we would step up our expenditures on advertising in 2000 and that the added dollars were the best investment that GEICO could make. [4]",
+        "Nevertheless, I want to emphasize that a major percentage of the $300-$350 million we will spend in 2000 on advertising, as well as large additional costs [1]."
+      ],
+      "status": "scored",
+      "latency_ms": 6670.53
+    },
+    {
+      "qid": "hv3_21",
+      "query": "How much of an A share's economic interest did a Berkshire B share represent in the 2000 report?",
+      "history": [],
+      "question_type": "fact_number",
+      "answer": "The B shares have an economic interest equal to 1/30th that of the A. [2]",
+      "citations": [
+        {
+          "marker": "[2]",
+          "passage_indices": [
+            1
+          ],
+          "raw_numbers": [
+            2
+          ],
+          "invalid_numbers": [],
+          "passage_ids": [
+            "2000_p0012"
+          ],
+          "years": [
+            2000
+          ],
+          "sources": [
+            "buffet_2000.pdf"
+          ]
+        }
+      ],
+      "passage_ids": [
+        "2000_p0096",
+        "2000_p0012",
+        "2000_p0088",
+        "2000_p0006",
+        "2000_p0105"
+      ],
+      "retrieved_passage_ids": [
+        "2000_p0096",
+        "2000_p0012",
+        "2000_p0088",
+        "2000_p0006",
+        "2000_p0105",
+        "2000_p0098",
+        "2000_p0008",
+        "2000_p0064"
+      ],
+      "required_claim_hits": [
+        {
+          "claim": "B shares had an economic interest equal to 1/30th that of A shares.",
+          "met": true,
+          "supporting_sentences": [
+            "The B shares have an economic interest equal to 1/30th that of the A. [2]"
+          ],
+          "required_terms": [
+            "economic interest",
+            "1/30th",
+            "B shares"
+          ],
+          "accepted_passage_ids": [
+            "2000_p0012"
+          ],
+          "supporting_passage_ids": [
+            "2000_p0012"
+          ]
+        }
+      ],
+      "refusal_correct": null,
+      "score": {
+        "qid": "hv3_21",
+        "accepted": true,
+        "claim_coverage": 1.0,
+        "claims": [
+          {
+            "claim": "B shares had an economic interest equal to 1/30th that of A shares.",
+            "met": true,
+            "supporting_sentences": [
+              "The B shares have an economic interest equal to 1/30th that of the A. [2]"
+            ],
+            "required_terms": [
+              "economic interest",
+              "1/30th",
+              "B shares"
+            ],
+            "accepted_passage_ids": [
+              "2000_p0012"
+            ],
+            "supporting_passage_ids": [
+              "2000_p0012"
+            ]
+          }
+        ],
+        "cited_passage_ids": [
+          "2000_p0012"
+        ],
+        "has_gold_citation": true,
+        "forbidden_terms_found": [],
+        "refusal_correct": null
+      },
+      "provider_failures": [],
+      "provider_calls": 1,
+      "model_requests": [
+        {
+          "model": "buffett-qwen2.5-7b-ft-r1-q4_k_m.gguf",
+          "temperature": 0.0
+        }
+      ],
+      "used_filter": {
+        "year": 2000
+      },
+      "reranked": false,
+      "raw_answers": [
+        "The B shares have an economic interest equal to 1/30th that of the A. [2]"
+      ],
+      "status": "scored",
+      "latency_ms": 4317.902
+    },
+    {
+      "qid": "hv3_22",
+      "query": "How small was headquarters compared with Berkshire's overall workforce in the 2001 letter?",
+      "history": [],
+      "question_type": "fact_number",
+      "answer": "At headquarters we added one employee and now have 14.8. [1]\n\n000. [1]",
+      "citations": [
+        {
+          "marker": "[1]",
+          "passage_indices": [
+            0
+          ],
+          "raw_numbers": [
+            1
+          ],
+          "invalid_numbers": [],
+          "passage_ids": [
+            "2001_p0122"
+          ],
+          "years": [
+            2001
+          ],
+          "sources": [
+            "buffet_2001.pdf"
+          ]
+        },
+        {
+          "marker": "[1]",
+          "passage_indices": [
+            0
+          ],
+          "raw_numbers": [
+            1
+          ],
+          "invalid_numbers": [],
+          "passage_ids": [
+            "2001_p0122"
+          ],
+          "years": [
+            2001
+          ],
+          "sources": [
+            "buffet_2001.pdf"
+          ]
+        }
+      ],
+      "passage_ids": [
+        "2001_p0122",
+        "2001_p0004",
+        "2001_p0100",
+        "2001_p0077",
+        "2001_p0061"
+      ],
+      "retrieved_passage_ids": [
+        "2001_p0122",
+        "2001_p0004",
+        "2001_p0100",
+        "2001_p0077",
+        "2001_p0061",
+        "2001_p0089",
+        "2001_p0094",
+        "2001_p0099"
+      ],
+      "required_claim_hits": [
+        {
+          "claim": "Headquarters had 14.8 employees.",
+          "met": true,
+          "supporting_sentences": [
+            "At headquarters we added one employee and now have 14.8. [1]"
+          ],
+          "required_terms": [
+            "headquarters",
+            "14.8"
+          ],
+          "accepted_passage_ids": [
+            "2001_p0122"
+          ],
+          "supporting_passage_ids": [
+            "2001_p0122"
+          ]
+        },
+        {
+          "claim": "Berkshire's total workforce was 110,000.",
+          "met": false,
+          "supporting_sentences": [],
+          "required_terms": [
+            "workforce",
+            "110,000"
+          ],
+          "accepted_passage_ids": [
+            "2001_p0122"
+          ],
+          "supporting_passage_ids": []
+        }
+      ],
+      "refusal_correct": null,
+      "score": {
+        "qid": "hv3_22",
+        "accepted": false,
+        "claim_coverage": 0.5,
+        "claims": [
+          {
+            "claim": "Headquarters had 14.8 employees.",
+            "met": true,
+            "supporting_sentences": [
+              "At headquarters we added one employee and now have 14.8. [1]"
+            ],
+            "required_terms": [
+              "headquarters",
+              "14.8"
+            ],
+            "accepted_passage_ids": [
+              "2001_p0122"
+            ],
+            "supporting_passage_ids": [
+              "2001_p0122"
+            ]
+          },
+          {
+            "claim": "Berkshire's total workforce was 110,000.",
+            "met": false,
+            "supporting_sentences": [],
+            "required_terms": [
+              "workforce",
+              "110,000"
+            ],
+            "accepted_passage_ids": [
+              "2001_p0122"
+            ],
+            "supporting_passage_ids": []
+          }
+        ],
+        "cited_passage_ids": [
+          "2001_p0122"
+        ],
+        "has_gold_citation": false,
+        "forbidden_terms_found": [],
+        "refusal_correct": null
+      },
+      "provider_failures": [],
+      "provider_calls": 1,
+      "model_requests": [
+        {
+          "model": "buffett-qwen2.5-7b-ft-r1-q4_k_m.gguf",
+          "temperature": 0.0
+        }
+      ],
+      "used_filter": {
+        "year": 2001
+      },
+      "reranked": false,
+      "raw_answers": [
+        "At headquarters we added one employee and now have 14.8. [1] Berkshire added about 40,000 employees last year, bringing our workforce to 110,000. [1]"
+      ],
+      "status": "scored",
+      "latency_ms": 5724.469
+    },
+    {
+      "qid": "hv3_23",
+      "query": "What profit turnaround in Berkshire's shoe business was reported for 2002?",
+      "history": [],
+      "question_type": "fact_number",
+      "answer": "Despite the cost of unwinding our problems there, we earned $24 million in shoes last year, an upward swing of $70 million from 2001. [3]",
+      "citations": [
+        {
+          "marker": "[3]",
+          "passage_indices": [
+            2
+          ],
+          "raw_numbers": [
+            3
+          ],
+          "invalid_numbers": [],
+          "passage_ids": [
+            "2002_p0058"
+          ],
+          "years": [
+            2002
+          ],
+          "sources": [
+            "buffet_2002.pdf"
+          ]
+        }
+      ],
+      "passage_ids": [
+        "2002_p0054",
+        "2002_p0049",
+        "2002_p0058",
+        "2002_p0044",
+        "2002_p0046"
+      ],
+      "retrieved_passage_ids": [
+        "2002_p0054",
+        "2002_p0049",
+        "2002_p0058",
+        "2002_p0044",
+        "2002_p0046",
+        "2002_p0012",
+        "2002_p0057",
+        "2002_p0064"
+      ],
+      "required_claim_hits": [
+        {
+          "claim": "Shoes earned $24 million, an upward swing of $70 million from 2001.",
+          "met": false,
+          "supporting_sentences": [],
+          "required_terms": [
+            "shoes",
+            "$24 million",
+            "$70 million"
+          ],
+          "accepted_passage_ids": [
+            "2002_p0059"
+          ],
+          "supporting_passage_ids": []
+        }
+      ],
+      "refusal_correct": null,
+      "score": {
+        "qid": "hv3_23",
+        "accepted": false,
+        "claim_coverage": 0.0,
+        "claims": [
+          {
+            "claim": "Shoes earned $24 million, an upward swing of $70 million from 2001.",
+            "met": false,
+            "supporting_sentences": [],
+            "required_terms": [
+              "shoes",
+              "$24 million",
+              "$70 million"
+            ],
+            "accepted_passage_ids": [
+              "2002_p0059"
+            ],
+            "supporting_passage_ids": []
+          }
+        ],
+        "cited_passage_ids": [
+          "2002_p0058"
+        ],
+        "has_gold_citation": false,
+        "forbidden_terms_found": [],
+        "refusal_correct": null
+      },
+      "provider_failures": [],
+      "provider_calls": 1,
+      "model_requests": [
+        {
+          "model": "buffett-qwen2.5-7b-ft-r1-q4_k_m.gguf",
+          "temperature": 0.0
+        }
+      ],
+      "used_filter": {
+        "year": 2002
+      },
+      "reranked": false,
+      "raw_answers": [
+        "Despite the cost of unwinding our problems there, we earned $24 million in shoes last year, an upward swing of $70 million from 2001. [3]"
+      ],
+      "status": "scored",
+      "latency_ms": 5193.528
+    },
+    {
+      "qid": "hv3_24",
+      "query": "For the federal tax return mentioned in Buffett's 2003 letter, how many pages were there and how many copies were filed?",
+      "history": [],
+      "question_type": "fact_number",
+      "answer": "Our federal tax return for 2002 (2003 is not finalized), when we paid $1.75 billion, covered a mere 8,905 pages. [1]\nAs is required, we dutifully filed two copies of this return, creating a pile of paper seven feet tall. [1]",
+      "citations": [
+        {
+          "marker": "[1]",
+          "passage_indices": [
+            0
+          ],
+          "raw_numbers": [
+            1
+          ],
+          "invalid_numbers": [],
+          "passage_ids": [
+            "2003_p0033"
+          ],
+          "years": [
+            2003
+          ],
+          "sources": [
+            "buffet_2003.pdf"
+          ]
+        },
+        {
+          "marker": "[1]",
+          "passage_indices": [
+            0
+          ],
+          "raw_numbers": [
+            1
+          ],
+          "invalid_numbers": [],
+          "passage_ids": [
+            "2003_p0033"
+          ],
+          "years": [
+            2003
+          ],
+          "sources": [
+            "buffet_2003.pdf"
+          ]
+        }
+      ],
+      "passage_ids": [
+        "2003_p0033",
+        "2003_p0034",
+        "2003_p0036",
+        "2003_p0035",
+        "2003_p0101"
+      ],
+      "retrieved_passage_ids": [
+        "2003_p0033",
+        "2003_p0034",
+        "2003_p0036",
+        "2003_p0035",
+        "2003_p0101",
+        "2003_p0032",
+        "2003_p0037",
+        "2003_p0103"
+      ],
+      "required_claim_hits": [
+        {
+          "claim": "The tax return ran to 8,905 pages and was submitted in two copies.",
+          "met": false,
+          "supporting_sentences": [],
+          "required_terms": [
+            "8,905 pages",
+            "two copies",
+            "return"
+          ],
+          "accepted_passage_ids": [
+            "2003_p0034"
+          ],
+          "supporting_passage_ids": []
+        }
+      ],
+      "refusal_correct": null,
+      "score": {
+        "qid": "hv3_24",
+        "accepted": false,
+        "claim_coverage": 0.0,
+        "claims": [
+          {
+            "claim": "The tax return ran to 8,905 pages and was submitted in two copies.",
+            "met": false,
+            "supporting_sentences": [],
+            "required_terms": [
+              "8,905 pages",
+              "two copies",
+              "return"
+            ],
+            "accepted_passage_ids": [
+              "2003_p0034"
+            ],
+            "supporting_passage_ids": []
+          }
+        ],
+        "cited_passage_ids": [
+          "2003_p0033"
+        ],
+        "has_gold_citation": false,
+        "forbidden_terms_found": [],
+        "refusal_correct": null
+      },
+      "provider_failures": [],
+      "provider_calls": 1,
+      "model_requests": [
+        {
+          "model": "buffett-qwen2.5-7b-ft-r1-q4_k_m.gguf",
+          "temperature": 0.0
+        }
+      ],
+      "used_filter": {
+        "year": 2003
+      },
+      "reranked": false,
+      "raw_answers": [
+        "Our federal tax return for 2002 (2003 is not finalized), when we paid $1.75 billion, covered a mere 8,905 pages. [1]\nAs is required, we dutifully filed two copies of this return, creating a pile of paper seven feet tall. [1]"
+      ],
+      "status": "scored",
+      "latency_ms": 6305.617
+    },
+    {
+      "qid": "hv3_25",
+      "query": "How large was the extra fiber-material cost burden on Shaw in 2004?",
+      "history": [],
+      "question_type": "fact_number",
+      "answer": "Shaw fielded a barrage of price increases in its main fiber materials during the year, a hit that added more than $300 million to its costs. [1]",
+      "citations": [
+        {
+          "marker": "[1]",
+          "passage_indices": [
+            0
+          ],
+          "raw_numbers": [
+            1
+          ],
+          "invalid_numbers": [],
+          "passage_ids": [
+            "2004_p0086"
+          ],
+          "years": [
+            2004
+          ],
+          "sources": [
+            "buffet_2004.pdf"
+          ]
+        }
+      ],
+      "passage_ids": [
+        "2004_p0086",
+        "2004_p0084",
+        "2004_p0102",
+        "2004_p0085",
+        "2004_p0167"
+      ],
+      "retrieved_passage_ids": [
+        "2004_p0086",
+        "2004_p0084",
+        "2004_p0102",
+        "2004_p0085",
+        "2004_p0167",
+        "2004_p0101",
+        "2004_p0005",
+        "2004_p0044"
+      ],
+      "required_claim_hits": [
+        {
+          "claim": "Fiber-material price increases added more than $300 million to Shaw's costs.",
+          "met": true,
+          "supporting_sentences": [
+            "Shaw fielded a barrage of price increases in its main fiber materials during the year, a hit that added more than $300 million to its costs. [1]"
+          ],
+          "required_terms": [
+            "Shaw",
+            "$300 million",
+            "costs"
+          ],
+          "accepted_passage_ids": [
+            "2004_p0086"
+          ],
+          "supporting_passage_ids": [
+            "2004_p0086"
+          ]
+        }
+      ],
+      "refusal_correct": null,
+      "score": {
+        "qid": "hv3_25",
+        "accepted": true,
+        "claim_coverage": 1.0,
+        "claims": [
+          {
+            "claim": "Fiber-material price increases added more than $300 million to Shaw's costs.",
+            "met": true,
+            "supporting_sentences": [
+              "Shaw fielded a barrage of price increases in its main fiber materials during the year, a hit that added more than $300 million to its costs. [1]"
+            ],
+            "required_terms": [
+              "Shaw",
+              "$300 million",
+              "costs"
+            ],
+            "accepted_passage_ids": [
+              "2004_p0086"
+            ],
+            "supporting_passage_ids": [
+              "2004_p0086"
+            ]
+          }
+        ],
+        "cited_passage_ids": [
+          "2004_p0086"
+        ],
+        "has_gold_citation": true,
+        "forbidden_terms_found": [],
+        "refusal_correct": null
+      },
+      "provider_failures": [],
+      "provider_calls": 1,
+      "model_requests": [
+        {
+          "model": "buffett-qwen2.5-7b-ft-r1-q4_k_m.gguf",
+          "temperature": 0.0
+        }
+      ],
+      "used_filter": {
+        "year": 2004
+      },
+      "reranked": false,
+      "raw_answers": [
+        "Shaw fielded a barrage of price increases in its main fiber materials during the year, a hit that added more than $300 million to its costs. [1]"
+      ],
+      "status": "scored",
+      "latency_ms": 4599.378
+    },
+    {
+      "qid": "hv3_26",
+      "query": "How did Buffett tie pay to what a manager actually contributes in the 2005 and 2006 letters?",
+      "history": [],
+      "question_type": "temporal_comparison",
+      "answer": "In 2005: The retrieved passages for this period do not cover this question.\n\nIn 2006: The retrieved passages for this period do not cover this question.",
+      "citations": [],
+      "passage_ids": [
+        "2005_p0105",
+        "2005_p0104",
+        "2005_p0106",
+        "2005_p0087",
+        "2005_p0086",
+        "2006_p0084",
+        "2006_p0083",
+        "2006_p0085",
+        "2006_p0041",
+        "2006_p0040"
+      ],
+      "retrieved_passage_ids": [
+        "2005_p0105",
+        "2006_p0084",
+        "2005_p0087",
+        "2006_p0041",
+        "2005_p0017",
+        "2006_p0022",
+        "2005_p0048",
+        "2006_p0005"
+      ],
+      "required_claim_hits": [
+        {
+          "claim": "Buffett favored options with strike prices adjusted for retained earnings.",
+          "met": false,
+          "supporting_sentences": [],
+          "required_terms": [
+            "strike prices",
+            "retained earnings"
+          ],
+          "accepted_passage_ids": [
+            "2005_p0099"
+          ],
+          "supporting_passage_ids": []
+        },
+        {
+          "claim": "Berkshire tied incentives to the operating results for which a given CEO had authority.",
+          "met": false,
+          "supporting_sentences": [],
+          "required_terms": [
+            "incentives",
+            "operating results",
+            "authority"
+          ],
+          "accepted_passage_ids": [
+            "2006_p0126"
+          ],
+          "supporting_passage_ids": []
+        }
+      ],
+      "refusal_correct": null,
+      "score": {
+        "qid": "hv3_26",
+        "accepted": false,
+        "claim_coverage": 0.0,
+        "claims": [
+          {
+            "claim": "Buffett favored options with strike prices adjusted for retained earnings.",
+            "met": false,
+            "supporting_sentences": [],
+            "required_terms": [
+              "strike prices",
+              "retained earnings"
+            ],
+            "accepted_passage_ids": [
+              "2005_p0099"
+            ],
+            "supporting_passage_ids": []
+          },
+          {
+            "claim": "Berkshire tied incentives to the operating results for which a given CEO had authority.",
+            "met": false,
+            "supporting_sentences": [],
+            "required_terms": [
+              "incentives",
+              "operating results",
+              "authority"
+            ],
+            "accepted_passage_ids": [
+              "2006_p0126"
+            ],
+            "supporting_passage_ids": []
+          }
+        ],
+        "cited_passage_ids": [],
+        "has_gold_citation": false,
+        "forbidden_terms_found": [],
+        "refusal_correct": null
+      },
+      "provider_failures": [],
+      "provider_calls": 0,
+      "model_requests": [],
+      "used_filter": {
+        "multi_subquery": [
+          {
+            "year": 2005
+          },
+          {
+            "year": 2006
+          }
+        ]
+      },
+      "reranked": false,
+      "raw_answers": [],
+      "status": "scored",
+      "latency_ms": 34.516
+    },
+    {
+      "qid": "hv3_27",
+      "query": "Did Berkshire's commitment to completing and keeping acquisitions change between the 2007 Marmon discussion and the 2008 buyer-of-choice explanation?",
+      "history": [],
+      "question_type": "temporal_comparison",
+      "answer": "In 2007: The retrieved passages for this period do not cover this question.\n\nIn 2008: The retrieved passages for this period do not cover this question.",
+      "citations": [],
+      "passage_ids": [
+        "2007_p0019",
+        "2007_p0018",
+        "2007_p0020",
+        "2007_p0128",
+        "2007_p0127",
+        "2008_p0037",
+        "2008_p0036",
+        "2008_p0038",
+        "2008_p0039",
+        "2008_p0040"
+      ],
+      "retrieved_passage_ids": [
+        "2007_p0019",
+        "2008_p0037",
+        "2007_p0128",
+        "2008_p0039",
+        "2007_p0011",
+        "2008_p0053",
+        "2007_p0022",
+        "2008_p0007"
+      ],
+      "required_claim_hits": [
+        {
+          "claim": "For the Marmon deal, Berkshire would close on the dot despite chaotic financial markets.",
+          "met": false,
+          "supporting_sentences": [],
+          "required_terms": [
+            "Marmon",
+            "close on the dot",
+            "financial markets"
+          ],
+          "accepted_passage_ids": [
+            "2007_p0024"
+          ],
+          "supporting_passage_ids": []
+        },
+        {
+          "claim": "Berkshire's policy was to keep promises and hold the purchased companies through thick and thin.",
+          "met": false,
+          "supporting_sentences": [],
+          "required_terms": [
+            "promises",
+            "hold the purchased companies",
+            "thick and thin"
+          ],
+          "accepted_passage_ids": [
+            "2008_p0037"
+          ],
+          "supporting_passage_ids": []
+        }
+      ],
+      "refusal_correct": null,
+      "score": {
+        "qid": "hv3_27",
+        "accepted": false,
+        "claim_coverage": 0.0,
+        "claims": [
+          {
+            "claim": "For the Marmon deal, Berkshire would close on the dot despite chaotic financial markets.",
+            "met": false,
+            "supporting_sentences": [],
+            "required_terms": [
+              "Marmon",
+              "close on the dot",
+              "financial markets"
+            ],
+            "accepted_passage_ids": [
+              "2007_p0024"
+            ],
+            "supporting_passage_ids": []
+          },
+          {
+            "claim": "Berkshire's policy was to keep promises and hold the purchased companies through thick and thin.",
+            "met": false,
+            "supporting_sentences": [],
+            "required_terms": [
+              "promises",
+              "hold the purchased companies",
+              "thick and thin"
+            ],
+            "accepted_passage_ids": [
+              "2008_p0037"
+            ],
+            "supporting_passage_ids": []
+          }
+        ],
+        "cited_passage_ids": [],
+        "has_gold_citation": false,
+        "forbidden_terms_found": [],
+        "refusal_correct": null
+      },
+      "provider_failures": [],
+      "provider_calls": 0,
+      "model_requests": [],
+      "used_filter": {
+        "multi_subquery": [
+          {
+            "year": 2007
+          },
+          {
+            "year": 2008
+          }
+        ]
+      },
+      "reranked": false,
+      "raw_answers": [],
+      "status": "scored",
+      "latency_ms": 44.741
+    },
+    {
+      "qid": "hv3_28",
+      "query": "How did MidAmerican Energy's primarily-Iowa electric customer count differ in the 2004 and 2009 letters?",
+      "history": [],
+      "question_type": "temporal_comparison",
+      "answer": "In 2004: The retrieved passages for this period do not cover this question.\n\nIn 2009: The retrieved passages for this period do not cover this question.",
+      "citations": [],
+      "passage_ids": [
+        "2004_p0020",
+        "2004_p0019",
+        "2004_p0021",
+        "2004_p0029",
+        "2004_p0028",
+        "2009_p0043",
+        "2009_p0042",
+        "2009_p0044",
+        "2009_p0045",
+        "2009_p0046"
+      ],
+      "retrieved_passage_ids": [
+        "2004_p0020",
+        "2009_p0043",
+        "2004_p0029",
+        "2009_p0045",
+        "2004_p0028",
+        "2009_p0042",
+        "2004_p0057",
+        "2009_p0048"
+      ],
+      "required_claim_hits": [
+        {
+          "claim": "MidAmerican Energy served 698,000 electric customers, primarily in Iowa.",
+          "met": false,
+          "supporting_sentences": [],
+          "required_terms": [
+            "MidAmerican Energy",
+            "698,000",
+            "electric customers"
+          ],
+          "accepted_passage_ids": [
+            "2004_p0020"
+          ],
+          "supporting_passage_ids": []
+        },
+        {
+          "claim": "MidAmerican Energy served 725,000 electric customers, primarily in Iowa.",
+          "met": false,
+          "supporting_sentences": [],
+          "required_terms": [
+            "MidAmerican Energy",
+            "725,000",
+            "electric customers"
+          ],
+          "accepted_passage_ids": [
+            "2009_p0043"
+          ],
+          "supporting_passage_ids": []
+        }
+      ],
+      "refusal_correct": null,
+      "score": {
+        "qid": "hv3_28",
+        "accepted": false,
+        "claim_coverage": 0.0,
+        "claims": [
+          {
+            "claim": "MidAmerican Energy served 698,000 electric customers, primarily in Iowa.",
+            "met": false,
+            "supporting_sentences": [],
+            "required_terms": [
+              "MidAmerican Energy",
+              "698,000",
+              "electric customers"
+            ],
+            "accepted_passage_ids": [
+              "2004_p0020"
+            ],
+            "supporting_passage_ids": []
+          },
+          {
+            "claim": "MidAmerican Energy served 725,000 electric customers, primarily in Iowa.",
+            "met": false,
+            "supporting_sentences": [],
+            "required_terms": [
+              "MidAmerican Energy",
+              "725,000",
+              "electric customers"
+            ],
+            "accepted_passage_ids": [
+              "2009_p0043"
+            ],
+            "supporting_passage_ids": []
+          }
+        ],
+        "cited_passage_ids": [],
+        "has_gold_citation": false,
+        "forbidden_terms_found": [],
+        "refusal_correct": null
+      },
+      "provider_failures": [],
+      "provider_calls": 2,
+      "model_requests": [
+        {
+          "model": "buffett-qwen2.5-7b-ft-r1-q4_k_m.gguf",
+          "temperature": 0.0
+        },
+        {
+          "model": "buffett-qwen2.5-7b-ft-r1-q4_k_m.gguf",
+          "temperature": 0.0
+        }
+      ],
+      "used_filter": {
+        "multi_subquery": [
+          {
+            "year": 2004
+          },
+          {
+            "year": 2009
+          }
+        ]
+      },
+      "reranked": false,
+      "raw_answers": [
+        "The retrieved passages do not provide enough evidence to answer this question.",
+        "The retrieved passages do not provide enough evidence to answer this question."
+      ],
+      "status": "scored",
+      "latency_ms": 4279.057
+    },
+    {
+      "qid": "hv3_29",
+      "query": "Across the 2011 and 2012 letters, when did Buffett expect Berkshire to beat the S&P 500 and when did he expect it to trail?",
+      "history": [],
+      "question_type": "temporal_comparison",
+      "answer": "In 2011: The retrieved passages for this period do not cover this question.\n\nIn 2012: The retrieved passages for this period do not cover this question.",
+      "citations": [],
+      "passage_ids": [
+        "2011_p0029",
+        "2011_p0028",
+        "2011_p0030",
+        "2011_p0015",
+        "2011_p0014",
+        "2012_p0014",
+        "2012_p0013",
+        "2012_p0015",
+        "2012_p0050",
+        "2012_p0049"
+      ],
+      "retrieved_passage_ids": [
+        "2011_p0029",
+        "2012_p0014",
+        "2011_p0015",
+        "2012_p0050",
+        "2011_p0019",
+        "2012_p0132",
+        "2011_p0048",
+        "2012_p0040"
+      ],
+      "required_claim_hits": [
+        {
+          "claim": "Berkshire's book-value performance should outpace the S&P 500 in a bad year and fall short in a strong up-year.",
+          "met": false,
+          "supporting_sentences": [],
+          "required_terms": [
+            "book-value performance",
+            "bad year",
+            "strong up-year"
+          ],
+          "accepted_passage_ids": [
+            "2011_p0029"
+          ],
+          "supporting_passage_ids": []
+        },
+        {
+          "claim": "Berkshire's relative performance should be better when the market is down or flat, but fall short in particularly strong years.",
+          "met": false,
+          "supporting_sentences": [],
+          "required_terms": [
+            "down or flat",
+            "particularly strong",
+            "fall short"
+          ],
+          "accepted_passage_ids": [
+            "2012_p0014"
+          ],
+          "supporting_passage_ids": []
+        }
+      ],
+      "refusal_correct": null,
+      "score": {
+        "qid": "hv3_29",
+        "accepted": false,
+        "claim_coverage": 0.0,
+        "claims": [
+          {
+            "claim": "Berkshire's book-value performance should outpace the S&P 500 in a bad year and fall short in a strong up-year.",
+            "met": false,
+            "supporting_sentences": [],
+            "required_terms": [
+              "book-value performance",
+              "bad year",
+              "strong up-year"
+            ],
+            "accepted_passage_ids": [
+              "2011_p0029"
+            ],
+            "supporting_passage_ids": []
+          },
+          {
+            "claim": "Berkshire's relative performance should be better when the market is down or flat, but fall short in particularly strong years.",
+            "met": false,
+            "supporting_sentences": [],
+            "required_terms": [
+              "down or flat",
+              "particularly strong",
+              "fall short"
+            ],
+            "accepted_passage_ids": [
+              "2012_p0014"
+            ],
+            "supporting_passage_ids": []
+          }
+        ],
+        "cited_passage_ids": [],
+        "has_gold_citation": false,
+        "forbidden_terms_found": [],
+        "refusal_correct": null
+      },
+      "provider_failures": [],
+      "provider_calls": 0,
+      "model_requests": [],
+      "used_filter": {
+        "multi_subquery": [
+          {
+            "year": 2011
+          },
+          {
+            "year": 2012
+          }
+        ]
+      },
+      "reranked": false,
+      "raw_answers": [],
+      "status": "scored",
+      "latency_ms": 82.282
+    },
+    {
+      "qid": "hv3_30",
+      "query": "How do BNSF's earnings in 2021 and 2031 compare?",
+      "history": [],
+      "question_type": "temporal_comparison",
+      "answer": "In 2021: The retrieved passages for this period do not cover this question.\n\nIn 2031: The retrieved passages for this period do not cover this question.",
+      "citations": [],
+      "passage_ids": [
+        "2021_p0031",
+        "2021_p0030",
+        "2021_p0032",
+        "2021_p0014",
+        "2021_p0013"
+      ],
+      "retrieved_passage_ids": [
+        "2021_p0031",
+        "2021_p0014",
+        "2021_p0030",
+        "2021_p0032",
+        "2021_p0055",
+        "2021_p0029",
+        "2021_p0056",
+        "2021_p0040"
+      ],
+      "required_claim_hits": [
+        {
+          "claim": "BNSF had record earnings of $6 billion in 2021.",
+          "met": false,
+          "supporting_sentences": [],
+          "required_terms": [
+            "BNSF",
+            "$6 billion",
+            "2021"
+          ],
+          "accepted_passage_ids": [
+            "2021_p0031"
+          ],
+          "supporting_passage_ids": []
+        }
+      ],
+      "refusal_correct": null,
+      "score": {
+        "qid": "hv3_30",
+        "accepted": false,
+        "claim_coverage": 0.0,
+        "claims": [
+          {
+            "claim": "BNSF had record earnings of $6 billion in 2021.",
+            "met": false,
+            "supporting_sentences": [],
+            "required_terms": [
+              "BNSF",
+              "$6 billion",
+              "2021"
+            ],
+            "accepted_passage_ids": [
+              "2021_p0031"
+            ],
+            "supporting_passage_ids": []
+          }
+        ],
+        "cited_passage_ids": [],
+        "has_gold_citation": false,
+        "forbidden_terms_found": [],
+        "refusal_correct": null
+      },
+      "provider_failures": [],
+      "provider_calls": 1,
+      "model_requests": [
+        {
+          "model": "buffett-qwen2.5-7b-ft-r1-q4_k_m.gguf",
+          "temperature": 0.0
+        }
+      ],
+      "used_filter": {
+        "multi_subquery": [
+          {
+            "year": 2021
+          },
+          {
+            "year": 2031
+          }
+        ]
+      },
+      "reranked": false,
+      "raw_answers": [
+        "The retrieved passages do not provide enough evidence to answer this question."
+      ],
+      "status": "scored",
+      "latency_ms": 2806.142
+    },
+    {
+      "qid": "hv3_31",
+      "query": "How much would exercising that purchase right cost, and how many shares did it cover?",
+      "history": [
+        {
+          "role": "user",
+          "content": "What unusual Bank of America position did Buffett describe in the 2013 letter?"
+        },
+        {
+          "role": "assistant",
+          "content": "Berkshire had a right to buy Bank of America shares before its option expired."
+        }
+      ],
+      "question_type": "follow_up",
+      "answer": "Berkshire has one major equity position that is not included in the table: We can buy 700 million shares of Bank of America at any time prior to September 2021 for $5 billion. [1]",
+      "citations": [
+        {
+          "marker": "[1]",
+          "passage_indices": [
+            0
+          ],
+          "raw_numbers": [
+            1
+          ],
+          "invalid_numbers": [],
+          "passage_ids": [
+            "2013_p0091"
+          ],
+          "years": [
+            2013
+          ],
+          "sources": [
+            "buffet_2013.pdf"
+          ]
+        }
+      ],
+      "passage_ids": [
+        "2013_p0091",
+        "2013_p0090",
+        "2013_p0092",
+        "2013_p0013",
+        "2013_p0012"
+      ],
+      "retrieved_passage_ids": [
+        "2013_p0091",
+        "2013_p0013",
+        "2013_p0095",
+        "2013_p0021",
+        "2013_p0020",
+        "2013_p0043",
+        "2013_p0060",
+        "2013_p0022"
+      ],
+      "required_claim_hits": [
+        {
+          "claim": "The Bank of America purchase right covered 700 million shares for $5 billion.",
+          "met": false,
+          "supporting_sentences": [],
+          "required_terms": [
+            "Bank of America",
+            "700 million shares",
+            "$5 billion"
+          ],
+          "accepted_passage_ids": [
+            "2013_p0091"
+          ],
+          "supporting_passage_ids": []
+        }
+      ],
+      "refusal_correct": null,
+      "score": {
+        "qid": "hv3_31",
+        "accepted": false,
+        "claim_coverage": 0.0,
+        "claims": [
+          {
+            "claim": "The Bank of America purchase right covered 700 million shares for $5 billion.",
+            "met": false,
+            "supporting_sentences": [],
+            "required_terms": [
+              "Bank of America",
+              "700 million shares",
+              "$5 billion"
+            ],
+            "accepted_passage_ids": [
+              "2013_p0091"
+            ],
+            "supporting_passage_ids": []
+          }
+        ],
+        "cited_passage_ids": [
+          "2013_p0091"
+        ],
+        "has_gold_citation": false,
+        "forbidden_terms_found": [],
+        "refusal_correct": null
+      },
+      "provider_failures": [],
+      "provider_calls": 1,
+      "model_requests": [
+        {
+          "model": "buffett-qwen2.5-7b-ft-r1-q4_k_m.gguf",
+          "temperature": 0.0
+        }
+      ],
+      "used_filter": {
+        "year": 2013
+      },
+      "reranked": false,
+      "raw_answers": [
+        "Berkshire has one major equity position that is not included in the table: We can buy 700 million shares of Bank of America at any time prior to September 2021 for $5 billion. [1]"
+      ],
+      "status": "scored",
+      "latency_ms": 4068.322
+    },
+    {
+      "qid": "hv3_32",
+      "query": "How much annual premium business had that operation already built?",
+      "history": [
+        {
+          "role": "user",
+          "content": "Who did Berkshire put in charge of its new specialty insurer, as recalled in 2015?"
+        },
+        {
+          "role": "assistant",
+          "content": "Peter Eastwood was put in charge of Berkshire Hathaway Specialty Insurance, or BHSI."
+        }
+      ],
+      "question_type": "follow_up",
+      "answer": "BHSI has already developed $1 billion of annual premium volume and, under Peter’s direction, is destined to become one of the world’s leading P/C insurers. [1]",
+      "citations": [
+        {
+          "marker": "[1]",
+          "passage_indices": [
+            0
+          ],
+          "raw_numbers": [
+            1
+          ],
+          "invalid_numbers": [],
+          "passage_ids": [
+            "2015_p0069"
+          ],
+          "years": [
+            2015
+          ],
+          "sources": [
+            "buffet_2015.pdf"
+          ]
+        }
+      ],
+      "passage_ids": [
+        "2015_p0069",
+        "2015_p0068",
+        "2015_p0070",
+        "2015_p0067",
+        "2015_p0009"
+      ],
+      "retrieved_passage_ids": [
+        "2015_p0069",
+        "2015_p0068",
+        "2015_p0009",
+        "2015_p0148",
+        "2015_p0035",
+        "2015_p0046",
+        "2015_p0070",
+        "2015_p0052"
+      ],
+      "required_claim_hits": [
+        {
+          "claim": "BHSI had developed $1 billion of annual premium volume.",
+          "met": true,
+          "supporting_sentences": [
+            "BHSI has already developed $1 billion of annual premium volume and, under Peter’s direction, is destined to become one of the world’s leading P/C insurers. [1]"
+          ],
+          "required_terms": [
+            "BHSI",
+            "$1 billion",
+            "annual premium volume"
+          ],
+          "accepted_passage_ids": [
+            "2015_p0069"
+          ],
+          "supporting_passage_ids": [
+            "2015_p0069"
+          ]
+        }
+      ],
+      "refusal_correct": null,
+      "score": {
+        "qid": "hv3_32",
+        "accepted": true,
+        "claim_coverage": 1.0,
+        "claims": [
+          {
+            "claim": "BHSI had developed $1 billion of annual premium volume.",
+            "met": true,
+            "supporting_sentences": [
+              "BHSI has already developed $1 billion of annual premium volume and, under Peter’s direction, is destined to become one of the world’s leading P/C insurers. [1]"
+            ],
+            "required_terms": [
+              "BHSI",
+              "$1 billion",
+              "annual premium volume"
+            ],
+            "accepted_passage_ids": [
+              "2015_p0069"
+            ],
+            "supporting_passage_ids": [
+              "2015_p0069"
+            ]
+          }
+        ],
+        "cited_passage_ids": [
+          "2015_p0069"
+        ],
+        "has_gold_citation": true,
+        "forbidden_terms_found": [],
+        "refusal_correct": null
+      },
+      "provider_failures": [],
+      "provider_calls": 1,
+      "model_requests": [
+        {
+          "model": "buffett-qwen2.5-7b-ft-r1-q4_k_m.gguf",
+          "temperature": 0.0
+        }
+      ],
+      "used_filter": {
+        "year": 2015
+      },
+      "reranked": false,
+      "raw_answers": [
+        "BHSI has already developed $1 billion of annual premium volume and, under Peter’s direction, is destined to become one of the world’s leading P/C insurers. [1]"
+      ],
+      "status": "scored",
+      "latency_ms": 3746.037
+    },
+    {
+      "qid": "hv3_33",
+      "query": "Did that financing carry interest while the money remained invested, and how many dollars arose from unrealized equity gains?",
+      "history": [
+        {
+          "role": "user",
+          "content": "What other financing source besides insurance float was highlighted in the 2018 letter?"
+        },
+        {
+          "role": "assistant",
+          "content": "Deferred income taxes were another funding source for Berkshire."
+        }
+      ],
+      "question_type": "follow_up",
+      "answer": "The retrieved passages do not provide enough evidence to answer this question.",
+      "citations": [],
+      "passage_ids": [
+        "2018_p0035",
+        "2018_p0034",
+        "2018_p0036",
+        "2018_p0050",
+        "2018_p0049"
+      ],
+      "retrieved_passage_ids": [
+        "2018_p0035",
+        "2018_p0050",
+        "2018_p0059",
+        "2018_p0048",
+        "2018_p0023",
+        "2018_p0081",
+        "2018_p0013",
+        "2018_p0053"
+      ],
+      "required_claim_hits": [
+        {
+          "claim": "Deferred income taxes were meanwhile interest-free liabilities.",
+          "met": false,
+          "supporting_sentences": [],
+          "required_terms": [
+            "deferred income taxes",
+            "interest-free"
+          ],
+          "accepted_passage_ids": [
+            "2018_p0059"
+          ],
+          "supporting_passage_ids": []
+        },
+        {
+          "claim": "About $14.7 billion of $50.5 billion of deferred taxes arose from unrealized gains in equity holdings.",
+          "met": false,
+          "supporting_sentences": [],
+          "required_terms": [
+            "$14.7 billion",
+            "$50.5 billion",
+            "unrealized"
+          ],
+          "accepted_passage_ids": [
+            "2018_p0059"
+          ],
+          "supporting_passage_ids": []
+        }
+      ],
+      "refusal_correct": null,
+      "score": {
+        "qid": "hv3_33",
+        "accepted": false,
+        "claim_coverage": 0.0,
+        "claims": [
+          {
+            "claim": "Deferred income taxes were meanwhile interest-free liabilities.",
+            "met": false,
+            "supporting_sentences": [],
+            "required_terms": [
+              "deferred income taxes",
+              "interest-free"
+            ],
+            "accepted_passage_ids": [
+              "2018_p0059"
+            ],
+            "supporting_passage_ids": []
+          },
+          {
+            "claim": "About $14.7 billion of $50.5 billion of deferred taxes arose from unrealized gains in equity holdings.",
+            "met": false,
+            "supporting_sentences": [],
+            "required_terms": [
+              "$14.7 billion",
+              "$50.5 billion",
+              "unrealized"
+            ],
+            "accepted_passage_ids": [
+              "2018_p0059"
+            ],
+            "supporting_passage_ids": []
+          }
+        ],
+        "cited_passage_ids": [],
+        "has_gold_citation": false,
+        "forbidden_terms_found": [],
+        "refusal_correct": null
+      },
+      "provider_failures": [],
+      "provider_calls": 1,
+      "model_requests": [
+        {
+          "model": "buffett-qwen2.5-7b-ft-r1-q4_k_m.gguf",
+          "temperature": 0.0
+        }
+      ],
+      "used_filter": {
+        "year": 2018
+      },
+      "reranked": false,
+      "raw_answers": [
+        "The retrieved passages do not provide enough evidence to answer this question."
+      ],
+      "status": "scored",
+      "latency_ms": 2121.588
+    },
+    {
+      "qid": "hv3_34",
+      "query": "What does he say really motivates those selling investments in that environment?",
+      "history": [
+        {
+          "role": "user",
+          "content": "How did the 2023 letter characterize changes in share trading?"
+        },
+        {
+          "role": "assistant",
+          "content": "Buffett described increasingly casino-like behavior, including in people's homes."
+        }
+      ],
+      "question_type": "follow_up",
+      "answer": "The retrieved passages do not provide enough evidence to answer this question.",
+      "citations": [],
+      "passage_ids": [
+        "2023_p0028",
+        "2023_p0027",
+        "2023_p0029",
+        "2023_p0039",
+        "2023_p0038"
+      ],
+      "retrieved_passage_ids": [
+        "2023_p0028",
+        "2023_p0039",
+        "2023_p0075",
+        "2023_p0029",
+        "2023_p0051",
+        "2023_p0004",
+        "2023_p0057",
+        "2023_p0030"
+      ],
+      "required_claim_hits": [
+        {
+          "claim": "Wall Street is driven by feverish activity, at which times whatever foolishness can be marketed will be vigorously marketed.",
+          "met": false,
+          "supporting_sentences": [],
+          "required_terms": [
+            "Wall Street",
+            "feverish activity",
+            "vigorously marketed"
+          ],
+          "accepted_passage_ids": [
+            "2023_p0021"
+          ],
+          "supporting_passage_ids": []
+        }
+      ],
+      "refusal_correct": null,
+      "score": {
+        "qid": "hv3_34",
+        "accepted": false,
+        "claim_coverage": 0.0,
+        "claims": [
+          {
+            "claim": "Wall Street is driven by feverish activity, at which times whatever foolishness can be marketed will be vigorously marketed.",
+            "met": false,
+            "supporting_sentences": [],
+            "required_terms": [
+              "Wall Street",
+              "feverish activity",
+              "vigorously marketed"
+            ],
+            "accepted_passage_ids": [
+              "2023_p0021"
+            ],
+            "supporting_passage_ids": []
+          }
+        ],
+        "cited_passage_ids": [],
+        "has_gold_citation": false,
+        "forbidden_terms_found": [],
+        "refusal_correct": null
+      },
+      "provider_failures": [],
+      "provider_calls": 0,
+      "model_requests": [],
+      "used_filter": {
+        "year": 2023
+      },
+      "reranked": false,
+      "raw_answers": [],
+      "status": "scored",
+      "latency_ms": 72.729
+    },
+    {
+      "qid": "hv3_35",
+      "query": "How can I make sourdough focaccia with an overnight cold proof?",
+      "history": [],
+      "question_type": "unanswerable",
+      "answer": "The retrieved passages do not provide enough evidence to answer this question.",
+      "citations": [],
+      "passage_ids": [
+        "2020_p0024",
+        "1991_p0034",
+        "2010_p0135",
+        "1985_p0099",
+        "2003_p0121"
+      ],
+      "retrieved_passage_ids": [
+        "2020_p0024",
+        "1991_p0034",
+        "2010_p0135",
+        "1985_p0099",
+        "2003_p0121",
+        "2010_p0161",
+        "1988_p0116",
+        "1990_p0095"
+      ],
+      "required_claim_hits": [],
+      "refusal_correct": true,
+      "score": {
+        "qid": "hv3_35",
+        "accepted": true,
+        "claim_coverage": null,
+        "claims": [],
+        "cited_passage_ids": [],
+        "has_gold_citation": false,
+        "forbidden_terms_found": [],
+        "refusal_correct": true
+      },
+      "provider_failures": [],
+      "provider_calls": 1,
+      "model_requests": [
+        {
+          "model": "buffett-qwen2.5-7b-ft-r1-q4_k_m.gguf",
+          "temperature": 0.0
+        }
+      ],
+      "used_filter": null,
+      "reranked": false,
+      "raw_answers": [
+        "The retrieved passages do not provide enough evidence to answer this question."
+      ],
+      "status": "scored",
+      "latency_ms": 3712.651
+    },
+    {
+      "qid": "hv3_36",
+      "query": "What temperature should I set for a bearded dragon's basking spot?",
+      "history": [],
+      "question_type": "unanswerable",
+      "answer": "The retrieved passages do not provide enough evidence to answer this question.",
+      "citations": [],
+      "passage_ids": [
+        "2002_p0121",
+        "1989_p0131",
+        "2014_p0211",
+        "2005_p0040",
+        "2002_p0119"
+      ],
+      "retrieved_passage_ids": [
+        "2002_p0121",
+        "1989_p0131",
+        "2014_p0211",
+        "2005_p0040",
+        "2002_p0119",
+        "1988_p0008",
+        "1986_p0127",
+        "2015_p0127"
+      ],
+      "required_claim_hits": [],
+      "refusal_correct": true,
+      "score": {
+        "qid": "hv3_36",
+        "accepted": true,
+        "claim_coverage": null,
+        "claims": [],
+        "cited_passage_ids": [],
+        "has_gold_citation": false,
+        "forbidden_terms_found": [],
+        "refusal_correct": true
+      },
+      "provider_failures": [],
+      "provider_calls": 0,
+      "model_requests": [],
+      "used_filter": null,
+      "reranked": false,
+      "raw_answers": [],
+      "status": "scored",
+      "latency_ms": 39.487
+    },
+    {
+      "qid": "hv3_37",
+      "query": "Using Buffett's 2019 letter, what was Apple's debt-service coverage ratio for that year?",
+      "history": [],
+      "question_type": "unanswerable",
+      "answer": "The retrieved passages do not provide enough evidence to answer this question.",
+      "citations": [],
+      "passage_ids": [
+        "2019_p0011",
+        "2019_p0033",
+        "2019_p0025",
+        "2019_p0014",
+        "2019_p0032"
+      ],
+      "retrieved_passage_ids": [
+        "2019_p0011",
+        "2019_p0033",
+        "2019_p0025",
+        "2019_p0014",
+        "2019_p0032",
+        "2019_p0015",
+        "2019_p0077",
+        "2019_p0040"
+      ],
+      "required_claim_hits": [],
+      "refusal_correct": true,
+      "score": {
+        "qid": "hv3_37",
+        "accepted": true,
+        "claim_coverage": null,
+        "claims": [],
+        "cited_passage_ids": [],
+        "has_gold_citation": false,
+        "forbidden_terms_found": [],
+        "refusal_correct": true
+      },
+      "provider_failures": [],
+      "provider_calls": 0,
+      "model_requests": [],
+      "used_filter": {
+        "year": 2019
+      },
+      "reranked": false,
+      "raw_answers": [],
+      "status": "scored",
+      "latency_ms": 49.309
+    },
+    {
+      "qid": "hv3_38",
+      "query": "How much underwriting profit did Berkshire report for 2031?",
+      "history": [],
+      "question_type": "unanswerable",
+      "answer": "The retrieved passages do not provide enough evidence to answer this question.",
+      "citations": [],
+      "passage_ids": [
+        "2001_p0038",
+        "2015_p0068",
+        "2016_p0059",
+        "1997_p0056",
+        "2017_p0042"
+      ],
+      "retrieved_passage_ids": [
+        "2001_p0038",
+        "2015_p0068",
+        "2016_p0059",
+        "1997_p0056",
+        "2017_p0042",
+        "2010_p0118",
+        "2002_p0049",
+        "2015_p0056"
+      ],
+      "required_claim_hits": [],
+      "refusal_correct": true,
+      "score": {
+        "qid": "hv3_38",
+        "accepted": true,
+        "claim_coverage": null,
+        "claims": [],
+        "cited_passage_ids": [],
+        "has_gold_citation": false,
+        "forbidden_terms_found": [],
+        "refusal_correct": true
+      },
+      "provider_failures": [],
+      "provider_calls": 1,
+      "model_requests": [
+        {
+          "model": "buffett-qwen2.5-7b-ft-r1-q4_k_m.gguf",
+          "temperature": 0.0
+        }
+      ],
+      "used_filter": null,
+      "reranked": false,
+      "raw_answers": [
+        "The retrieved passages do not provide enough evidence to answer this question."
+      ],
+      "status": "scored",
+      "latency_ms": 3893.545
+    },
+    {
+      "qid": "hv3_39",
+      "query": "What purchase price did Berkshire pay when it acquired Spotify, and how was the transaction funded?",
+      "history": [],
+      "question_type": "unanswerable",
+      "answer": "The retrieved passages do not provide enough evidence to answer this question.",
+      "citations": [],
+      "passage_ids": [
+        "1981_p0016",
+        "1983_p0102",
+        "1993_p0004",
+        "2012_p0114",
+        "1984_p0094"
+      ],
+      "retrieved_passage_ids": [
+        "1981_p0016",
+        "1983_p0102",
+        "1993_p0004",
+        "2012_p0114",
+        "1984_p0094",
+        "1999_p0064",
+        "2004_p0141",
+        "1996_p0104"
+      ],
+      "required_claim_hits": [],
+      "refusal_correct": true,
+      "score": {
+        "qid": "hv3_39",
+        "accepted": true,
+        "claim_coverage": null,
+        "claims": [],
+        "cited_passage_ids": [],
+        "has_gold_citation": false,
+        "forbidden_terms_found": [],
+        "refusal_correct": true
+      },
+      "provider_failures": [],
+      "provider_calls": 1,
+      "model_requests": [
+        {
+          "model": "buffett-qwen2.5-7b-ft-r1-q4_k_m.gguf",
+          "temperature": 0.0
+        }
+      ],
+      "used_filter": null,
+      "reranked": false,
+      "raw_answers": [
+        "The retrieved passages do not provide enough evidence to answer this question."
+      ],
+      "status": "scored",
+      "latency_ms": 3538.133
+    },
+    {
+      "qid": "hv3_40",
+      "query": "What was the difference in 2023 customer acquisition cost per new auto policy between GEICO and Progressive?",
+      "history": [],
+      "question_type": "unanswerable",
+      "answer": "The retrieved passages do not provide enough evidence to answer this question.",
+      "citations": [],
+      "passage_ids": [
+        "2023_p0028",
+        "2023_p0075",
+        "2023_p0039",
+        "2023_p0011",
+        "2023_p0010"
+      ],
+      "retrieved_passage_ids": [
+        "2023_p0028",
+        "2023_p0075",
+        "2023_p0039",
+        "2023_p0011",
+        "2023_p0010",
+        "2023_p0030",
+        "2023_p0040",
+        "2023_p0009"
+      ],
+      "required_claim_hits": [],
+      "refusal_correct": true,
+      "score": {
+        "qid": "hv3_40",
+        "accepted": true,
+        "claim_coverage": null,
+        "claims": [],
+        "cited_passage_ids": [],
+        "has_gold_citation": false,
+        "forbidden_terms_found": [],
+        "refusal_correct": true
+      },
+      "provider_failures": [],
+      "provider_calls": 0,
+      "model_requests": [],
+      "used_filter": {
+        "year": 2023
+      },
+      "reranked": false,
+      "raw_answers": [],
+      "status": "scored",
+      "latency_ms": 69.42
+    }
+  ]
+}

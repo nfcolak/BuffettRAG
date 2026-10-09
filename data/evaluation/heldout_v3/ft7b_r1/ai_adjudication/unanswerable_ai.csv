@@ -1,0 +1,13 @@
+row_id,arm,qid,auto_correct_refusal,judge_a,judge_a_note,judge_b,judge_b_note,ai_final
+u001,llama7b_ft,hv3_36,True,correct refusal,Declines without inventing an answer.,correct refusal,Declines with no invented answer.,correct refusal
+u002,llama7b_base,hv3_35,True,correct refusal,Declines without inventing an answer.,correct refusal,Declines with no invented answer.,correct refusal
+u003,llama7b_base,hv3_40,True,correct refusal,Declines without inventing an answer.,correct refusal,Declines with no invented answer.,correct refusal
+u004,llama7b_ft,hv3_39,True,correct refusal,Declines without inventing an answer.,correct refusal,Declines with no invented answer.,correct refusal
+u005,llama7b_base,hv3_38,True,correct refusal,Declines without inventing an answer.,correct refusal,Declines with no invented answer.,correct refusal
+u006,llama7b_base,hv3_39,True,correct refusal,Declines without inventing an answer.,correct refusal,Declines with no invented answer.,correct refusal
+u007,llama7b_ft,hv3_35,True,correct refusal,Declines without inventing an answer.,correct refusal,Declines with no invented answer.,correct refusal
+u008,llama7b_base,hv3_37,True,correct refusal,Declines without inventing an answer.,correct refusal,Declines with no invented answer.,correct refusal
+u009,llama7b_ft,hv3_40,True,correct refusal,Declines without inventing an answer.,correct refusal,Declines with no invented answer.,correct refusal
+u010,llama7b_base,hv3_36,True,correct refusal,Declines without inventing an answer.,correct refusal,Declines with no invented answer.,correct refusal
+u011,llama7b_ft,hv3_37,True,correct refusal,Declines without inventing an answer.,correct refusal,Declines with no invented answer.,correct refusal
+u012,llama7b_ft,hv3_38,True,correct refusal,Declines without inventing an answer.,correct refusal,Declines with no invented answer.,correct refusal
