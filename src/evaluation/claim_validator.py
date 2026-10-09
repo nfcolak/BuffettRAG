@@ -16,7 +16,7 @@ from src.evaluation.citation_faithfulness import lexical_support_score
 _CITATION_RE = re.compile(r"\[(\d+(?:\s*,\s*\d+)*)\]")
 _TOKEN_RE = re.compile(r"[A-Za-z0-9']+")
 _NUMBER_RE = re.compile(
-    r"(?<![\w.])(?P<currency>[$£€]?)\s*(?P<value>\d[\d,]*(?:\.\d+)?)"
+    r"(?<![\w.])(?P<currency>[$£€]?)\s*(?P<value>\d(?:[\d,]*\d)?(?:\.\d+)?)"
     r"(?:\s*(?P<scale>billion|million|thousand|bn|[mb])\b)?"
     r"\s*(?P<percent>%|percent\b|per\s+cent\b)?", re.I,
 )
