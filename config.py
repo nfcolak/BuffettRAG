@@ -136,8 +136,7 @@ RERANK_TOP_K = 8
 # Generation
 # -----------------------------------------------------------------------------
 LLM_MAX_NEW_TOKENS = 900
-# Providers: "llama" (embedded llama.cpp GGUF model) | "mlx" | "grounded". The extractive engine ("local") is an internal fallback only,
-# not selectable.
+# Providers: "llama" (embedded llama.cpp GGUF model) | "mlx" | "grounded". The extractive engine was removed.
 # No external API is used anywhere.
 DEFAULT_LLM_PROVIDER = os.getenv("DEFAULT_LLM_PROVIDER", "llama").strip().lower()
 LLM_MODEL_PATH = Path(os.getenv("LLM_MODEL_PATH", "models/ft/7b_r1/buffett-qwen2.5-7b-ft-r1-q4_k_m.gguf"))

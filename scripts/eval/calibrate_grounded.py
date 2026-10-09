@@ -5,9 +5,8 @@ Stages (one invocation each, all deterministic):
            provider), score every candidate window once with the real cross-encoder and cache the
            probabilities in GroundedSettings.CACHE_DIR (git-ignored); print the score distribution.
   grid     replay selection / decision / template compose / verify for T_RELEVANT x T_SLOT x MAX_UNITS from
-           the cache only (a missing score is an error, never re-scored); also run the extractive
-           baseline (provider local, BM25); write grid.csv; apply the fixed objective; write chosen.json
-           (or report BLOCKED-NO-FEASIBLE with the closest settings and write only grid.csv).
+           the cache only (a missing score is an error, never re-scored); write grid.csv; apply the fixed
+           objective; write chosen.json (or report BLOCKED-NO-FEASIBLE with the closest settings and write only grid.csv).
 
 Dev sets: heldout_v1, heldout_v2 (both spent), answer_benchmark_v3 and the 8 dev-only adversarial cases.
 heldout_v3 is never read.
@@ -47,7 +46,7 @@ from src.generation.grounded.template import TemplateComposer  # noqa: E402
 from src.generation.grounded.verify import DeterministicVerifier  # noqa: E402
 from src.generation.prompt import REFUSAL_LINE  # noqa: E402
 from src.retrieval.context import build_doc_lookup  # noqa: E402
-from src.storage import SearchHit, load_chunks_as_docs  # noqa: E402
+from src.storage import load_chunks_as_docs  # noqa: E402
 
 OUT_DIR = ROOT / "data/evaluation/grounded_dev_v1"
 DEV_SETS = {
@@ -123,18 +122,6 @@ def retrieve_contexts(runner, docs, cases):
         backend.ask(_request(backend, case))
         out[case["qid"]] = capture.calls[-1] if len(capture.calls) > before else \
             {"query": case["query"], "hits": [], "history": case.get("history", []), "max_new_tokens": 200}
-    return out
-
-
-def extractive_baseline(runner, docs, cases):
-    """Provider local (extractive), BM25, through the same backend.ask path."""
-    from src.generation.providers import create_llm_provider
-    backend = _backend_state(runner, docs, create_llm_provider(provider="local"))
-    out = {}
-    for case in cases:
-        response = backend.ask(_request(backend, case))
-        hits = [SearchHit(h.id, h.text, {"year": h.year, "source_file": h.source_file}, h.score) for h in response.hits]
-        out[case["qid"]] = {"answer": response.answer, "citations": response.citations, "hits": hits}
     return out
 
 
@@ -333,12 +320,11 @@ def _floats(text: str) -> List[float]:
     return [float(x) for x in text.split(",")]
 
 
-def feasibility(agg: Dict[str, Any], ext_abstain: int) -> Dict[str, Any]:
+def feasibility(agg: Dict[str, Any]) -> Dict[str, Any]:
     # plan section 6: correct refusals >= 5/6 of the PRE-EXISTING unanswerable dev cases; the dev-only
     # adversarial refusal cases are reported separately and are never part of the gate
     need = math.ceil(5 * agg["preexisting_unanswerable"] / 6)
     return {"zero_invalid": agg["invalid_markers"] == 0,
-            "abstain_ok": agg["abstain_answerable"] <= ext_abstain,
             "refusals_ok": agg["preexisting_refusals"] >= need, "refusals_needed": need}
 
 
@@ -351,11 +337,6 @@ def stage_grid(args) -> int:
     contexts = retrieve_contexts(runner, docs, cases)
     scorer = Scorer()
 
-    ext = extractive_baseline(runner, docs, cases)
-    ext_rows = [scorer.row(c, ext[c["qid"]]["answer"], ext[c["qid"]]["citations"], ext[c["qid"]]["hits"]) for c in cases]
-    ext_agg = aggregate(ext_rows)
-    print("extractive baseline:", json.dumps(ext_agg))
-
     t_rel, t_slot, units = _floats(args.t_relevant), _floats(args.t_slot), [int(x) for x in args.max_units.split(",")]
     results = []
     start = time.perf_counter()
@@ -364,8 +345,8 @@ def stage_grid(args) -> int:
         rows = run_setting(settings, cases, contexts, cache, scorer)
         agg = aggregate(rows)
         agg.update(T_RELEVANT=tr, T_SLOT=ts, MAX_UNITS=mu, NUMERIC_GUARD="bound")
-        agg.update(feasibility(agg, ext_agg["abstain_answerable"]))
-        agg["feasible"] = agg["zero_invalid"] and agg["abstain_ok"] and agg["refusals_ok"]
+        agg.update(feasibility(agg))
+        agg["feasible"] = agg["zero_invalid"] and agg["refusals_ok"]
         results.append((agg, rows))
         print(f"T_REL={tr} T_SLOT={ts} UNITS={mu} supported={agg['supported_met']}/{agg['required_claims']} "
               f"invalid={agg['invalid_markers']} abstain={agg['abstain_answerable']}/{agg['answerable']} "
@@ -385,8 +366,8 @@ def stage_grid(args) -> int:
             agg = aggregate(run_setting(settings, cases, contexts, cache, scorer))
             agg.update(T_RELEVANT=settings.T_RELEVANT, T_SLOT=settings.T_SLOT, MAX_UNITS=settings.MAX_UNITS,
                        NUMERIC_GUARD=guard)
-            agg.update(feasibility(agg, ext_agg["abstain_answerable"]))
-            agg["feasible"] = agg["zero_invalid"] and agg["abstain_ok"] and agg["refusals_ok"]
+            agg.update(feasibility(agg))
+            agg["feasible"] = agg["zero_invalid"] and agg["refusals_ok"]
             rows_out.append(agg)
 
     out_dir = Path(args.out_dir)
@@ -402,13 +383,14 @@ def stage_grid(args) -> int:
         writer.writerows(rows_out)
 
     dev_summary = {"sets": {n: sum(c["_set"] == n for c in cases) for n in DEV_SETS},
-                   "answerable": ext_agg["answerable"], "unanswerable": ext_agg["unanswerable"],
+                   "answerable": sum(not is_unanswerable_case(c) for c in cases),
+                   "unanswerable": sum(is_unanswerable_case(c) for c in cases),
                    "unanswerable_qids": sorted(c["qid"] for c in cases if is_unanswerable_case(c))}
     grid_axes = {"T_RELEVANT": t_rel, "T_SLOT": t_slot, "MAX_UNITS": units}
     if chosen is None:
         def violation(a):
-            return (a["invalid_markers"] > 0, max(0, a["abstain_answerable"] - ext_agg["abstain_answerable"])
-                    + max(0, a["refusals_needed"] - a["preexisting_refusals"]), -a["supported_met"])
+            return (a["invalid_markers"] > 0, max(0, a["refusals_needed"] - a["preexisting_refusals"]),
+                    -a["supported_met"])
         closest = sorted((a for a, _ in results), key=violation)[:5]
         print("BLOCKED-NO-FEASIBLE; closest settings:")
         for a in closest:
@@ -416,7 +398,7 @@ def stage_grid(args) -> int:
                                                       "preexisting_refusals", "preexisting_unanswerable",
                                                       "adversarial_refusals", "adversarial_unanswerable")})
         (Path(args.run_dir) / "blocked.json").write_text(json.dumps(
-            {"extractive": ext_agg, "closest": closest, "dev": dev_summary, "grid": grid_axes}), encoding="utf-8")
+            {"closest": closest, "dev": dev_summary, "grid": grid_axes}), encoding="utf-8")
         return 2
 
     best, best_rows = chosen
@@ -431,14 +413,12 @@ def stage_grid(args) -> int:
                                            "preexisting_refusals", "adversarial_unanswerable", "adversarial_refusals",
                                            "refusals_needed")},
         "constraints": {"zero_invalid_markers": best["zero_invalid"],
-                        "abstentions_le_extractive": best["abstain_ok"],
                         "correct_refusals_ge_5_6": best["refusals_ok"],
                         "refusal_denominator": best["preexisting_unanswerable"],
                         "refusal_rule": "correct refusals >= ceil(5/6 * pre-existing unanswerable dev cases); "
                                         "adversarial refusal cases are reported, never gated",
                         "refusals_needed": best["refusals_needed"]},
         "tie_break": "most supported claims; then fewer MAX_UNITS; then higher T_RELEVANT; then higher T_SLOT",
-        "extractive_baseline": ext_agg,
         "guard_comparison": {"bound": {k: best[k] for k in ("supported_met", "invalid_markers", "abstain_answerable",
                                                             "preexisting_refusals", "adversarial_refusals")},
                              "verbatim": {k: verbatim[k] for k in ("supported_met", "invalid_markers",
