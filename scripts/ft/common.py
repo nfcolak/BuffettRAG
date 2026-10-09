@@ -177,15 +177,17 @@ def split_for(year=None, key=''):
 
 
 class Teacher:
-    def __init__(self, deadline=None):
+    def __init__(self, deadline=None, path=None):
+        # `path` is opt-in (round 4 passes FT_TEACHER); v1-v3 keep the module default.
         self.deadline = deadline
+        self.path = Path(path) if path is not None else TEACHER
         import mlx.core as mx
         from mlx_lm import load
         self.mx = mx
-        if not TEACHER.is_dir():
-            raise RuntimeError(f'Teacher path missing: {TEACHER}')
-        self.model, self.tokenizer = load(str(TEACHER), trust_remote_code=False)
-        print(f'teacher_loaded={TEACHER}', flush=True)
+        if not self.path.is_dir():
+            raise RuntimeError(f'Teacher path missing: {self.path}')
+        self.model, self.tokenizer = load(str(self.path), trust_remote_code=False)
+        print(f'teacher_loaded={self.path}', flush=True)
 
     def generate(self, messages, key, max_tokens=350, temperature=.2):
         from mlx_lm import stream_generate
