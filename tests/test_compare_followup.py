@@ -69,7 +69,7 @@ def test_neighbor_evidence_has_its_own_citation_identity():
     assert EARLY not in context[0].text and context[1].text == EARLY
 
 
-@pytest.mark.parametrize("provider_name", ["local", "llama"])
+@pytest.mark.parametrize("provider_name", ["llama", "mlx"])
 def test_comparison_isolates_generation_validates_and_renumbers(provider_name):
     class Capture:
         def generate(self, prompt, max_new_tokens=None):
@@ -120,7 +120,6 @@ def test_followup_uses_last_user_terms_and_year_not_assistant_facts():
 
 def test_http_stream_and_pipeline_share_comparison_answers(monkeypatch):
     from fastapi.testclient import TestClient
-    from src.generation.providers.local_provider import LocalProvider
     from src.pipeline import BuffettRAGPipeline
     from src.retrieval.retriever import RetrievalResult
     from src.services import backend_app as backend, ask_flow
@@ -128,7 +127,12 @@ def test_http_stream_and_pipeline_share_comparison_answers(monkeypatch):
     class Fixed:
         def search(self, *args, **kwargs):
             return RetrievalResult(QUERY, "hybrid", passages)
-    llm = LocalProvider()
+    class Stub:
+        provider_name, model = "llama", "stub"
+
+        def generate(self, prompt, max_new_tokens=None):
+            return (EARLY if "(focus: 2041)" in prompt else LATE) + " [1]"
+    llm = Stub()
     monkeypatch.setattr(ask_flow, "_state", {"retriever": Fixed(), "llm": llm, "docs_by_id": {}})
     monkeypatch.setattr(backend, "API_KEYS", ())
     payload = {"query": QUERY, "expand_query": False}

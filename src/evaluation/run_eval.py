@@ -183,7 +183,7 @@ def parse_args() -> argparse.Namespace:
                    help="Also run end-to-end answer generation + faithfulness")
     p.add_argument("--answers-only", action="store_true",
                    help="Skip the retrieval matrix; only run answer faithfulness (implies --with-llm)")
-    p.add_argument("--provider", choices=["llama", "local"], default=None,
+    p.add_argument("--provider", choices=["llama", "mlx", "grounded"], default=None,
                    help="Answer engine for --with-llm (default: config)")
     p.add_argument("--top-k", type=int, default=10)
     return p.parse_args()

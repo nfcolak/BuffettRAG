@@ -9,7 +9,7 @@ from typing import Optional
 from config import DEFAULT_LLM_PROVIDER, LLM_MODEL_PATH
 from src.generation.providers.base import LLMProvider
 from src.generation.providers.llama_provider import LlamaCppProvider
-from src.generation.providers.local_provider import LocalProvider
+from src.generation.providers.unavailable import UnavailableProvider
 
 logger = logging.getLogger(__name__)
 
@@ -17,27 +17,26 @@ logger = logging.getLogger(__name__)
 def create_llm_provider(provider: Optional[str] = None) -> LLMProvider:
     """Create the answer provider: ``llama`` (default), ``mlx`` or ``grounded``.
 
-    The extractive engine (``local``) is no longer selectable; it is only the internal
-    fallback returned when the llama model file or ``llama_cpp`` is unavailable.
-    Evaluation code that needs it constructs ``LocalProvider()`` directly.
+    When the llama model file or ``llama_cpp`` is unavailable an
+    ``UnavailableProvider`` is returned: the backend still starts and search works,
+    while ``generate()`` raises. The extractive engine was removed; ``local`` and
+    ``extractive`` raise ``ValueError``.
     """
     selected = (provider or DEFAULT_LLM_PROVIDER).strip().lower()
 
     if selected == "llama":
         if not LLM_MODEL_PATH.is_file():
-            logger.warning("llama model file missing (%s); falling back to 'local' provider", LLM_MODEL_PATH)
-            return LocalProvider()
+            reason = f"llama model file missing ({LLM_MODEL_PATH})"
+            logger.warning("%s; answers are unavailable", reason)
+            return UnavailableProvider(reason)
         if importlib.util.find_spec("llama_cpp") is None:
-            logger.warning("llama_cpp is not importable; falling back to 'local' provider")
-            return LocalProvider()
+            reason = "llama_cpp is not importable"
+            logger.warning("%s; answers are unavailable", reason)
+            return UnavailableProvider(reason)
         return LlamaCppProvider()
 
-    if selected == "local":
-        raise ValueError(
-            "The extractive engine is no longer a selectable answer provider; use 'llama' "
-            "(it remains only as the internal fallback)."
-        )
-
+    if selected in ("local", "extractive"):
+        raise ValueError("The extractive engine was removed; use 'llama', 'mlx' or 'grounded'.")
     # Factory-local imports: grounded/mlx stay out of the import graph of old providers.
     if selected == "grounded":
         from src.generation.providers.grounded_provider import GroundedProvider

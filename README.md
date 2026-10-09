@@ -30,18 +30,12 @@ The final results are recorded in [`comparison.md`](data/evaluation/heldout_v1/f
 
 | System | Accepted | Required claims met | Correct refusals | Unexpected refusals | Provider failures | Mean latency ms |
 | --- | --- | --- | --- | --- | --- | --- |
-| Extractive local | 18/24 | 23/31 | 2/2 | 0 | 0 | 43.578 |
+| Past result: removed extractive engine | 18/24 | 23/31 | 2/2 | 0 | 0 | 43.578 |
 | Base Qwen2.5-1.5B | 3/24 | 2/31 | 2/2 | 18 | 0 | 1171.486 |
 | Fine-tuned round 1 | 5/24 | 4/31 | 2/2 | 7 | 0 | 652.433 |
 | Fine-tuned round 2 | 10/24 | 10/31 | 2/2 | 3 | 0 | 1139.950 |
 
-The extractive engine's fixes were diagnosed partly on this held-out set, so its 18/24 is optimistic. The LLM rows were not tuned on it. Latencies are measurements from these runs, not deployment guarantees.
-
-To rerun the extractive baseline without a model or database:
-
-```bash
-PYTHON_DOTENV_DISABLED=1 python scripts/eval/run_live_benchmark.py --provider local --retrieval bm25 --temperature 0 --cases data/evaluation/heldout_v1/answer_benchmark_heldout_v1.json --output data/evaluation/heldout_v1/local_bm25_rerun.json
-```
+The extractive engine (first row) was removed from the code and is no longer a runnable option; its row is a past result, and its fixes were diagnosed partly on this held-out set, so its 18/24 is optimistic. The LLM rows were not tuned on it. Latencies are measurements from these runs, not deployment guarantees.
 
 ## Quick start
 
@@ -69,11 +63,11 @@ The first backend start downloads the embedding model (~440MB) and the reranker 
 
 ## Embedded answer model
 
-Answers come from a small model that runs inside the backend process through llama.cpp (`llama-cpp-python`): Qwen2.5-7B-Instruct fine-tuned with LoRA on Kaggle (FT-r1), 4-bit GGUF (`q4_k_m`, about 4.7 GB). Without the file the backend falls back to the internal extractive engine. **No external API keys are used anywhere**: no OpenAI, Anthropic or OpenRouter calls, no per-request provider or key fields, and the frontend stores no keys.
+Answers come from a small model that runs inside the backend process through llama.cpp (`llama-cpp-python`): Qwen2.5-7B-Instruct fine-tuned with LoRA on Kaggle (FT-r1), 4-bit GGUF (`q4_k_m`, about 4.7 GB). Without the file the backend still starts and search keeps working, but `/ask` returns an "LLM unavailable" message. **No external API keys are used anywhere**: no OpenAI, Anthropic or OpenRouter calls, no per-request provider or key fields, and the frontend stores no keys.
 
 The GGUF is produced by the Kaggle/Colab LoRA notebook under `colab/`, is not downloadable, and is git-ignored; place it at `models/ft/7b_r1/buffett-qwen2.5-7b-ft-r1-q4_k_m.gguf`.
 
-Providers: `llama` (default), `grounded`, `mlx`. The extractive engine is an internal fallback only, not selectable: if `llama` is selected but the model file is missing or `llama_cpp` cannot be imported, the factory logs one line and falls back to it.
+Providers: `llama` (default), `grounded`, `mlx`. If `llama` is selected but the model file is missing or `llama_cpp` cannot be imported, the factory logs one warning and the backend runs without an answer engine: search works, `/ask` returns the "LLM unavailable" message.
 
 Latency: with Metal (`LLM_GPU_LAYERS=-1`) an answer takes a few seconds. On a CPU-only server (`LLM_GPU_LAYERS=0`) expect roughly 10 to 40 seconds per answer depending on cores. To keep the prompt inside what a 1.5B model handles, the prompt uses only the first `LLM_CONTEXT_PASSAGES` expanded passages (5 by default, 8 for 7B GGUF files), each cut around its anchor chunk to `LLM_PASSAGE_MAX_CHARS`, and trailing passages are dropped until the prompt fits `LLM_N_CTX` minus the answer budget (4 chars per token estimate). Citation numbers always match the passages shown.
 
@@ -152,7 +146,7 @@ For shared or public deployments there are separate hardening knobs.
 - `src/evaluation/`: Retrieval metrics, answer benchmarks and lexical claim validation.
 - `src/services/`: `backend_app` routes, `ask_flow`, request/response schemas and security.
 - `scripts/index/`: Index building, corpus audits and chunk validation.
-- `scripts/eval/`: Offline quality checks, ablations and answer/live benchmarks.
+- `scripts/eval/`: Ablations and answer/live benchmarks.
 - `scripts/ft/`: Teacher-data generation, leakage checks, LoRA training and GGUF export/evaluation.
 - `frontend/`: React/Vite answer and cited-passage interface.
 - `tests/`: Unit, regression and end-to-end smoke tests.
@@ -185,11 +179,10 @@ For shared or public deployments there are separate hardening knobs.
 └── tests/                  # unit and end-to-end smoke tests
 ```
 
-Tests run without a database (the llama smoke test runs only if the GGUF file exists) (install `pytest` for the regression suite). Deterministic offline diagnostics also use the tracked corpus and local extractive provider:
+Tests run without a database (the llama smoke test runs only if the GGUF file exists) (install `pytest` for the regression suite). Corpus audit:
 
 ```bash
 PYTHON_DOTENV_DISABLED=1 python -m pytest tests -q
-PYTHON_DOTENV_DISABLED=1 python scripts/eval/eval_offline_quality.py --output data/evaluation/offline.json
 PYTHON_DOTENV_DISABLED=1 python scripts/index/audit_corpus.py
 ```
 

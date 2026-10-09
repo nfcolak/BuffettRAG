@@ -12,7 +12,6 @@ from fastapi.testclient import TestClient
 
 from src.generation.prompt import REFUSAL_LINE
 from src.generation.providers.grounded_provider import GroundedProvider, ProviderUnavailable
-from src.generation.providers.local_provider import LocalProvider
 from src.retrieval.retriever import RetrievalResult
 from src.services import ask_flow, backend_app as backend
 from src.storage import SearchHit
@@ -42,6 +41,15 @@ class FakeGrounded:
 
     def generate(self, prompt, max_new_tokens=None):  # pragma: no cover - must never be reached
         raise AssertionError("old generation path used for grounded")
+
+
+class StubProvider:
+    """Stand-in for an ordinary (non-grounded) provider; generation must not be reached."""
+    provider_name = "llama"
+    model = "stub"
+
+    def generate(self, prompt, max_new_tokens=None):  # pragma: no cover
+        raise AssertionError("generation must not be reached")
 
 
 class Fixed:
@@ -117,10 +125,10 @@ def test_grounded_error_is_identical_on_both_routes(monkeypatch):
 
 
 def test_old_providers_keep_no_hit_and_stream_behaviour(monkeypatch):
-    ordinary, events, _ = run_routes(monkeypatch, LocalProvider(), [], {"query": "insurance float cost?"})
+    ordinary, events, _ = run_routes(monkeypatch, StubProvider(), [], {"query": "insurance float cost?"})
     assert ordinary["answer"] is None and events[-1] == ("done", {"answer": None, "citations": []})
     assert [d["stage"] for k, d in events if k == "status"] == ["retrieving"]
-    refused, events, _ = run_routes(monkeypatch, LocalProvider(), HITS, {"query": "moon cheese recipes?"})
+    refused, events, _ = run_routes(monkeypatch, StubProvider(), HITS, {"query": "moon cheese recipes?"})
     assert refused["answer"] == REFUSAL_LINE and events[-1][1]["answer"] == REFUSAL_LINE
 
 
@@ -139,7 +147,7 @@ def test_attach_resources_only_for_grounded():
     llm.attach_resources = lambda *, reranker: attached.append(reranker)
     retriever = Fixed(HITS)
     ask_flow.attach_grounded_resources(llm, retriever)
-    ask_flow.attach_grounded_resources(LocalProvider(), retriever)
+    ask_flow.attach_grounded_resources(StubProvider(), retriever)
     assert attached == [retriever.reranker]
 
 

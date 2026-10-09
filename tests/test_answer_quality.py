@@ -201,7 +201,7 @@ def test_http_and_streaming_use_the_same_real_evidence(monkeypatch):
     import json
     from fastapi.testclient import TestClient
     from src.services import backend_app as backend, ask_flow
-    from src.generation.providers.local_provider import LocalProvider
+    from src.generation.text_relevance import split_sentences
     from src.retrieval.context import build_doc_lookup
     from src.retrieval.retriever import RetrievalResult
     from src.storage import SearchHit
@@ -210,11 +210,15 @@ def test_http_and_streaming_use_the_same_real_evidence(monkeypatch):
     class FixedRetriever:
         def search(self, **kwargs):
             return RetrievalResult(kwargs['query'], 'hybrid', [hit])
+    class Quoting:
+        provider_name, model = 'llama', 'stub'
+        def generate(self, prompt, max_new_tokens=None):
+            return split_sentences(hit.text)[0] + ' [1]'
     monkeypatch.setattr(ask_flow, '_state', {'retriever': FixedRetriever(),
-                        'docs_by_id': build_doc_lookup(docs), 'llm': LocalProvider()})
+                        'docs_by_id': build_doc_lookup(docs), 'llm': Quoting()})
     monkeypatch.setattr(backend, 'API_KEYS', ())
     # No lifespan context: startup would load models/DB. HTTP serialization,
-    # real prompt/context, local generation, citation parsing and SSE are live.
+    # real prompt/context, stub generation, citation parsing and SSE are live.
     client = TestClient(backend.app)
     payload = {'query': 'How did insurance operations perform?', 'expand_query': False}
     response = client.post('/ask', json=payload)

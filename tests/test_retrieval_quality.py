@@ -64,14 +64,14 @@ class QueryExpansionTests(unittest.TestCase):
         expanded = expand_query("Middle East in letters?", FakeLLM())
         self.assertEqual(expanded, "Middle East in letters? Israel ISCAR OPEC")
 
-    def test_expand_query_skips_local_provider(self) -> None:
-        class FakeLocal:
-            provider_name = "local"
+    def test_expand_query_skips_unavailable_provider(self) -> None:
+        class FakeUnavailable:
+            provider_name = "unavailable"
 
             def generate(self, prompt, max_new_tokens=None):
                 raise AssertionError("should not be called")
 
-        self.assertIsNone(expand_query("anything", FakeLocal()))
+        self.assertIsNone(expand_query("anything", FakeUnavailable()))
 
     def test_expand_query_swallows_provider_errors(self) -> None:
         class Broken:

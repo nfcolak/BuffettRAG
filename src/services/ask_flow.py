@@ -28,7 +28,7 @@ from src.generation.prompt import (
 from src.generation.compare import comparison_periods, generate_comparison_answer, prepare_answer_context
 from src.generation.evidence_gate import assess_evidence
 from src.evaluation.claim_validator import validate_and_filter_answer
-from src.generation.providers import LocalProvider, create_llm_provider
+from src.generation.providers import create_llm_provider
 from src.retrieval.query_expansion import build_followup_retrieval_query, expand_query, expand_query_structured
 from src.retrieval.retriever import Retriever
 from src.services.schemas import AskRequest, HitOut, SearchRequest
@@ -192,11 +192,11 @@ def _finalize_answer(llm, prompt: str, context_hits, raw_answer: str, max_new_to
     model answers selects against justified abstention without new evidence.
     """
     answer = format_answer_markdown(strip_chat_artifacts(raw_answer))
-    if is_citation_only(answer) and getattr(llm, "provider_name", "") != "local":
-        # A bare "[5]" is a failed generation, not an answer or a refusal.
+    if is_citation_only(answer):
+        # A bare "[5]" is a failed generation, not an answer: refuse, with no citations.
         if EXPOSE_DEBUG_STATUS:
-            print(f"[backend] citation-only answer {answer!r}, falling back to local", flush=True)
-        answer = format_answer_markdown(LocalProvider().generate(prompt, max_new_tokens=max_new_tokens))
+            print(f"[backend] citation-only answer {answer!r}, refusing", flush=True)
+        return REFUSAL_LINE, []
     if answer == REFUSAL_LINE:
         return answer, []
     validation = validate_and_filter_answer(answer, context_hits)

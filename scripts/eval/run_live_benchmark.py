@@ -1,6 +1,6 @@
 """Run the real /ask path in-process; BM25 mode needs no downloaded models.
 
-The `local` provider is extractive, not a live LLM; `llama` is the embedded GGUF model
+`llama` is the embedded GGUF model
 (prompts are fitted by backend_app via fit_context_to_llm, as in the server). Scores are the existing
 claim-term/number/polarity and claim-specific citation checks, not an LLM judge.
 Provider failures are unscored and never enter the answer-quality denominator.
@@ -30,7 +30,7 @@ from src.evaluation.answer_benchmark import (
     is_unanswerable_case,
     validate_fixture_ids,
 )
-from src.generation.providers import LocalProvider, create_llm_provider
+from src.generation.providers import create_llm_provider
 from src.generation.prompt import REFUSAL_LINE
 from src.retrieval.context import build_doc_lookup
 from src.retrieval.retriever import Retriever
@@ -363,10 +363,7 @@ def run(
         config.LLM_TEMPERATURE = temperature
         if model_path is not None and (composer or provider) == "llama":
             config.LLM_MODEL_PATH = Path(model_path)
-        if provider == "local":
-            created = LocalProvider()  # evaluation-only: extractive engine for comparisons
-        else:
-            created = create_llm_provider(provider=provider)
+        created = create_llm_provider(provider=provider)
         if hasattr(created, "temperature"):
             created.temperature = temperature  # default arg was bound at import time
             if created.temperature != temperature:
@@ -462,7 +459,7 @@ def run(
     unanswerable_qids = {case["qid"] for case in selected_cases if is_unanswerable_case(case)}
     return {
         "schema_version": 1,
-        "mode": "offline_bm25_extractive_not_live_llm_quality" if provider == "local" and retrieval == "bm25" else "offline_bm25_embedded_llama" if provider == "llama" and retrieval == "bm25" else "in_process_ask_benchmark",
+        "mode": "offline_bm25_embedded_llama" if provider == "llama" and retrieval == "bm25" else "in_process_ask_benchmark",
         "execution_path": "src.services.backend_app.ask (no HTTP server)",
         "live_provider_run": llm is not None and any(row["model_requests"] for row in rows) and (
             llm.provider_name == "llama" or (grounded_run and composer != "template")),
@@ -499,7 +496,7 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--cases", type=Path, default=DEFAULT_CASES)
     parser.add_argument("--corpus", type=Path, default=CHUNKS_V3_FILE)
-    parser.add_argument("--provider", choices=("llama", "local", "grounded", "mlx"), default=DEFAULT_LLM_PROVIDER)
+    parser.add_argument("--provider", choices=("llama", "grounded", "mlx"), default=DEFAULT_LLM_PROVIDER)
     parser.add_argument("--composer", choices=COMPOSERS, default=None,
                         help="required with --provider grounded; there is no auto")
     parser.add_argument("--model-path", type=Path, default=None, help="absolute model path (llama/mlx/grounded)")

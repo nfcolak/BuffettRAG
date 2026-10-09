@@ -87,10 +87,9 @@ def expand_query(query: str, llm, history_text: str = "") -> Optional[str]:
     """Return ``query + keywords`` for retrieval, or None when unavailable.
 
     Never raises: any provider failure just means retrieval runs on the
-    original query. The embedded extractive provider cannot expand queries,
-    so it is skipped.
+    original query. A provider that cannot generate (``unavailable``) is skipped.
     """
-    if llm is None or getattr(llm, "provider_name", "") == "local":
+    if llm is None or getattr(llm, "provider_name", "") == "unavailable":
         return None
     history_block = f"\nRecent conversation:\n{history_text}\n" if history_text else ""
     try:
@@ -117,7 +116,7 @@ def expand_query_structured(query: str, llm, history_text: str = "") -> Optional
     The original question remains the first component of ``retrieval_query``;
     generated fields can only add candidates and cannot rewrite temporal/entity intent.
     """
-    if llm is None or getattr(llm, "provider_name", "") == "local":
+    if llm is None or getattr(llm, "provider_name", "") == "unavailable":
         return None
     prompt = (
         "Return JSON only: {\"terms\":[...],\"entities\":[...],\"years\":[...]} for "

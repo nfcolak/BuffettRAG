@@ -288,20 +288,6 @@ def test_streaming_never_emits_raw_unvalidated_llm_deltas(monkeypatch):
     assert "event: delta" not in response.text
 
 
-def test_v3_offline_answer_benchmark_accepts_all_curated_cases():
-    from scripts.eval.run_answer_benchmark import run
-
-    result = run(
-        Path("data/processed/chunks_v3_paragraph.jsonl"),
-        Path("data/evaluation/answer_quality_program/answer_benchmark_v3.json"),
-    )
-    assert result["n_cases"] == 8
-    assert result["accepted"] == 8
-    assert len(result["corpus_sha256"]) == 64
-    assert len(result["cases_sha256"]) == 64
-    assert result["answer_engine"] == {"provider": "local", "model": "embedded-extractive-v1"}
-
-
 def test_backend_prefers_structured_expansion_without_replacing_original_query(monkeypatch):
     from types import SimpleNamespace
     from src.services import ask_flow as backend
@@ -312,9 +298,9 @@ def test_backend_prefers_structured_expansion_without_replacing_original_query(m
         def search(self, **kwargs):
             seen.append(kwargs.get("retrieval_query"))
             return RetrievalResult(kwargs["query"], "hybrid", [_hit("p", "Apple repurchases in 2020.", 2020)])
-    class Local:
-        provider_name = "local"
-    monkeypatch.setattr(backend, "_state", {"retriever": FixedRetriever(), "docs_by_id": {}, "llm": Local()})
+    class Stub:
+        provider_name = "llama"
+    monkeypatch.setattr(backend, "_state", {"retriever": FixedRetriever(), "docs_by_id": {}, "llm": Stub()})
     monkeypatch.setattr(backend, "expand_query_structured", lambda *_args, **_kwargs: SimpleNamespace(retrieval_query="What did Apple do in 2020? investment Apple 2020"))
     monkeypatch.setattr(backend, "EXPANSION_MODE", "always")
     backend._prepare_ask(backend.AskRequest(query="What did Apple do in 2020?"))
@@ -475,28 +461,6 @@ def test_answer_benchmark_requires_claim_level_gold_citation_and_polarity():
     assert evaluate_answer("Revenue was $10. [1] Costs were $7. [2]", paired_hits, paired_case)["accepted"]
 
 
-def test_local_provider_honors_tiny_output_budget():
-    from src.generation.providers.local_provider import LocalProvider
-
-    long_sentence = "Insurance " + ("performed strongly " * 300) + "."
-    prompt = (
-        "BEGIN USER QUESTION\nQuestion: How did insurance perform?\n\n"
-        f"[1] (year=2024)\n{long_sentence}\n\nEND UNTRUSTED PASSAGES"
-    )
-    answer = LocalProvider().generate(prompt, max_new_tokens=1)
-    assert len(answer) <= 4 or "enough evidence" in answer
-
-    bounded_prompt = (
-        "BEGIN USER QUESTION\nQuestion: How did insurance performance improve?\n\n"
-        "[1] (year=2024)\n"
-        "Insurance performance improved improved . "
-        "Insurance performance improved improved improved .\n\n"
-        "END UNTRUSTED PASSAGES"
-    )
-    bounded = LocalProvider().generate(bounded_prompt, max_new_tokens=25)
-    assert len(bounded) <= 25 * 4
-
-
 def test_demo_evidence_html_escapes_backend_supplied_text():
     from src.services.demo_security import render_evidence_html
 
@@ -570,7 +534,14 @@ def test_live_runner_smoke_uses_backend_ask_and_restores_state(monkeypatch):
         calls.append(req)
         return real_ask(req)
     monkeypatch.setattr(backend, "ask", capture)
-    result = run(provider="local", retrieval="bm25", max_cases=1)
+
+    class StubProvider:
+        provider_name, model = "stub", "unit-stub"
+
+        def generate(self, *_args, **_kwargs):
+            return "Insurance float is described in the retrieved letters. [1]"
+    monkeypatch.setattr("scripts.eval.run_live_benchmark.create_llm_provider", lambda **_kw: StubProvider())
+    result = run(provider="llama", retrieval="bm25", max_cases=1)
     assert len(calls) == 1 and not hasattr(calls[0], "llm_provider")
     assert ask_flow._state is old_state
     assert result["summary"]["cases_run"] == 1
@@ -594,19 +565,19 @@ def test_live_runner_checks_unselected_fixture_ids_before_provider(monkeypatch):
         raise AssertionError("Missing fixtures must fail before provider initialization")
     monkeypatch.setattr(runner, "create_llm_provider", forbidden_factory)
     with pytest.raises(ValueError, match="Missing fixture passage IDs: 2022_p0021"):
-        runner.run(provider="local", retrieval="bm25", max_cases=1)
+        runner.run(provider="llama", retrieval="bm25", max_cases=1)
 
 
 def test_live_runner_separates_provider_failure_without_leaking_error(monkeypatch):
     from scripts.eval import run_live_benchmark as runner
 
     class FailingProvider:
-        provider_name = "local"
+        provider_name = "stub"
         model = "unit-failure"
         def generate(self, *_args, **_kwargs):
             raise RuntimeError("provider body containing a secret must not be persisted")
-    monkeypatch.setattr(runner, "LocalProvider", lambda: FailingProvider())  # --provider local builds LocalProvider directly
-    result = runner.run(provider="local", retrieval="bm25", max_cases=1)
+    monkeypatch.setattr(runner, "create_llm_provider", lambda **_kw: FailingProvider())
+    result = runner.run(provider="llama", retrieval="bm25", max_cases=1)
     assert result["summary"]["provider_failures"] == 1
     assert result["summary"]["scored_answers"] == 0
     assert result["summary"]["acceptance_rate"] is None
