@@ -1,0 +1,101 @@
+{
+  "corpus_sha256": "8263f08958729a77febf0922e7bbc4161bedd5fdb3e9a8b3fc9a64ab681ab5f0",
+  "counts_per_split": {
+    "train": 899,
+    "valid": 101
+  },
+  "counts_per_split_kind": {
+    "train": {
+      "distractor": 59,
+      "followup": 105,
+      "multipart": 275,
+      "single": 224,
+      "temporal": 174,
+      "unanswerable": 62
+    },
+    "valid": {
+      "distractor": 3,
+      "followup": 15,
+      "multipart": 25,
+      "single": 26,
+      "temporal": 26,
+      "unanswerable": 6
+    }
+  },
+  "excluded_passage_count": 498,
+  "frozen_set_hashes": {
+    "agent/fix-eval:data/evaluation/heldout_v1/answer_benchmark_heldout_v1.json": "deea734a5b50816283aa671f9c461ce4a16d707cb41e4487c2bdd7935a5ce718",
+    "data/evaluation/answer_quality_program/answer_benchmark_v3.json": "2832d202750db493cff5e7a38f9353d8e734f5e9d85f0347e5f436f82c94de8a",
+    "data/evaluation/heldout_v2/answer_benchmark_heldout_v2.json": "642501e574649d73ebada40740137d52030d051c66f4827c19144a0d4cf5b609",
+    "data/evaluation/heldout_v3/answer_benchmark_heldout_v3.json": "23f3a71930ce761412a1366e313bd319c5c36ec9454538ca1f0b9d4beea1baf3"
+  },
+  "heldout_exclusions": "dev, heldout_v1, heldout_v2, heldout_v3 (ids), heldout_v4 (checker) with +-1 neighbours",
+  "heldout_v4_excluded_sha256": "796da8d55646a479431c75c6dae63d203fcffa54d431939fc61a8fa975259a24",
+  "kept_per_category": {
+    "followup": 120,
+    "multipart": 300,
+    "refusal": 130,
+    "single": 250,
+    "temporal": 200
+  },
+  "natural_retrieval_share": 0.854,
+  "passages_per_prompt": {
+    "0": 4,
+    "5": 4,
+    "6": 3,
+    "7": 12,
+    "8": 977
+  },
+  "pilot": false,
+  "prompt_chars_max": 19448,
+  "prompt_chars_p95": 19232,
+  "quotas": {
+    "followup": 120,
+    "multipart": 300,
+    "refusal": 130,
+    "single": 250,
+    "temporal": 200
+  },
+  "refusal_share": 0.13,
+  "refusals_gate_sufficient": 95,
+  "rejection_reasons": {
+    "answerable_refusal": 17,
+    "banned_filler": 15,
+    "evidence_gate_insufficient": 181,
+    "missing_or_invalid_sentence_citation": 30,
+    "missing_part_found_in_context": 3,
+    "no_cited_sentence": 3,
+    "refusal_expected_teacher_answered": 36,
+    "requested_part_missing_or_source_wording_changed": 26,
+    "source_evidence_not_in_context": 87,
+    "too_many_sentences": 1,
+    "unrequested_absent_statement": 16,
+    "validator_dropped_sentence": 11
+  },
+  "seed": 13,
+  "settings": {
+    "max_chars": 9000,
+    "max_new_tokens": 900,
+    "max_passages": 8,
+    "n_ctx": 8192,
+    "neighbors": 1,
+    "passage_max_chars": 1800,
+    "prompt_revision": 1,
+    "retrieval": "bm25 top 8 (serving-style year/period handling)",
+    "split_strategy": "seeded source-year grouping (~10% valid years); retrieval stays inside each split",
+    "teacher_max_tokens": 600,
+    "temperature": 0.1
+  },
+  "style": "v4",
+  "target_met": true,
+  "target_new_examples": 1000,
+  "teacher_id": "/Users/necatifurkancolak/AI-Workplace/Projects/done/BuffettRAG/models/teacher-qwen2.5-14b-mlx4",
+  "teacher_license": "Apache-2.0",
+  "validation_years": [
+    1988,
+    1993,
+    1995,
+    2018,
+    2020
+  ]
+}

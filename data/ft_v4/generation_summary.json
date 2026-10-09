@@ -1,0 +1,30 @@
+{
+  "keep_rate": 0.8635578583765112,
+  "kept_per_category": {
+    "followup": 120,
+    "multipart": 300,
+    "refusal": 130,
+    "single": 250,
+    "temporal": 200
+  },
+  "new_kept": 1000,
+  "output": "/Users/necatifurkancolak/AI-Workplace/Projects/done/BuffettRAG/data/ft_v4",
+  "pilot": false,
+  "rejection_reasons": {
+    "answerable_refusal": 17,
+    "banned_filler": 15,
+    "evidence_gate_insufficient": 181,
+    "missing_or_invalid_sentence_citation": 30,
+    "missing_part_found_in_context": 3,
+    "no_cited_sentence": 3,
+    "refusal_expected_teacher_answered": 36,
+    "requested_part_missing_or_source_wording_changed": 26,
+    "source_evidence_not_in_context": 87,
+    "too_many_sentences": 1,
+    "unrequested_absent_statement": 16,
+    "validator_dropped_sentence": 11
+  },
+  "teacher_answers": 1158,
+  "teacher_seconds": 6923.71868617821,
+  "wall_seconds": 10149.268734959012
+}
