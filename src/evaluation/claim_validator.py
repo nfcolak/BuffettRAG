@@ -34,7 +34,7 @@ _IGNORE = frozenset(
     "buffett warren berkshire hathaway said says wrote writes argued noted explained according "
     "called predicted letter letters shareholders he his him".split()
 )
-_SPLIT_RE = re.compile(r"([.!?](?:[ \t]*\[\d+(?:\s*,\s*\d+)*\])*)[ \t]+(?=[A-Z0-9\"'“‘(])")
+_SPLIT_RE = re.compile(r"([.!?](?:[ \t]*\[\d+(?:\s*,\s*\d+)*\])*)[ \t]+(?=(?:[o•▪◦][ \t]+)?[A-Z0-9\"'“‘(])")
 _ABBREVIATIONS = frozenset({"mr", "mrs", "ms", "dr", "prof", "st", "jr", "sr", "vs"})
 _MIN_COVERAGE = 0.6
 
@@ -105,7 +105,25 @@ def evidence_sentences(text: str) -> List[str]:
             joined[-1] += " " + part
         else:
             joined.append(part)
-    return joined
+    # PDF bullet glyphs ("o ", "•") that opened a sentence are layout, not text.
+    return [re.sub(r"^[o•▪◦]\s+(?=[A-Z0-9\"'“‘(])", "", part) for part in joined]
+
+
+def _evidence_units(passage: str) -> List[str]:
+    """Evidence sentences plus their clauses (split exactly like claims are).
+
+    Claims are checked clause by clause, so the evidence must be checkable at the
+    same granularity: a claim clause is compared with the clause that states it,
+    not with a neighbouring clause's negation or numbers. Every unit still has to
+    satisfy the full coverage/quantity/entity/polarity rules on its own.
+    """
+    units: List[str] = []
+    for sentence in evidence_sentences(passage):
+        units.append(sentence)
+        clauses = split_claims(sentence)
+        if len(clauses) > 1:
+            units.extend(clauses)
+    return units
 
 
 def split_claims(text: str) -> List[str]:
@@ -147,7 +165,7 @@ def _deterministic_agreement(claim: str, passage: str) -> tuple[bool, float]:
     }
     needed = 1.0 if len(claim_content) <= 3 else _MIN_COVERAGE
     best_score = 0.0
-    for sentence in evidence_sentences(_normalize(passage)):
+    for sentence in _evidence_units(_normalize(passage)):
         evidence_set = {token.lower() for token in _TOKEN_RE.findall(sentence)}
         coverage = len(claim_content & evidence_set) / len(claim_content) if claim_content else 0.0
         best_score = max(best_score, lexical_support_score(normalized_claim, sentence), coverage)
