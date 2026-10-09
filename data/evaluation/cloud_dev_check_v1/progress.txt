@@ -11,3 +11,9 @@ RERUN llama_ftr2_guard: first run used the base model (model path not applied); 
 START llama_ftr2_guard 2026-10-06T16:27:11Z
 END llama_ftr2_guard exit=0 seconds=2580
 ALL_DONE 2026-10-06T17:10:11Z
+START llama7b_base 2026-10-09T08:50:23Z
+END llama7b_base exit=0 seconds=437
+START llama7b_ft 2026-10-09T08:57:40Z
+END llama7b_ft exit=0 seconds=405
+ALL_DONE 2026-10-09T09:04:25Z
+NOTE llama7b_base/llama7b_ft (2026-10-09): run on the local Mac (Mac17,8, 24 GB) with Metal GPU, LLM_GPU_LAYERS=-1, not on the 18-vCPU cloud CPU; their latencies are not comparable with arms 1-5. Models: Kaggle T4 unsloth q4_k_m GGUFs, base sha256 7be44a6c3790cbeff4619c4e860f76ede5a3c4a1b97d853c75dc70f482ac85cc, FT-r1 sha256 ec41100e1457ffc88289d42c9c56de5bddb648c511db693cb75fd2d628182ec1.

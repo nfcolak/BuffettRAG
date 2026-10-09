@@ -154,6 +154,66 @@
         "p95": 59975.7,
         "mean": 36579.534
       }
+    },
+    {
+      "name": "llama7b_base",
+      "label": "llama base Qwen2.5-7B",
+      "code": "branch",
+      "provider": "llama",
+      "model": "qwen2.5-7b-instruct-q4_k_m.gguf",
+      "cases_run": 80,
+      "scored_answers": 80,
+      "lexical_accepted": 15,
+      "nli_accepted": 13,
+      "nli_claims_met": 14,
+      "nli_required_claims": 95,
+      "strict_supported_claims_met": 5,
+      "strict_required_claims": 95,
+      "context_id_mismatches": 0,
+      "unanswerable_cases": 9,
+      "correct_refusals": 8,
+      "answerable_cases": 71,
+      "unexpected_refusals": 43,
+      "abstain_answerable": 50,
+      "citation_only_caught_by_guard": 0,
+      "citation_only_qids": [],
+      "provider_failures": 0,
+      "latency_ms": {
+        "n": 80,
+        "p50": 5572.7,
+        "p95": 9712.4,
+        "mean": 5390.029
+      }
+    },
+    {
+      "name": "llama7b_ft",
+      "label": "llama FT-r1 7B (ft_v3, LoRA)",
+      "code": "branch",
+      "provider": "llama",
+      "model": "buffett-qwen2.5-7b-ft-r1-q4_k_m.gguf",
+      "cases_run": 80,
+      "scored_answers": 80,
+      "lexical_accepted": 44,
+      "nli_accepted": 31,
+      "nli_claims_met": 44,
+      "nli_required_claims": 95,
+      "strict_supported_claims_met": 42,
+      "strict_required_claims": 95,
+      "context_id_mismatches": 0,
+      "unanswerable_cases": 9,
+      "correct_refusals": 8,
+      "answerable_cases": 71,
+      "unexpected_refusals": 13,
+      "abstain_answerable": 15,
+      "citation_only_caught_by_guard": 0,
+      "citation_only_qids": [],
+      "provider_failures": 0,
+      "latency_ms": {
+        "n": 80,
+        "p50": 5117.3,
+        "p95": 8233.7,
+        "mean": 4981.089
+      }
     }
   ]
 }
