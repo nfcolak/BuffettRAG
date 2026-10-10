@@ -59,8 +59,10 @@ KEEP_RATE = .85
 NATURAL_MISS_SHARE = .10
 MAX_ANSWER_TOKENS = 600
 
-STYLE_V5 = ('\nAnswer every part of the question in 1-2 sentences per part, each sentence ending with its [n] citation, '
-            "using the passages' own wording where possible. If a part is truly not in the passages, say so in one sentence.")
+STYLE_V5 = ('\nAnswer every part of the question. Write one fact per sentence; each sentence must restate ONE passage sentence closely, '
+            "reusing that sentence's own words and numbers. Shorten it if needed; do not merge two passage sentences into one. "
+            'End each sentence with exactly one citation [n], never multiple citations such as [1,3]. '
+            'If a part is truly not in the passages, say so in one short sentence.')
 CITATION = re.compile(r'\[\d+(?:\s*,\s*\d+)*\]')
 BULLET = re.compile(r'^\s*(?:[-*]|\d+\.)\s+')
 GAP = re.compile(r"\b(?:do(?:es)?\s+not|don't|doesn't|never)\s+(?:state|say|provide|mention|cover|address|specify|include|give|describe|report|"
@@ -545,7 +547,7 @@ ANSWER_RETRY = {
     'refusal_mixed_with_answer': 'either answer from the passages or give the refusal line alone, never both',
     'banned_filler': 'do not start sentences with Additionally, Furthermore, Moreover or Therefore',
     'no_cited_sentence': 'every sentence needs a [n] citation',
-    'validator_dropped_over_15pct': 'more than 15% of your sentences were not supported by the passage they cite; stay close to the passages\' own wording and cite the passage that states it',
+    'validator_dropped_over_15pct': 'more than 15% of your sentences were not supported by the passage they cite; each sentence must restate a single passage sentence in that passage\'s own words, one [n] each',
     'part_not_covered': 'every part of the question needs its own cited sentence that uses the passages\' own key words',
     'gap_for_served_part': 'a "not stated" sentence is only allowed for a part the passages really do not contain',
     'unmatched_gap_sentence': 'a "not stated" sentence must name the part of the question it refers to',
