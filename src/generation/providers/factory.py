@@ -6,7 +6,8 @@ import importlib.util
 import logging
 from typing import Optional
 
-from config import DEFAULT_LLM_PROVIDER, LLM_MODEL_PATH
+import config
+from config import DEFAULT_LLM_PROVIDER
 from src.generation.providers.base import LLMProvider
 from src.generation.providers.llama_provider import LlamaCppProvider
 from src.generation.providers.unavailable import UnavailableProvider
@@ -25,15 +26,16 @@ def create_llm_provider(provider: Optional[str] = None) -> LLMProvider:
     selected = (provider or DEFAULT_LLM_PROVIDER).strip().lower()
 
     if selected == "llama":
-        if not LLM_MODEL_PATH.is_file():
-            reason = f"llama model file missing ({LLM_MODEL_PATH})"
+        path = config.LLM_MODEL_PATH
+        if not path.is_file():
+            reason = f"llama model file missing ({path})"
             logger.warning("%s; answers are unavailable", reason)
             return UnavailableProvider(reason)
         if importlib.util.find_spec("llama_cpp") is None:
             reason = "llama_cpp is not importable"
             logger.warning("%s; answers are unavailable", reason)
             return UnavailableProvider(reason)
-        return LlamaCppProvider()
+        return LlamaCppProvider(model_path=path)
 
     if selected in ("local", "extractive"):
         raise ValueError("The extractive engine was removed; use 'llama', 'mlx' or 'grounded'.")
