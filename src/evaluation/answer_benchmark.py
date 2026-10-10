@@ -2,17 +2,63 @@
 from __future__ import annotations
 
 import re
-from typing import Any, Dict, Sequence
+from typing import Any, Dict, List, Sequence
 
 from src.evaluation.citation_faithfulness import split_sentences
 
 _CITATION_RE = re.compile(r"\[(\d+(?:\s*,\s*\d+)*)\]")
 _NUMBER_RE = re.compile(r"(?<![A-Za-z])\$?\d[\d,]*(?:\.\d+)?%?(?:bn|m|b)?", re.I)
 _NEGATIONS = frozenset({"no", "not", "never", "neither", "nor", "without"})
+# Predicate negation. A bare "no" is NOT here: idioms ("no matter", "no doubt", "of no importance") are not
+# negations, so "no" counts only directly before a claim required term (see _has_negation).
 _PREDICATE_NEGATION_RE = re.compile(
-    r"\b(?:is|are|was|were|did|does|do|has|have|had|will|would|can|could)\s+not\b|\bnever\b|\bno\s+[A-Za-z]",
+    r"\b(?:is|are|was|were|did|does|do|has|have|had|will|would|can|could|should|shall|must|may|might)\s+not\b"
+    r"|\bcannot\b|\bnever\b|\bno\s+longer\b",
     re.I,
 )
+# Contractions become their spelled-out form before the negation check.
+_CONTRACTION_RES = (
+    (re.compile(r"\bwon[\u2019']t\b", re.I), "will not"),
+    (re.compile(r"\bcan[\u2019']t\b", re.I), "can not"),
+    (re.compile(r"\bshan[\u2019']t\b", re.I), "shall not"),
+    (re.compile(r"(?<=[A-Za-z])n[\u2019']t\b", re.I), " not"),
+)
+# Clause boundaries: , ; : ( ) and but/although/while. A comma between digits ("$21,904,000") is not one.
+_CLAUSE_SPLIT_RE = re.compile(r"(?<!\d),|,(?!\d)|[;:()]|\b(?:but|although|while)\b", re.I)
+
+
+def _normalise_contractions(text: str) -> str:
+    for pattern, replacement in _CONTRACTION_RES:
+        text = pattern.sub(replacement, text)
+    return text
+
+
+def _has_negation(text: str, terms: Sequence[str] = ()) -> bool:
+    text = _normalise_contractions(text)
+    if _PREDICATE_NEGATION_RE.search(text):
+        return True
+    lowered = text.lower()
+    for term in terms:
+        term = term.lower()
+        if not term:
+            continue
+        if term.startswith("no ") and term in lowered:  # the required term itself is the "no X" phrase
+            return True
+        if re.search(r"\bno\s+" + re.escape(term), lowered):
+            return True
+    return False
+
+
+def _best_clauses(sentence: str, terms: Sequence[str]) -> List[str]:
+    """The clause(s) of the sentence containing the most required terms (all of them on a tie)."""
+    clauses = [c for c in _CLAUSE_SPLIT_RE.split(sentence) if c and c.strip()]
+    if not clauses:
+        return [sentence]
+    lowered_terms = [t.lower() for t in terms if t]
+    counts = [sum(t in c.lower() for t in lowered_terms) for c in clauses]
+    if max(counts) == 0:  # terms straddle clause boundaries: judge the whole sentence
+        return [sentence]
+    return [c for c, n in zip(clauses, counts) if n == max(counts)]
 
 
 def validate_benchmark_case(case: Dict[str, Any]) -> None:
@@ -38,11 +84,20 @@ def _sentence_cited_ids(sentence: str, hits: Sequence[Any]) -> set[str]:
     return {hits[index].id for index in indexes if 0 <= index < len(hits)}
 
 
-def _polarity_and_numbers_agree(reference: str, sentence: str) -> bool:
-    if bool(_PREDICATE_NEGATION_RE.search(reference)) != bool(_PREDICATE_NEGATION_RE.search(sentence)):
+def _polarity_and_numbers_agree(reference: str, sentence: str, terms: Sequence[str] = (),
+                                extra_numbers: Sequence[str] = ()) -> bool:
+    """Polarity is compared inside the sentence clause holding the most claim required terms.
+
+    `extra_numbers` (e.g. the year of a stripped, hit-supported label) count for the number check only.
+    """
+    # On a tie between clauses every tied clause must agree (a tie never relaxes the check).
+    clauses = _best_clauses(_normalise_contractions(sentence), terms)
+    reference_negative = _has_negation(reference, terms)
+    if any(_has_negation(clause, terms) != reference_negative for clause in clauses):
         return False
     expected_numbers = {value.lower().replace(",", "") for value in _NUMBER_RE.findall(reference)}
     actual_numbers = {value.lower().replace(",", "") for value in _NUMBER_RE.findall(sentence)}
+    actual_numbers.update(str(value).lower().replace(",", "") for value in extra_numbers)
     return expected_numbers.issubset(actual_numbers)
 
 
@@ -65,7 +120,7 @@ def evaluate_answer(answer: str, hits: Sequence[Any], case: Dict[str, Any]) -> D
             cited_gold = bool(_sentence_cited_ids(sentence, hits) & claim_gold_ids)
             if (
                 all(term in sentence_lc for term in terms)
-                and _polarity_and_numbers_agree(claim["claim"], sentence)
+                and _polarity_and_numbers_agree(claim["claim"], sentence, terms)
                 and (not require_citation or cited_gold)
             ):
                 matching.append(sentence)

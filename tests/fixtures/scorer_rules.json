@@ -1,0 +1,126 @@
+{
+ "source": "data/evaluation/grounded_dev_v1/confirm/dev_cases.json + data/processed/chunks_v3_paragraph.jsonl (copied verbatim)",
+ "cases": [
+  {
+   "qid": "ho01_1977_operating_earnings",
+   "query": "What were Berkshire's total operating earnings and operating earnings per share in 1977?",
+   "gold_passage_ids": [
+    "1977_p0000"
+   ],
+   "gold_claims": [
+    {
+     "claim": "Operating earnings were $21,904,000.",
+     "required_terms": [
+      "operating earnings",
+      "$21,904,000"
+     ],
+     "gold_passage_ids": [
+      "1977_p0000"
+     ]
+    },
+    {
+     "claim": "Operating earnings were $22.54 per share.",
+     "required_terms": [
+      "$22.54",
+      "share"
+     ],
+     "gold_passage_ids": [
+      "1977_p0000"
+     ]
+    }
+   ],
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": true
+   },
+   "reject": {
+    "forbidden_terms": []
+   }
+  },
+  {
+   "qid": "ho22_1988_2022_coca_cola_comparison",
+   "query": "Compare Buffett's stated holding horizon for Coca-Cola in 1988 with the cash-dividend outcome reported in 2022: how long did he favor holding outstanding businesses, and what dividends did Coke pay Berkshire in 1994 and 2022?",
+   "gold_passage_ids": [
+    "1988_p0068",
+    "2022_p0021"
+   ],
+   "gold_claims": [
+    {
+     "claim": "The favorite holding period for outstanding businesses is forever.",
+     "required_terms": [
+      "holding period",
+      "forever"
+     ],
+     "gold_passage_ids": [
+      "1988_p0068"
+     ]
+    },
+    {
+     "claim": "The cash dividend from Coke was $75 million.",
+     "required_terms": [
+      "dividend",
+      "$75 million"
+     ],
+     "gold_passage_ids": [
+      "2022_p0021"
+     ]
+    },
+    {
+     "claim": "The dividend increased to $704 million.",
+     "required_terms": [
+      "dividend",
+      "$704 million"
+     ],
+     "gold_passage_ids": [
+      "2022_p0021"
+     ]
+    }
+   ],
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": true
+   },
+   "reject": {
+    "forbidden_terms": [
+     "sold all coca-cola shares"
+    ]
+   }
+  }
+ ],
+ "chunks": {
+  "1977_p0000": {
+   "text": "To the Stockholders of Berkshire Hathaway Inc.:\n\nOperating earnings in 1977 of $21,904,000, or $22.54 per\nshare, were moderately better than anticipated a year ago. Of\nthese earnings, $1.43 per share resulted from substantial\nrealized capital gains by Blue Chip Stamps which, to the extent\nof our proportional interest in that company, are included in our\noperating earnings figure. Capital gains or losses realized\ndirectly by Berkshire Hathaway Inc. or its insurance subsidiaries\nare not included in our calculation of operating earnings. While\ntoo much attention should not be paid to the figure for any\nsingle year, over the longer term the record regarding aggregate\ncapital gains or losses obviously is of significance.",
+   "year": 1977
+  },
+  "1988_p0068": {
+   "text": "o In 1988 we made major purchases of Federal Home Loan\nMortgage Pfd. (“Freddie Mac”) and Coca Cola. We expect to hold\nthese securities for a long time. In fact, when we own portions\nof outstanding businesses with outstanding managements, our\nfavorite holding period is forever. We are just the opposite of\nthose who hurry to sell and book profits when companies perform\nwell but who tenaciously hang on to businesses that disappoint.\nPeter Lynch aptly likens such behavior to cutting the flowers and\nwatering the weeds. Our holdings of Freddie Mac are the maximum\nallowed by law, and are extensively described by Charlie in his\nletter. In our consolidated balance sheet these shares are\ncarried at cost rather than market, since they are owned by",
+   "year": 1988
+  },
+  "2022_p0021": {
+   "text": "near-disasters at USAir and Salomon? I certainly do.)\nOur satisfactory results have been the product of about a dozen truly good decisions – that\nwould be about one every five years – and a sometimes-forgotten advantage that favors long-term\ninvestors such as Berkshire. Let’s take a peek behind the curtain.\nThe Secret Sauce\nIn August 1994 – yes, 1994 – Berkshire completed its seven-year purchase of the 400\nmillion shares of Coca-Cola we now own. The total cost was $1.3 billion – then a very meaningful\nsum at Berkshire.\nThe cash dividend we received from Coke in 1994 was $75 million. By 2022, the dividend\nhad increased to $704 million. Growth occurred every year, just as certain as birthdays. All Charlie",
+   "year": 2022
+  }
+ },
+ "gold_sentences": {
+  "ho01_1977_operating_earnings:0": {
+   "passage_id": "1977_p0000",
+   "sentence": "To the Stockholders of Berkshire Hathaway Inc.: Operating earnings in 1977 of $21,904,000, or $22.54 per share, were moderately better than anticipated a year ago."
+  },
+  "ho01_1977_operating_earnings:1": {
+   "passage_id": "1977_p0000",
+   "sentence": "To the Stockholders of Berkshire Hathaway Inc.: Operating earnings in 1977 of $21,904,000, or $22.54 per share, were moderately better than anticipated a year ago."
+  },
+  "ho22_1988_2022_coca_cola_comparison:0": {
+   "passage_id": "1988_p0068",
+   "sentence": "In fact, when we own portions of outstanding businesses with outstanding managements, our favorite holding period is forever."
+  },
+  "ho22_1988_2022_coca_cola_comparison:1": {
+   "passage_id": "2022_p0021",
+   "sentence": "The cash dividend we received from Coke in 1994 was $75 million."
+  },
+  "ho22_1988_2022_coca_cola_comparison:2": {
+   "passage_id": "2022_p0021",
+   "sentence": "By 2022, the dividend had increased to $704 million."
+  }
+ }
+}
