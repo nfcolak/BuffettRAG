@@ -19,7 +19,7 @@ class MlxProvider:
     def __init__(self, model_path: str | None = None, temperature: float = LLM_TEMPERATURE) -> None:
         if model_path is None:
             from src.generation.grounded.settings import GroundedSettings
-            model_path = str(GroundedSettings().MLX_MODEL)
+            model_path = str(GroundedSettings.from_env().MLX_MODEL)
         self.model_path = str(Path(model_path).expanduser().resolve())
         self.temperature = temperature
         self.model = Path(self.model_path).name
