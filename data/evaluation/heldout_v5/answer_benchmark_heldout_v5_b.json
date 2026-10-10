@@ -1,0 +1,3399 @@
+{
+  "schema_version": 1,
+  "purpose": "Frozen blind set measured once per system, never used for tuning. Scope: source-heldout (FT answer passages excluded), not unseen-evidence (FT context overlap allowed). Curated from the frozen corpus without running any retriever or model.",
+  "frozen": true,
+  "created": "2026-10-10",
+  "source_corpus": "data/processed/chunks_v3_paragraph.jsonl",
+  "corpus_sha256": "8263f08958729a77febf0922e7bbc4161bedd5fdb3e9a8b3fc9a64ab681ab5f0",
+  "part": "b",
+  "cases": [
+    {
+      "qid": "hv5b_01",
+      "question_type": "opinion",
+      "answerable": true,
+      "years": [
+        1984
+      ],
+      "query": "What is the 'rented suit' story Buffett tells about insurance accounting, and what lesson does he draw from it for his own reporting?",
+      "gold_passage_ids": [
+        "1984_p0081",
+        "1984_p0082"
+      ],
+      "relevant_ids": [
+        "1984_p0081",
+        "1984_p0082"
+      ],
+      "gold_claims": [
+        {
+          "claim": "A man abroad asked his sister to handle his father's funeral and kept receiving a $15 bill because the father had been buried in a rented suit.",
+          "required_terms": [
+            "rented suit",
+            "$15"
+          ],
+          "gold_passage_ids": [
+            "1984_p0081"
+          ],
+          "verification_note": "1984 letter; unit=dollars per monthly bill; definition=the recurring charge revealed by the punchline of the funeral story."
+        },
+        {
+          "claim": "Berkshire has tried to include all of its 'rented suit' liabilities in its current financial statement, but its record of past error should make it humble and readers suspicious.",
+          "required_terms": [
+            "rented suit",
+            "humble",
+            "suspicious"
+          ],
+          "gold_passage_ids": [
+            "1984_p0082"
+          ],
+          "verification_note": "1984 letter; unit=qualitative accounting caution; definition=applying the story to insurance liabilities and past reserving error."
+        },
+        {
+          "claim": "Buffett says he will continue to report the errors, plus or minus, that surface each year.",
+          "required_terms": [
+            "continue to report",
+            "errors"
+          ],
+          "gold_passage_ids": [
+            "1984_p0082"
+          ],
+          "verification_note": "1984 letter; unit=qualitative reporting commitment; definition=annual disclosure of reserve errors."
+        }
+      ],
+      "multi_part": true,
+      "accept": {
+        "min_claim_coverage": 1.0,
+        "require_valid_citation": true
+      },
+      "reject": {
+        "forbidden_terms": []
+      },
+      "verification_note": "1984_p0081 tells the rented-suit story and 1984_p0082 applies it to Berkshire's liability reporting and error disclosure.",
+      "ft_context_overlap": true
+    },
+    {
+      "qid": "hv5b_02",
+      "question_type": "opinion",
+      "answerable": true,
+      "years": [
+        1984
+      ],
+      "query": "Why does Buffett say that not every reserving mistake in the property-casualty business is an innocent one?",
+      "gold_passage_ids": [
+        "1984_p0083"
+      ],
+      "relevant_ids": [
+        "1984_p0083"
+      ],
+      "gold_claims": [
+        {
+          "claim": "With underwriting results as bad as they were and managements free to shape financial statements, some unattractive aspects of human nature showed up.",
+          "required_terms": [
+            "underwriting results",
+            "human nature"
+          ],
+          "gold_passage_ids": [
+            "1984_p0083"
+          ],
+          "verification_note": "1984 letter; unit=qualitative industry conduct; definition=bad results plus reporting discretion leading to bad behaviour."
+        },
+        {
+          "claim": "Companies that would be out of business if they realistically appraised their loss costs simply took an extraordinarily optimistic view of unpaid sums.",
+          "required_terms": [
+            "out of business",
+            "extraordinarily optimistic"
+          ],
+          "gold_passage_ids": [
+            "1984_p0083"
+          ],
+          "verification_note": "1984 letter; unit=qualitative reserving practice; definition=optimistic estimates of yet-to-be-paid losses by weak insurers."
+        },
+        {
+          "claim": "Others used various transactions to hide true current loss costs.",
+          "required_terms": [
+            "various transactions",
+            "hide true current loss costs"
+          ],
+          "gold_passage_ids": [
+            "1984_p0083"
+          ],
+          "verification_note": "1984 letter; unit=qualitative reserving practice; definition=transactions designed to conceal current loss costs."
+        }
+      ],
+      "multi_part": true,
+      "accept": {
+        "min_claim_coverage": 1.0,
+        "require_valid_citation": true
+      },
+      "reject": {
+        "forbidden_terms": []
+      },
+      "verification_note": "1984_p0083 separates innocent reserving errors from optimistic and concealing behaviour by weak insurers.",
+      "ft_context_overlap": true
+    },
+    {
+      "qid": "hv5b_03",
+      "question_type": "opinion",
+      "answerable": true,
+      "years": [
+        1986
+      ],
+      "query": "How did Buffett describe his outlook for the stocks and bonds Berkshire held, and what would be the best outcome for the bond holdings?",
+      "gold_passage_ids": [
+        "1986_p0085"
+      ],
+      "relevant_ids": [
+        "1986_p0085"
+      ],
+      "gold_claims": [
+        {
+          "claim": "Expectations for both the stocks and bonds Berkshire holds are exceptionally modest given current market levels.",
+          "required_terms": [
+            "exceptionally modest",
+            "current market levels"
+          ],
+          "gold_passage_ids": [
+            "1986_p0085"
+          ],
+          "verification_note": "1986 letter; unit=qualitative return expectation; definition=modest forward expectations for stock and bond holdings."
+        },
+        {
+          "claim": "The best thing that could happen is a market in which Berkshire would sell many bonds at a significant loss to reallocate funds into far-better equity values.",
+          "required_terms": [
+            "significant loss",
+            "far-better equity values"
+          ],
+          "gold_passage_ids": [
+            "1986_p0085"
+          ],
+          "verification_note": "1986 letter; unit=qualitative scenario; definition=selling bonds at a loss to buy cheaper equities."
+        },
+        {
+          "claim": "Those bond losses would come from high interest rates, which would probably depress common stocks considerably more than medium-term bonds.",
+          "required_terms": [
+            "high interest rates",
+            "medium-term bonds"
+          ],
+          "gold_passage_ids": [
+            "1986_p0085"
+          ],
+          "verification_note": "1986 letter; unit=qualitative interest-rate effect; definition=rate rises hurting stocks more than medium-term bonds."
+        }
+      ],
+      "multi_part": true,
+      "accept": {
+        "min_claim_coverage": 1.0,
+        "require_valid_citation": true
+      },
+      "reject": {
+        "forbidden_terms": []
+      },
+      "verification_note": "1986_p0085 gives modest expectations, the bond-sale scenario and the effect of high interest rates.",
+      "ft_context_overlap": true
+    },
+    {
+      "qid": "hv5b_04",
+      "question_type": "opinion",
+      "answerable": true,
+      "years": [
+        1988
+      ],
+      "query": "Why doesn't Berkshire want its shares to trade at the highest possible price?",
+      "gold_passage_ids": [
+        "1988_p0111"
+      ],
+      "relevant_ids": [
+        "1988_p0111"
+      ],
+      "gold_claims": [
+        {
+          "claim": "Berkshire does not want to maximize the price of its shares but wants them to trade in a narrow range centered at intrinsic business value.",
+          "required_terms": [
+            "maximize the price",
+            "narrow range centered at intrinsic"
+          ],
+          "gold_passage_ids": [
+            "1988_p0111"
+          ],
+          "verification_note": "1988 letter; unit=qualitative valuation goal; definition=stock price tracking intrinsic business value rather than being maximized."
+        },
+        {
+          "claim": "Charlie Munger and Buffett are bothered as much by significant overvaluation as by significant undervaluation.",
+          "required_terms": [
+            "bothered as",
+            "overvaluation",
+            "undervaluation"
+          ],
+          "gold_passage_ids": [
+            "1988_p0111"
+          ],
+          "verification_note": "1988 letter; unit=qualitative valuation attitude; definition=symmetric discomfort with over- and undervaluation."
+        },
+        {
+          "claim": "If the stock price consistently mirrors business value, each shareholder's result roughly parallels Berkshire's business results during his holding period.",
+          "required_terms": [
+            "consistently mirrors",
+            "holding period"
+          ],
+          "gold_passage_ids": [
+            "1988_p0111"
+          ],
+          "verification_note": "1988 letter; unit=qualitative shareholder outcome; definition=investor results matching business results over the holding period."
+        }
+      ],
+      "multi_part": true,
+      "accept": {
+        "min_claim_coverage": 1.0,
+        "require_valid_citation": true
+      },
+      "reject": {
+        "forbidden_terms": []
+      },
+      "verification_note": "1988_p0111 states the narrow-range-around-intrinsic-value goal and its reason.",
+      "ft_context_overlap": true
+    },
+    {
+      "qid": "hv5b_05",
+      "question_type": "opinion",
+      "answerable": true,
+      "years": [
+        1988
+      ],
+      "query": "Why does Buffett say it is wiser to sell high-priced corn flakes than low-priced auto insurance?",
+      "gold_passage_ids": [
+        "1988_p0051"
+      ],
+      "relevant_ids": [
+        "1988_p0051"
+      ],
+      "gold_claims": [
+        {
+          "claim": "Breakfast cereal's return on invested capital is more than double that of the auto insurance industry.",
+          "required_terms": [
+            "breakfast cereal",
+            "more than double",
+            "auto insurance"
+          ],
+          "gold_passage_ids": [
+            "1988_p0051"
+          ],
+          "verification_note": "1988 letter; unit=ratio of returns on invested capital; definition=cereal return on capital relative to auto insurance."
+        },
+        {
+          "claim": "Kellogg and General Mills sell at five times book value while most large insurers sell close to book.",
+          "required_terms": [
+            "Kellogg",
+            "five times book value"
+          ],
+          "gold_passage_ids": [
+            "1988_p0051"
+          ],
+          "verification_note": "1988 letter; unit=multiple of book value; definition=price-to-book comparison of cereal makers and insurers."
+        },
+        {
+          "claim": "Cereal companies regularly raise prices and not a peep is heard from consumers, but customers are outraged when auto insurers raise prices.",
+          "required_terms": [
+            "not a peep",
+            "outraged"
+          ],
+          "gold_passage_ids": [
+            "1988_p0051"
+          ],
+          "verification_note": "1988 letter; unit=qualitative public reaction; definition=consumer reaction to cereal versus auto-insurance price increases."
+        }
+      ],
+      "multi_part": true,
+      "accept": {
+        "min_claim_coverage": 1.0,
+        "require_valid_citation": true
+      },
+      "reject": {
+        "forbidden_terms": []
+      },
+      "verification_note": "1988_p0051 contrasts cereal and auto-insurance returns, valuation and customer reaction to price increases.",
+      "ft_context_overlap": true
+    },
+    {
+      "qid": "hv5b_06",
+      "question_type": "opinion",
+      "answerable": true,
+      "years": [
+        1990
+      ],
+      "query": "Why does Buffett warn that press reports about the value of Berkshire's convertible preferred stocks can be misleading?",
+      "gold_passage_ids": [
+        "1990_p0104"
+      ],
+      "relevant_ids": [
+        "1990_p0104"
+      ],
+      "gold_claims": [
+        {
+          "claim": "Berkshire's convertible preferred stocks are relatively simple securities, yet Buffett warns that inaccurate or misleading statements about them may appear.",
+          "required_terms": [
+            "relatively simple securities",
+            "inaccurate or misleading"
+          ],
+          "gold_passage_ids": [
+            "1990_p0104"
+          ],
+          "verification_note": "1990 letter; unit=qualitative disclosure warning; definition=warning about press coverage of the preferreds."
+        },
+        {
+          "claim": "Several members of the press valued all the preferreds as equal to the common stock into which they are convertible.",
+          "required_terms": [
+            "several members of the press",
+            "convertible"
+          ],
+          "gold_passage_ids": [
+            "1990_p0104"
+          ],
+          "verification_note": "1990 letter; unit=qualitative valuation error; definition=press equating preferreds with their conversion value."
+        },
+        {
+          "claim": "By that logic the Salomon preferred, convertible at $38, would be worth 60% of face value if Salomon common sold at $22.80.",
+          "required_terms": [
+            "$38",
+            "60% of face value",
+            "$22.80"
+          ],
+          "gold_passage_ids": [
+            "1990_p0104"
+          ],
+          "verification_note": "1990 letter; unit=dollars per share and percent of face value; definition=implied conversion value of the Salomon preferred at a $22.80 stock price."
+        }
+      ],
+      "multi_part": true,
+      "accept": {
+        "min_claim_coverage": 1.0,
+        "require_valid_citation": true
+      },
+      "reject": {
+        "forbidden_terms": []
+      },
+      "verification_note": "1990_p0104 warns about the press equating convertible preferreds with conversion value, with the Salomon example.",
+      "ft_context_overlap": false
+    },
+    {
+      "qid": "hv5b_07",
+      "question_type": "opinion",
+      "answerable": true,
+      "years": [
+        1992
+      ],
+      "query": "What predictions does Buffett make about the S&P index and about Berkshire's edge over it?",
+      "gold_passage_ids": [
+        "1992_p0011"
+      ],
+      "relevant_ids": [
+        "1992_p0011"
+      ],
+      "gold_claims": [
+        {
+          "claim": "Buffett and Charlie Munger are virtually certain that the return over the next decade from an investment in the S&P index will be far less than that of the past decade.",
+          "required_terms": [
+            "virtually certain",
+            "return over the next decade"
+          ],
+          "gold_passage_ids": [
+            "1992_p0011"
+          ],
+          "verification_note": "1992 letter; unit=qualitative market forecast; definition=expected S&P return over the next decade versus the past decade."
+        },
+        {
+          "claim": "They are dead certain that the drag of Berkshire's expanding capital base will substantially reduce its historical advantage relative to the index.",
+          "required_terms": [
+            "dead certain",
+            "expanding capital base",
+            "historical advantage"
+          ],
+          "gold_passage_ids": [
+            "1992_p0011"
+          ],
+          "verification_note": "1992 letter; unit=qualitative performance forecast; definition=size drag on Berkshire's advantage over the index."
+        }
+      ],
+      "multi_part": true,
+      "accept": {
+        "min_claim_coverage": 1.0,
+        "require_valid_citation": true
+      },
+      "reject": {
+        "forbidden_terms": []
+      },
+      "verification_note": "1992_p0011 holds the two predictions about the S&P and the capital-base drag.",
+      "ft_context_overlap": true
+    },
+    {
+      "qid": "hv5b_08",
+      "question_type": "opinion",
+      "answerable": true,
+      "years": [
+        2010
+      ],
+      "query": "Why does Buffett think net income is a poor guide to how Berkshire's business is really doing?",
+      "gold_passage_ids": [
+        "2010_p0126"
+      ],
+      "relevant_ids": [
+        "2010_p0126"
+      ],
+      "gold_claims": [
+        {
+          "claim": "Realized gains or losses on investments go into net income, whereas unrealized gains and most losses are excluded.",
+          "required_terms": [
+            "realized gains or losses",
+            "unrealized gains"
+          ],
+          "gold_passage_ids": [
+            "2010_p0126"
+          ],
+          "verification_note": "2010 letter; unit=qualitative accounting rule; definition=which investment gains and losses enter net income."
+        },
+        {
+          "claim": "With a $10 billion increase in unrealized gains and $1 billion of realized losses, net income would count only the loss and come in below operating income.",
+          "required_terms": [
+            "$10 billion increase",
+            "$1 billion of realized losses"
+          ],
+          "gold_passage_ids": [
+            "2010_p0126"
+          ],
+          "verification_note": "2010 letter; unit=billions of dollars; definition=illustrative unrealized gain and realized loss example."
+        },
+        {
+          "claim": "Headlines might proclaim that earnings were down when the business might in reality be much improved.",
+          "required_terms": [
+            "headlines might proclaim",
+            "much improved"
+          ],
+          "gold_passage_ids": [
+            "2010_p0126"
+          ],
+          "verification_note": "2010 letter; unit=qualitative reporting effect; definition=misleading net income headlines."
+        }
+      ],
+      "multi_part": true,
+      "accept": {
+        "min_claim_coverage": 1.0,
+        "require_valid_citation": true
+      },
+      "reject": {
+        "forbidden_terms": []
+      },
+      "verification_note": "2010_p0126 explains net-income distortion from realized versus unrealized gains with a worked example.",
+      "ft_context_overlap": false
+    },
+    {
+      "qid": "hv5b_09",
+      "question_type": "opinion",
+      "answerable": true,
+      "years": [
+        2000
+      ],
+      "query": "According to Buffett, what do you need to understand to judge an insurance company, and what is float?",
+      "gold_passage_ids": [
+        "2000_p0038"
+      ],
+      "relevant_ids": [
+        "2000_p0038"
+      ],
+      "gold_claims": [
+        {
+          "claim": "To evaluate an insurance company, the key determinants are the amount of float, its cost and the long-term outlook for both.",
+          "required_terms": [
+            "evaluate an insurance company",
+            "amount of float",
+            "long-term outlook"
+          ],
+          "gold_passage_ids": [
+            "2000_p0038"
+          ],
+          "verification_note": "2000 letter; unit=qualitative evaluation framework; definition=three determinants of insurer value."
+        },
+        {
+          "claim": "In an insurance operation, float is money we hold but do not own.",
+          "required_terms": [
+            "float is money we hold",
+            "In an insurance operation"
+          ],
+          "gold_passage_ids": [
+            "2000_p0038"
+          ],
+          "verification_note": "2000 letter; unit=qualitative definition; definition=float as money held but not owned."
+        },
+        {
+          "claim": "Float arises because premiums are received before losses are paid, an interval that sometimes extends over many years.",
+          "required_terms": [
+            "premiums are received before losses are paid",
+            "many years"
+          ],
+          "gold_passage_ids": [
+            "2000_p0038"
+          ],
+          "verification_note": "2000 letter; unit=years of delay; definition=interval between premium receipt and loss payment."
+        }
+      ],
+      "multi_part": true,
+      "accept": {
+        "min_claim_coverage": 1.0,
+        "require_valid_citation": true
+      },
+      "reject": {
+        "forbidden_terms": []
+      },
+      "verification_note": "2000_p0038 lists the determinants of insurer value and defines float.",
+      "ft_context_overlap": true
+    },
+    {
+      "qid": "hv5b_10",
+      "question_type": "opinion",
+      "answerable": true,
+      "years": [
+        2004
+      ],
+      "query": "Why have insurers generally earned poor returns, in Buffett's view?",
+      "gold_passage_ids": [
+        "2004_p0035"
+      ],
+      "relevant_ids": [
+        "2004_p0035"
+      ],
+      "gold_claims": [
+        {
+          "claim": "Insurers sell a commodity-like product with standard policy forms available from many suppliers, some of them mutual companies with limited profit goals.",
+          "required_terms": [
+            "commodity-like",
+            "mutual companies"
+          ],
+          "gold_passage_ids": [
+            "2004_p0035"
+          ],
+          "verification_note": "2004 letter; unit=qualitative industry structure; definition=insurance as a commodity-like product."
+        },
+        {
+          "claim": "Customers ask for Gillette blades or a Coke but never ask for a National Indemnity policy.",
+          "required_terms": [
+            "Gillette blades",
+            "National Indemnity policy"
+          ],
+          "gold_passage_ids": [
+            "2004_p0035"
+          ],
+          "verification_note": "2004 letter; unit=qualitative brand illustration; definition=absence of brand preference among insureds."
+        },
+        {
+          "claim": "Price competition in insurance is usually fierce.",
+          "required_terms": [
+            "price competition",
+            "usually fierce"
+          ],
+          "gold_passage_ids": [
+            "2004_p0035"
+          ],
+          "verification_note": "2004 letter; unit=qualitative competitive intensity; definition=pricing pressure in insurance."
+        }
+      ],
+      "multi_part": true,
+      "accept": {
+        "min_claim_coverage": 1.0,
+        "require_valid_citation": true
+      },
+      "reject": {
+        "forbidden_terms": []
+      },
+      "verification_note": "2004_p0035 explains poor industry returns through commodity-like products and fierce price competition.",
+      "ft_context_overlap": false
+    },
+    {
+      "qid": "hv5b_11",
+      "question_type": "opinion",
+      "answerable": true,
+      "years": [
+        2004
+      ],
+      "query": "Why must a business with a no-layoff policy be especially careful about adding even one new employee?",
+      "gold_passage_ids": [
+        "2004_p0047",
+        "2004_p0048"
+      ],
+      "relevant_ids": [
+        "2004_p0047",
+        "2004_p0048"
+      ],
+      "gold_claims": [
+        {
+          "claim": "Tom Murphy told Buffett about an employee who asked to hire an assistant and assumed the added $20,000 of payroll was inconsequential.",
+          "required_terms": [
+            "Tom Murphy",
+            "$20,000"
+          ],
+          "gold_passage_ids": [
+            "2004_p0047"
+          ],
+          "verification_note": "2004 letter; unit=dollars of annual payroll; definition=the hypothetical assistant's annual cost as the employee saw it."
+        },
+        {
+          "claim": "The boss said the proposal should be evaluated as a $3 million decision because the added person would probably cost at least that amount over his lifetime.",
+          "required_terms": [
+            "$3 million decision",
+            "at least that amount"
+          ],
+          "gold_passage_ids": [
+            "2004_p0047"
+          ],
+          "verification_note": "2004 letter; unit=millions of dollars of lifetime cost; definition=lifetime cost of one additional employee."
+        },
+        {
+          "claim": "Unless the company fell on very hard times, the added employee would be unlikely to be dismissed, however marginal his contribution.",
+          "required_terms": [
+            "very hard times",
+            "unlikely to be dismissed"
+          ],
+          "gold_passage_ids": [
+            "2004_p0048"
+          ],
+          "verification_note": "2004 letter; unit=qualitative employment commitment; definition=no-layoff policy making hires hard to reverse."
+        }
+      ],
+      "multi_part": true,
+      "accept": {
+        "min_claim_coverage": 1.0,
+        "require_valid_citation": true
+      },
+      "reject": {
+        "forbidden_terms": []
+      },
+      "verification_note": "2004_p0047-48 give Tom Murphy's $20,000 versus $3 million hiring illustration.",
+      "ft_context_overlap": true
+    },
+    {
+      "qid": "hv5b_12",
+      "question_type": "company",
+      "answerable": true,
+      "years": [
+        1984
+      ],
+      "query": "How do other property-casualty insurers' loss-reserving failures end up costing Berkshire money?",
+      "gold_passage_ids": [
+        "1984_p0087",
+        "1984_p0088"
+      ],
+      "relevant_ids": [
+        "1984_p0087",
+        "1984_p0088"
+      ],
+      "gold_claims": [
+        {
+          "claim": "Berkshire suffers from sell-at-any-price competition by the 'walking dead' insurers.",
+          "required_terms": [
+            "sell-at-any-price competition",
+            "walking dead"
+          ],
+          "gold_passage_ids": [
+            "1984_p0087"
+          ],
+          "verification_note": "1984 letter; unit=qualitative competitive harm; definition=competition from insurers that are effectively insolvent."
+        },
+        {
+          "claim": "State guarantee funds levy assessments, so Berkshire ends up paying a portion of insolvent insurers' asset deficiencies.",
+          "required_terms": [
+            "guarantee funds",
+            "asset deficiencies"
+          ],
+          "gold_passage_ids": [
+            "1984_p0087"
+          ],
+          "verification_note": "1984 letter; unit=qualitative cost transfer; definition=assessment of solvent insurers for failed insurers' deficits."
+        },
+        {
+          "claim": "Regulators are slow to improve: progress on that front in promptly identifying and terminating insolvent insurers has been slow.",
+          "required_terms": [
+            "regulators",
+            "progress on that front"
+          ],
+          "gold_passage_ids": [
+            "1984_p0088"
+          ],
+          "verification_note": "1984 letter; unit=qualitative regulatory progress; definition=pace of regulators' action against insolvent insurers."
+        }
+      ],
+      "multi_part": true,
+      "accept": {
+        "min_claim_coverage": 1.0,
+        "require_valid_citation": true
+      },
+      "reject": {
+        "forbidden_terms": []
+      },
+      "verification_note": "1984_p0087-88 describe walking-dead competition, guarantee-fund assessments and slow regulators.",
+      "ft_context_overlap": true
+    },
+    {
+      "qid": "hv5b_13",
+      "question_type": "company",
+      "answerable": true,
+      "years": [
+        1988
+      ],
+      "query": "What does Buffett say about Henderson Brothers, the specialist firm that handles Berkshire's shares on the NYSE?",
+      "gold_passage_ids": [
+        "1988_p0110"
+      ],
+      "relevant_ids": [
+        "1988_p0110"
+      ],
+      "gold_claims": [
+        {
+          "claim": "Henderson Brothers is the oldest continuing specialist firm on the Exchange, and its progenitor bought a seat for $500 in 1861.",
+          "required_terms": [
+            "oldest continuing specialist firm",
+            "$500"
+          ],
+          "gold_passage_ids": [
+            "1988_p0110"
+          ],
+          "verification_note": "1988 letter; unit=dollars paid for a seat; definition=price of the original 1861 Exchange seat."
+        },
+        {
+          "claim": "Among the 54 firms acting as specialists, HBI ranks second in number of stocks assigned, with 83.",
+          "required_terms": [
+            "54 firms",
+            "second in number of stocks",
+            "83"
+          ],
+          "gold_passage_ids": [
+            "1988_p0110"
+          ],
+          "verification_note": "1988 letter; unit=count of stocks assigned; definition=HBI's rank and stock count among specialist firms."
+        },
+        {
+          "claim": "Recently, seats were selling for about $625,000.",
+          "required_terms": [
+            "seats were selling",
+            "$625,000"
+          ],
+          "gold_passage_ids": [
+            "1988_p0110"
+          ],
+          "verification_note": "1988 letter; unit=dollars per seat; definition=recent price of an Exchange seat."
+        }
+      ],
+      "multi_part": true,
+      "accept": {
+        "min_claim_coverage": 1.0,
+        "require_valid_citation": true
+      },
+      "reject": {
+        "forbidden_terms": []
+      },
+      "verification_note": "1988_p0110 describes HBI's seniority, rank among 54 firms and seat prices.",
+      "ft_context_overlap": true
+    },
+    {
+      "qid": "hv5b_14",
+      "question_type": "company",
+      "answerable": true,
+      "years": [
+        1988
+      ],
+      "query": "What would California's Proposition 103 have done to See's Candies' prices, and where did the initiative stand?",
+      "gold_passage_ids": [
+        "1988_p0052"
+      ],
+      "relevant_ids": [
+        "1988_p0052"
+      ],
+      "gold_claims": [
+        {
+          "claim": "Proposition 103, passed in California, threatens to push auto insurance prices down sharply even though costs have been soaring.",
+          "required_terms": [
+            "Proposition 103",
+            "auto insurance"
+          ],
+          "gold_passage_ids": [
+            "1988_p0052"
+          ],
+          "verification_note": "1988 letter; unit=qualitative regulatory effect; definition=forced auto-insurance price cuts."
+        },
+        {
+          "claim": "The price cut has been suspended while the courts review the initiative.",
+          "required_terms": [
+            "suspended",
+            "courts review"
+          ],
+          "gold_passage_ids": [
+            "1988_p0052"
+          ],
+          "verification_note": "1988 letter; unit=qualitative legal status; definition=initiative suspended pending court review."
+        },
+        {
+          "claim": "If Proposition 103 applied to candy, See's would have to sell at $5.76 per pound rather than $7.60 and would lose money.",
+          "required_terms": [
+            "$5.76 per pound",
+            "$7.60"
+          ],
+          "gold_passage_ids": [
+            "1988_p0052"
+          ],
+          "verification_note": "1988 letter; unit=dollars per pound; definition=See's forced price versus its actual price."
+        }
+      ],
+      "multi_part": true,
+      "accept": {
+        "min_claim_coverage": 1.0,
+        "require_valid_citation": true
+      },
+      "reject": {
+        "forbidden_terms": []
+      },
+      "verification_note": "1988_p0052 gives the Proposition 103 status and the See's $5.76 versus $7.60 per pound illustration.",
+      "ft_context_overlap": true
+    },
+    {
+      "qid": "hv5b_15",
+      "question_type": "company",
+      "answerable": true,
+      "years": [
+        1992
+      ],
+      "query": "How old was Mrs. B, why did she leave Nebraska Furniture Mart in 1989, and what did NFM buy from her later?",
+      "gold_passage_ids": [
+        "1992_p0104",
+        "1992_p0105"
+      ],
+      "relevant_ids": [
+        "1992_p0104",
+        "1992_p0105"
+      ],
+      "gold_claims": [
+        {
+          "claim": "At 99, Mrs. B continues to work seven days a week.",
+          "required_terms": [
+            "At 99",
+            "seven days a week"
+          ],
+          "gold_passage_ids": [
+            "1992_p0104"
+          ],
+          "verification_note": "1992 letter; unit=age and days worked per week; definition=Mrs. B's continued full-time work."
+        },
+        {
+          "claim": "After her family sold 80% of Nebraska Furniture Mart to Berkshire in 1983 she kept running the carpet operation, but left in 1989 after a managerial disagreement and opened her own business next door.",
+          "required_terms": [
+            "sold 80%",
+            "In 1989"
+          ],
+          "gold_passage_ids": [
+            "1992_p0104"
+          ],
+          "verification_note": "1992 letter; unit=percent ownership sold and year of departure; definition=NFM sale and her 1989 departure."
+        },
+        {
+          "claim": "At the end of last year Mrs. B decided to sell her building and land to NFM while continuing to run her carpet business there.",
+          "required_terms": [
+            "sell her building",
+            "land to NFM"
+          ],
+          "gold_passage_ids": [
+            "1992_p0105"
+          ],
+          "verification_note": "1992 letter; unit=qualitative property sale; definition=sale of the building and land back to NFM."
+        }
+      ],
+      "multi_part": true,
+      "accept": {
+        "min_claim_coverage": 1.0,
+        "require_valid_citation": true
+      },
+      "reject": {
+        "forbidden_terms": []
+      },
+      "verification_note": "1992_p0104-05 recount Mrs. B's age, her 1989 exit and her sale of the building to NFM.",
+      "ft_context_overlap": true
+    },
+    {
+      "qid": "hv5b_16",
+      "question_type": "company",
+      "answerable": true,
+      "years": [
+        2000
+      ],
+      "query": "Why did Buffett think Berkshire's insurance advertising was running into diminishing returns in 2000?",
+      "gold_passage_ids": [
+        "2000_p0058"
+      ],
+      "relevant_ids": [
+        "2000_p0058"
+      ],
+      "gold_claims": [
+        {
+          "claim": "Berkshire pushed advertising 'frequency' very hard and probably overstepped in certain media.",
+          "required_terms": [
+            "frequency",
+            "overstepped"
+          ],
+          "gold_passage_ids": [
+            "2000_p0058"
+          ],
+          "verification_note": "2000 letter; unit=qualitative advertising assessment; definition=too many repeated messages in some media."
+        },
+        {
+          "claim": "More messages through any medium eventually bring diminishing returns, and the third ad in an hour on a cable channel is less effective than the first.",
+          "required_terms": [
+            "diminishing returns",
+            "third ad in an hour"
+          ],
+          "gold_passage_ids": [
+            "2000_p0058"
+          ],
+          "verification_note": "2000 letter; unit=qualitative advertising effectiveness; definition=declining marginal effect of repeated ads."
+        },
+        {
+          "claim": "Berkshire may have already picked much of the low-hanging fruit, since particularly older ones are reluctant to buy directly.",
+          "required_terms": [
+            "low-hanging fruit",
+            "older ones"
+          ],
+          "gold_passage_ids": [
+            "2000_p0058"
+          ],
+          "verification_note": "2000 letter; unit=qualitative market saturation; definition=direct-purchase reluctance and early easy sales."
+        }
+      ],
+      "multi_part": true,
+      "accept": {
+        "min_claim_coverage": 1.0,
+        "require_valid_citation": true
+      },
+      "reject": {
+        "forbidden_terms": []
+      },
+      "verification_note": "2000_p0058 gives the frequency, diminishing-returns and low-hanging-fruit explanations.",
+      "ft_context_overlap": true
+    },
+    {
+      "qid": "hv5b_17",
+      "question_type": "company",
+      "answerable": true,
+      "years": [
+        2002
+      ],
+      "query": "How does Buffett pitch NetJets fractional ownership to business customers?",
+      "gold_passage_ids": [
+        "2002_p0065"
+      ],
+      "relevant_ids": [
+        "2002_p0065"
+      ],
+      "gold_claims": [
+        {
+          "claim": "Many businesses could save millions of dollars annually by flying with NetJets, and yearly savings at some large companies could exceed $10 million.",
+          "required_terms": [
+            "save millions of dollars annually",
+            "exceed $10 million"
+          ],
+          "gold_passage_ids": [
+            "2002_p0065"
+          ],
+          "verification_note": "2002 letter; unit=dollars saved per year; definition=claimed annual savings for large companies."
+        },
+        {
+          "claim": "A fractional ownership of a single NetJets plane allows a client to have several planes in the air simultaneously.",
+          "required_terms": [
+            "fractional ownership of a single",
+            "several planes in the air simultaneously"
+          ],
+          "gold_passage_ids": [
+            "2002_p0065"
+          ],
+          "verification_note": "2002 letter; unit=qualitative capability; definition=simultaneous use of multiple planes via one share."
+        }
+      ],
+      "multi_part": true,
+      "accept": {
+        "min_claim_coverage": 1.0,
+        "require_valid_citation": true
+      },
+      "reject": {
+        "forbidden_terms": []
+      },
+      "verification_note": "2002_p0065 states the savings claim and the simultaneous-use benefit.",
+      "ft_context_overlap": true
+    },
+    {
+      "qid": "hv5b_18",
+      "question_type": "company",
+      "answerable": true,
+      "years": [
+        2004
+      ],
+      "query": "What does Buffett say about the discipline at National Indemnity (NICO) when its premium volume dwindles?",
+      "gold_passage_ids": [
+        "2004_p0049"
+      ],
+      "relevant_ids": [
+        "2004_p0049"
+      ],
+      "gold_claims": [
+        {
+          "claim": "It takes real fortitude, embedded in company culture, to live day after day with dwindling volume while competitors boast of growth.",
+          "required_terms": [
+            "real fortitude",
+            "dwindling volume"
+          ],
+          "gold_passage_ids": [
+            "2004_p0049"
+          ],
+          "verification_note": "2004 letter; unit=qualitative management discipline; definition=culture needed to accept shrinking volume."
+        },
+        {
+          "claim": "NICO has had four CEOs since its formation in 1940, and none have bent.",
+          "required_terms": [
+            "four CEOs",
+            "since its formation in 1940"
+          ],
+          "gold_passage_ids": [
+            "2004_p0049"
+          ],
+          "verification_note": "2004 letter; unit=count of CEOs since 1940; definition=CEO continuity at NICO."
+        },
+        {
+          "claim": "Only one of the four graduated from college, and Buffett says extraordinary business ability is largely innate.",
+          "required_terms": [
+            "graduated from college",
+            "largely innate"
+          ],
+          "gold_passage_ids": [
+            "2004_p0049"
+          ],
+          "verification_note": "2004 letter; unit=qualitative management trait; definition=business ability versus education."
+        }
+      ],
+      "multi_part": true,
+      "accept": {
+        "min_claim_coverage": 1.0,
+        "require_valid_citation": true
+      },
+      "reject": {
+        "forbidden_terms": []
+      },
+      "verification_note": "2004_p0049 describes NICO's discipline, four CEOs since 1940 and the college remark.",
+      "ft_context_overlap": true
+    },
+    {
+      "qid": "hv5b_19",
+      "question_type": "company",
+      "answerable": true,
+      "years": [
+        2008
+      ],
+      "query": "How do state insurance regulators vet a company's history when it proposes to buy another insurer?",
+      "gold_passage_ids": [
+        "2008_p0040"
+      ],
+      "relevant_ids": [
+        "2008_p0040"
+      ],
+      "gold_claims": [
+        {
+          "claim": "There is no hiding your history before these regulators, who can and do call their counterparts in other states where the company operates.",
+          "required_terms": [
+            "There is no hiding your history",
+            "counterparts in other states"
+          ],
+          "gold_passage_ids": [
+            "2008_p0040"
+          ],
+          "verification_note": "2008 letter; unit=qualitative regulatory scrutiny; definition=cross-state inquiries by regulators."
+        },
+        {
+          "claim": "Regulators ask how the company has behaved in respect to all aspects of the business, including a willingness to commit adequate equity capital.",
+          "required_terms": [
+            "all aspects of the",
+            "adequate equity capital"
+          ],
+          "gold_passage_ids": [
+            "2008_p0040"
+          ],
+          "verification_note": "2008 letter; unit=qualitative regulatory criteria; definition=conduct and capital commitment questions."
+        }
+      ],
+      "multi_part": true,
+      "accept": {
+        "min_claim_coverage": 1.0,
+        "require_valid_citation": true
+      },
+      "reject": {
+        "forbidden_terms": []
+      },
+      "verification_note": "2008_p0040 describes cross-state regulator checks on conduct and equity commitment.",
+      "ft_context_overlap": false
+    },
+    {
+      "qid": "hv5b_20",
+      "question_type": "company",
+      "answerable": true,
+      "years": [
+        2010
+      ],
+      "query": "What does Buffett say Ajit Jain's reinsurance group does, and how big has its float become?",
+      "gold_passage_ids": [
+        "2010_p0063"
+      ],
+      "relevant_ids": [
+        "2010_p0063"
+      ],
+      "gold_claims": [
+        {
+          "claim": "Ajit insures risks that no one else has the desire or the capital to take on.",
+          "required_terms": [
+            "Ajit insures risks",
+            "capital to take on"
+          ],
+          "gold_passage_ids": [
+            "2010_p0063"
+          ],
+          "verification_note": "2010 letter; unit=qualitative business description; definition=reinsurance of risks others avoid."
+        },
+        {
+          "claim": "In the past year Ajit significantly increased his life reinsurance operation, developing annual premium volume of about $2 billion that will repeat for decades.",
+          "required_terms": [
+            "life reinsurance",
+            "$2 billion"
+          ],
+          "gold_passage_ids": [
+            "2010_p0063"
+          ],
+          "verification_note": "2010 letter; unit=billions of dollars of annual premium; definition=new life reinsurance premium volume."
+        },
+        {
+          "claim": "From a standing start in 1985, Ajit has built an insurance business with float of $30 billion.",
+          "required_terms": [
+            "standing start in 1985",
+            "float of $30 billion"
+          ],
+          "gold_passage_ids": [
+            "2010_p0063"
+          ],
+          "verification_note": "2010 letter; unit=billions of dollars of float; definition=float of the reinsurance group."
+        }
+      ],
+      "multi_part": true,
+      "accept": {
+        "min_claim_coverage": 1.0,
+        "require_valid_citation": true
+      },
+      "reject": {
+        "forbidden_terms": []
+      },
+      "verification_note": "2010_p0063 covers Ajit Jain's business, life reinsurance volume and $30 billion float.",
+      "ft_context_overlap": false
+    },
+    {
+      "qid": "hv5b_21",
+      "question_type": "company",
+      "answerable": true,
+      "years": [
+        2014
+      ],
+      "query": "What did Buffett say Berkshire would do about paying for acquisitions, dividends and choosing subsidiary CEOs?",
+      "gold_passage_ids": [
+        "2014_p0228"
+      ],
+      "relevant_ids": [
+        "2014_p0228"
+      ],
+      "gold_claims": [
+        {
+          "claim": "New subsidiaries would usually be bought with cash, not newly issued stock.",
+          "required_terms": [
+            "bought with cash",
+            "newly issued stock"
+          ],
+          "gold_passage_ids": [
+            "2014_p0228"
+          ],
+          "verification_note": "2014 letter; unit=qualitative acquisition policy; definition=payment method for acquisitions."
+        },
+        {
+          "claim": "Berkshire would not pay dividends so long as each retained dollar creates more than one dollar of market value for shareholders.",
+          "required_terms": [
+            "would not pay dividends",
+            "one dollar of market value"
+          ],
+          "gold_passage_ids": [
+            "2014_p0228"
+          ],
+          "verification_note": "2014 letter; unit=dollars of market value per retained dollar; definition=dividend test based on value created by retention."
+        },
+        {
+          "claim": "In buying a subsidiary, Berkshire would seek a fair price for a good business the Chairman could understand, with a good CEO in place.",
+          "required_terms": [
+            "fair price for a good business",
+            "good CEO in place"
+          ],
+          "gold_passage_ids": [
+            "2014_p0228"
+          ],
+          "verification_note": "2014 letter; unit=qualitative purchase criteria; definition=price, business and management criteria."
+        },
+        {
+          "claim": "In choosing subsidiary CEOs, Berkshire would try to secure trustworthiness, skill, energy and love for the business.",
+          "required_terms": [
+            "trustworthiness, skill, energy",
+            "love for"
+          ],
+          "gold_passage_ids": [
+            "2014_p0228"
+          ],
+          "verification_note": "2014 letter; unit=qualitative CEO criteria; definition=traits sought in subsidiary CEOs."
+        }
+      ],
+      "multi_part": true,
+      "accept": {
+        "min_claim_coverage": 1.0,
+        "require_valid_citation": true
+      },
+      "reject": {
+        "forbidden_terms": []
+      },
+      "verification_note": "2014_p0228 lists acquisition-payment, dividend, purchase and CEO-selection principles.",
+      "ft_context_overlap": true
+    },
+    {
+      "qid": "hv5b_22",
+      "question_type": "company",
+      "answerable": true,
+      "years": [
+        2016
+      ],
+      "query": "How many businesses report directly to headquarters in the manufacturing, service and retailing group, and how large is Marmon?",
+      "gold_passage_ids": [
+        "2016_p0076"
+      ],
+      "relevant_ids": [
+        "2016_p0076"
+      ],
+      "gold_claims": [
+        {
+          "claim": "The financial summary for the group includes 44 businesses that report directly to headquarters.",
+          "required_terms": [
+            "44 businesses",
+            "report directly to headquarters"
+          ],
+          "gold_passage_ids": [
+            "2016_p0076"
+          ],
+          "verification_note": "2016 letter; unit=count of businesses; definition=businesses reporting directly to headquarters."
+        },
+        {
+          "claim": "Marmon has 175 separate business units, serving widely disparate markets.",
+          "required_terms": [
+            "Marmon has 175",
+            "widely disparate markets"
+          ],
+          "gold_passage_ids": [
+            "2016_p0076"
+          ],
+          "verification_note": "2016 letter; unit=count of business units; definition=units under the Marmon umbrella."
+        }
+      ],
+      "multi_part": true,
+      "accept": {
+        "min_claim_coverage": 1.0,
+        "require_valid_citation": true
+      },
+      "reject": {
+        "forbidden_terms": []
+      },
+      "verification_note": "2016_p0076 gives 44 direct-report businesses and Marmon's 175 units.",
+      "ft_context_overlap": true
+    },
+    {
+      "qid": "hv5b_23",
+      "question_type": "company",
+      "answerable": true,
+      "years": [
+        2012
+      ],
+      "query": "How much business did Nebraska Furniture Mart do during its annual meeting sale the year before, and when does the Berkshire discount period run?",
+      "gold_passage_ids": [
+        "2012_p0138"
+      ],
+      "relevant_ids": [
+        "2012_p0138"
+      ],
+      "gold_claims": [
+        {
+          "claim": "Nebraska Furniture Mart did $35.9 million of business during its annual meeting sale, an all-time record.",
+          "required_terms": [
+            "$35.9 million",
+            "all-time record"
+          ],
+          "gold_passage_ids": [
+            "2012_p0138"
+          ],
+          "verification_note": "2012 letter; unit=millions of dollars of sales; definition=record sales in the prior year's meeting sale."
+        },
+        {
+          "claim": "The store sits on a 77-acre site on 72nd Street between Dodge and Pacific.",
+          "required_terms": [
+            "77-acre site",
+            "72nd Street"
+          ],
+          "gold_passage_ids": [
+            "2012_p0138"
+          ],
+          "verification_note": "2012 letter; unit=acres of site area; definition=NFM's Omaha location."
+        },
+        {
+          "claim": "The Berkshire discount applies to purchases between Tuesday, April 30th and Monday, May 6th, with the meeting credential.",
+          "required_terms": [
+            "April 30th",
+            "May 6th",
+            "meeting credential"
+          ],
+          "gold_passage_ids": [
+            "2012_p0138"
+          ],
+          "verification_note": "2012 letter; unit=dates of the discount period; definition=window for Berkshire Weekend pricing."
+        }
+      ],
+      "multi_part": true,
+      "accept": {
+        "min_claim_coverage": 1.0,
+        "require_valid_citation": true
+      },
+      "reject": {
+        "forbidden_terms": []
+      },
+      "verification_note": "2012_p0138 gives the $35.9 million record, the 77-acre site and the April 30th-May 6th discount window.",
+      "ft_context_overlap": true
+    },
+    {
+      "qid": "hv5b_24",
+      "question_type": "company",
+      "answerable": true,
+      "years": [
+        2012
+      ],
+      "query": "How did the manufacturing, service and retailing businesses perform in 2012 in revenues and earnings?",
+      "gold_passage_ids": [
+        "2012_p0065",
+        "2012_p0066"
+      ],
+      "relevant_ids": [
+        "2012_p0065",
+        "2012_p0066"
+      ],
+      "gold_claims": [
+        {
+          "claim": "The group's revenues were $83,255 million in 2012.",
+          "required_terms": [
+            "Revenues",
+            "$83,255"
+          ],
+          "gold_passage_ids": [
+            "2012_p0065"
+          ],
+          "verification_note": "2012 letter; unit=millions of dollars; definition=2012 revenues of the manufacturing, service and retailing group."
+        },
+        {
+          "claim": "Berkshire equity in the group is $48,657 million.",
+          "required_terms": [
+            "Berkshire equity",
+            "48,657"
+          ],
+          "gold_passage_ids": [
+            "2012_p0065"
+          ],
+          "verification_note": "2012 letter; unit=millions of dollars; definition=Berkshire equity on the group's summary balance sheet."
+        },
+        {
+          "claim": "Pre-tax earnings were $6,131 million in 2012.",
+          "required_terms": [
+            "Pre-tax earnings",
+            "6,131"
+          ],
+          "gold_passage_ids": [
+            "2012_p0066"
+          ],
+          "verification_note": "2012 letter; unit=millions of dollars; definition=2012 pre-tax earnings of the group."
+        },
+        {
+          "claim": "Net earnings were $3,699 million in 2012.",
+          "required_terms": [
+            "Net earnings",
+            "3,699"
+          ],
+          "gold_passage_ids": [
+            "2012_p0066"
+          ],
+          "verification_note": "2012 letter; unit=millions of dollars; definition=2012 net earnings of the group."
+        }
+      ],
+      "multi_part": true,
+      "accept": {
+        "min_claim_coverage": 1.0,
+        "require_valid_citation": true
+      },
+      "reject": {
+        "forbidden_terms": []
+      },
+      "verification_note": "2012_p0065-66 give the summary balance sheet equity and the 2012 earnings statement of the group.",
+      "ft_context_overlap": true
+    },
+    {
+      "qid": "hv5b_25",
+      "question_type": "fact_number",
+      "answerable": true,
+      "years": [
+        1984
+      ],
+      "query": "What minimum purchase size and what kind of balance sheet does Berkshire look for in an acquisition?",
+      "gold_passage_ids": [
+        "1984_p0134"
+      ],
+      "relevant_ids": [
+        "1984_p0134"
+      ],
+      "gold_claims": [
+        {
+          "claim": "Berkshire prefers large purchases of at least $5 million of after-tax earnings.",
+          "required_terms": [
+            "large purchases",
+            "$5 million"
+          ],
+          "gold_passage_ids": [
+            "1984_p0134"
+          ],
+          "verification_note": "1984 letter; unit=millions of dollars of after-tax earnings; definition=minimum acquisition size."
+        },
+        {
+          "claim": "It wants businesses earning good returns on equity while employing little or no debt.",
+          "required_terms": [
+            "good returns on equity",
+            "little or no debt"
+          ],
+          "gold_passage_ids": [
+            "1984_p0134"
+          ],
+          "verification_note": "1984 letter; unit=qualitative financial criteria; definition=returns on equity with minimal debt."
+        },
+        {
+          "claim": "It wants demonstrated consistent earning power, with future projections and turn-around situations of little interest.",
+          "required_terms": [
+            "consistent earning power",
+            "turn-around"
+          ],
+          "gold_passage_ids": [
+            "1984_p0134"
+          ],
+          "verification_note": "1984 letter; unit=qualitative earnings criteria; definition=historical earning power over projections."
+        }
+      ],
+      "multi_part": true,
+      "accept": {
+        "min_claim_coverage": 1.0,
+        "require_valid_citation": true
+      },
+      "reject": {
+        "forbidden_terms": []
+      },
+      "verification_note": "1984_p0134 lists the $5 million size test, low-debt returns and the consistent-earnings test.",
+      "ft_context_overlap": true
+    },
+    {
+      "qid": "hv5b_26",
+      "question_type": "fact_number",
+      "answerable": true,
+      "years": [
+        1988
+      ],
+      "query": "When did Berkshire's shares begin trading on the New York Stock Exchange, and what are the trading-lot rules?",
+      "gold_passage_ids": [
+        "1988_p0109"
+      ],
+      "relevant_ids": [
+        "1988_p0109"
+      ],
+      "gold_claims": [
+        {
+          "claim": "Berkshire's shares were listed on the New York Stock Exchange on November 29, 1988.",
+          "required_terms": [
+            "New York Stock",
+            "November 29, 1988"
+          ],
+          "gold_passage_ids": [
+            "1988_p0109"
+          ],
+          "verification_note": "1988 letter; unit=date of listing; definition=NYSE listing date."
+        },
+        {
+          "claim": "The round lot on the NYSE is ten shares, but any number from one share up can be bought or sold.",
+          "required_terms": [
+            "round lot",
+            "ten shares"
+          ],
+          "gold_passage_ids": [
+            "1988_p0109"
+          ],
+          "verification_note": "1988 letter; unit=shares per round lot; definition=NYSE trading lot size."
+        },
+        {
+          "claim": "The listing aimed to reduce transaction costs, and the spread has been well below the over-the-counter spread.",
+          "required_terms": [
+            "transaction costs",
+            "over-the-counter"
+          ],
+          "gold_passage_ids": [
+            "1988_p0109"
+          ],
+          "verification_note": "1988 letter; unit=qualitative trading cost; definition=bid-asked spread versus over-the-counter market."
+        }
+      ],
+      "multi_part": true,
+      "accept": {
+        "min_claim_coverage": 1.0,
+        "require_valid_citation": true
+      },
+      "reject": {
+        "forbidden_terms": []
+      },
+      "verification_note": "1988_p0109 gives the listing date, the ten-share round lot and the cost rationale.",
+      "ft_context_overlap": true
+    },
+    {
+      "qid": "hv5b_27",
+      "question_type": "fact_number",
+      "answerable": true,
+      "years": [
+        1990
+      ],
+      "query": "How far did premium growth fall short of what the industry needed, and where was the combined ratio heading next?",
+      "gold_passage_ids": [
+        "1990_p0052"
+      ],
+      "relevant_ids": [
+        "1990_p0052"
+      ],
+      "gold_claims": [
+        {
+          "claim": "Premium growth fell far short of the required 10% and underwriting results therefore worsened.",
+          "required_terms": [
+            "required 10%",
+            "underwriting results therefore worsened"
+          ],
+          "gold_passage_ids": [
+            "1990_p0052"
+          ],
+          "verification_note": "1990 letter; unit=percent premium growth required; definition=premium growth shortfall versus 10% requirement."
+        },
+        {
+          "claim": "The deterioration in 1990 is masked in the table because Hurricane Hugo losses put the 1989 ratio somewhat above trendline.",
+          "required_terms": [
+            "Hurricane Hugo",
+            "above trendline"
+          ],
+          "gold_passage_ids": [
+            "1990_p0052"
+          ],
+          "verification_note": "1990 letter; unit=qualitative ratio distortion; definition=1989 hurricane effect on the combined ratio."
+        },
+        {
+          "claim": "The combined ratio will again increase in 1991, probably by about two points.",
+          "required_terms": [
+            "again increase in 1991",
+            "about two points"
+          ],
+          "gold_passage_ids": [
+            "1990_p0052"
+          ],
+          "verification_note": "1990 letter; unit=combined-ratio points; definition=expected 1991 increase."
+        }
+      ],
+      "multi_part": true,
+      "accept": {
+        "min_claim_coverage": 1.0,
+        "require_valid_citation": true
+      },
+      "reject": {
+        "forbidden_terms": []
+      },
+      "verification_note": "1990_p0052 gives the 10% shortfall, the Hugo distortion and the two-point 1991 increase.",
+      "ft_context_overlap": true
+    },
+    {
+      "qid": "hv5b_28",
+      "question_type": "fact_number",
+      "answerable": true,
+      "years": [
+        1990
+      ],
+      "query": "What did the condensed pro-forma U.S. Steel balance sheet for the end of 1935 show for cash assets, long-term notes and surplus?",
+      "gold_passage_ids": [
+        "1990_p0145",
+        "1990_p0146"
+      ],
+      "relevant_ids": [
+        "1990_p0145",
+        "1990_p0146"
+      ],
+      "gold_claims": [
+        {
+          "claim": "The condensed pro-forma balance sheet of U.S. Steel is dated December 31, 1935.",
+          "required_terms": [
+            "Balance Sheet",
+            "December 31, 1935"
+          ],
+          "gold_passage_ids": [
+            "1990_p0145"
+          ],
+          "verification_note": "1990 letter; unit=balance-sheet date; definition=as-of date of the pro-forma statement."
+        },
+        {
+          "claim": "It shows cash assets of 142,000,000 and receivables of 56,000,000.",
+          "required_terms": [
+            "142,000,000",
+            "56,000,000"
+          ],
+          "gold_passage_ids": [
+            "1990_p0145"
+          ],
+          "verification_note": "1990 letter; unit=dollars of current assets; definition=cash and receivables on the pro-forma balance sheet."
+        },
+        {
+          "claim": "New sinking fund notes are 1,080,000,000 and the contingency reserve is 1,000,000,000.",
+          "required_terms": [
+            "1,080,000,000",
+            "1,000,000,000"
+          ],
+          "gold_passage_ids": [
+            "1990_p0146"
+          ],
+          "verification_note": "1990 letter; unit=dollars of liabilities and reserves; definition=notes and contingency reserve."
+        },
+        {
+          "claim": "The initial surplus is 389,000,001.",
+          "required_terms": [
+            "Initial Surplus",
+            "389,000,001"
+          ],
+          "gold_passage_ids": [
+            "1990_p0146"
+          ],
+          "verification_note": "1990 letter; unit=dollars of surplus; definition=initial surplus line."
+        }
+      ],
+      "multi_part": true,
+      "accept": {
+        "min_claim_coverage": 1.0,
+        "require_valid_citation": true
+      },
+      "reject": {
+        "forbidden_terms": []
+      },
+      "verification_note": "1990_p0145-46 show the pro-forma U.S. Steel statement with cash, receivables, notes, reserve and surplus.",
+      "ft_context_overlap": false
+    },
+    {
+      "qid": "hv5b_29",
+      "question_type": "fact_number",
+      "answerable": true,
+      "years": [
+        1992
+      ],
+      "query": "How much did Scott Fetzer earn before taxes in 1992, and how much equity capital did it need to do that?",
+      "gold_passage_ids": [
+        "1992_p0106"
+      ],
+      "relevant_ids": [
+        "1992_p0106"
+      ],
+      "gold_claims": [
+        {
+          "claim": "Ralph Schey, CEO of Scott Fetzer, hit a grand slam when the company earned a record $110 million pre-tax.",
+          "required_terms": [
+            "Ralph Schey",
+            "$110 million pre-tax"
+          ],
+          "gold_passage_ids": [
+            "1992_p0106"
+          ],
+          "verification_note": "1992 letter; unit=millions of dollars pre-tax; definition=record Scott Fetzer pre-tax earnings."
+        },
+        {
+          "claim": "Scott Fetzer achieved those earnings while employing only $116 million of equity capital.",
+          "required_terms": [
+            "Scott Fetzer achieved",
+            "$116 million of equity capital"
+          ],
+          "gold_passage_ids": [
+            "1992_p0106"
+          ],
+          "verification_note": "1992 letter; unit=millions of dollars of equity; definition=equity capital employed."
+        },
+        {
+          "claim": "The result is not the product of leverage; borrowing is minor apart from its finance subsidiary.",
+          "required_terms": [
+            "product of leverage",
+            "finance subsidiary"
+          ],
+          "gold_passage_ids": [
+            "1992_p0106"
+          ],
+          "verification_note": "1992 letter; unit=qualitative leverage use; definition=low debt outside the finance subsidiary."
+        }
+      ],
+      "multi_part": true,
+      "accept": {
+        "min_claim_coverage": 1.0,
+        "require_valid_citation": true
+      },
+      "reject": {
+        "forbidden_terms": []
+      },
+      "verification_note": "1992_p0106 gives $110 million pre-tax on $116 million of equity with minimal leverage.",
+      "ft_context_overlap": true
+    },
+    {
+      "qid": "hv5b_30",
+      "question_type": "fact_number",
+      "answerable": true,
+      "years": [
+        1998
+      ],
+      "query": "How much did the shareholder-designated contribution program give in 1998, and how much has it given over its whole life?",
+      "gold_passage_ids": [
+        "1998_p0094"
+      ],
+      "relevant_ids": [
+        "1998_p0094"
+      ],
+      "gold_claims": [
+        {
+          "claim": "The 1998 shareholder-designated program made contributions totaling $16.9 million.",
+          "required_terms": [
+            "$16.9 million",
+            "contributions totaling"
+          ],
+          "gold_passage_ids": [
+            "1998_p0094"
+          ],
+          "verification_note": "1998 letter; unit=millions of dollars; definition=1998 program contributions."
+        },
+        {
+          "claim": "Over the 18 years of the program, Berkshire has made contributions of $130 million at its shareholders' instruction.",
+          "required_terms": [
+            "18 years",
+            "$130 million"
+          ],
+          "gold_passage_ids": [
+            "1998_p0094"
+          ],
+          "verification_note": "1998 letter; unit=millions of dollars cumulative; definition=cumulative program contributions over 18 years."
+        }
+      ],
+      "multi_part": true,
+      "accept": {
+        "min_claim_coverage": 1.0,
+        "require_valid_citation": true
+      },
+      "reject": {
+        "forbidden_terms": []
+      },
+      "verification_note": "1998_p0094 gives $16.9 million for 1998 and $130 million cumulative over 18 years.",
+      "ft_context_overlap": true
+    },
+    {
+      "qid": "hv5b_31",
+      "question_type": "fact_number",
+      "answerable": true,
+      "years": [
+        2004
+      ],
+      "query": "By how much did Berkshire's net worth and per-share book value grow in 2004, and what was the 40-year compounded rate?",
+      "gold_passage_ids": [
+        "2004_p0008"
+      ],
+      "relevant_ids": [
+        "2004_p0008"
+      ],
+      "gold_claims": [
+        {
+          "claim": "Net worth rose $8.3 billion in 2004, increasing per-share book value of Class A and Class B stock by 10.5%.",
+          "required_terms": [
+            "$8.3 billion",
+            "10.5%"
+          ],
+          "gold_passage_ids": [
+            "2004_p0008"
+          ],
+          "verification_note": "2004 letter; unit=billions of dollars and percent; definition=2004 net worth gain and book value growth."
+        },
+        {
+          "claim": "Over 40 years book value grew from $19 to $55,824, a rate of 21.9% compounded annually.",
+          "required_terms": [
+            "$55,824",
+            "21.9%"
+          ],
+          "gold_passage_ids": [
+            "2004_p0008"
+          ],
+          "verification_note": "2004 letter; unit=dollars per share and percent compounded; definition=40-year book value growth."
+        }
+      ],
+      "multi_part": true,
+      "accept": {
+        "min_claim_coverage": 1.0,
+        "require_valid_citation": true
+      },
+      "reject": {
+        "forbidden_terms": []
+      },
+      "verification_note": "2004_p0008 gives the 2004 gain and the 40-year book value record.",
+      "ft_context_overlap": true
+    },
+    {
+      "qid": "hv5b_32",
+      "question_type": "fact_number",
+      "answerable": true,
+      "years": [
+        2006
+      ],
+      "query": "How much federal income tax would Berkshire pay on its 2006 earnings, and how does that compare with daily government spending?",
+      "gold_passage_ids": [
+        "2006_p0119"
+      ],
+      "relevant_ids": [
+        "2006_p0119"
+      ],
+      "gold_claims": [
+        {
+          "claim": "Berkshire will pay about $4.4 billion in federal income tax on its 2006 earnings.",
+          "required_terms": [
+            "$4.4 billion",
+            "federal income tax"
+          ],
+          "gold_passage_ids": [
+            "2006_p0119"
+          ],
+          "verification_note": "2006 letter; unit=billions of dollars; definition=Berkshire's 2006 federal income tax."
+        },
+        {
+          "claim": "The U.S. Government spent $2.6 trillion in its last fiscal year, or about $7 billion per day.",
+          "required_terms": [
+            "$2.6 trillion",
+            "$7 billion per day"
+          ],
+          "gold_passage_ids": [
+            "2006_p0119"
+          ],
+          "verification_note": "2006 letter; unit=trillions of dollars and billions per day; definition=federal outlays."
+        },
+        {
+          "claim": "Had there been only 600 taxpayers like Berkshire, no one else would have needed to pay federal income or payroll taxes.",
+          "required_terms": [
+            "600 taxpayers",
+            "payroll taxes"
+          ],
+          "gold_passage_ids": [
+            "2006_p0119"
+          ],
+          "verification_note": "2006 letter; unit=number of taxpayers; definition=taxpayers like Berkshire needed to fund the government."
+        }
+      ],
+      "multi_part": true,
+      "accept": {
+        "min_claim_coverage": 1.0,
+        "require_valid_citation": true
+      },
+      "reject": {
+        "forbidden_terms": []
+      },
+      "verification_note": "2006_p0119 gives $4.4 billion of tax versus $7 billion per day of federal spending.",
+      "ft_context_overlap": true
+    },
+    {
+      "qid": "hv5b_33",
+      "question_type": "fact_number",
+      "answerable": true,
+      "years": [
+        2006
+      ],
+      "query": "What overall and compounded gains did Berkshire's per-share book value show from the start of current management through 2006, against the S&P 500?",
+      "gold_passage_ids": [
+        "2006_p0005"
+      ],
+      "relevant_ids": [
+        "2006_p0005"
+      ],
+      "gold_claims": [
+        {
+          "claim": "Compounded annual gain for 1965-2006 was 21.4% for Berkshire against 10.4% for the S&P 500 with dividends.",
+          "required_terms": [
+            "1965-2006",
+            "21.4%",
+            "10.4%"
+          ],
+          "gold_passage_ids": [
+            "2006_p0005"
+          ],
+          "verification_note": "2006 letter; unit=percent compounded annually; definition=1965-2006 compounded annual gain, Berkshire versus S&P 500."
+        },
+        {
+          "claim": "Overall gain for 1964-2006 was 361,156% for Berkshire against 6,479% for the S&P 500.",
+          "required_terms": [
+            "1964-2006",
+            "361,156%",
+            "6,479%"
+          ],
+          "gold_passage_ids": [
+            "2006_p0005"
+          ],
+          "verification_note": "2006 letter; unit=percent overall gain; definition=1964-2006 cumulative gain, Berkshire versus S&P 500."
+        },
+        {
+          "claim": "The 2006 gain was 18.4% for Berkshire against 15.8% for the S&P 500.",
+          "required_terms": [
+            "18.4",
+            "15.8"
+          ],
+          "gold_passage_ids": [
+            "2006_p0005"
+          ],
+          "verification_note": "2006 letter; unit=percent annual change; definition=2006 annual change, Berkshire versus S&P 500."
+        }
+      ],
+      "multi_part": true,
+      "accept": {
+        "min_claim_coverage": 1.0,
+        "require_valid_citation": true
+      },
+      "reject": {
+        "forbidden_terms": []
+      },
+      "verification_note": "2006_p0005 gives the 2006 row and the 1965-2006 and 1964-2006 totals of the performance table.",
+      "ft_context_overlap": true
+    },
+    {
+      "qid": "hv5b_34",
+      "question_type": "fact_number",
+      "answerable": true,
+      "years": [
+        2010
+      ],
+      "query": "At yearend 2010, what were Berkshire's common stocks worth versus their cost, and how large were investees' undistributed earnings?",
+      "gold_passage_ids": [
+        "2010_p0102"
+      ],
+      "relevant_ids": [
+        "2010_p0102"
+      ],
+      "gold_claims": [
+        {
+          "claim": "Total common stocks carried at market had a cost of $33,733 million and a market value of $61,513 million.",
+          "required_terms": [
+            "Total Common Stocks Carried at Market",
+            "$33,733",
+            "$61,513"
+          ],
+          "gold_passage_ids": [
+            "2010_p0102"
+          ],
+          "verification_note": "2010 letter; unit=millions of dollars; definition=cost versus market value of the common stock portfolio."
+        },
+        {
+          "claim": "Berkshire's share of its investees' undistributed earnings was more than $2 billion last year.",
+          "required_terms": [
+            "undistributed earnings",
+            "more than $2 billion"
+          ],
+          "gold_passage_ids": [
+            "2010_p0102"
+          ],
+          "verification_note": "2010 letter; unit=billions of dollars; definition=undistributed investee earnings."
+        },
+        {
+          "claim": "Undistributed earnings have been matched or exceeded by market gains, albeit in a highly irregular manner.",
+          "required_terms": [
+            "matched or exceeded by market gains",
+            "highly irregular"
+          ],
+          "gold_passage_ids": [
+            "2010_p0102"
+          ],
+          "verification_note": "2010 letter; unit=qualitative market-gain relationship; definition=retained earnings versus market gains."
+        }
+      ],
+      "multi_part": true,
+      "accept": {
+        "min_claim_coverage": 1.0,
+        "require_valid_citation": true
+      },
+      "reject": {
+        "forbidden_terms": []
+      },
+      "verification_note": "2010_p0102 gives the portfolio cost/market totals and the $2 billion undistributed-earnings remark.",
+      "ft_context_overlap": true
+    },
+    {
+      "qid": "hv5b_35",
+      "question_type": "fact_number",
+      "answerable": true,
+      "years": [
+        2012
+      ],
+      "query": "How much free money did Berkshire's insurance operations supply for investment, and what underwriting gain did they deliver?",
+      "gold_passage_ids": [
+        "2012_p0020"
+      ],
+      "relevant_ids": [
+        "2012_p0020"
+      ],
+      "gold_claims": [
+        {
+          "claim": "Insurance operations gave Berkshire $73 billion of free money to invest.",
+          "required_terms": [
+            "$73 billion",
+            "free money"
+          ],
+          "gold_passage_ids": [
+            "2012_p0020"
+          ],
+          "verification_note": "2012 letter; unit=billions of dollars of float; definition=float available for investment."
+        },
+        {
+          "claim": "They delivered a $1.6 billion underwriting gain, the tenth consecutive year of profitable underwriting.",
+          "required_terms": [
+            "$1.6 billion underwriting gain",
+            "tenth consecutive year"
+          ],
+          "gold_passage_ids": [
+            "2012_p0020"
+          ],
+          "verification_note": "2012 letter; unit=billions of dollars and years; definition=2012 underwriting gain and streak."
+        }
+      ],
+      "multi_part": true,
+      "accept": {
+        "min_claim_coverage": 1.0,
+        "require_valid_citation": true
+      },
+      "reject": {
+        "forbidden_terms": []
+      },
+      "verification_note": "2012_p0020 gives $73 billion of float, a $1.6 billion gain and a ten-year streak.",
+      "ft_context_overlap": true
+    },
+    {
+      "qid": "hv5b_36",
+      "question_type": "fact_number",
+      "answerable": true,
+      "years": [
+        2014
+      ],
+      "query": "At yearend 2014, what did the manufacturing, service and retailing group's balance sheet show for cash, inventory, goodwill and Berkshire equity?",
+      "gold_passage_ids": [
+        "2014_p0081",
+        "2014_p0082"
+      ],
+      "relevant_ids": [
+        "2014_p0081",
+        "2014_p0082"
+      ],
+      "gold_claims": [
+        {
+          "claim": "Cash and equivalents were $5,765 million at 12/31/14.",
+          "required_terms": [
+            "Cash and equivalents",
+            "5,765"
+          ],
+          "gold_passage_ids": [
+            "2014_p0081"
+          ],
+          "verification_note": "2014 letter; unit=millions of dollars; definition=cash of the group at yearend 2014."
+        },
+        {
+          "claim": "Inventory was $10,236 million at 12/31/14.",
+          "required_terms": [
+            "Inventory",
+            "10,236"
+          ],
+          "gold_passage_ids": [
+            "2014_p0081"
+          ],
+          "verification_note": "2014 letter; unit=millions of dollars; definition=inventory of the group at yearend 2014."
+        },
+        {
+          "claim": "Goodwill and other intangibles were $28,107 million.",
+          "required_terms": [
+            "Goodwill and other intangibles",
+            "28,107"
+          ],
+          "gold_passage_ids": [
+            "2014_p0082"
+          ],
+          "verification_note": "2014 letter; unit=millions of dollars; definition=goodwill and intangibles of the group in 2014."
+        },
+        {
+          "claim": "Berkshire equity in the group was $51,827 million.",
+          "required_terms": [
+            "Berkshire equity",
+            "51,827"
+          ],
+          "gold_passage_ids": [
+            "2014_p0082"
+          ],
+          "verification_note": "2014 letter; unit=millions of dollars; definition=Berkshire equity of the group in 2014."
+        }
+      ],
+      "multi_part": true,
+      "accept": {
+        "min_claim_coverage": 1.0,
+        "require_valid_citation": true
+      },
+      "reject": {
+        "forbidden_terms": []
+      },
+      "verification_note": "2014_p0081-82 hold the 12/31/14 summary balance sheet of the group.",
+      "ft_context_overlap": true
+    },
+    {
+      "qid": "hv5b_37",
+      "question_type": "fact_number",
+      "answerable": true,
+      "years": [
+        2016
+      ],
+      "query": "What revenues, pre-tax earnings and net earnings did the manufacturing, service and retailing group report for 2016?",
+      "gold_passage_ids": [
+        "2016_p0076"
+      ],
+      "relevant_ids": [
+        "2016_p0076"
+      ],
+      "gold_claims": [
+        {
+          "claim": "Revenues were $120,059 million, with operating expenses of 111,383.",
+          "required_terms": [
+            "$120,059",
+            "111,383"
+          ],
+          "gold_passage_ids": [
+            "2016_p0076"
+          ],
+          "verification_note": "2016 letter; unit=millions of dollars; definition=2016 revenues and operating expenses of the group."
+        },
+        {
+          "claim": "Pre-tax earnings were $8,462 million.",
+          "required_terms": [
+            "Pre-tax earnings",
+            "8,462"
+          ],
+          "gold_passage_ids": [
+            "2016_p0076"
+          ],
+          "verification_note": "2016 letter; unit=millions of dollars; definition=2016 pre-tax earnings of the group."
+        },
+        {
+          "claim": "Net earnings were $5,631 million after income taxes and non-controlling interests of 2,831.",
+          "required_terms": [
+            "Net earnings",
+            "5,631",
+            "2,831"
+          ],
+          "gold_passage_ids": [
+            "2016_p0076"
+          ],
+          "verification_note": "2016 letter; unit=millions of dollars; definition=2016 net earnings of the group."
+        }
+      ],
+      "multi_part": true,
+      "accept": {
+        "min_claim_coverage": 1.0,
+        "require_valid_citation": true
+      },
+      "reject": {
+        "forbidden_terms": []
+      },
+      "verification_note": "2016_p0076 gives revenue, operating expense, pre-tax and net earnings for 2016.",
+      "ft_context_overlap": true
+    },
+    {
+      "qid": "hv5b_38",
+      "question_type": "temporal_comparison",
+      "answerable": true,
+      "years": [
+        2006,
+        2010
+      ],
+      "query": "How large was Berkshire's insurance float at the end of 2006, and how did it compare with the end of 2010?",
+      "gold_passage_ids": [
+        "2006_p0041",
+        "2010_p0059"
+      ],
+      "relevant_ids": [
+        "2006_p0041",
+        "2010_p0059"
+      ],
+      "gold_claims": [
+        {
+          "claim": "In the 2006 letter, total yearend float was $50,887 million.",
+          "required_terms": [
+            "Yearend Float",
+            "$50,887"
+          ],
+          "gold_passage_ids": [
+            "2006_p0041"
+          ],
+          "verification_note": "2006 letter; unit=millions of dollars; definition=yearend 2006 float across all insurance operations."
+        },
+        {
+          "claim": "In the 2010 letter, yearend float had reached $65,832 million, up from $27,871 million in 2000.",
+          "required_terms": [
+            "65,832",
+            "27,871"
+          ],
+          "gold_passage_ids": [
+            "2010_p0059"
+          ],
+          "verification_note": "2010 letter; unit=millions of dollars; definition=yearend 2010 float and the 2000 comparison point."
+        }
+      ],
+      "multi_part": true,
+      "accept": {
+        "min_claim_coverage": 1.0,
+        "require_valid_citation": true
+      },
+      "reject": {
+        "forbidden_terms": []
+      },
+      "verification_note": "2006_p0041 gives $50,887 million and 2010_p0059 gives $65,832 million of float.",
+      "ft_context_overlap": true
+    },
+    {
+      "qid": "hv5b_39",
+      "question_type": "temporal_comparison",
+      "answerable": true,
+      "years": [
+        2004,
+        2006
+      ],
+      "query": "How did Buffett describe Gen Re's derivative operation in 2004 compared with 2006?",
+      "gold_passage_ids": [
+        "2004_p0072",
+        "2006_p0087"
+      ],
+      "relevant_ids": [
+        "2004_p0072",
+        "2006_p0087"
+      ],
+      "gold_claims": [
+        {
+          "claim": "In 2004, Gen Re's derivative contracts were marked to market, but fuzzy prices meant phantom profits were often recorded.",
+          "required_terms": [
+            "marked to market",
+            "phantom profits"
+          ],
+          "gold_passage_ids": [
+            "2004_p0072"
+          ],
+          "verification_note": "2004 letter; unit=qualitative valuation reliability; definition=mark-to-market uncertainty and phantom profits."
+        },
+        {
+          "claim": "In 2004, the marks influenced the managerial and trading bonuses that were paid annually.",
+          "required_terms": [
+            "managerial and trading bonuses",
+            "paid annually"
+          ],
+          "gold_passage_ids": [
+            "2004_p0072"
+          ],
+          "verification_note": "2004 letter; unit=qualitative incentive effect; definition=marks feeding annual bonuses."
+        },
+        {
+          "claim": "By 2006 the wind-down had cut the book from 23,218 contracts to 197.",
+          "required_terms": [
+            "23,218 contracts",
+            "197"
+          ],
+          "gold_passage_ids": [
+            "2006_p0087"
+          ],
+          "verification_note": "2006 letter; unit=count of contracts; definition=contracts outstanding at start of wind-down versus 2006."
+        },
+        {
+          "claim": "By 2006 the cumulative pre-tax loss totalled $409 million, with only $5 million in 2006.",
+          "required_terms": [
+            "$409 million",
+            "$5 million"
+          ],
+          "gold_passage_ids": [
+            "2006_p0087"
+          ],
+          "verification_note": "2006 letter; unit=millions of dollars; definition=cumulative and 2006 loss on the derivative operation."
+        }
+      ],
+      "multi_part": true,
+      "accept": {
+        "min_claim_coverage": 1.0,
+        "require_valid_citation": true
+      },
+      "reject": {
+        "forbidden_terms": []
+      },
+      "verification_note": "2004_p0072 covers marking and bonuses; 2006_p0087 gives the wind-down counts and $409 million loss.",
+      "ft_context_overlap": true
+    },
+    {
+      "qid": "hv5b_40",
+      "question_type": "temporal_comparison",
+      "answerable": true,
+      "years": [
+        2006,
+        2012
+      ],
+      "query": "What shareholder events did Buffett describe at Borsheim's for the annual meeting weekend in 2006 versus 2012?",
+      "gold_passage_ids": [
+        "2006_p0161",
+        "2012_p0139"
+      ],
+      "relevant_ids": [
+        "2006_p0161",
+        "2012_p0139"
+      ],
+      "gold_claims": [
+        {
+          "claim": "In 2006, Ariel Hsing would play table tennis at Borsheim's from 1 p.m. to 4 p.m. on Sunday against anyone brave enough.",
+          "required_terms": [
+            "Ariel Hsing",
+            "1 p.m. to 4 p.m."
+          ],
+          "gold_passage_ids": [
+            "2006_p0161"
+          ],
+          "verification_note": "2006 letter; unit=hours of an event; definition=2006 Sunday table-tennis exhibition at Borsheim's."
+        },
+        {
+          "claim": "In 2006, Ariel was only 11 and ranked number one among girls under 16 in the U.S.",
+          "required_terms": [
+            "only 11",
+            "number one among girls under 16"
+          ],
+          "gold_passage_ids": [
+            "2006_p0161"
+          ],
+          "verification_note": "2006 letter; unit=age and ranking; definition=Ariel Hsing's age and ranking."
+        },
+        {
+          "claim": "In 2012, Borsheims planned a cocktail reception from 6 p.m. to 9 p.m. on Friday, May 3rd.",
+          "required_terms": [
+            "cocktail reception",
+            "6 p.m. to 9 p.m."
+          ],
+          "gold_passage_ids": [
+            "2012_p0139"
+          ],
+          "verification_note": "2012 letter; unit=hours of an event; definition=2012 Friday-evening Borsheims reception."
+        },
+        {
+          "claim": "In 2012, the main gala was set for Sunday, May 5th, from 9 a.m. to 4 p.m.",
+          "required_terms": [
+            "main gala",
+            "9 a.m. to 4 p.m."
+          ],
+          "gold_passage_ids": [
+            "2012_p0139"
+          ],
+          "verification_note": "2012 letter; unit=hours of an event; definition=2012 Sunday Borsheims gala."
+        }
+      ],
+      "multi_part": true,
+      "accept": {
+        "min_claim_coverage": 1.0,
+        "require_valid_citation": true
+      },
+      "reject": {
+        "forbidden_terms": []
+      },
+      "verification_note": "2006_p0161 has the Ariel Hsing Sunday event and 2012_p0139 the reception and gala hours.",
+      "ft_context_overlap": true
+    },
+    {
+      "qid": "hv5b_41",
+      "question_type": "temporal_comparison",
+      "answerable": true,
+      "years": [
+        1992,
+        2000
+      ],
+      "query": "How did Buffett describe Scott Fetzer's performance and its CEO in 1992 versus 2000?",
+      "gold_passage_ids": [
+        "1992_p0107",
+        "2000_p0114"
+      ],
+      "relevant_ids": [
+        "1992_p0107",
+        "2000_p0114"
+      ],
+      "gold_claims": [
+        {
+          "claim": "In 1992, Scott Fetzer operated with a significantly smaller investment in inventory and fixed assets than when Berkshire bought it.",
+          "required_terms": [
+            "significantly smaller",
+            "inventory and fixed assets"
+          ],
+          "gold_passage_ids": [
+            "1992_p0107"
+          ],
+          "verification_note": "1992 letter; unit=qualitative capital intensity; definition=reduced investment in inventory and fixed assets."
+        },
+        {
+          "claim": "In 1992, it had distributed more than 100% of its earnings to Berkshire over seven years of ownership while increasing earnings.",
+          "required_terms": [
+            "more than 100% of its earnings",
+            "seven years of ownership"
+          ],
+          "gold_passage_ids": [
+            "1992_p0107"
+          ],
+          "verification_note": "1992 letter; unit=percent of earnings distributed over years; definition=distributions over seven years of ownership."
+        },
+        {
+          "claim": "In 2000, Buffett recalled that Berkshire bought Scott Fetzer in 1985 and acquired the services of Ralph Schey, a truly outstanding CEO.",
+          "required_terms": [
+            "In 1985",
+            "Ralph Schey",
+            "truly outstanding CEO"
+          ],
+          "gold_passage_ids": [
+            "2000_p0114"
+          ],
+          "verification_note": "2000 letter; unit=year of purchase; definition=1985 purchase and Ralph Schey's role."
+        },
+        {
+          "claim": "In 2000, Buffett noted that Ralph was then 61 and that most companies focus on the calendar rather than ability.",
+          "required_terms": [
+            "Ralph was then 61",
+            "calendar rather than ability"
+          ],
+          "gold_passage_ids": [
+            "2000_p0114"
+          ],
+          "verification_note": "2000 letter; unit=age in years; definition=Ralph Schey's age at purchase."
+        }
+      ],
+      "multi_part": true,
+      "accept": {
+        "min_claim_coverage": 1.0,
+        "require_valid_citation": true
+      },
+      "reject": {
+        "forbidden_terms": []
+      },
+      "verification_note": "1992_p0107 covers capital and distributions; 2000_p0114 covers the purchase and Ralph Schey's age.",
+      "ft_context_overlap": true
+    },
+    {
+      "qid": "hv5b_42",
+      "question_type": "temporal_comparison",
+      "answerable": true,
+      "years": [
+        1998,
+        2002
+      ],
+      "query": "How did Buffett criticize misleading earnings presentations in 1998 versus 2002?",
+      "gold_passage_ids": [
+        "1998_p0078",
+        "1998_p0079",
+        "2002_p0010"
+      ],
+      "relevant_ids": [
+        "1998_p0078",
+        "1998_p0079",
+        "2002_p0010"
+      ],
+      "gold_claims": [
+        {
+          "claim": "In 1998, Buffett called the restructuring charge a device that too often is used for manipulating earnings.",
+          "required_terms": [
+            "restructuring charge",
+            "manipulating earnings"
+          ],
+          "gold_passage_ids": [
+            "1998_p0078"
+          ],
+          "verification_note": "1998 letter; unit=qualitative accounting criticism; definition=restructuring charges used to manage earnings."
+        },
+        {
+          "claim": "In 1998, such charges rested on the idea that Wall Street will not mind if earnings fall short by $5 per share in a quarter as long as future quarters beat expectations by five cents per share.",
+          "required_terms": [
+            "fall short by $5",
+            "five cents per share"
+          ],
+          "gold_passage_ids": [
+            "1998_p0079"
+          ],
+          "verification_note": "1998 letter; unit=dollars per share; definition=shortfall tolerated versus later outperformance."
+        },
+        {
+          "claim": "In 2002, pro-forma earnings statements showed earnings far in excess of those allowed by their auditors.",
+          "required_terms": [
+            "pro-forma",
+            "far in excess of those allowed by their auditors"
+          ],
+          "gold_passage_ids": [
+            "2002_p0010"
+          ],
+          "verification_note": "2002 letter; unit=qualitative accounting criticism; definition=pro-forma earnings above audited earnings."
+        },
+        {
+          "claim": "In 2002, the CEO tells his owners not to count this or that, just count what makes earnings fat.",
+          "required_terms": [
+            "CEO tells his owners",
+            "just count what makes earnings"
+          ],
+          "gold_passage_ids": [
+            "2002_p0010"
+          ],
+          "verification_note": "2002 letter; unit=qualitative accounting criticism; definition=selective counting in pro-forma presentations."
+        }
+      ],
+      "multi_part": true,
+      "accept": {
+        "min_claim_coverage": 1.0,
+        "require_valid_citation": true
+      },
+      "reject": {
+        "forbidden_terms": []
+      },
+      "verification_note": "1998_p0078-79 cover restructuring charges and 2002_p0010 covers pro-forma earnings.",
+      "ft_context_overlap": true
+    },
+    {
+      "qid": "hv5b_43",
+      "question_type": "temporal_comparison",
+      "answerable": true,
+      "years": [
+        2014,
+        2032
+      ],
+      "query": "How many shares did the 1964 tender offer cover as recounted in 2014, and how does that compare with 2032?",
+      "gold_passage_ids": [
+        "2014_p0139"
+      ],
+      "relevant_ids": [
+        "2014_p0139"
+      ],
+      "gold_claims": [
+        {
+          "claim": "In 1964 Berkshire's then-management offered to buy 225,000 shares of its stock for $11.375 per share.",
+          "required_terms": [
+            "225,000 shares",
+            "$11.375 per share"
+          ],
+          "gold_passage_ids": [
+            "2014_p0139"
+          ],
+          "verification_note": "2014 letter; unit=shares and dollars per share; definition=1964 tender-offer size and price."
+        },
+        {
+          "claim": "Berkshire then had 1,583,680 shares outstanding, about 7% owned by Buffett Partnership Ltd.",
+          "required_terms": [
+            "1,583,680 shares",
+            "About 7%"
+          ],
+          "gold_passage_ids": [
+            "2014_p0139"
+          ],
+          "verification_note": "2014 letter; unit=shares outstanding and percent held; definition=1964 share count and BPL stake."
+        }
+      ],
+      "multi_part": true,
+      "expected_coverage_note": "2032 is the missing period: the frozen corpus has no 2032 letter or 2032 text; answer the supported 2014 side and identify the missing evidence without claiming a change or issuing a total refusal.",
+      "accept": {
+        "min_claim_coverage": 1.0,
+        "require_valid_citation": true
+      },
+      "reject": {
+        "forbidden_terms": []
+      },
+      "verification_note": "2014_p0139 gives the 225,000-share tender offer at $11.375; no 2032 letter or text exists in the corpus.",
+      "ft_context_overlap": true
+    },
+    {
+      "qid": "hv5b_44",
+      "question_type": "follow_up",
+      "answerable": true,
+      "years": [
+        1984
+      ],
+      "history": [
+        {
+          "role": "user",
+          "content": "Does Berkshire's 1984 letter run a 'business wanted' ad?"
+        },
+        {
+          "role": "assistant",
+          "content": "Yes, each year Buffett repeats a short ad describing the kind of company Berkshire would like to buy."
+        }
+      ],
+      "query": "Who found a candidate that year, and why did a deal not happen?",
+      "gold_passage_ids": [
+        "1984_p0133"
+      ],
+      "relevant_ids": [
+        "1984_p0133"
+      ],
+      "gold_claims": [
+        {
+          "claim": "John Loomis, a knowledgeable and alert shareholder, came up with a company that met all of our tests.",
+          "required_terms": [
+            "John Loomis",
+            "met all of our tests"
+          ],
+          "gold_passage_ids": [
+            "1984_p0133"
+          ],
+          "verification_note": "1984 letter; unit=person identity; definition=the shareholder who proposed a qualifying company."
+        },
+        {
+          "claim": "A chance complication prevented a deal.",
+          "required_terms": [
+            "chance complication",
+            "prevented a deal"
+          ],
+          "gold_passage_ids": [
+            "1984_p0133"
+          ],
+          "verification_note": "1984 letter; unit=qualitative deal outcome; definition=reason the deal did not close."
+        }
+      ],
+      "multi_part": true,
+      "accept": {
+        "min_claim_coverage": 1.0,
+        "require_valid_citation": true
+      },
+      "reject": {
+        "forbidden_terms": []
+      },
+      "verification_note": "1984_p0133 names John Loomis and a chance complication; history only establishes the annual ad.",
+      "ft_context_overlap": true
+    },
+    {
+      "qid": "hv5b_45",
+      "question_type": "follow_up",
+      "answerable": true,
+      "years": [
+        1990
+      ],
+      "history": [
+        {
+          "role": "user",
+          "content": "What does Buffett say about insurance float in the 1990 letter?"
+        },
+        {
+          "role": "assistant",
+          "content": "He explains that float is money an insurer holds before claims are paid, and that some kinds of insurance generate far more of it than others."
+        }
+      ],
+      "query": "Which lines produce the most float relative to premiums, and why does that happen?",
+      "gold_passage_ids": [
+        "1990_p0063"
+      ],
+      "relevant_ids": [
+        "1990_p0063"
+      ],
+      "gold_claims": [
+        {
+          "claim": "Malpractice insurance covering doctors, lawyers and accountants produces a very high amount of float compared to annual premium volume.",
+          "required_terms": [
+            "malpractice insurance",
+            "very high amount of float"
+          ],
+          "gold_passage_ids": [
+            "1990_p0063"
+          ],
+          "verification_note": "1990 letter; unit=qualitative float ratio; definition=float relative to premium volume for malpractice cover."
+        },
+        {
+          "claim": "The float materializes because claims are often brought long after the alleged wrongdoing and payment may be further delayed by lengthy litigation.",
+          "required_terms": [
+            "long after the alleged wrongdoing",
+            "lengthy litigation"
+          ],
+          "gold_passage_ids": [
+            "1990_p0063"
+          ],
+          "verification_note": "1990 letter; unit=qualitative payment delay; definition=reasons claims are paid late."
+        },
+        {
+          "claim": "Insurers get to hold large sums for an extended period in this kind of business.",
+          "required_terms": [
+            "extended period",
+            "hold large sums"
+          ],
+          "gold_passage_ids": [
+            "1990_p0063"
+          ],
+          "verification_note": "1990 letter; unit=qualitative holding period; definition=length of time insurers hold the money."
+        }
+      ],
+      "multi_part": true,
+      "accept": {
+        "min_claim_coverage": 1.0,
+        "require_valid_citation": true
+      },
+      "reject": {
+        "forbidden_terms": []
+      },
+      "verification_note": "1990_p0063 explains why long-tail liability lines generate high float; history only introduces float.",
+      "ft_context_overlap": false
+    },
+    {
+      "qid": "hv5b_46",
+      "question_type": "follow_up",
+      "answerable": true,
+      "years": [
+        1992
+      ],
+      "history": [
+        {
+          "role": "user",
+          "content": "How have Berkshire's negotiated preferred-stock purchases turned out so far, per the 1992 letter?"
+        },
+        {
+          "role": "assistant",
+          "content": "They have roughly met the expectation Buffett set earlier, without exceeding it."
+        }
+      ],
+      "query": "What would have worked better, and why couldn't Berkshire do that?",
+      "gold_passage_ids": [
+        "1992_p0080"
+      ],
+      "relevant_ids": [
+        "1992_p0080"
+      ],
+      "gold_claims": [
+        {
+          "claim": "Berkshire would have done better putting the money into open-market purchases of the type it likes.",
+          "required_terms": [
+            "would have done better",
+            "open-market"
+          ],
+          "gold_passage_ids": [
+            "1992_p0080"
+          ],
+          "verification_note": "1992 letter; unit=qualitative alternative strategy; definition=open-market purchases versus negotiated deals."
+        },
+        {
+          "claim": "Berkshire found it difficult because of both our size and the general strength of the markets.",
+          "required_terms": [
+            "our size",
+            "strength of the markets"
+          ],
+          "gold_passage_ids": [
+            "1992_p0080"
+          ],
+          "verification_note": "1992 letter; unit=qualitative constraint; definition=size and strong markets limiting open-market buying."
+        }
+      ],
+      "multi_part": true,
+      "accept": {
+        "min_claim_coverage": 1.0,
+        "require_valid_citation": true
+      },
+      "reject": {
+        "forbidden_terms": []
+      },
+      "verification_note": "1992_p0080 says open-market purchases would have beaten negotiated deals but size and markets made it hard; history only states the results met expectations.",
+      "ft_context_overlap": false
+    },
+    {
+      "qid": "hv5b_47",
+      "question_type": "follow_up",
+      "answerable": true,
+      "years": [
+        2000
+      ],
+      "history": [
+        {
+          "role": "user",
+          "content": "In the 2000 letter, what does Buffett say about why sellers choose Berkshire?"
+        },
+        {
+          "role": "assistant",
+          "content": "He says owners who built a business prefer to pick its permanent home themselves rather than have heirs auction it off."
+        }
+      ],
+      "query": "Which sellers did he name as examples, and what did Berkshire promise them?",
+      "gold_passage_ids": [
+        "2000_p0037"
+      ],
+      "relevant_ids": [
+        "2000_p0037"
+      ],
+      "gold_claims": [
+        {
+          "claim": "Buffett tells John Justin that his business will remain headquartered in Fort Worth.",
+          "required_terms": [
+            "John Justin",
+            "Fort Worth"
+          ],
+          "gold_passage_ids": [
+            "2000_p0037"
+          ],
+          "verification_note": "2000 letter; unit=person and place; definition=promise to the seller John Justin."
+        },
+        {
+          "claim": "He assures the Bridge family that its operation will not be merged with another jeweler.",
+          "required_terms": [
+            "Bridge family",
+            "another jeweler"
+          ],
+          "gold_passage_ids": [
+            "2000_p0037"
+          ],
+          "verification_note": "2000 letter; unit=family identity and promise; definition=promise to the Bridge family."
+        }
+      ],
+      "multi_part": true,
+      "accept": {
+        "min_claim_coverage": 1.0,
+        "require_valid_citation": true
+      },
+      "reject": {
+        "forbidden_terms": []
+      },
+      "verification_note": "2000_p0037 names John Justin and the Bridge family and the promises made; history only gives the general appeal to sellers.",
+      "ft_context_overlap": true
+    },
+    {
+      "qid": "hv5b_48",
+      "question_type": "follow_up",
+      "answerable": true,
+      "years": [
+        2010
+      ],
+      "history": [
+        {
+          "role": "user",
+          "content": "What did Buffett say about Berkshire's cash hoard in the 2010 letter?"
+        },
+        {
+          "role": "assistant",
+          "content": "He said he would welcome a chance to put some of that cash to work at decent returns."
+        }
+      ],
+      "query": "And which holding did he expect to raise its payout the most, and why had payouts been stuck?",
+      "gold_passage_ids": [
+        "2010_p0106"
+      ],
+      "relevant_ids": [
+        "2010_p0106"
+      ],
+      "gold_claims": [
+        {
+          "claim": "Dividends on our current common stock holdings will almost certainly increase, and the gain is likely to come at Wells Fargo.",
+          "required_terms": [
+            "gain is likely to come at Wells Fargo",
+            "dividends on our current common stock holdings"
+          ],
+          "gold_passage_ids": [
+            "2010_p0106"
+          ],
+          "verification_note": "2010 letter; unit=qualitative dividend outlook; definition=the holding expected to raise its dividend the most."
+        },
+        {
+          "claim": "The Federal Reserve has frozen dividend levels at major banks, whether strong or weak, during the last two years.",
+          "required_terms": [
+            "Federal Reserve",
+            "has frozen",
+            "major banks"
+          ],
+          "gold_passage_ids": [
+            "2010_p0106"
+          ],
+          "verification_note": "2010 letter; unit=years of frozen dividends; definition=regulatory freeze on bank dividends."
+        }
+      ],
+      "multi_part": true,
+      "accept": {
+        "min_claim_coverage": 1.0,
+        "require_valid_citation": true
+      },
+      "reject": {
+        "forbidden_terms": []
+      },
+      "verification_note": "2010_p0106 names Wells Fargo and the Federal Reserve dividend freeze; history only covers the cash hoard.",
+      "ft_context_overlap": true
+    },
+    {
+      "qid": "hv5b_49",
+      "question_type": "follow_up",
+      "answerable": true,
+      "years": [
+        2014
+      ],
+      "history": [
+        {
+          "role": "user",
+          "content": "What principles does Buffett lay out for how Berkshire is run in the 2014 letter?"
+        },
+        {
+          "role": "assistant",
+          "content": "They include buying new subsidiaries with cash rather than stock and not paying dividends while retained earnings create more value."
+        }
+      ],
+      "query": "What did it say about selling subsidiaries or moving their CEOs, and about debt?",
+      "gold_passage_ids": [
+        "2014_p0229"
+      ],
+      "relevant_ids": [
+        "2014_p0229"
+      ],
+      "gold_claims": [
+        {
+          "claim": "Berkshire would almost never sell a subsidiary and would almost never transfer a subsidiary's CEO to another unrelated subsidiary.",
+          "required_terms": [
+            "almost never sell a subsidiary",
+            "almost never transfer"
+          ],
+          "gold_passage_ids": [
+            "2014_p0229"
+          ],
+          "verification_note": "2014 letter; unit=qualitative ownership policy; definition=policy on selling subsidiaries and moving CEOs."
+        },
+        {
+          "claim": "Berkshire would never force the CEO of a subsidiary to retire on account of mere age.",
+          "required_terms": [
+            "never force the CEO",
+            "mere age"
+          ],
+          "gold_passage_ids": [
+            "2014_p0229"
+          ],
+          "verification_note": "2014 letter; unit=qualitative retirement policy; definition=no forced age-based retirement."
+        },
+        {
+          "claim": "Berkshire would have little debt outstanding, maintaining virtually perfect creditworthiness.",
+          "required_terms": [
+            "little debt outstanding",
+            "virtually perfect creditworthiness"
+          ],
+          "gold_passage_ids": [
+            "2014_p0229"
+          ],
+          "verification_note": "2014 letter; unit=qualitative leverage policy; definition=low debt and creditworthiness."
+        }
+      ],
+      "multi_part": true,
+      "accept": {
+        "min_claim_coverage": 1.0,
+        "require_valid_citation": true
+      },
+      "reject": {
+        "forbidden_terms": []
+      },
+      "verification_note": "2014_p0229 lists the never-sell, no-forced-retirement and low-debt principles; history only mentions acquisition and dividend policy.",
+      "ft_context_overlap": true
+    },
+    {
+      "qid": "hv5b_50",
+      "question_type": "follow_up",
+      "answerable": true,
+      "years": [
+        2002
+      ],
+      "history": [
+        {
+          "role": "user",
+          "content": "What did Buffett say about NetJets in the 2002 letter?"
+        },
+        {
+          "role": "assistant",
+          "content": "He promoted its fractional-ownership model as a cheaper and more flexible way for businesses to fly."
+        }
+      ],
+      "query": "How many other aircraft models can an owner use, and what example did he give from his own family?",
+      "gold_passage_ids": [
+        "2002_p0065"
+      ],
+      "relevant_ids": [
+        "2002_p0065"
+      ],
+      "gold_claims": [
+        {
+          "claim": "An owner of an interest in one plane can fly any of 12 other models through the interchange arrangement.",
+          "required_terms": [
+            "12 other models",
+            "interchange arrangement"
+          ],
+          "gold_passage_ids": [
+            "2002_p0065"
+          ],
+          "verification_note": "2002 letter; unit=count of aircraft models; definition=other models available through interchange."
+        },
+        {
+          "claim": "Buffett's sister owns a fraction of a Falcon 2000 but interchanges to a more economical Citation Excel for short trips.",
+          "required_terms": [
+            "Falcon 2000",
+            "Citation Excel"
+          ],
+          "gold_passage_ids": [
+            "2002_p0065"
+          ],
+          "verification_note": "2002 letter; unit=aircraft models; definition=family example of interchanging planes."
+        }
+      ],
+      "multi_part": true,
+      "accept": {
+        "min_claim_coverage": 1.0,
+        "require_valid_citation": true
+      },
+      "reject": {
+        "forbidden_terms": []
+      },
+      "verification_note": "2002_p0065 gives the 12 other models and the sister's Falcon 2000/Citation Excel example; history only introduces NetJets.",
+      "ft_context_overlap": true
+    },
+    {
+      "qid": "hv5b_51",
+      "question_type": "follow_up",
+      "answerable": true,
+      "years": [
+        2012
+      ],
+      "history": [
+        {
+          "role": "user",
+          "content": "What did Buffett say about GEICO in the 2012 letter?"
+        },
+        {
+          "role": "assistant",
+          "content": "He said GEICO kept winning market share without giving up underwriting discipline."
+        }
+      ],
+      "query": "How far had its share and premium volume grown since Berkshire took control, and who gets the credit?",
+      "gold_passage_ids": [
+        "2012_p0020"
+      ],
+      "relevant_ids": [
+        "2012_p0020"
+      ],
+      "gold_claims": [
+        {
+          "claim": "Since 1995, when Berkshire obtained control, GEICO's share of the personal-auto market has grown from 2.5% to 9.7%.",
+          "required_terms": [
+            "Since 1995",
+            "2.5%",
+            "9.7%"
+          ],
+          "gold_passage_ids": [
+            "2012_p0020"
+          ],
+          "verification_note": "2012 letter; unit=percent market share; definition=GEICO's personal-auto market share growth."
+        },
+        {
+          "claim": "GEICO's premium volume increased from $2.8 billion to $16.7 billion.",
+          "required_terms": [
+            "$2.8 billion",
+            "$16.7 billion"
+          ],
+          "gold_passage_ids": [
+            "2012_p0020"
+          ],
+          "verification_note": "2012 letter; unit=billions of dollars of premium; definition=GEICO premium volume growth."
+        },
+        {
+          "claim": "The credit goes to Tony Nicely and his 27,000 associates.",
+          "required_terms": [
+            "Tony Nicely",
+            "27,000 associates"
+          ],
+          "gold_passage_ids": [
+            "2012_p0020"
+          ],
+          "verification_note": "2012 letter; unit=person and headcount; definition=who is credited for GEICO's performance."
+        }
+      ],
+      "multi_part": true,
+      "accept": {
+        "min_claim_coverage": 1.0,
+        "require_valid_citation": true
+      },
+      "reject": {
+        "forbidden_terms": []
+      },
+      "verification_note": "2012_p0020 gives GEICO's share and premium growth and the credit; history only says it gained share.",
+      "ft_context_overlap": true
+    },
+    {
+      "qid": "hv5b_52",
+      "question_type": "follow_up",
+      "answerable": true,
+      "years": [
+        1998
+      ],
+      "history": [
+        {
+          "role": "user",
+          "content": "How does Berkshire handle charitable giving in its 1998 letter?"
+        },
+        {
+          "role": "assistant",
+          "content": "There is a shareholder-designated contribution program, and the subsidiaries do their own giving separately."
+        }
+      ],
+      "query": "How much did the subsidiaries give in total, and how much of that was in kind?",
+      "gold_passage_ids": [
+        "1998_p0094"
+      ],
+      "relevant_ids": [
+        "1998_p0094"
+      ],
+      "gold_claims": [
+        {
+          "claim": "In aggregate, the subsidiaries made contributions of $12.5 million in 1998.",
+          "required_terms": [
+            "subsidiaries made contributions",
+            "$12.5"
+          ],
+          "gold_passage_ids": [
+            "1998_p0094"
+          ],
+          "verification_note": "1998 letter; unit=millions of dollars; definition=subsidiaries' aggregate 1998 giving."
+        },
+        {
+          "claim": "That total included in-kind donations of $2.0 million.",
+          "required_terms": [
+            "in-kind donations",
+            "$2.0 million"
+          ],
+          "gold_passage_ids": [
+            "1998_p0094"
+          ],
+          "verification_note": "1998 letter; unit=millions of dollars; definition=in-kind portion of the subsidiaries' giving."
+        }
+      ],
+      "multi_part": true,
+      "accept": {
+        "min_claim_coverage": 1.0,
+        "require_valid_citation": true
+      },
+      "reject": {
+        "forbidden_terms": []
+      },
+      "verification_note": "1998_p0094 gives the subsidiaries' $12.5 million total and $2.0 million in-kind; history only mentions both giving channels.",
+      "ft_context_overlap": true
+    },
+    {
+      "qid": "hv5b_53",
+      "question_type": "unanswerable",
+      "answerable": false,
+      "refusal_category": "out_of_domain",
+      "years": [],
+      "query": "What oven temperature should I use to bake sourdough bread?",
+      "gold_passage_ids": [],
+      "relevant_ids": [],
+      "gold_claims": [],
+      "expected_answer": "The retrieved passages do not provide enough evidence to answer this question.",
+      "accept": {
+        "min_claim_coverage": 1.0,
+        "require_exact_refusal": true,
+        "require_valid_citation": false
+      },
+      "reject": {
+        "forbidden_terms": []
+      },
+      "absence_search_patterns": [
+        "sourdough",
+        "oven temperature"
+      ],
+      "verification_note": "Whole-corpus case-insensitive searches for sourdough, oven temperature each have zero matches; the request has no supporting passage in the frozen corpus.",
+      "ft_context_overlap": false
+    },
+    {
+      "qid": "hv5b_54",
+      "question_type": "unanswerable",
+      "answerable": false,
+      "refusal_category": "out_of_domain",
+      "years": [],
+      "query": "What is the best way to get a wine stain out of a cotton shirt?",
+      "gold_passage_ids": [],
+      "relevant_ids": [],
+      "gold_claims": [],
+      "expected_answer": "The retrieved passages do not provide enough evidence to answer this question.",
+      "accept": {
+        "min_claim_coverage": 1.0,
+        "require_exact_refusal": true,
+        "require_valid_citation": false
+      },
+      "reject": {
+        "forbidden_terms": []
+      },
+      "absence_search_patterns": [
+        "wine stain",
+        "cotton shirt"
+      ],
+      "verification_note": "Whole-corpus case-insensitive searches for wine stain, cotton shirt each have zero matches; the request has no supporting passage in the frozen corpus.",
+      "ft_context_overlap": false
+    },
+    {
+      "qid": "hv5b_55",
+      "question_type": "unanswerable",
+      "answerable": false,
+      "refusal_category": "unsupported_figure",
+      "years": [],
+      "query": "What price-to-sales ratio did Buffett quote for Coca-Cola in the 1998 letter?",
+      "gold_passage_ids": [],
+      "relevant_ids": [],
+      "gold_claims": [],
+      "expected_answer": "The retrieved passages do not provide enough evidence to answer this question.",
+      "accept": {
+        "min_claim_coverage": 1.0,
+        "require_exact_refusal": true,
+        "require_valid_citation": false
+      },
+      "reject": {
+        "forbidden_terms": []
+      },
+      "absence_search_patterns": [
+        "price[\\s-]+to[\\s-]+sales"
+      ],
+      "verification_note": "Whole-corpus case-insensitive searches for price to sales each have zero matches; the request has no supporting passage in the frozen corpus.",
+      "ft_context_overlap": false
+    },
+    {
+      "qid": "hv5b_56",
+      "question_type": "unanswerable",
+      "answerable": false,
+      "refusal_category": "future_absent_year",
+      "years": [],
+      "query": "How many Berkshire shares were repurchased in 2036?",
+      "gold_passage_ids": [],
+      "relevant_ids": [],
+      "gold_claims": [],
+      "expected_answer": "The retrieved passages do not provide enough evidence to answer this question.",
+      "accept": {
+        "min_claim_coverage": 1.0,
+        "require_exact_refusal": true,
+        "require_valid_citation": false
+      },
+      "reject": {
+        "forbidden_terms": []
+      },
+      "absence_search_patterns": [
+        "\\b2036\\b"
+      ],
+      "verification_note": "Whole-corpus case-insensitive searches for 2036 each have zero matches; the request has no supporting passage in the frozen corpus.",
+      "ft_context_overlap": false
+    },
+    {
+      "qid": "hv5b_57",
+      "question_type": "unanswerable",
+      "answerable": false,
+      "refusal_category": "false_premise",
+      "years": [],
+      "query": "What price did Berkshire pay when it first bought its Tesla shares?",
+      "gold_passage_ids": [],
+      "relevant_ids": [],
+      "gold_claims": [],
+      "expected_answer": "The retrieved passages do not provide enough evidence to answer this question.",
+      "accept": {
+        "min_claim_coverage": 1.0,
+        "require_exact_refusal": true,
+        "require_valid_citation": false
+      },
+      "reject": {
+        "forbidden_terms": []
+      },
+      "absence_search_patterns": [
+        "tesla"
+      ],
+      "verification_note": "Whole-corpus case-insensitive searches for tesla each have zero matches; the request has no supporting passage in the frozen corpus.",
+      "ft_context_overlap": false
+    },
+    {
+      "qid": "hv5b_58",
+      "question_type": "unanswerable",
+      "answerable": false,
+      "refusal_category": "both_sides_unsupported",
+      "years": [],
+      "query": "At the end of 2021, which holding was bigger for Berkshire, Zoom or Peloton, and by what amount?",
+      "gold_passage_ids": [],
+      "relevant_ids": [],
+      "gold_claims": [],
+      "unsupported_sides": [
+        "Zoom",
+        "Peloton"
+      ],
+      "expected_answer": "The retrieved passages do not provide enough evidence to answer this question.",
+      "accept": {
+        "min_claim_coverage": 1.0,
+        "require_exact_refusal": true,
+        "require_valid_citation": false
+      },
+      "reject": {
+        "forbidden_terms": []
+      },
+      "absence_search_patterns": [
+        "\\bzoom\\b",
+        "\\bpeloton\\b"
+      ],
+      "verification_note": "Whole-corpus case-insensitive searches for zoom, peloton each have zero matches; the request has no supporting passage in the frozen corpus.",
+      "ft_context_overlap": false
+    },
+    {
+      "qid": "hv5b_59",
+      "question_type": "unanswerable",
+      "answerable": false,
+      "refusal_category": "unsupported_entity",
+      "years": [],
+      "query": "What does Buffett think of Spotify's subscription model?",
+      "gold_passage_ids": [],
+      "relevant_ids": [],
+      "gold_claims": [],
+      "expected_answer": "The retrieved passages do not provide enough evidence to answer this question.",
+      "accept": {
+        "min_claim_coverage": 1.0,
+        "require_exact_refusal": true,
+        "require_valid_citation": false
+      },
+      "reject": {
+        "forbidden_terms": []
+      },
+      "absence_search_patterns": [
+        "spotify"
+      ],
+      "verification_note": "Whole-corpus case-insensitive searches for spotify each have zero matches; the request has no supporting passage in the frozen corpus.",
+      "ft_context_overlap": false
+    },
+    {
+      "qid": "hv5b_60",
+      "question_type": "unanswerable",
+      "answerable": false,
+      "refusal_category": "unsupported_role",
+      "years": [],
+      "query": "Who was Berkshire's chief technology officer in 2010?",
+      "gold_passage_ids": [],
+      "relevant_ids": [],
+      "gold_claims": [],
+      "expected_answer": "The retrieved passages do not provide enough evidence to answer this question.",
+      "accept": {
+        "min_claim_coverage": 1.0,
+        "require_exact_refusal": true,
+        "require_valid_citation": false
+      },
+      "reject": {
+        "forbidden_terms": []
+      },
+      "absence_search_patterns": [
+        "chief technology officer"
+      ],
+      "verification_note": "Whole-corpus case-insensitive searches for chief technology officer each have zero matches; the request has no supporting passage in the frozen corpus.",
+      "ft_context_overlap": false
+    }
+  ]
+}
