@@ -58,7 +58,7 @@ def _probability(name: str, value: float) -> None:
 @dataclass(frozen=True)
 class GroundedSettings:
     COMPOSER: str = "auto"
-    MLX_MODEL: Path | str = _MODEL_CHECKOUT / "models/teacher-qwen2.5-14b-mlx4"
+    MLX_MODEL: Path | str = _MODEL_CHECKOUT / "models/teacher-qwen2.5-7b-mlx4"
     LLAMA_MODEL: Path | str = (
         _MODEL_CHECKOUT / "models/ft/7b_r1/buffett-qwen2.5-7b-ft-r1-q4_k_m.gguf"
     )
