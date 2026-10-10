@@ -33,15 +33,55 @@ def _normalise_contractions(text: str) -> str:
     return text
 
 
-def _has_negation(text: str, terms: Sequence[str] = ()) -> bool:
-    text = _normalise_contractions(text)
-    if _PREDICATE_NEGATION_RE.search(text):
-        return True
-    lowered = text.lower()
+# A predicate negation scopes a required term when the term starts within this many words after it. A term
+# two words after it is scoped only when the words between (its verb) belong to the claim: "had not increased
+# to $704 million" negates "increased to $704 million", "have never operated on Sunday" does not negate
+# "closed on Sunday".
+_NEGATION_SCOPE_WORDS = 3
+_SCOPE_STOPWORDS = frozenset(
+    "a an the of to in on at by for from with and or as is are was were be been being has have had it its this "
+    "that these those our we us their his her they not never also already still even ever yet just only".split())
+
+
+def _stem_set(text: str) -> set:
+    return {w[:5] for w in re.findall(r"[a-z0-9$%]+", text.lower()) if len(w) >= 4 and w not in _SCOPE_STOPWORDS}
+
+
+def _negation_scopes_term(tail: str, terms: Sequence[str], claim: str) -> bool:
+    """`tail` = the lowered clause text after a predicate negation; `terms` are lowered."""
+    words = list(re.finditer(r"\S+", tail))[:_NEGATION_SCOPE_WORDS]
+    if not words:
+        return False
+    reach = words[-1].end()
+    claim_stems = _stem_set(claim)
     for term in terms:
-        term = term.lower()
-        if not term:
-            continue
+        index = tail.find(term)
+        while index != -1 and index < reach:
+            between = [w.group(0) for w in words if w.start() < index]
+            if len(between) <= 1:
+                return True
+            content = [w.strip(".,;:()\"'\u2019") for w in between]
+            content = [w for w in content if w and w not in _SCOPE_STOPWORDS]
+            if not content or any(w[:5] in claim_stems for w in content if len(w) >= 4):
+                return True
+            index = tail.find(term, index + 1)
+    return False
+
+
+def _has_negation(text: str, terms: Sequence[str] = (), scoped: bool = False, claim: str = "") -> bool:
+    """Does the text negate? With `scoped`, a predicate negation counts only when it scopes a required term
+    of the claim (`claim` is the reference wording, used to tell a negated claim verb from another verb)."""
+    text = _normalise_contractions(text)
+    lowered = text.lower()
+    lowered_terms = [t.lower() for t in terms if t]
+    for match in _PREDICATE_NEGATION_RE.finditer(text):
+        if not scoped or not lowered_terms:
+            return True
+        if any(match.start() <= lowered.find(t, match.start()) < match.end() for t in lowered_terms):
+            return True  # the term is the negation itself
+        if _negation_scopes_term(lowered[match.end():], lowered_terms, claim):
+            return True
+    for term in lowered_terms:
         if term.startswith("no ") and term in lowered:  # the required term itself is the "no X" phrase
             return True
         if re.search(r"\bno\s+" + re.escape(term), lowered):
@@ -91,6 +131,8 @@ def _polarity_and_numbers_agree(reference: str, sentence: str, terms: Sequence[s
     `extra_numbers` (e.g. the year of a stripped, hit-supported label) count for the number check only.
     """
     # On a tie between clauses every tied clause must agree (a tie never relaxes the check).
+    # A negated claim needs a negation anywhere in the clause; a non-negated claim is contradicted only by a
+    # negation that scopes one of its required terms (see _has_negation).
     clauses = _best_clauses(_normalise_contractions(sentence), terms)
     reference_negative = _has_negation(reference, terms)
     if len(clauses) > 1:
@@ -104,9 +146,9 @@ def _polarity_and_numbers_agree(reference: str, sentence: str, terms: Sequence[s
             matching = [rc for rc in reference_clauses if any(t in rc.lower() for t in held)]
             return any(_has_negation(rc, terms) for rc in matching) if matching else reference_negative
 
-        if any(_has_negation(clause, terms) != expected(clause) for clause in clauses):
+        if any(_has_negation(clause, terms, not expected(clause), reference) != expected(clause) for clause in clauses):
             return False
-    elif any(_has_negation(clause, terms) != reference_negative for clause in clauses):
+    elif any(_has_negation(clause, terms, not reference_negative, reference) != reference_negative for clause in clauses):
         return False
     expected_numbers = {value.lower().replace(",", "") for value in _NUMBER_RE.findall(reference)}
     actual_numbers = {value.lower().replace(",", "") for value in _NUMBER_RE.findall(sentence)}
