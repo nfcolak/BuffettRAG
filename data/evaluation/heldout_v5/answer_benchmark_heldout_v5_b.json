@@ -256,7 +256,7 @@
       "years": [
         1988
       ],
-      "query": "Why does Buffett say it is wiser to sell high-priced corn flakes than low-priced auto insurance?",
+      "query": "Why would Buffett rather be a cereal maker charging premium prices than a car insurer charging thin ones?",
       "gold_passage_ids": [
         "1988_p0051"
       ],
@@ -2225,7 +2225,7 @@
         2006,
         2010
       ],
-      "query": "How large was Berkshire's insurance float at the end of 2006, and how did it compare with the end of 2010?",
+      "query": "Compare Berkshire's yearend float in 2006 with 2010: how big was each?",
       "gold_passage_ids": [
         "2006_p0041",
         "2010_p0059"
@@ -3228,7 +3228,7 @@
       "answerable": false,
       "refusal_category": "out_of_domain",
       "years": [],
-      "query": "What is the best way to get a wine stain out of a cotton shirt?",
+      "query": "How should I clean wine spilled onto a cotton shirt?",
       "gold_passage_ids": [],
       "relevant_ids": [],
       "gold_claims": [],
@@ -3351,15 +3351,19 @@
         "\\bpeloton\\b"
       ],
       "verification_note": "Whole-corpus case-insensitive searches for zoom, peloton each have zero matches; the request has no supporting passage in the frozen corpus.",
-      "ft_context_overlap": false
+      "ft_context_overlap": false,
+      "side_patterns": {
+        "Zoom": "\\bzoom\\b",
+        "Peloton": "\\bpeloton\\b"
+      }
     },
     {
       "qid": "hv5b_59",
       "question_type": "unanswerable",
       "answerable": false,
-      "refusal_category": "unsupported_entity",
+      "refusal_category": "unsupported_figure",
       "years": [],
-      "query": "What does Buffett think of Spotify's subscription model?",
+      "query": "What was Berkshire's net promoter score in 2012?",
       "gold_passage_ids": [],
       "relevant_ids": [],
       "gold_claims": [],
@@ -3373,16 +3377,16 @@
         "forbidden_terms": []
       },
       "absence_search_patterns": [
-        "spotify"
+        "net[\\s-]+promoter"
       ],
-      "verification_note": "Whole-corpus case-insensitive searches for spotify each have zero matches; the request has no supporting passage in the frozen corpus.",
+      "verification_note": "Whole-corpus case-insensitive search for net promoter has zero matches; the requested figure has no supporting passage in the frozen corpus.",
       "ft_context_overlap": false
     },
     {
       "qid": "hv5b_60",
       "question_type": "unanswerable",
       "answerable": false,
-      "refusal_category": "unsupported_role",
+      "refusal_category": "false_premise",
       "years": [],
       "query": "Who was Berkshire's chief technology officer in 2010?",
       "gold_passage_ids": [],
