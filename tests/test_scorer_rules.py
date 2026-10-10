@@ -126,6 +126,21 @@ def test_a_direct_helper():
     assert not _polarity_and_numbers_agree("A is B.", "A is never B.", ["a", "b"])
 
 
+FRANCHISE = _case("An economic franchise sells a product or service that is needed or desired, has no close "
+                  "substitute and is not subject to price regulation.",
+                  ["no close substitute", "price regulation", "needed or desired"])
+
+
+def test_a_list_items_with_mixed_polarity_match_the_claim_part_by_part():
+    # hv4_04: each list item is compared with the polarity of the claim part holding the same term.
+    answer = ("An economic franchise arises from a product or service that: (1) is needed or desired; (2) is thought "
+              "by its customers to have no close substitute and; (3) is not subject to price regulation. [1]")
+    assert _met(FRANCHISE, answer, [_hit()])
+    # Flipping one item (regulated, or a close substitute exists) is still rejected.
+    assert not _met(FRANCHISE, answer.replace("is not subject to", "is subject to"), [_hit()])
+    assert not _met(FRANCHISE, answer.replace("is needed or desired", "is not needed or desired"), [_hit()])
+
+
 # --- b. merged neighbour ids -------------------------------------------------------------------
 
 B_CASE = _case("Float reached $10 billion.", ["float", "$10 billion"], gold=("g2",))
@@ -283,3 +298,15 @@ def test_polarity_mutation_covers_aux_negation_for_most_claims():
             labels = [lab for lab, _ in _mutations(sentence, [t.lower() for t in claim["required_terms"]])]
             covered += "contraction" in labels
     assert covered >= 3
+
+
+def test_d_term_that_is_the_abbreviation_itself_still_matches_after_expansion():
+    # hv3_32: the required term "BHSI" is the abbreviation, which the expansion would otherwise replace.
+    case = _case("BHSI had developed $1 billion of annual premium volume.",
+                 ["BHSI", "$1 billion", "annual premium volume"])
+    answer = (D_DEFINITION + "That move was a home run: BHSI has already developed $1 billion of annual premium "
+              "volume and, under Peter\u2019s direction, is destined to become one of the world\u2019s leading "
+              "P/C insurers. [1]")
+    assert _met(case, answer, [_hit()])
+    assert not _met(case, "That move was a home run: BHSI has already developed $2 billion of annual premium volume [1].",
+                    [_hit()])

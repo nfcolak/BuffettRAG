@@ -93,7 +93,20 @@ def _polarity_and_numbers_agree(reference: str, sentence: str, terms: Sequence[s
     # On a tie between clauses every tied clause must agree (a tie never relaxes the check).
     clauses = _best_clauses(_normalise_contractions(sentence), terms)
     reference_negative = _has_negation(reference, terms)
-    if any(_has_negation(clause, terms) != reference_negative for clause in clauses):
+    if len(clauses) > 1:
+        # Tied clauses hold different terms ("is needed; has no close substitute; is not regulated"): each is
+        # compared with the polarity of the reference clause(s) holding the same terms, not with one global flag.
+        reference_clauses = [c for c in _CLAUSE_SPLIT_RE.split(_normalise_contractions(reference)) if c and c.strip()]
+        lowered_terms = [t.lower() for t in terms if t]
+
+        def expected(clause: str) -> bool:
+            held = [t for t in lowered_terms if t in clause.lower()]
+            matching = [rc for rc in reference_clauses if any(t in rc.lower() for t in held)]
+            return any(_has_negation(rc, terms) for rc in matching) if matching else reference_negative
+
+        if any(_has_negation(clause, terms) != expected(clause) for clause in clauses):
+            return False
+    elif any(_has_negation(clause, terms) != reference_negative for clause in clauses):
         return False
     expected_numbers = {value.lower().replace(",", "") for value in _NUMBER_RE.findall(reference)}
     actual_numbers = {value.lower().replace(",", "") for value in _NUMBER_RE.findall(sentence)}

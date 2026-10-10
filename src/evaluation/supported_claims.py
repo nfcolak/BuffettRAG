@@ -226,7 +226,8 @@ def supported_claims_met(case: Dict[str, Any], answer_text: str, citations: Sequ
             year_hit = label_year is not None and any(_hit_year(h) == int(label_year) for h in gold_hits)
             extra_numbers = [label_year] if (label_year and year_hit) else []
             aliased = _expand_aliases(body, aliases_before[position])
-            if not (all(t in aliased.lower() for t in terms)
+            # A term matches the sentence as written or with its abbreviations expanded (a term may be the abbreviation).
+            if not (all(t in aliased.lower() or t in body.lower() for t in terms)
                     and _polarity_and_numbers_agree(claim["claim"], body, terms, extra_numbers)):
                 continue
             if any(_cited_hit_supports(verifier, body, h, i, neighbours, chunk_texts)
