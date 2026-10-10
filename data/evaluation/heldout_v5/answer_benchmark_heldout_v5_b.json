@@ -12,51 +12,49 @@
       "question_type": "opinion",
       "answerable": true,
       "years": [
-        1984
+        2002
       ],
-      "query": "What is the 'rented suit' story Buffett tells about insurance accounting, and what lesson does he draw from it for his own reporting?",
+      "query": "In the 2002 letter, what stance does Buffett take on adding to equities, how comfortable are he and Charlie with the stocks Berkshire already owns, and what did the total common stock holdings come to at cost and at market value?",
       "gold_passage_ids": [
-        "1984_p0081",
-        "1984_p0082"
+        "2002_p0088"
       ],
       "relevant_ids": [
-        "1984_p0081",
-        "1984_p0082"
+        "2002_p0088"
       ],
       "gold_claims": [
         {
-          "claim": "A man abroad asked his sister to handle his father's funeral and kept receiving a $15 bill because the father had been buried in a rented suit.",
+          "claim": "Berkshire continues to be largely inactive in equities: 'We continue to do little in equities.'",
           "required_terms": [
-            "rented suit",
-            "$15"
+            "continue to do little",
+            "in equities"
           ],
           "gold_passage_ids": [
-            "1984_p0081"
+            "2002_p0088"
           ],
-          "verification_note": "1984 letter; unit=dollars per monthly bill; definition=the recurring charge revealed by the punchline of the funeral story."
+          "verification_note": "2002 letter; unit=qualitative investment stance; definition=Buffett's statement about new equity purchases."
         },
         {
-          "claim": "Berkshire has tried to include all of its 'rented suit' liabilities in its current financial statement, but its record of past error should make it humble and readers suspicious.",
+          "claim": "Charlie and Buffett are increasingly comfortable with their holdings in the stocks Berkshire already owns.",
           "required_terms": [
-            "rented suit",
-            "humble",
-            "suspicious"
+            "increasingly comfortable",
+            "holdings in"
           ],
           "gold_passage_ids": [
-            "1984_p0082"
+            "2002_p0088"
           ],
-          "verification_note": "1984 letter; unit=qualitative accounting caution; definition=applying the story to insurance liabilities and past reserving error."
+          "verification_note": "2002 letter; unit=qualitative comfort level; definition=their view of the existing stock holdings."
         },
         {
-          "claim": "Buffett says he will continue to report the errors, plus or minus, that surface each year.",
+          "claim": "Total common stocks were $9,164 million at cost and $28,363 million at market value.",
           "required_terms": [
-            "continue to report",
-            "errors"
+            "Total Common Stocks",
+            "$9,164",
+            "$28,363"
           ],
           "gold_passage_ids": [
-            "1984_p0082"
+            "2002_p0088"
           ],
-          "verification_note": "1984 letter; unit=qualitative reporting commitment; definition=annual disclosure of reserve errors."
+          "verification_note": "2002 letter; unit=millions of dollars; definition=cost and market value of the total common stock holdings."
         }
       ],
       "multi_part": true,
@@ -67,8 +65,8 @@
       "reject": {
         "forbidden_terms": []
       },
-      "verification_note": "1984_p0081 tells the rented-suit story and 1984_p0082 applies it to Berkshire's liability reporting and error disclosure.",
-      "ft_context_overlap": true
+      "verification_note": "2002_p0088 gives the totals row for common stocks and Buffett's remarks that Berkshire does little in equities and is increasingly comfortable with its holdings.",
+      "ft_context_overlap": false
     },
     {
       "qid": "hv5b_02",
@@ -258,7 +256,7 @@
       "years": [
         1988
       ],
-      "query": "Why does Buffett say it is wiser to sell high-priced corn flakes than low-priced auto insurance?",
+      "query": "Why would Buffett rather be a cereal maker charging premium prices than a car insurer charging thin ones?",
       "gold_passage_ids": [
         "1988_p0051"
       ],
@@ -1136,46 +1134,35 @@
       "years": [
         2010
       ],
-      "query": "What does Buffett say Ajit Jain's reinsurance group does, and how big has its float become?",
+      "query": "In the 2010 letter, how many businesses does Buffett multiply by the occasional 'he'll be interested' suggestion, and what does he conclude is the better way to respond?",
       "gold_passage_ids": [
-        "2010_p0063"
+        "2010_p0163"
       ],
       "relevant_ids": [
-        "2010_p0063"
+        "2010_p0163"
       ],
       "gold_claims": [
         {
-          "claim": "Ajit insures risks that no one else has the desire or the capital to take on.",
+          "claim": "Buffett multiplies 76 businesses by the periodic 'I think he'll be interested in this one' suggestion to show how many pitches would otherwise arrive.",
           "required_terms": [
-            "Ajit insures risks",
-            "capital to take on"
+            "76 businesses",
+            "periodic"
           ],
           "gold_passage_ids": [
-            "2010_p0063"
+            "2010_p0163"
           ],
-          "verification_note": "2010 letter; unit=qualitative business description; definition=reinsurance of risks others avoid."
+          "verification_note": "2010 letter; unit=count of businesses; definition=businesses whose managers occasionally propose deals."
         },
         {
-          "claim": "In the past year Ajit significantly increased his life reinsurance operation, developing annual premium volume of about $2 billion that will repeat for decades.",
+          "claim": "He concludes it is better to say no firmly and immediately than to suggest candidates write or call him.",
           "required_terms": [
-            "life reinsurance",
-            "$2 billion"
+            "better to say no",
+            "firmly and immediately"
           ],
           "gold_passage_ids": [
-            "2010_p0063"
+            "2010_p0163"
           ],
-          "verification_note": "2010 letter; unit=billions of dollars of annual premium; definition=new life reinsurance premium volume."
-        },
-        {
-          "claim": "From a standing start in 1985, Ajit has built an insurance business with float of $30 billion.",
-          "required_terms": [
-            "standing start in 1985",
-            "float of $30 billion"
-          ],
-          "gold_passage_ids": [
-            "2010_p0063"
-          ],
-          "verification_note": "2010 letter; unit=billions of dollars of float; definition=float of the reinsurance group."
+          "verification_note": "2010 letter; unit=qualitative response policy; definition=how Buffett handles such suggestions."
         }
       ],
       "multi_part": true,
@@ -1186,8 +1173,8 @@
       "reject": {
         "forbidden_terms": []
       },
-      "verification_note": "2010_p0063 covers Ajit Jain's business, life reinsurance volume and $30 billion float.",
-      "ft_context_overlap": false
+      "verification_note": "2010_p0163 gives the 76 businesses multiplier and the conclusion to say no firmly and immediately.",
+      "ft_context_overlap": true
     },
     {
       "qid": "hv5b_21",
@@ -1265,37 +1252,48 @@
       "question_type": "company",
       "answerable": true,
       "years": [
-        2016
+        2024
       ],
-      "query": "How many businesses report directly to headquarters in the manufacturing, service and retailing group, and how large is Marmon?",
+      "query": "How did Berkshire's per-share market value fare against the S&P 500 with dividends included in 2001, in 2002 and in 2003, according to the 2024 letter's long-run performance table?",
       "gold_passage_ids": [
-        "2016_p0076"
+        "2024_p0060"
       ],
       "relevant_ids": [
-        "2016_p0076"
+        "2024_p0060"
       ],
       "gold_claims": [
         {
-          "claim": "The financial summary for the group includes 44 businesses that report directly to headquarters.",
+          "claim": "In 2001 Berkshire's per-share market value rose 6.5% while the S&P 500 with dividends fell 11.9%.",
           "required_terms": [
-            "44 businesses",
-            "report directly to headquarters"
+            "6.5",
+            "11.9"
           ],
           "gold_passage_ids": [
-            "2016_p0076"
+            "2024_p0060"
           ],
-          "verification_note": "2016 letter; unit=count of businesses; definition=businesses reporting directly to headquarters."
+          "verification_note": "2024 letter; unit=percent annual change; definition=2001 per-share market value of Berkshire versus the S&P 500 with dividends."
         },
         {
-          "claim": "Marmon has 175 separate business units, serving widely disparate markets.",
+          "claim": "In 2002 Berkshire's per-share market value fell 3.8% versus a 22.1% decline for the S&P 500.",
           "required_terms": [
-            "Marmon has 175",
-            "widely disparate markets"
+            "3.8",
+            "22.1"
           ],
           "gold_passage_ids": [
-            "2016_p0076"
+            "2024_p0060"
           ],
-          "verification_note": "2016 letter; unit=count of business units; definition=units under the Marmon umbrella."
+          "verification_note": "2024 letter; unit=percent annual change; definition=2002 per-share market value of Berkshire versus the S&P 500 with dividends."
+        },
+        {
+          "claim": "In 2003 Berkshire's per-share market value rose 15.8% against 28.7% for the S&P 500.",
+          "required_terms": [
+            "15.8",
+            "28.7"
+          ],
+          "gold_passage_ids": [
+            "2024_p0060"
+          ],
+          "verification_note": "2024 letter; unit=percent annual change; definition=2003 per-share market value of Berkshire versus the S&P 500 with dividends."
         }
       ],
       "multi_part": true,
@@ -1306,8 +1304,8 @@
       "reject": {
         "forbidden_terms": []
       },
-      "verification_note": "2016_p0076 gives 44 direct-report businesses and Marmon's 175 units.",
-      "ft_context_overlap": true
+      "verification_note": "2024_p0060 lists the 2001, 2002 and 2003 rows of Berkshire's market value change versus the S&P 500.",
+      "ft_context_overlap": false
     },
     {
       "qid": "hv5b_23",
@@ -2164,49 +2162,48 @@
       "question_type": "fact_number",
       "answerable": true,
       "years": [
-        2016
+        2020
       ],
-      "query": "What revenues, pre-tax earnings and net earnings did the manufacturing, service and retailing group report for 2016?",
+      "query": "In the 2020 letter's performance table, what were Berkshire's per-share market value gains and the S&P 500 with dividends returns for 1978, 1979 and 1980?",
       "gold_passage_ids": [
-        "2016_p0076"
+        "2020_p0003"
       ],
       "relevant_ids": [
-        "2016_p0076"
+        "2020_p0003"
       ],
       "gold_claims": [
         {
-          "claim": "Revenues were $120,059 million, with operating expenses of 111,383.",
+          "claim": "In 1978 Berkshire's per-share market value rose 14.5% against 6.4% for the S&P 500 with dividends.",
           "required_terms": [
-            "$120,059",
-            "111,383"
+            "14.5",
+            "6.4"
           ],
           "gold_passage_ids": [
-            "2016_p0076"
+            "2020_p0003"
           ],
-          "verification_note": "2016 letter; unit=millions of dollars; definition=2016 revenues and operating expenses of the group."
+          "verification_note": "2020 letter; unit=percent annual change; definition=1978 per-share market value of Berkshire versus the S&P 500 with dividends."
         },
         {
-          "claim": "Pre-tax earnings were $8,462 million.",
+          "claim": "In 1979 Berkshire's per-share market value rose 102.5% against 18.2% for the S&P 500 with dividends.",
           "required_terms": [
-            "Pre-tax earnings",
-            "8,462"
+            "102.5",
+            "18.2"
           ],
           "gold_passage_ids": [
-            "2016_p0076"
+            "2020_p0003"
           ],
-          "verification_note": "2016 letter; unit=millions of dollars; definition=2016 pre-tax earnings of the group."
+          "verification_note": "2020 letter; unit=percent annual change; definition=1979 per-share market value of Berkshire versus the S&P 500 with dividends."
         },
         {
-          "claim": "Net earnings were $5,631 million after income taxes and non-controlling interests of 2,831.",
+          "claim": "In 1980 Berkshire's per-share market value rose 32.8% against 32.3% for the S&P 500 with dividends.",
           "required_terms": [
-            "Net earnings",
-            "5,631",
-            "2,831"
+            "32.8",
+            "32.3"
           ],
           "gold_passage_ids": [
-            "2016_p0076"
+            "2020_p0003"
           ],
-          "verification_note": "2016 letter; unit=millions of dollars; definition=2016 net earnings of the group."
+          "verification_note": "2020 letter; unit=percent annual change; definition=1980 per-share market value of Berkshire versus the S&P 500 with dividends."
         }
       ],
       "multi_part": true,
@@ -2217,7 +2214,7 @@
       "reject": {
         "forbidden_terms": []
       },
-      "verification_note": "2016_p0076 gives revenue, operating expense, pre-tax and net earnings for 2016.",
+      "verification_note": "2020_p0003 lists the 1978, 1979 and 1980 rows of market value change versus the S&P 500.",
       "ft_context_overlap": true
     },
     {
@@ -2228,7 +2225,7 @@
         2006,
         2010
       ],
-      "query": "How large was Berkshire's insurance float at the end of 2006, and how did it compare with the end of 2010?",
+      "query": "Compare Berkshire's yearend float in 2006 with 2010: how big was each?",
       "gold_passage_ids": [
         "2006_p0041",
         "2010_p0059"
@@ -2627,47 +2624,58 @@
       "question_type": "follow_up",
       "answerable": true,
       "years": [
-        1984
+        2022
       ],
       "history": [
         {
           "role": "user",
-          "content": "Does Berkshire's 1984 letter run a 'business wanted' ad?"
+          "content": "Does Berkshire's 2022 letter include a table that compares its stock performance with the S&P 500 year by year?"
         },
         {
           "role": "assistant",
-          "content": "Yes, each year Buffett repeats a short ad describing the kind of company Berkshire would like to buy."
+          "content": "Yes, it has an annual percentage-change table covering per-share market value and the S&P 500 with dividends included."
         }
       ],
-      "query": "Who found a candidate that year, and why did a deal not happen?",
+      "query": "What did it show for 1985, 1986 and 1988?",
       "gold_passage_ids": [
-        "1984_p0133"
+        "2022_p0005"
       ],
       "relevant_ids": [
-        "1984_p0133"
+        "2022_p0005"
       ],
       "gold_claims": [
         {
-          "claim": "John Loomis, a knowledgeable and alert shareholder, came up with a company that met all of our tests.",
+          "claim": "In 1985 Berkshire's per-share market value rose 93.7% against 31.6% for the S&P 500 with dividends.",
           "required_terms": [
-            "John Loomis",
-            "met all of our tests"
+            "93.7",
+            "31.6"
           ],
           "gold_passage_ids": [
-            "1984_p0133"
+            "2022_p0005"
           ],
-          "verification_note": "1984 letter; unit=person identity; definition=the shareholder who proposed a qualifying company."
+          "verification_note": "2022 letter; unit=percent annual change; definition=1985 per-share market value of Berkshire versus the S&P 500 with dividends."
         },
         {
-          "claim": "A chance complication prevented a deal.",
+          "claim": "In 1986 Berkshire's per-share market value rose 14.2% against 18.6% for the S&P 500 with dividends.",
           "required_terms": [
-            "chance complication",
-            "prevented a deal"
+            "14.2",
+            "18.6"
           ],
           "gold_passage_ids": [
-            "1984_p0133"
+            "2022_p0005"
           ],
-          "verification_note": "1984 letter; unit=qualitative deal outcome; definition=reason the deal did not close."
+          "verification_note": "2022 letter; unit=percent annual change; definition=1986 per-share market value of Berkshire versus the S&P 500 with dividends."
+        },
+        {
+          "claim": "In 1988 Berkshire's per-share market value rose 59.3% against 16.6% for the S&P 500 with dividends.",
+          "required_terms": [
+            "59.3",
+            "16.6"
+          ],
+          "gold_passage_ids": [
+            "2022_p0005"
+          ],
+          "verification_note": "2022 letter; unit=percent annual change; definition=1988 per-share market value of Berkshire versus the S&P 500 with dividends."
         }
       ],
       "multi_part": true,
@@ -2678,8 +2686,8 @@
       "reject": {
         "forbidden_terms": []
       },
-      "verification_note": "1984_p0133 names John Loomis and a chance complication; history only establishes the annual ad.",
-      "ft_context_overlap": true
+      "verification_note": "2022_p0005 lists the 1985, 1986 and 1988 rows; history only establishes that the 2022 letter has an annual comparison table.",
+      "ft_context_overlap": false
     },
     {
       "qid": "hv5b_45",
@@ -3220,7 +3228,7 @@
       "answerable": false,
       "refusal_category": "out_of_domain",
       "years": [],
-      "query": "What is the best way to get a wine stain out of a cotton shirt?",
+      "query": "How should I clean wine spilled onto a cotton shirt?",
       "gold_passage_ids": [],
       "relevant_ids": [],
       "gold_claims": [],
@@ -3343,15 +3351,19 @@
         "\\bpeloton\\b"
       ],
       "verification_note": "Whole-corpus case-insensitive searches for zoom, peloton each have zero matches; the request has no supporting passage in the frozen corpus.",
-      "ft_context_overlap": false
+      "ft_context_overlap": false,
+      "side_patterns": {
+        "Zoom": "\\bzoom\\b",
+        "Peloton": "\\bpeloton\\b"
+      }
     },
     {
       "qid": "hv5b_59",
       "question_type": "unanswerable",
       "answerable": false,
-      "refusal_category": "unsupported_entity",
+      "refusal_category": "unsupported_figure",
       "years": [],
-      "query": "What does Buffett think of Spotify's subscription model?",
+      "query": "What was Berkshire's net promoter score in 2012?",
       "gold_passage_ids": [],
       "relevant_ids": [],
       "gold_claims": [],
@@ -3365,16 +3377,16 @@
         "forbidden_terms": []
       },
       "absence_search_patterns": [
-        "spotify"
+        "net[\\s-]+promoter"
       ],
-      "verification_note": "Whole-corpus case-insensitive searches for spotify each have zero matches; the request has no supporting passage in the frozen corpus.",
+      "verification_note": "Whole-corpus case-insensitive search for net promoter has zero matches; the requested figure has no supporting passage in the frozen corpus.",
       "ft_context_overlap": false
     },
     {
       "qid": "hv5b_60",
       "question_type": "unanswerable",
       "answerable": false,
-      "refusal_category": "unsupported_role",
+      "refusal_category": "false_premise",
       "years": [],
       "query": "Who was Berkshire's chief technology officer in 2010?",
       "gold_passage_ids": [],

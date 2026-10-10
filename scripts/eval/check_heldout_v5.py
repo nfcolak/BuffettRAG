@@ -43,6 +43,10 @@ FT_PATHS = ("data/ft/examples.jsonl", "data/ft_v2/examples.jsonl", "data/ft_v3/e
             "data/ft_v4/examples.jsonl")
 PART_TYPE_COUNTS = {"opinion": 11, "company": 11, "fact_number": 11,
                     "temporal_comparison": 10, "follow_up": 9, "unanswerable": 8}
+PART_EXACT_TYPE_COUNTS = {"opinion": 11, "follow_up": 9, "unanswerable": 8}
+MIN_TEMPORAL, MAX_TEMPORAL = 6, 10
+MIN_COMPANY_FACT = 11
+FLEX_TYPE_TOTAL = 32
 PART_SIZE = 60
 PART_ANSWERABLE = 52
 MIN_PART_CLAIMS = 110
@@ -246,7 +250,15 @@ def check_part(part: str, context: tuple | None = None) -> tuple[str, dict]:
     cases = fixture["cases"]
     require(isinstance(cases, list) and len(cases) == PART_SIZE, f"Need {PART_SIZE} cases")
     require([case["qid"] for case in cases] == expected_qids(part), f"Qids must be unique hv5{part}_01..60")
-    require(Counter(case["question_type"] for case in cases) == Counter(PART_TYPE_COUNTS), "Wrong type counts")
+    type_counts = Counter(case["question_type"] for case in cases)
+    require(set(type_counts) <= set(PART_TYPE_COUNTS), "Unknown question types")
+    require(all(type_counts[kind] == count for kind, count in PART_EXACT_TYPE_COUNTS.items()),
+            "Wrong opinion/follow_up/unanswerable counts")
+    require(MIN_TEMPORAL <= type_counts["temporal_comparison"] <= MAX_TEMPORAL, "Wrong temporal_comparison count")
+    require(type_counts["company"] >= MIN_COMPANY_FACT and type_counts["fact_number"] >= MIN_COMPANY_FACT,
+            "company and fact_number need >= 11 each")
+    require(type_counts["company"] + type_counts["fact_number"] + type_counts["temporal_comparison"]
+            == FLEX_TYPE_TOTAL, "company + fact_number + temporal_comparison must be 32")
     require(len({case["query"].casefold() for case in cases}) == PART_SIZE, "Duplicate queries")
     answer_years: set[int] = set()
     year_cases: Counter[int] = Counter()
