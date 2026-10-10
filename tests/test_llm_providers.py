@@ -2,6 +2,7 @@ import json
 from pathlib import Path
 import importlib
 import unittest
+import tempfile
 from unittest import mock
 
 import pytest
@@ -15,8 +16,19 @@ from src.storage import SearchHit
 
 
 class LLMProviderTests(unittest.TestCase):
+    def test_factory_uses_current_configured_model_path(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            model_path = Path(temp_dir) / "r2.gguf"
+            model_path.touch()
+            with mock.patch.object(config, "LLM_MODEL_PATH", model_path):
+                with mock.patch.object(factory.importlib.util, "find_spec", return_value=object()):
+                    with mock.patch.object(factory, "LlamaCppProvider") as llama_provider:
+                        provider = create_llm_provider(provider="llama")
+            llama_provider.assert_called_once_with(model_path=model_path)
+            self.assertIs(provider, llama_provider.return_value)
+
     def test_factory_returns_unavailable_provider_when_model_missing(self) -> None:
-        with mock.patch.object(factory, "LLM_MODEL_PATH", config.BASE_DIR / "models" / "missing.gguf"):
+        with mock.patch.object(config, "LLM_MODEL_PATH", config.BASE_DIR / "models" / "missing.gguf"):
             provider = create_llm_provider(provider="llama")
         self.assertIsInstance(provider, UnavailableProvider)
         self.assertEqual(provider.provider_name, "unavailable")
@@ -24,7 +36,7 @@ class LLMProviderTests(unittest.TestCase):
             provider.generate("any prompt")
 
     def test_factory_returns_unavailable_provider_when_llama_cpp_missing(self) -> None:
-        with mock.patch.object(factory, "LLM_MODEL_PATH", config.BASE_DIR / "config.py"), \
+        with mock.patch.object(config, "LLM_MODEL_PATH", config.BASE_DIR / "config.py"), \
                 mock.patch.object(factory.importlib.util, "find_spec", return_value=None):
             provider = create_llm_provider(provider="llama")
         self.assertIsInstance(provider, UnavailableProvider)
@@ -170,7 +182,7 @@ def test_missing_model_ask_returns_llm_unavailable_message(monkeypatch):
         def search(self, **kwargs):
             return RetrievalResult(kwargs["query"], "hybrid", [hit])
 
-    with mock.patch.object(factory, "LLM_MODEL_PATH", config.BASE_DIR / "models" / "missing.gguf"):
+    with mock.patch.object(config, "LLM_MODEL_PATH", config.BASE_DIR / "models" / "missing.gguf"):
         provider = create_llm_provider(provider="llama")
     monkeypatch.setattr(ask_flow, "_state", {"retriever": FixedRetriever(), "docs_by_id": {}, "llm": provider})
     monkeypatch.setattr(backend, "API_KEYS", ())
