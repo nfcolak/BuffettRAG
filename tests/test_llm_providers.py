@@ -1,3 +1,5 @@
+import json
+from pathlib import Path
 import importlib
 import unittest
 from unittest import mock
@@ -179,3 +181,27 @@ def test_missing_model_ask_returns_llm_unavailable_message(monkeypatch):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+_FT_V4_VALID = Path(
+    "/Users/necatifurkancolak/AI-Workplace/Projects/done/BuffettRAG/data/ft_v4/valid.jsonl"
+)
+
+
+def test_split_prompt_keeps_answer_cue_and_training_system_prompt():
+    from src.generation.prompt import SYSTEM_PROMPT
+    from src.generation.providers.llama_provider import split_prompt
+
+    hits = [
+        SearchHit("a", "Derivatives are dangerous.", {"year": 2002, "source_file": "buffet_2002.txt"}, 1.0),
+        SearchHit("b", "We compound steadily.", {"year": 1989, "source_file": "buffet_1989.txt"}, 0.9),
+    ]
+    system, user = split_prompt(build_cited_prompt("What about derivatives?", hits))
+    assert user.endswith("\n\nAnswer:")
+    assert user.startswith("BEGIN UNTRUSTED PASSAGES")
+    if _FT_V4_VALID.exists():
+        with _FT_V4_VALID.open() as fh:
+            train_system = json.loads(fh.readline())["messages"][0]["content"]
+        assert system == train_system
+    assert system == SYSTEM_PROMPT
+    assert system.endswith("outside the numbered passages.\n")

@@ -60,11 +60,12 @@ def _load_model(model_path: Path, n_ctx: int, n_threads: int, n_gpu_layers: int)
 
 def split_prompt(prompt: str) -> Tuple[str, str]:
     """Split the grounded prompt from build_cited_prompt into (system, user)."""
+    # Keep the trailing "Answer:" cue and the system prompt's trailing newline:
+    # both match the fine-tuning rows exactly (training/serving parity).
     text = prompt.strip()
-    if text.endswith("Answer:"):
-        text = text[: -len("Answer:")].rstrip()
     if text.startswith(SYSTEM_PROMPT.strip()):
-        return SYSTEM_PROMPT.strip(), text[len(SYSTEM_PROMPT.strip()):].strip()
+        user = text[len(SYSTEM_PROMPT.strip()):].strip()
+        return SYSTEM_PROMPT, user
     positions = [text.find(m) for m in _USER_MARKERS if text.find(m) >= 0]
     if not positions:
         return "", text
