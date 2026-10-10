@@ -31,6 +31,7 @@ from src.evaluation.answer_benchmark import (
     validate_fixture_ids,
 )
 from src.generation.providers import create_llm_provider
+from src.generation.decompose import split_question
 from src.generation.prompt import REFUSAL_LINE
 from src.retrieval.context import build_doc_lookup
 from src.retrieval.retriever import Retriever
@@ -406,7 +407,10 @@ def run(
     try:
         for case in selected_cases:
             if case["qid"] in prior_rows:
-                rows.append(prior_rows[case["qid"]])
+                resumed = prior_rows[case["qid"]]
+                if os.getenv("ANSWER_DECOMPOSE", "0") == "1":
+                    resumed["decompose_parts"] = split_question(case["query"])
+                rows.append(resumed)
                 resumed_qids.append(case["qid"])
                 continue
             start = time.perf_counter()
@@ -416,6 +420,8 @@ def run(
                    "answer": None, "citations": [], "passage_ids": [], "retrieved_passage_ids": [],
                    "required_claim_hits": None, "refusal_correct": None, "score": None,
                    "provider_failures": [], "provider_calls": 0, "model_requests": []}
+            if os.getenv("ANSWER_DECOMPOSE", "0") == "1":
+                row["decompose_parts"] = split_question(case["query"])
             if initialization_failure is not None:
                 row["status"] = "provider_failure"
                 row["provider_failures"] = [dict(initialization_failure)]
