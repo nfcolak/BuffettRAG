@@ -1,0 +1,296 @@
+{
+ "note": "Sentences the baseline validator (487ee15) dropped although the cited passage states them. Copied from stored model answers (teacher14b_dev20, ftr1_dev, ft_v5 pilot1/pilot2 with contexts rebuilt by scripts/ft/round5.py load_serving); passage text verbatim. negate/entity: [old, new] replacements for the mutation test. For hv15 the sentence already contains \"never\", so its negate pair removes that negation instead of inserting \"not\" (an inserted \"not\" is masked by the whole-sentence unit's \"never\").",
+ "cases": [
+  {
+   "id": "teacher14b:ho04_1983_goodwill_preference:1983_p0028",
+   "source": "teacher14b_dev20.json",
+   "qid": "ho04_1983_goodwill_preference",
+   "fix": [
+    "context_year"
+   ],
+   "baseline_cause": "quantity_year",
+   "sentence": "By 1983, Buffett preferred businesses that possess large amounts of enduring Goodwill and that utilize a minimum of tangible assets [1,2].",
+   "original_sentence": "By 1983, Buffett preferred businesses that possess large amounts of enduring Goodwill and that utilize a minimum of tangible assets [4,2].",
+   "passages": [
+    {
+     "id": "1983_p0028",
+     "year": 1983,
+     "text": "(2) More important, we own several businesses that possess\neconomic Goodwill (which is properly includable in\nintrinsic business value) far larger than the\naccounting Goodwill that is carried on our balance\nsheet and reflected in book value.\n\nGoodwill, both economic and accounting, is an arcane subject\nand requires more explanation than is appropriate here. The\nappendix that follows this letter - “Goodwill and its\nAmortization: The Rules and The Realities” - explains why\neconomic and accounting Goodwill can, and usually do, differ\nenormously.\n\nYou can live a full and rewarding life without ever thinking\nabout Goodwill and its amortization. But students of investment\nand management should understand the nuances of the subject. My\nown thinking has changed drastically from 35 years ago when I was\ntaught to favor tangible assets and to shun businesses whose\nvalue depended largely upon economic Goodwill. This bias caused\nme to make many important business mistakes of omission, although\nrelatively few of commission.\n\nKeynes identified my problem: “The difficulty lies not in\nthe new ideas but in escaping from the old ones.” My escape was\nlong delayed, in part because most of what I had been taught by\nthe same teacher had been (and continues to be) so\nextraordinarily valuable. Ultimately, business experience,\ndirect and vicarious, produced my present strong preference for\nbusinesses that possess large amounts of enduring Goodwill and\nthat utilize a minimum of tangible assets."
+    },
+    {
+     "id": "1983_p0029",
+     "year": 1983,
+     "text": "You can live a full and rewarding life without ever thinking\nabout Goodwill and its amortization. But students of investment\nand management should understand the nuances of the subject. My\nown thinking has changed drastically from 35 years ago when I was\ntaught to favor tangible assets and to shun businesses whose\nvalue depended largely upon economic Goodwill. This bias caused\nme to make many important business mistakes of omission, although\nrelatively few of commission.\n\nKeynes identified my problem: “The difficulty lies not in\nthe new ideas but in escaping from the old ones.” My escape was\nlong delayed, in part because most of what I had been taught by\nthe same teacher had been (and continues to be) so\nextraordinarily valuable. Ultimately, business experience,\ndirect and vicarious, produced my present strong preference for\nbusinesses that possess large amounts of enduring Goodwill and\nthat utilize a minimum of tangible assets.\n\nI recommend the Appendix to those who are comfortable with\naccounting terminology and who have an interest in understanding\nthe business aspects of Goodwill. Whether or not you wish to\ntackle the Appendix, you should be aware that Charlie and I\nbelieve that Berkshire possesses very significant economic\nGoodwill value above that reflected in our book value.\n\nSources of Reported Earnings"
+    }
+   ],
+   "negate": [
+    "preferred",
+    "did not prefer"
+   ],
+   "entity": [
+    "Goodwill",
+    "Walmart Stores"
+   ]
+  },
+  {
+   "id": "teacher14b:ho16_2017_hurricane_loss:2017_p0039",
+   "source": "teacher14b_dev20.json",
+   "qid": "ho16_2017_hurricane_loss",
+   "fix": [
+    "context_year"
+   ],
+   "baseline_cause": "quantity_year",
+   "sentence": "Berkshire estimated its losses from the three 2017 hurricanes to be $3 billion before tax and about $2 billion after tax. [1]",
+   "original_sentence": "Berkshire estimated its losses from the three 2017 hurricanes to be $3 billion before tax and about $2 billion after tax. [1]",
+   "passages": [
+    {
+     "id": "2017_p0039",
+     "year": 2017,
+     "text": "the industry was experiencing was not a new norm. Last September drove home that point, as three significant\nhurricanes hit Texas, Florida and Puerto Rico.\n\nMy guess at this time is that the insured losses arising from the hurricanes are $100 billion or so. That figure,\nhowever, could be far off the mark. The pattern with most mega-catastrophes has been that initial loss estimates ran\nlow. As well-known analyst V.J. Dowling has pointed out, the loss reserves of an insurer are similar to a self-graded\nexam. Ignorance, wishful thinking or, occasionally, downright fraud can deliver inaccurate figures about an insurer’s\nfinancial condition for a very long time.\nWe currently estimate Berkshire’s losses from the three hurricanes to be $3 billion (or about $2 billion after\ntax). If both that estimate and my industry estimate of $100 billion are close to accurate, our share of the industry loss\n\nwas about 3%. I believe that percentage is also what we may reasonably expect to be our share of losses in future\nAmerican mega-cats.\nIt’s worth noting that the $2 billion net cost from the three hurricanes reduced Berkshire’s GAAP net worth\nby less than 1%. Elsewhere in the reinsurance industry there were many companies that suffered losses in net worth\nranging from 7% to more than 15%. The damage to them could have been far worse: Had Hurricane Irma followed a\npath through Florida only a bit to the east, insured losses might well have been an additional $100 billion.\nWe believe that the annual probability of a U.S. mega-catastrophe causing $400 billion or more of insured\nlosses is about 2%. No one, of course, knows the correct probability. We do know, however, that the risk increases"
+    }
+   ],
+   "negate": [
+    "estimated",
+    "did not estimate"
+   ],
+   "entity": [
+    "Berkshire",
+    "Walmart Stores"
+   ]
+  },
+  {
+   "id": "teacher14b:ho22_1988_2022_coca_cola_comparison:1988_p0068",
+   "source": "teacher14b_dev20.json",
+   "qid": "ho22_1988_2022_coca_cola_comparison",
+   "fix": [
+    "context_year"
+   ],
+   "baseline_cause": "quantity_year",
+   "sentence": "In 1988, Buffett stated that when owning portions of outstanding businesses with outstanding managements, his favorite holding period is forever. [1]",
+   "original_sentence": "In 1988, Buffett stated that when owning portions of outstanding businesses with outstanding managements, his favorite holding period is forever. [1]",
+   "passages": [
+    {
+     "id": "1988_p0068",
+     "year": 1988,
+     "text": "o In 1988 we made major purchases of Federal Home Loan\nMortgage Pfd. (“Freddie Mac”) and Coca Cola. We expect to hold\nthese securities for a long time. In fact, when we own portions\nof outstanding businesses with outstanding managements, our\nfavorite holding period is forever. We are just the opposite of\nthose who hurry to sell and book profits when companies perform\nwell but who tenaciously hang on to businesses that disappoint.\nPeter Lynch aptly likens such behavior to cutting the flowers and\nwatering the weeds. Our holdings of Freddie Mac are the maximum\nallowed by law, and are extensively described by Charlie in his\nletter. In our consolidated balance sheet these shares are\ncarried at cost rather than market, since they are owned by"
+    }
+   ],
+   "negate": [
+    "is forever",
+    "is not forever"
+   ],
+   "entity": [
+    "Buffett",
+    "Munger Partners"
+   ]
+  },
+  {
+   "id": "teacher14b:hv24:2001_p0036",
+   "source": "teacher14b_dev20.json",
+   "qid": "hv24",
+   "fix": [
+    "table_scale"
+   ],
+   "baseline_cause": "quantity",
+   "sentence": "GEICO generated $4,251 million in float in 2001 [1].",
+   "original_sentence": "GEICO generated $4,251 million in float in 2001 [4].",
+   "passages": [
+    {
+     "id": "2001_p0036",
+     "year": 2001,
+     "text": "Historically, Berkshire has obtained its float at a very low cost. Indeed, our cost has been less than zero in\nabout half of the years in which we’ve operated; that is, we’ve actually been paid for holding other people’s money.\nOver the last few years, however, our cost has been too high, and in 2001 it was terrible.\nThe table that follows shows (at intervals) the float generated by the various segments of Berkshire’s\ninsurance operations since we entered the business 35 years ago upon acquiring National Indemnity Company\n(whose traditional lines are included in the segment “Other Primary”). For the table we have calculated our float —\n\nwhich we generate in large amounts relative to our premium volume — by adding net loss reserves, loss adjustment\nreserves, funds held under reinsurance assumed and unearned premium reserves, and then subtracting insurancerelated receivables, prepaid acquisition costs, prepaid taxes and deferred charges applicable to assumed reinsurance.\n(Got that?)\nYearend Float (in $ millions)\nOther\nOther\nYear\nGEICO\nGeneral Re\nReinsurance\nPrimary\nTotal\n1967\n1977\n1987\n1,508\n1997\n2,917\n4,014\n7,386\n1998\n3,125\n14,909\n4,305\n22,754\n1999\n3,444\n15,166\n6,285\n25,298\n2000\n3,943\n15,525\n7,805\n27,871\n2001\n4,251\n19,310\n11,262\n35,508\nLast year I told you that, barring a mega-catastrophe, our cost of float would probably drop from its 2000\n\nlevel of 6%. I had in mind natural catastrophes when I said that, but instead we were hit by a man-made catastrophe\non September 11th – an event that delivered the insurance industry its largest loss in history. Our float cost therefore\ncame in at a staggering 12.8%. It was our worst year in float cost since 1984, and a result that to a significant\ndegree, as I will explain in the next section, we brought upon ourselves.\nIf no mega-catastrophe occurs, I – once again – expect the cost of our float to be low in the coming year.\nWe will indeed need a low cost, as will all insurers. Some years back, float costing, say, 4% was tolerable because"
+    }
+   ],
+   "negate": [
+    "generated",
+    "did not generate"
+   ],
+   "entity": [
+    "GEICO",
+    "Walmart Stores"
+   ]
+  },
+  {
+   "id": "ftr1:hv15:1999_p0016",
+   "source": "ftr1_dev.json",
+   "qid": "hv15",
+   "fix": [
+    "evidence_resplit"
+   ],
+   "baseline_cause": "polarity",
+   "sentence": "R. C. Willey’s stores have never operated on Sunday because Bill and most of his managers are Mormons, and for this reason, R. C. Willey’s stores have never operated on Sunday. [1]",
+   "original_sentence": "R. C. Willey’s stores have never operated on Sunday because Bill and most of his managers are Mormons, and for this reason, R. C. Willey’s stores have never operated on Sunday. [1]",
+   "passages": [
+    {
+     "id": "1999_p0016",
+     "year": 1999,
+     "text": "ums issued about capital expenditures. We simply ask our managers to run their companies as if\nthese are the sole asset of their families and will remain so for the next century.\nCharlie and I try to behave with our managers just as we attempt to behave with Berkshire’s shareholders, treating\nboth groups as we would wish to be treated if our positions were reversed. Though “working” means nothing to me\nfinancially, I love doing it at Berkshire for some simple reasons: It gives me a sense of achievement, a freedom to act as\n\nI see fit and an opportunity to interact daily with people I like and trust. Why should our managers — accomplished\nartists at what they do — see things differently?\nIn their relations with Berkshire, our managers often appear to be hewing to President Kennedy’s charge, “Ask\nnot what your country can do for you; ask what you can do for your country.” Here’s a remarkable story from last year:\nIt’s about R. C. Willey, Utah’s dominant home furnishing business, which Berkshire purchased from Bill Child and his\nfamily in 1995. Bill and most of his managers are Mormons, and for this reason R. C. Willey’s stores have never\noperated on Sunday. This is a difficult way to do business: Sunday is the favorite shopping day for many customers.\n\nBill, nonetheless, stuck to his principles -- and while doing so built his business from $250,000 of annual sales in 1954,\nwhen he took over, to $342 million in 1999.\nBill felt that R. C. Willey could operate successfully in markets outside of Utah and in 1997 suggested that we open\na store in Boise. I was highly skeptical about taking a no-Sunday policy into a new territory where we would be up\nagainst entrenched rivals open seven days a week. Nevertheless, this was Bill’s business to run. So, despite my\nreservations, I to"
+    }
+   ],
+   "negate": [
+    "have never operated on Sunday because",
+    "have operated on Sunday because"
+   ],
+   "entity": [
+    "Mormons",
+    "Baptist Sisters"
+   ]
+  },
+  {
+   "id": "pilot1:v5:multipart:0008:1994_p0072",
+   "source": "pilot1_out_rebuilt.json",
+   "qid": "v5:multipart:0008",
+   "fix": [
+    "context_year"
+   ],
+   "baseline_cause": "quantity_year",
+   "sentence": "According to the letters, the estimated maximum insurance loss for Berkshire Hathaway in 1994 was about $600 million after-tax [1].",
+   "original_sentence": "According to the letters, the estimated maximum insurance loss for Berkshire Hathaway in 1994 was about $600 million after-tax [4].",
+   "passages": [
+    {
+     "id": "1994_p0072",
+     "year": 1994,
+     "text": "All things considered, we believe our worst-case insurance\nloss from a super-cat is now about $600 million after-tax, an\namount that would slightly exceed Berkshire's annual earnings from\nother sources. If you are not comfortable with this level of\nexposure, the time to sell your Berkshire stock is now, not after\nthe inevitable mega-catastrophe.\n\nOur super-cat volume will probably be down in 1995. Prices\nfor garden-variety policies have fallen somewhat, and the torrent\nof capital that was committed to the reinsurance business a few\nyears ago will be inclined to chase premiums, irrespective of their\nadequacy. Nevertheless, we have strong relations with an important\ngroup of clients who will provide us with a substantial amount of\nbusiness in 1995.\n\nBerkshire's other insurance operations had excellent results\nin 1994. Our homestate operation, led by Rod Eldred; our workers'\ncompensation business, headed by Brad Kinstler; our credit card\noperation, managed by the Kizer family; National Indemnity's\ntraditional auto and general liability business, led by Don Wurster\n- all of these generated significant underwriting profits\naccompanied by substantial float.\n\nWe can conclude this section as we did last year: All in all,\nwe have a first-class insurance business. Though its results will\nbe highly volatile, this operation possesses an intrinsic value\nthat exceeds its book value by a large amount - larger, in fact,\nthan is the case at any other Berkshire business.\n\nCommon Stock Investments\n\nBelow we list our common stockholdings having a value of over\n$300 million. A small portion of these investments belongs to\nsubsidiaries of which Berkshire owns less than 100%."
+    }
+   ],
+   "negate": [
+    "was about",
+    "was not about"
+   ],
+   "entity": [
+    "Berkshire Hathaway",
+    "Walmart Stores"
+   ]
+  },
+  {
+   "id": "pilot1:v5:multipart:0013:2009:2009_p0049",
+   "source": "pilot1_out_rebuilt.json",
+   "qid": "v5:multipart:0013:2009",
+   "fix": [
+    "context_year"
+   ],
+   "baseline_cause": "quantity_year",
+   "sentence": "Northern Natural tied for second place among the 43 U.S. pipelines ranked by a firm named Mastio in 2009 [1].",
+   "original_sentence": "Northern Natural tied for second place among the 43 U.S. pipelines ranked by a firm named Mastio in 2009 [1].",
+   "passages": [
+    {
+     "id": "2009_p0049",
+     "year": 2009,
+     "text": "behalf of our customers) to allow us an appropriate return on the huge amounts of capital we must deploy to meet\nfuture needs. We shouldn’t expect our regulators to live up to their end of the bargain unless we live up to ours.\nDave and Greg make sure we do just that. National research companies consistently rank our Iowa and\nWestern utilities at or near the top of their industry. Similarly, among the 43 U.S. pipelines ranked by a firm\nnamed Mastio, our Kern River and Northern Natural properties tied for second place.\nMoreover, we continue to pour huge sums of money into our operations so as to not only prepare for\nthe future but also make these operations more environmentally friendly. Since we purchased MidAmerican ten"
+    }
+   ],
+   "negate": [
+    "tied for",
+    "did not tie for"
+   ],
+   "entity": [
+    "Mastio",
+    "Fitch Ratings"
+   ]
+  },
+  {
+   "id": "pilot1:v5:single:0020:1992_p0057",
+   "source": "pilot1_out_rebuilt.json",
+   "qid": "v5:single:0020",
+   "fix": [
+    "evidence_resplit"
+   ],
+   "baseline_cause": "polarity",
+   "sentence": "National Indemnity's commercial auto and general liability business, led by Don Wurster, and our homestate operation, led by Rod Eldred, both recorded an underwriting profit in 1992. [1]",
+   "original_sentence": "National Indemnity's commercial auto and general liability business, led by Don Wurster, and our homestate operation, led by Rod Eldred, both recorded an underwriting profit in 1992. [1]",
+   "passages": [
+    {
+     "id": "1992_p0057",
+     "year": 1992,
+     "text": "Last year, our insurance operation again generated funds at a\ncost below that incurred by the U.S. Government on its newly-issued\nlong-term bonds. This means that in 21 years out of the 26 years\nwe have been in the insurance business we have beaten the\nGovernment's rate, and often we have done so by a wide margin.\n(If, on average, we didn't beat the Government's rate, there would\nbe no economic reason for us to be in the business.)\n\nIn 1992, as in previous years, National Indemnity's commercial\nauto and general liability business, led by Don Wurster, and our\nhomestate operation, led by Rod Eldred, made excellent\ncontributions to our low cost of float. Indeed, both of these\noperations recorded an underwriting profit last year, thereby\ngenerating float at a less-than-zero cost. The bulk of our float,\nmeanwhile, comes from large transactions developed by Ajit. His\nefforts are likely to produce a further growth in float during\n1993.\n\nCharlie and I continue to like the insurance business, which\nwe expect to be our main source of earnings for decades to come.\nThe industry is huge; in certain sectors we can compete world-wide;\nand Berkshire possesses an important competitive advantage. We\nwill look for ways to expand our participation in the business,\neither indirectly as we have done through GEICO or directly as we\ndid by acquiring Central States Indemnity.\n\nCommon Stock Investments\n\nBelow we list our common stock holdings having a value of over\n$100 million. A small portion of these investments belongs to\nsubsidiaries of which Berkshire owns less than 100%."
+    }
+   ],
+   "negate": [
+    "both recorded",
+    "both did not record"
+   ],
+   "entity": [
+    "Don Wurster",
+    "Walt Disney"
+   ]
+  },
+  {
+   "id": "pilot2:v5:multipart:0003:1996_p0067",
+   "source": "pilot2_out_rebuilt.json",
+   "qid": "v5:multipart:0003",
+   "fix": [
+    "context_year"
+   ],
+   "baseline_cause": "quantity_year",
+   "sentence": "Helzberg's suffered a material decline in earnings in 1996 [1].",
+   "original_sentence": "Helzberg's suffered a material decline in earnings in 1996 [2].",
+   "passages": [
+    {
+     "id": "1996_p0067",
+     "year": 1996,
+     "text": "peration's\nnew status as the only direct-seller of encyclopedias in the country\n(Encyclopedia Britannica exited the field last year), its unit volume fell.\nAdditionally, World Book spent heavily on a new CD-ROM product that began\nto take in revenues only in early 1997, when it was launched in association\nwith IBM. In the face of these factors, earnings would have evaporated had\nWorld Book not revamped distribution methods and cut overhead at\nheadquarters, thereby dramatically reducing its fixed costs. Overall, the\ncompany has gone a long way toward assuring its long-term viability in both\nthe print and electronic marketplaces.\n\nOur only disappointment last year was in jewelry: Borsheim's did\nfine, but Helzberg's suffered a material decline in earnings. Its expense\nlevels had been geared to a sizable increase in same-store sales,\nconsistent with the gains achieved in recent years. When sales were\ninstead flat, profit margins fell. Jeff Comment, CEO of Helzberg's, is\naddressing the expense problem in a decisive manner, and the company's\nearnings should improve in 1997.\n\nOverall, our operating businesses continue to perform exceptionally,\nfar outdoing their industry norms. For this, Charlie and I thank our\nmanagers. If you should see any of them at the Annual Meeting, add your\nthanks as well.\n\nMore information about our various businesses is given on pages 3646, where you will also find our segment earnings reported on a GAAP\nbasis. In addition, on pages 51-57, we have rearranged Berkshire's\nfinancial data into four segments on a non-GAAP basis, a presentation\nthat corresponds to the way Charlie and I think about the company. Our\nintent is to supply you with the financial information that we would wish\nyou to give us if our positions were reversed.\n\n\"Look-Through\" Earnings"
+    }
+   ],
+   "negate": [
+    "suffered",
+    "did not suffer"
+   ],
+   "entity": [
+    "Helzberg's",
+    "Walmart Stores"
+   ]
+  },
+  {
+   "id": "pilot2:v5:multipart:0020:2009_p0074",
+   "source": "pilot2_out_rebuilt.json",
+   "qid": "v5:multipart:0020",
+   "fix": [
+    "stem"
+   ],
+   "baseline_cause": "coverage",
+   "sentence": "Berkshire can’t borrow at a rate approaching that available to government agencies, which limits sales and hurts both Clayton and a multitude of worthy families who long for a low-cost home. [1]",
+   "original_sentence": "Berkshire can’t borrow at a rate approaching that available to government agencies, which limits sales and hurts both Clayton and a multitude of worthy families who long for a low-cost home. [4]",
+   "passages": [
+    {
+     "id": "2009_p0074",
+     "year": 2009,
+     "text": "attitude was all-important: They signed up to live in the home, not resell or refinance it.\nConsequently, our buyers usually took out loans with payments geared to their verified incomes (we weren’t\nmaking “liar’s loans”) and looked forward to the day they could burn their mortgage. If they lost their jobs, had\nhealth problems or got divorced, we could of course expect defaults. But they seldom walked away simply\nbecause house values had fallen. Even today, though job-loss troubles have grown, Clayton’s delinquencies and\n\ndefaults remain reasonable and will not cause us significant problems.\nWe have tried to qualify more of our customers’ loans for treatment similar to those available on the\nsite-built product. So far we have had only token success. Many families with modest incomes but responsible\nhabits have therefore had to forego home ownership simply because the financing differential attached to the\nfactory-built product makes monthly payments too expensive. If qualifications aren’t broadened, so as to open\nlow-cost financing to all who meet down-payment and income standards, the manufactured-home industry seems\ndestined to struggle and dwindle.\nEven under these conditions, I believe Clayton will operate profitably in coming years, though well\n\nbelow its potential. We couldn’t have a better manager than CEO Kevin Clayton, who treats Berkshire’s interests\nas if they were his own. Our product is first-class, inexpensive and constantly being improved. Moreover, we will\ncontinue to use Berkshire’s credit to support Clayton’s mortgage program, convinced as we are of its soundness.\nEven so, Berkshire can’t borrow at a rate approaching that available to government agencies. This handicap will\nlimit sales, hurting both Clayton and a multitude of worthy families who long"
+    }
+   ],
+   "negate": [
+    "can’t borrow",
+    "can borrow"
+   ],
+   "entity": [
+    "Clayton",
+    "Walmart Stores"
+   ]
+  },
+  {
+   "id": "pilot2:v5:multipart:0021:2019_p0078",
+   "source": "pilot2_out_rebuilt.json",
+   "qid": "v5:multipart:0021",
+   "fix": [
+    "stem"
+   ],
+   "baseline_cause": "coverage",
+   "sentence": "In 2019, Berkshire repurchased about 1% of the company's shares, spending $5 billion on stock repurchases [1].",
+   "original_sentence": "In 2019, Berkshire repurchased about 1% of the company's shares, spending $5 billion on stock repurchases [1].",
+   "passages": [
+    {
+     "id": "2019_p0078",
+     "year": 2019,
+     "text": "past reports, we’ve discussed both the sense and nonsense of stock repurchases. Our thinking, boiled down:\nBerkshire will buy back its stock only if a) Charlie and I believe that it is selling for less than it is worth and b) the\ncompany, upon completing the repurchase, is left with ample cash.\nCalculations of intrinsic value are far from precise. Consequently, neither of us feels any urgency to buy an\nestimated $1 of value for a very real 95 cents. In 2019, the Berkshire price/value equation was modestly favorable at\n\ntimes, and we spent $5 billion in repurchasing about 1% of the company.\nOver time, we want Berkshire’s share count to go down. If the price-to-value discount (as we estimate it)\nwidens, we will likely become more aggressive in purchasing shares. We will not, however, prop the stock at any\nlevel.\nShareholders having at least $20 million in value of A or B shares and an inclination to sell shares to Berkshire\nmay wish to have their broker contact Berkshire’s Mark Millard at 402-346-1400. We request that you phone Mark\nbetween 8:00-8:30 a.m. or 3:00-3:30 p.m. Central Time, calling only if you are ready to sell.\n* * * * * * * * * * * *\nIn 2019, Berkshire sent $3.6 billion to the U.S. Treasury to pay its current income tax. The U.S. government\n\ncollected $243 billion from corporate income tax payments during the same period. From these statistics, you can take\npride that your company delivered 11⁄2% of the federal income taxes paid by all of corporate America.\nFifty-five years ago, when Berkshire entered its current incarnation, the company paid nothing in federal\nincome tax. (For good reason, too: Over the previous decade, the struggling business had recorded a net loss.) Since\nthen, as Berkshire retained nearly all of its earnings, the beneficiaries of that"
+    }
+   ],
+   "negate": [
+    "repurchased",
+    "did not repurchase"
+   ],
+   "entity": [
+    "Berkshire",
+    "Walmart Stores"
+   ]
+  }
+ ]
+}

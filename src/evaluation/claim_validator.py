@@ -37,6 +37,17 @@ _IGNORE = frozenset(
 _SPLIT_RE = re.compile(r"([.!?](?:[ \t]*\[\d+(?:\s*,\s*\d+)*\])*)[ \t]+(?=(?:[o•▪◦][ \t]+)?[A-Z0-9\"'“‘(])")
 _ABBREVIATIONS = frozenset({"mr", "mrs", "ms", "dr", "prof", "st", "jr", "sr", "vs"})
 _MIN_COVERAGE = 0.6
+# Sentence end followed by a closing bracket/quote ("... business.) In 1992 ..."): the base splitter keeps
+# such text in one evidence sentence, so a negation in the first half leaks into the second half.
+_CLOSER_SPLIT_RE = re.compile(r"(?<=[.!?][)\"'])\s+(?=[A-Z0-9\"'(])")
+_CONNECTOR_RE = re.compile(r"\s+(?:and|but)\s+|;", re.I)
+# "(in $ millions)": bare table numbers are dollar amounts in that scale.
+_TABLE_SCALE_RE = re.compile(r"\$\s*(?:in\s+)?(millions|billions)\b|\bin\s+\$?\s*(millions|billions)\b", re.I)
+_YEAR_MIN, _YEAR_MAX = 1800, 2100
+# A unit that points away from the letter's own year must name that year itself.
+_RELATIVE_TIME_RE = re.compile(
+    r"\b(?:ago|next\s+year|previous|prior|earlier|later|decades?|from\s+now|hence|eventually|in\s+the\s+future"
+    r"|(?:year|years|decade|decades)\s+(?:before|after))\b", re.I)
 
 
 @dataclass
@@ -55,6 +66,44 @@ def _normalize(text: str) -> str:
     # Possessive typography must not manufacture an entity/token named 's'.
     text = re.sub(r"\b([A-Za-z]+)'s\b", r"\1", text)
     return re.sub(r"\s+", " ", text).strip()
+
+
+def _stem(token: str) -> str:
+    """Cheap, symmetric stem (plural / -ed / -ing / final e). Applied to claim and evidence alike."""
+    t = token.lower()
+    if t.isdigit() or len(t) <= 3 or "'" in t:
+        return t
+    if t.endswith("ies") and len(t) > 4:
+        t = t[:-3] + "y"
+    elif re.search(r"(?:sses|xes|ches|shes)$", t):
+        t = t[:-2]
+    elif t.endswith("s") and not t.endswith(("ss", "us", "is")):
+        t = t[:-1]
+    if t.endswith("ing") and len(t) > 5:
+        t = t[:-3]
+    elif t.endswith("ed") and len(t) > 4:
+        t = t[:-2]
+    if t.endswith("e") and len(t) > 4:
+        t = t[:-1]
+    return t
+
+
+def _stems(text: str) -> set[str]:
+    return {_stem(t) for t in _TOKEN_RE.findall(text)}
+
+
+def _is_year(value: Decimal) -> bool:
+    return value == value.to_integral_value() and _YEAR_MIN <= value <= _YEAR_MAX
+
+
+def _hit_year(hit: Any) -> int | None:
+    """Fiscal year of the letter a passage comes from (hit metadata), if known."""
+    metadata = getattr(hit, "metadata", None)
+    try:
+        year = int(str(metadata.get("year"))) if isinstance(metadata, dict) and metadata.get("year") is not None else None
+    except ValueError:
+        return None
+    return year if year is not None and _YEAR_MIN <= year <= _YEAR_MAX else None
 
 
 def _quantities(text: str) -> set[tuple[Decimal, str]]:
@@ -123,7 +172,35 @@ def _evidence_units(passage: str) -> List[str]:
         clauses = split_claims(sentence)
         if len(clauses) > 1:
             units.extend(clauses)
+        for extra in _extra_units(sentence):
+            if extra not in units:
+                units.append(extra)
     return units
+
+
+def _extra_units(sentence: str) -> List[str]:
+    """Additional evidence granularity; each unit still faces every check on its own.
+
+    1. A sentence end inside brackets/quotes ('... business.) In 1992, ...') is a boundary.
+    2. split_claims keeps "Bill and most of his managers are Mormons, and for this reason ..." whole
+       (subject conjunction), which lets the second clause's "never" taint the first. Keep only the
+       subject conjunction together and still split the later clauses.
+    """
+    extras: List[str] = []
+    pieces = [p.strip() for p in _CLOSER_SPLIT_RE.split(sentence) if p.strip()]
+    if len(pieces) > 1:
+        extras.extend(pieces)
+    for piece in pieces or [sentence]:
+        clean = _CITATION_RE.sub("", piece).strip().rstrip(".!?")
+        matches = list(_CONNECTOR_RE.finditer(clean))
+        if len(matches) < 2 or len(_TOKEN_RE.findall(clean[:matches[0].start()])) > 2:
+            continue
+        start = 0
+        for match in matches[1:]:
+            extras.append(clean[start:match.start()].strip(" ,.;"))
+            start = match.end()
+        extras.append(clean[start:].strip(" ,.;"))
+    return [e for e in extras if e]
 
 
 def split_claims(text: str) -> List[str]:
@@ -136,13 +213,32 @@ def split_claims(text: str) -> List[str]:
     return parts
 
 
-def _hard_agreement(claim: str, sentence: str) -> bool:
-    return (_quantities(claim).issubset(_quantities(sentence)) and
+def _evidence_quantities(sentence: str) -> set[tuple[Decimal, str]]:
+    quantities = _quantities(sentence)
+    scale = _TABLE_SCALE_RE.search(_normalize(sentence))
+    if scale:
+        factor = _SCALES["billion" if (scale.group(1) or scale.group(2)).lower() == "billions" else "million"]
+        quantities |= {(value * factor, "$") for value, unit in quantities if unit == "number"}
+    return quantities
+
+
+def _quantities_agree(claim: str, sentence: str, context_year: int | None = None) -> bool:
+    missing = _quantities(claim) - _evidence_quantities(sentence)
+    if missing and context_year is not None and missing == {(Decimal(context_year), "number")}:
+        # "In 1983, ..." cited to the 1983 letter: the year is the passage's own, not stated in the
+        # sentence. Only when the evidence unit names no year of its own and does not point to another time.
+        return not (_RELATIVE_TIME_RE.search(sentence) or
+                    any(unit == "number" and _is_year(value) for value, unit in _evidence_quantities(sentence)))
+    return not missing
+
+
+def _hard_agreement(claim: str, sentence: str, context_year: int | None = None) -> bool:
+    return (_quantities_agree(claim, sentence, context_year) and
             bool(_PREDICATE_NEGATION_RE.search(_normalize(claim))) ==
             bool(_PREDICATE_NEGATION_RE.search(_normalize(sentence))))
 
 
-def _nli_hard_agreement(claim: str, passage: str) -> bool:
+def _nli_hard_agreement(claim: str, passage: str, context_year: int | None = None) -> bool:
     # An unrelated affirmative sentence must not license a negated claim's
     # opposite. Apply hard checks to the best lexical evidence, not any sentence.
     content = {t.lower() for t in _TOKEN_RE.findall(_normalize(claim))
@@ -150,26 +246,26 @@ def _nli_hard_agreement(claim: str, passage: str) -> bool:
     candidates = [(len(content & {t.lower() for t in _TOKEN_RE.findall(_normalize(s))}), s)
                   for s in evidence_sentences(passage)]
     best = max((score for score, _ in candidates), default=0)
-    return best > 0 and any(_hard_agreement(claim, s) for score, s in candidates if score == best)
+    return best > 0 and any(_hard_agreement(claim, s, context_year) for score, s in candidates if score == best)
 
 
-def _deterministic_agreement(claim: str, passage: str) -> tuple[bool, float]:
+def _deterministic_agreement(claim: str, passage: str, context_year: int | None = None) -> tuple[bool, float]:
     """Require content coverage, typed quantities, named entities and polarity."""
     normalized_claim = _normalize(claim)
     raw_tokens = _TOKEN_RE.findall(normalized_claim)
-    claim_content = {t.lower() for t in raw_tokens if t.lower() not in _STOPWORDS and t.lower() not in _IGNORE}
+    claim_content = {_stem(t) for t in raw_tokens if t.lower() not in _STOPWORDS and t.lower() not in _IGNORE}
     claim_entities = {
-        t.lower() for t in raw_tokens[1:]
+        _stem(t) for t in raw_tokens[1:]
         if t[:1].isupper() and t.lower() not in _STOPWORDS and t.lower() not in _IGNORE
         and not t[:1].isdigit()
     }
     needed = 1.0 if len(claim_content) <= 3 else _MIN_COVERAGE
     best_score = 0.0
     for sentence in _evidence_units(_normalize(passage)):
-        evidence_set = {token.lower() for token in _TOKEN_RE.findall(sentence)}
+        evidence_set = _stems(sentence)
         coverage = len(claim_content & evidence_set) / len(claim_content) if claim_content else 0.0
         best_score = max(best_score, lexical_support_score(normalized_claim, sentence), coverage)
-        if coverage >= needed and _hard_agreement(claim, sentence) and claim_entities.issubset(evidence_set):
+        if coverage >= needed and _hard_agreement(claim, sentence, context_year) and claim_entities.issubset(evidence_set):
             return True, max(best_score, coverage)
     return False, best_score
 
@@ -201,12 +297,13 @@ def validate_and_filter_answer(answer: str, hits: Sequence[Any], *, nli_scorer: 
                 scores, agreements = [], []
                 for index in valid:
                     passage = hits[index].text
+                    year = _hit_year(hits[index])
                     if nli_scorer:
                         score = float(nli_scorer(passage, claim))
                         agreement = (score >= max(0.5, threshold) and
-                                     _nli_hard_agreement(claim, passage))
+                                     _nli_hard_agreement(claim, passage, year))
                     else:
-                        agreement, score = _deterministic_agreement(claim, passage)
+                        agreement, score = _deterministic_agreement(claim, passage, year)
                     scores.append(score)
                     agreements.append(agreement)
                 supported = bool(valid) and any(agreements)
