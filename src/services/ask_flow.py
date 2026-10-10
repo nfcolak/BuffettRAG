@@ -1,6 +1,7 @@
 """Question-answer preparation, generation and shared backend state."""
 from __future__ import annotations
 
+import os
 import re
 from pathlib import Path
 from typing import Any, Dict, List, Optional
@@ -26,6 +27,7 @@ from src.generation.prompt import (
     strip_chat_artifacts,
 )
 from src.generation.compare import comparison_periods, generate_comparison_answer, prepare_answer_context
+from src.generation.decompose import answer_by_parts, split_question
 from src.generation.evidence_gate import assess_evidence
 from src.evaluation.claim_validator import validate_and_filter_answer
 from src.generation.providers import create_llm_provider
@@ -211,6 +213,15 @@ def _generate_answer(llm, prompt: str, context_hits, max_new_tokens: int, query:
     is_comparison = bool(query and comparison_periods(query))
     if query and not is_comparison and not assess_evidence(query, context_hits, extra_queries=extra_queries).sufficient:
         return REFUSAL_LINE, []
+    if query and not is_comparison and os.getenv("ANSWER_DECOMPOSE", "0") == "1":
+        parts = split_question(query)
+        if len(parts) >= 2:
+            try:
+                return answer_by_parts(llm, query, context_hits, history, max_new_tokens)
+            except Exception as exc:
+                if EXPOSE_DEBUG_STATUS:
+                    print(f"[backend] LLM provider unavailable: {exc}", flush=True)
+                return _llm_error_message(exc), []
     try:
         if is_comparison and query is not None:
             comparison = generate_comparison_answer(
