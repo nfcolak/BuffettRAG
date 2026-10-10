@@ -211,8 +211,16 @@ def _generate_answer(llm, prompt: str, context_hits, max_new_tokens: int, query:
     if is_grounded(llm):
         return _generate_grounded(llm, query or "", context_hits, max_new_tokens, history)
     is_comparison = bool(query and comparison_periods(query))
-    if query and not is_comparison and not assess_evidence(query, context_hits, extra_queries=extra_queries).sufficient:
-        return REFUSAL_LINE, []
+    if query and not is_comparison:
+        evidence = assess_evidence(query, context_hits, extra_queries=extra_queries)
+        soft_gate = (
+            os.getenv("EVIDENCE_GATE_SOFT", "0") == "1"
+            and 0.15 <= evidence.best_overlap < 0.30
+        )
+        if not evidence.sufficient and not soft_gate:
+            return REFUSAL_LINE, []
+        if EXPOSE_DEBUG_STATUS:
+            print(f"[backend] evidence overlap: {evidence.best_overlap:.3f}", flush=True)
     if query and not is_comparison and os.getenv("ANSWER_DECOMPOSE", "0") == "1":
         parts = split_question(query)
         if len(parts) >= 2:
