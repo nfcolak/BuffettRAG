@@ -70,8 +70,10 @@ def _context_snapshot(context_hits) -> List[Dict[str, Any]]:
         text = getattr(hit, "text", "") or ""
         meta = getattr(hit, "metadata", None) or {}
         year = getattr(hit, "year", None)
-        out.append({"id": getattr(hit, "id", None), "year": year if year is not None else meta.get("year"),
-                    "text_sha256": hashlib.sha256(text.encode("utf-8")).hexdigest(), "text": text})
+        hit_id = getattr(hit, "id", None)
+        out.append({"id": hit_id, "year": year if year is not None else meta.get("year"),
+                    "text_sha256": hashlib.sha256(text.encode("utf-8")).hexdigest(), "text": text,
+                    "merged_ids": list(meta.get("merged_ids") or [hit_id])})
     return out
 
 
@@ -383,6 +385,15 @@ def run(
     setup_latency_ms = (time.perf_counter() - setup_start) * 1000
 
     old_state, old_debug = ask_flow._state, ask_flow.EXPOSE_DEBUG_STATUS
+    old_prepare = ask_flow._prepare_ask
+    served_context: List[Any] = []  # context_hits exactly as handed to the model (merge + truncation applied)
+
+    def _capturing_prepare(req):
+        prepared = old_prepare(req)
+        served_context[:] = list(prepared[4])
+        return prepared
+
+    ask_flow._prepare_ask = _capturing_prepare
     ask_flow._state = {"retriever": retriever, "docs": docs, "docs_by_id": build_doc_lookup(docs), "llm": llm}
     ask_flow.EXPOSE_DEBUG_STATUS = False
     rows = []
@@ -416,6 +427,7 @@ def run(
                 raw_offset = len(llm.raw_outputs)
                 grounded_offset = len(llm.grounded_calls)
                 note_offset = len(llm.notes)
+                served_context.clear()
                 req = backend.AskRequest(query=case["query"], history=case.get("history", []),
                                          strategy="hybrid", rerank=retrieval == "hybrid")
                 response = backend.ask(req)
@@ -429,7 +441,10 @@ def run(
                 if grounded_run:
                     row["grounded_calls"] = llm.grounded_calls[grounded_offset:]
                     row["notes"] = llm.notes[note_offset:]
-                    row["context_snapshot"] = row["grounded_calls"][-1]["context"] if row["grounded_calls"] else []
+                if grounded_run and row["grounded_calls"]:
+                    row["context_snapshot"] = row["grounded_calls"][-1]["context"]
+                else:
+                    row["context_snapshot"] = _context_snapshot(served_context)
                 if save_raw:
                     row["raw_answers"] = [text for stage, text in llm.raw_outputs[raw_offset:] if stage == "generating"]
                 if row["provider_failures"] or (response.answer or "").startswith("[LLM unavailable"):
@@ -451,6 +466,7 @@ def run(
             sidecar.append_row(row)
     finally:
         ask_flow._state, ask_flow.EXPOSE_DEBUG_STATUS = old_state, old_debug
+        ask_flow._prepare_ask = old_prepare
     if resume:
         sidecar.record_resume(resumed_qids, len(rows) - len(resumed_qids))
 
