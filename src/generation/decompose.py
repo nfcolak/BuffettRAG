@@ -4,7 +4,7 @@ from __future__ import annotations
 import re
 from typing import Any, Dict, List, Sequence
 
-from src.evaluation.claim_validator import validate_and_filter_answer
+from src.evaluation.claim_validator import evidence_sentences, validate_and_filter_answer
 from src.generation.prompt import (
     REFUSAL_LINE,
     build_cited_prompt,
@@ -160,7 +160,28 @@ def split_question(query: str) -> list[str]:
 
 
 def _sentences(text: str) -> List[str]:
-    return [s.strip() for s in re.split(r"(?<=[.!?])\s+", text.strip()) if s.strip()]
+    """Split answer prose without detaching trailing citation markers."""
+    out: List[str] = []
+    for sentence in evidence_sentences(text):
+        sentence = sentence.strip()
+        if not sentence:
+            continue
+        if not _dedupe_key(sentence) and out:
+            out[-1] += " " + sentence  # a bare marker belongs to the previous sentence
+        elif _dedupe_key(sentence):
+            out.append(sentence)
+    return out
+
+
+def _dedupe_key(sentence: str) -> str:
+    text = re.sub(r"\[\d+(?:\s*,\s*\d+)*\]", "", sentence)
+    return " ".join(re.findall(r"[^\W_]+(?:['’][^\W_]+)*", text.casefold()))
+
+
+def _near_duplicate(left: str, right: str) -> bool:
+    left_tokens, right_tokens = set(left.split()), set(right.split())
+    union = left_tokens | right_tokens
+    return bool(union) and len(left_tokens & right_tokens) / len(union) >= 0.8
 
 
 def answer_by_parts(llm: Any, query: str, context_hits: Sequence[Any], history,
@@ -176,7 +197,7 @@ def answer_by_parts(llm: Any, query: str, context_hits: Sequence[Any], history,
         return answer, parse_citations(answer, context_hits)
 
     kept: List[str] = []
-    seen = set()
+    keys: List[str] = []
     for part in parts:
         part_query = f"{query}\nAnswer only this part: {part}"
         prompt = build_cited_prompt(query=part_query, hits=context_hits, history=history)
@@ -189,11 +210,14 @@ def answer_by_parts(llm: Any, query: str, context_hits: Sequence[Any], history,
         if answer == REFUSAL_LINE:
             continue
         for sentence in _sentences(answer):
-            key = re.sub(r"\s+", " ", re.sub(r"\[\d+(?:\s*,\s*\d+)*\]", "", sentence)).casefold().strip()
-            if key not in seen:
-                seen.add(key)
+            key = _dedupe_key(sentence)
+            if key and not any(key == k or _near_duplicate(key, k) for k in keys):
+                keys.append(key)
                 kept.append(sentence)
     if not kept:
         return REFUSAL_LINE, []
     answer = " ".join(kept)
+    answer = validate_and_filter_answer(answer, context_hits).safe_answer or REFUSAL_LINE
+    if answer == REFUSAL_LINE:
+        return REFUSAL_LINE, []
     return answer, parse_citations(answer, context_hits)

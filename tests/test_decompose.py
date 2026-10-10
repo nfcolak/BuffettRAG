@@ -82,3 +82,50 @@ def test_flag_off_generates_once(monkeypatch):
     )
     assert answer == "ok"
     assert llm.calls == 1
+
+
+def _join(monkeypatch, raws):
+    from src.generation import decompose
+
+    monkeypatch.setattr(
+        decompose, "validate_and_filter_answer", lambda ans, hits: SimpleNamespace(safe_answer=ans)
+    )
+
+    class FakeLLM:
+        def __init__(self):
+            self.answers = iter(raws)
+
+        def generate(self, prompt, max_new_tokens=None):
+            return next(self.answers)
+
+    hit = SimpleNamespace(id="p1", text="x", metadata={"year": 2000, "source_file": "l.txt"})
+    return decompose.answer_by_parts(
+        FakeLLM(), "(1) What is first? (2) What is second?", [hit, hit], [], 80
+    )[0]
+
+
+def test_join_keeps_markers_on_their_sentences(monkeypatch):
+    answer = _join(monkeypatch, [
+        "Alpha holds many shares today. [1] Beta paid some dividends then. [1]",
+        "Gamma bought another company later [2].",
+    ])
+    assert answer == (
+        "Alpha holds many shares today. [1] Beta paid some dividends then. [1] "
+        "Gamma bought another company later [2]."
+    )
+
+
+def test_join_dedupes_exact_and_near_duplicates(monkeypatch):
+    answer = _join(monkeypatch, [
+        "Alpha holds many shares of the big company today [1].",
+        "Alpha holds many shares of the big company today [2]. "
+        "Alpha holds many shares of the big company today now [1].",
+    ])
+    assert answer.count("Alpha holds") == 1
+
+
+def test_bare_marker_never_becomes_own_sentence(monkeypatch):
+    from src.generation.decompose import _sentences
+
+    assert _sentences("Alpha holds many shares today. [1]") == ["Alpha holds many shares today. [1]"]
+    assert _sentences("[1]") == []
