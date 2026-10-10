@@ -79,33 +79,79 @@ _TEMPORAL_COMPARISON_RE = re.compile(
 )
 
 
-def detect_temporal_comparison(query: str) -> Optional[List[Dict[str, Any]]]:
-    """Detect two or more explicit time periods in question order.
+CORPUS_YEAR_MIN, CORPUS_YEAR_MAX = 1977, 2024
+_PERIOD_RE = re.compile(
+    r"\b(?:((?:19|20)\d0)s|((?:19|20)\d{2})|(seventies|eighties|nineties))\b", re.IGNORECASE
+)
+_COMPARISON_CUE_RE = re.compile(
+    r"\b(?:compar\w*|contrast\w*|versus|vs|between|chang\w*|differ\w*|both years|each year)\b"
+    r"|\bfrom\b[^.?!]*?\bto\b",
+    re.IGNORECASE,
+)
+# "the 2002 and 2003 letters", "1986 annual report".
+_LETTER_YEARS_RE = re.compile(
+    r"\b((?:19|20)\d{2}(?:\s*(?:,|and|or|/)\s*(?:and\s+)?(?:19|20)\d{2})*)"
+    r"\s+(?:annual\s+|shareholder\s+)?(?:letters?|reports?)\b",
+    re.IGNORECASE,
+)
+_LETTER_OF_YEAR_RE = re.compile(r"\bletters?\s+(?:of|for|from)\s+(?:19|20)\d{2}\b", re.IGNORECASE)
 
-    Years and decades are kept distinct; aliases of the same decade collapse.
-    The caller isolates retrieval and answer generation for every period.
+
+def explicit_periods(text: str) -> List[Dict[str, Any]]:
+    """Distinct in-corpus periods named in ``text``, in order, with no cue rule.
+
+    Years and decades wholly outside 1977-2024 are not letter periods.
     """
-    # Explicit periods, not comparison verbs, determine the decomposition.
-    # Keep all distinct periods in question order, including mixed years/decades;
-    # do not silently replace distant explicit years with intervening ranges.
-    period_re = re.compile(
-        r"\b(?:((?:19|20)\d0)s|((?:19|20)\d{2})|"
-        r"(seventies|eighties|nineties))\b", re.IGNORECASE
-    )
     periods: List[Dict[str, Any]] = []
-    for match in period_re.finditer(query):
+    for match in _PERIOD_RE.finditer(text):
         decade, year, word = match.groups()
         if decade:
-            start = int(decade)
-            filt = {"year": {"$gte": start, "$lte": start + 9}}
+            start, end = int(decade), int(decade) + 9
+            filt: Dict[str, Any] = {"year": {"$gte": start, "$lte": end}}
         elif word:
             start, end = _DECADE_WORD_TO_RANGE[word.lower()]
             filt = {"year": {"$gte": start, "$lte": end}}
         else:
-            filt = {"year": int(year)}
+            start = end = int(year)
+            filt = {"year": start}
+        if end < CORPUS_YEAR_MIN or start > CORPUS_YEAR_MAX:
+            continue
         if filt not in periods:
             periods.append(filt)
-    return periods if len(periods) >= 2 else None
+    return periods
+
+
+def history_pins_letter(history: Optional[Sequence[Dict[str, Any]]]) -> bool:
+    """True when an earlier turn already names a specific letter year."""
+    for turn in history or []:
+        text = str(turn.get("content", ""))
+        if _LETTER_YEARS_RE.search(text) or _LETTER_OF_YEAR_RE.search(text):
+            return True
+    return False
+
+
+def detect_temporal_comparison(
+    query: str, history: Optional[Sequence[Dict[str, Any]]] = None,
+) -> Optional[List[Dict[str, Any]]]:
+    """Detect two or more explicit time periods in question order.
+
+    Years and decades are kept distinct; aliases of the same decade collapse.
+    The caller isolates retrieval and answer generation for every period.
+    Years outside the corpus (1977-2024) are ignored, a comparison cue or two
+    "YYYY letter" mentions is required, and a follow-up whose history already
+    pins a letter is never split: its years are event years, not letters.
+    """
+    if history_pins_letter(history):
+        return None
+    periods = explicit_periods(query)
+    if len(periods) < 2:
+        return None
+    letter_years = {
+        y for m in _LETTER_YEARS_RE.finditer(query) for y in re.findall(r"(?:19|20)\d{2}", m.group(1))
+    }
+    if not _COMPARISON_CUE_RE.search(query) and len(letter_years) < 2:
+        return None
+    return periods
 
 
 def reserve_period_hits(
@@ -328,12 +374,13 @@ class Retriever:
         where: Optional[Dict[str, Any]] = None,
         auto_year_filter: bool = True,
         retrieval_query: Optional[str] = None,
+        history: Optional[Sequence[Dict[str, Any]]] = None,
     ) -> "RetrievalResult":
         applied_filter: Optional[Dict[str, Any]] = dict(where) if where else None
 
         # The lexical path uses the same per-period reservation as hybrid.
         if strategy in ("hybrid", "hybrid_multi", "bm25") and auto_year_filter and not where:
-            subquery_filters = detect_temporal_comparison(query)
+            subquery_filters = detect_temporal_comparison(query, history)
             if subquery_filters:
                 return self._multi_subquery_search(
                     query, subquery_filters, top_k, fetch_k, rerank, retrieval_query, strategy
