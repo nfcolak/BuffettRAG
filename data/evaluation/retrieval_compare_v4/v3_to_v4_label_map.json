@@ -1,0 +1,2173 @@
+{
+  "schema_version": 1,
+  "rule": "map top-1 where Jaccard>=0.5 and confirmed by text; otherwise v4 chunk(s) holding the same text (any hit counts); literal_map_v4_ids = sensitivity variant (top-1 where Jaccard>=0.5)",
+  "gold50": "text-based relevance (target year + keyword); no ids, no mapping needed",
+  "unresolved": [],
+  "entries": [
+    {
+      "v3_id": "1977_p0000",
+      "label_set": "dev",
+      "v4_ids": [
+        "1977_p0000"
+      ],
+      "method": "map",
+      "jaccard": 1.0,
+      "note": "id map Jaccard 1.00; top-1 chunk confirmed by text (v4 chunk(s) holding the claim's required terms)",
+      "literal_map_v4_ids": [
+        "1977_p0000"
+      ]
+    },
+    {
+      "v3_id": "1977_p0006",
+      "label_set": "dev",
+      "v4_ids": [
+        "1977_p0006"
+      ],
+      "method": "map",
+      "jaccard": 1.0,
+      "note": "id map Jaccard 1.00; top-1 chunk confirmed by text (v4 chunk(s) holding the claim's required terms)",
+      "literal_map_v4_ids": [
+        "1977_p0006"
+      ]
+    },
+    {
+      "v3_id": "1977_p0028",
+      "label_set": "dev",
+      "v4_ids": [
+        "1977_p0028"
+      ],
+      "method": "map",
+      "jaccard": 1.0,
+      "note": "id map Jaccard 1.00; top-1 chunk confirmed by text (v4 chunk(s) holding the claim's required terms)",
+      "literal_map_v4_ids": [
+        "1977_p0028"
+      ]
+    },
+    {
+      "v3_id": "1978_p0039",
+      "label_set": "dev",
+      "v4_ids": [
+        "1978_p0039"
+      ],
+      "method": "map",
+      "jaccard": 1.0,
+      "note": "id map Jaccard 1.00; top-1 chunk confirmed by text (v4 chunk(s) holding the claim's required terms)",
+      "literal_map_v4_ids": [
+        "1978_p0039"
+      ]
+    },
+    {
+      "v3_id": "1979_p0011",
+      "label_set": "dev",
+      "v4_ids": [
+        "1979_p0011"
+      ],
+      "method": "map",
+      "jaccard": 1.0,
+      "note": "id map Jaccard 1.00; top-1 chunk confirmed by text (v4 chunk(s) holding the claim's required terms)",
+      "literal_map_v4_ids": [
+        "1979_p0011"
+      ]
+    },
+    {
+      "v3_id": "1979_p0024",
+      "label_set": "dev",
+      "v4_ids": [
+        "1979_p0024"
+      ],
+      "method": "map",
+      "jaccard": 1.0,
+      "note": "id map Jaccard 1.00; top-1 chunk confirmed by text (v4 chunk(s) holding the claim's required terms)",
+      "literal_map_v4_ids": [
+        "1979_p0024"
+      ]
+    },
+    {
+      "v3_id": "1980_p0076",
+      "label_set": "dev",
+      "v4_ids": [
+        "1980_p0076"
+      ],
+      "method": "map",
+      "jaccard": 1.0,
+      "note": "id map Jaccard 1.00; top-1 chunk confirmed by text (v4 chunk(s) holding the claim's required terms)",
+      "literal_map_v4_ids": [
+        "1980_p0076"
+      ]
+    },
+    {
+      "v3_id": "1981_p0006",
+      "label_set": "dev",
+      "v4_ids": [
+        "1981_p0006"
+      ],
+      "method": "map",
+      "jaccard": 1.0,
+      "note": "id map Jaccard 1.00; top-1 chunk confirmed by text (v4 chunk(s) holding the claim's required terms)",
+      "literal_map_v4_ids": [
+        "1981_p0006"
+      ]
+    },
+    {
+      "v3_id": "1982_p0016",
+      "label_set": "dev",
+      "v4_ids": [
+        "1982_p0016"
+      ],
+      "method": "map",
+      "jaccard": 1.0,
+      "note": "id map Jaccard 1.00; top-1 chunk confirmed by text (v4 chunk(s) holding the claim's required terms)",
+      "literal_map_v4_ids": [
+        "1982_p0016"
+      ]
+    },
+    {
+      "v3_id": "1983_p0017",
+      "label_set": "dev",
+      "v4_ids": [
+        "1983_p0017"
+      ],
+      "method": "map",
+      "jaccard": 1.0,
+      "note": "id map Jaccard 1.00; top-1 chunk confirmed by text (v4 chunk(s) holding the claim's required terms)",
+      "literal_map_v4_ids": [
+        "1983_p0017"
+      ]
+    },
+    {
+      "v3_id": "1983_p0029",
+      "label_set": "dev",
+      "v4_ids": [
+        "1983_p0029"
+      ],
+      "method": "map",
+      "jaccard": 1.0,
+      "note": "id map Jaccard 1.00; top-1 chunk confirmed by text (v4 chunk(s) holding the claim's required terms)",
+      "literal_map_v4_ids": [
+        "1983_p0029"
+      ]
+    },
+    {
+      "v3_id": "1983_p0095",
+      "label_set": "dev",
+      "v4_ids": [
+        "1983_p0095"
+      ],
+      "method": "map",
+      "jaccard": 1.0,
+      "note": "id map Jaccard 1.00; top-1 chunk confirmed by text (v4 chunk(s) holding the claim's required terms)",
+      "literal_map_v4_ids": [
+        "1983_p0095"
+      ]
+    },
+    {
+      "v3_id": "1984_p0034",
+      "label_set": "dev",
+      "v4_ids": [
+        "1984_p0034"
+      ],
+      "method": "map",
+      "jaccard": 1.0,
+      "note": "id map Jaccard 1.00; top-1 chunk confirmed by text (v4 chunk(s) holding the claim's required terms)",
+      "literal_map_v4_ids": [
+        "1984_p0034"
+      ]
+    },
+    {
+      "v3_id": "1984_p0057",
+      "label_set": "dev",
+      "v4_ids": [
+        "1984_p0057"
+      ],
+      "method": "map",
+      "jaccard": 1.0,
+      "note": "id map Jaccard 1.00; top-1 chunk confirmed by text (v4 chunk(s) holding the claim's required terms)",
+      "literal_map_v4_ids": [
+        "1984_p0057"
+      ]
+    },
+    {
+      "v3_id": "1984_p0094",
+      "label_set": "dev",
+      "v4_ids": [
+        "1984_p0094"
+      ],
+      "method": "map",
+      "jaccard": 1.0,
+      "note": "id map Jaccard 1.00; top-1 chunk confirmed by text (v4 chunk(s) holding the claim's required terms)",
+      "literal_map_v4_ids": [
+        "1984_p0094"
+      ]
+    },
+    {
+      "v3_id": "1985_p0029",
+      "label_set": "dev",
+      "v4_ids": [
+        "1985_p0029"
+      ],
+      "method": "map",
+      "jaccard": 1.0,
+      "note": "id map Jaccard 1.00; top-1 chunk confirmed by text (v4 chunk(s) holding the claim's required terms)",
+      "literal_map_v4_ids": [
+        "1985_p0029"
+      ]
+    },
+    {
+      "v3_id": "1985_p0104",
+      "label_set": "dev",
+      "v4_ids": [
+        "1985_p0104"
+      ],
+      "method": "map",
+      "jaccard": 1.0,
+      "note": "id map Jaccard 1.00; top-1 chunk confirmed by text (v4 chunk(s) holding the claim's required terms)",
+      "literal_map_v4_ids": [
+        "1985_p0104"
+      ]
+    },
+    {
+      "v3_id": "1985_p0143",
+      "label_set": "dev",
+      "v4_ids": [
+        "1985_p0143"
+      ],
+      "method": "map",
+      "jaccard": 1.0,
+      "note": "id map Jaccard 1.00; top-1 chunk confirmed by text (v4 chunk(s) holding the claim's required terms)",
+      "literal_map_v4_ids": [
+        "1985_p0143"
+      ]
+    },
+    {
+      "v3_id": "1986_p0070",
+      "label_set": "dev",
+      "v4_ids": [
+        "1986_p0070"
+      ],
+      "method": "map",
+      "jaccard": 1.0,
+      "note": "id map Jaccard 1.00; top-1 chunk confirmed by text (v4 chunk(s) holding the claim's required terms)",
+      "literal_map_v4_ids": [
+        "1986_p0070"
+      ]
+    },
+    {
+      "v3_id": "1986_p0120",
+      "label_set": "dev",
+      "v4_ids": [
+        "1986_p0120"
+      ],
+      "method": "map",
+      "jaccard": 1.0,
+      "note": "id map Jaccard 1.00; top-1 chunk confirmed by text (v4 chunk(s) holding the claim's required terms)",
+      "literal_map_v4_ids": [
+        "1986_p0120"
+      ]
+    },
+    {
+      "v3_id": "1986_p0150",
+      "label_set": "dev",
+      "v4_ids": [
+        "1986_p0150"
+      ],
+      "method": "map",
+      "jaccard": 1.0,
+      "note": "id map Jaccard 1.00; top-1 chunk confirmed by text (v4 chunk(s) holding the claim's required terms)",
+      "literal_map_v4_ids": [
+        "1986_p0150"
+      ]
+    },
+    {
+      "v3_id": "1987_p0069",
+      "label_set": "dev",
+      "v4_ids": [
+        "1987_p0069"
+      ],
+      "method": "map",
+      "jaccard": 1.0,
+      "note": "id map Jaccard 1.00; top-1 chunk confirmed by text (v4 chunk(s) holding the claim's required terms)",
+      "literal_map_v4_ids": [
+        "1987_p0069"
+      ]
+    },
+    {
+      "v3_id": "1988_p0003",
+      "label_set": "dev",
+      "v4_ids": [
+        "1988_p0003"
+      ],
+      "method": "map",
+      "jaccard": 1.0,
+      "note": "id map Jaccard 1.00; top-1 chunk confirmed by text (v4 chunk(s) holding the claim's required terms)",
+      "literal_map_v4_ids": [
+        "1988_p0003"
+      ]
+    },
+    {
+      "v3_id": "1988_p0068",
+      "label_set": "dev",
+      "v4_ids": [
+        "1988_p0068"
+      ],
+      "method": "map",
+      "jaccard": 1.0,
+      "note": "id map Jaccard 1.00; top-1 chunk confirmed by text (v4 chunk(s) holding the claim's required terms)",
+      "literal_map_v4_ids": [
+        "1988_p0068"
+      ]
+    },
+    {
+      "v3_id": "1989_p0033",
+      "label_set": "dev",
+      "v4_ids": [
+        "1989_p0033"
+      ],
+      "method": "map",
+      "jaccard": 1.0,
+      "note": "id map Jaccard 1.00; top-1 chunk confirmed by text (v4 chunk(s) holding the claim's required terms)",
+      "literal_map_v4_ids": [
+        "1989_p0033"
+      ]
+    },
+    {
+      "v3_id": "1989_p0146",
+      "label_set": "dev",
+      "v4_ids": [
+        "1989_p0146"
+      ],
+      "method": "map",
+      "jaccard": 1.0,
+      "note": "id map Jaccard 1.00; top-1 chunk confirmed by text (v4 chunk(s) holding the claim's required terms)",
+      "literal_map_v4_ids": [
+        "1989_p0146"
+      ]
+    },
+    {
+      "v3_id": "1990_p0019",
+      "label_set": "dev",
+      "v4_ids": [
+        "1990_p0019"
+      ],
+      "method": "map",
+      "jaccard": 1.0,
+      "note": "id map Jaccard 1.00; top-1 chunk confirmed by text (v4 chunk(s) holding the claim's required terms)",
+      "literal_map_v4_ids": [
+        "1990_p0019"
+      ]
+    },
+    {
+      "v3_id": "1990_p0058",
+      "label_set": "dev",
+      "v4_ids": [
+        "1990_p0058"
+      ],
+      "method": "map",
+      "jaccard": 1.0,
+      "note": "id map Jaccard 1.00; top-1 chunk confirmed by text (v4 chunk(s) holding the claim's required terms)",
+      "literal_map_v4_ids": [
+        "1990_p0058"
+      ]
+    },
+    {
+      "v3_id": "1991_p0004",
+      "label_set": "dev",
+      "v4_ids": [
+        "1991_p0004"
+      ],
+      "method": "map",
+      "jaccard": 1.0,
+      "note": "id map Jaccard 1.00; top-1 chunk confirmed by text (v4 chunk(s) holding the claim's required terms)",
+      "literal_map_v4_ids": [
+        "1991_p0004"
+      ]
+    },
+    {
+      "v3_id": "1993_p0045",
+      "label_set": "dev",
+      "v4_ids": [
+        "1993_p0045"
+      ],
+      "method": "map",
+      "jaccard": 1.0,
+      "note": "id map Jaccard 1.00; top-1 chunk confirmed by text (v4 chunk(s) holding the claim's required terms)",
+      "literal_map_v4_ids": [
+        "1993_p0045"
+      ]
+    },
+    {
+      "v3_id": "1994_p0017",
+      "label_set": "dev",
+      "v4_ids": [
+        "1994_p0017"
+      ],
+      "method": "map",
+      "jaccard": 1.0,
+      "note": "id map Jaccard 1.00; top-1 chunk confirmed by text (v4 chunk(s) holding the claim's required terms)",
+      "literal_map_v4_ids": [
+        "1994_p0017"
+      ]
+    },
+    {
+      "v3_id": "1994_p0085",
+      "label_set": "dev",
+      "v4_ids": [
+        "1994_p0085"
+      ],
+      "method": "map",
+      "jaccard": 1.0,
+      "note": "id map Jaccard 1.00; top-1 chunk confirmed by text (v4 chunk(s) holding the claim's required terms)",
+      "literal_map_v4_ids": [
+        "1994_p0085"
+      ]
+    },
+    {
+      "v3_id": "1995_p0031",
+      "label_set": "dev",
+      "v4_ids": [
+        "1995_p0031"
+      ],
+      "method": "map",
+      "jaccard": 1.0,
+      "note": "id map Jaccard 1.00; top-1 chunk confirmed by text (v4 chunk(s) holding the claim's required terms)",
+      "literal_map_v4_ids": [
+        "1995_p0031"
+      ]
+    },
+    {
+      "v3_id": "1996_p0036",
+      "label_set": "dev",
+      "v4_ids": [
+        "1996_p0036"
+      ],
+      "method": "map",
+      "jaccard": 1.0,
+      "note": "id map Jaccard 1.00; top-1 chunk confirmed by text (v4 chunk(s) holding the claim's required terms)",
+      "literal_map_v4_ids": [
+        "1996_p0036"
+      ]
+    },
+    {
+      "v3_id": "1996_p0092",
+      "label_set": "dev",
+      "v4_ids": [
+        "1996_p0092"
+      ],
+      "method": "map",
+      "jaccard": 1.0,
+      "note": "id map Jaccard 1.00; top-1 chunk confirmed by text (v4 chunk(s) holding the claim's required terms)",
+      "literal_map_v4_ids": [
+        "1996_p0092"
+      ]
+    },
+    {
+      "v3_id": "1997_p0072",
+      "label_set": "dev",
+      "v4_ids": [
+        "1997_p0072"
+      ],
+      "method": "map",
+      "jaccard": 1.0,
+      "note": "id map Jaccard 1.00; top-1 chunk confirmed by text (v4 chunk(s) holding the claim's required terms)",
+      "literal_map_v4_ids": [
+        "1997_p0072"
+      ]
+    },
+    {
+      "v3_id": "1998_p0069",
+      "label_set": "dev",
+      "v4_ids": [
+        "1998_p0072"
+      ],
+      "method": "manual",
+      "jaccard": 0.6022,
+      "note": "id map Jaccard 0.60, top-1 1998_p0073 not among holders; v4 chunk(s) holding the claim's required terms",
+      "literal_map_v4_ids": [
+        "1998_p0073"
+      ]
+    },
+    {
+      "v3_id": "1999_p0016",
+      "label_set": "dev",
+      "v4_ids": [
+        "1999_p0017"
+      ],
+      "method": "map",
+      "jaccard": 0.6574,
+      "note": "id map Jaccard 0.66; top-1 chunk confirmed by text (v4 chunk(s) holding the claim's required terms)",
+      "literal_map_v4_ids": [
+        "1999_p0017"
+      ]
+    },
+    {
+      "v3_id": "1999_p0091",
+      "label_set": "dev",
+      "v4_ids": [
+        "1999_p0093"
+      ],
+      "method": "manual",
+      "jaccard": 0.7073,
+      "note": "id map Jaccard 0.71, top-1 1999_p0094 not among holders; v4 chunk(s) holding the claim's required terms",
+      "literal_map_v4_ids": [
+        "1999_p0094"
+      ]
+    },
+    {
+      "v3_id": "2000_p0024",
+      "label_set": "dev",
+      "v4_ids": [
+        "2000_p0024"
+      ],
+      "method": "manual",
+      "jaccard": 0.593,
+      "note": "id map Jaccard 0.59, top-1 2000_p0025 not among holders; v4 chunk(s) holding the claim's required terms",
+      "literal_map_v4_ids": [
+        "2000_p0025"
+      ]
+    },
+    {
+      "v3_id": "2001_p0037",
+      "label_set": "dev",
+      "v4_ids": [
+        "2001_p0036"
+      ],
+      "method": "map",
+      "jaccard": 0.7604,
+      "note": "id map Jaccard 0.76; top-1 chunk confirmed by text (v4 chunk(s) holding the claim's required terms)",
+      "literal_map_v4_ids": [
+        "2001_p0036"
+      ]
+    },
+    {
+      "v3_id": "2001_p0060",
+      "label_set": "dev",
+      "v4_ids": [
+        "2001_p0063"
+      ],
+      "method": "map",
+      "jaccard": 0.6571,
+      "note": "id map Jaccard 0.66; top-1 chunk confirmed by text (v4 chunk(s) holding the claim's required terms)",
+      "literal_map_v4_ids": [
+        "2001_p0063"
+      ]
+    },
+    {
+      "v3_id": "2001_p0061",
+      "label_set": "dev",
+      "v4_ids": [
+        "2001_p0063"
+      ],
+      "method": "manual",
+      "jaccard": 0.3984,
+      "note": "id map Jaccard 0.40, top-1 2001_p0065 not among holders; v4 chunk(s) holding the claim's required terms",
+      "literal_map_v4_ids": [
+        "2001_p0063"
+      ]
+    },
+    {
+      "v3_id": "2001_p0085",
+      "label_set": "dev",
+      "v4_ids": [
+        "2001_p0091"
+      ],
+      "method": "map",
+      "jaccard": 0.6058,
+      "note": "id map Jaccard 0.61; top-1 chunk confirmed by text (v4 chunk(s) holding the claim's required terms)",
+      "literal_map_v4_ids": [
+        "2001_p0091"
+      ]
+    },
+    {
+      "v3_id": "2002_p0024",
+      "label_set": "dev",
+      "v4_ids": [
+        "2002_p0022"
+      ],
+      "method": "manual",
+      "jaccard": 0.4576,
+      "note": "id map Jaccard 0.46, top-1 2002_p0023 not among holders; v4 chunk(s) holding the claim's required terms",
+      "literal_map_v4_ids": [
+        "2002_p0022"
+      ]
+    },
+    {
+      "v3_id": "2002_p0063",
+      "label_set": "dev",
+      "v4_ids": [
+        "2002_p0064"
+      ],
+      "method": "map",
+      "jaccard": 1.0,
+      "note": "id map Jaccard 1.00; top-1 chunk confirmed by text (v4 chunk(s) holding the claim's required terms)",
+      "literal_map_v4_ids": [
+        "2002_p0064"
+      ]
+    },
+    {
+      "v3_id": "2002_p0086",
+      "label_set": "dev",
+      "v4_ids": [
+        "2002_p0090"
+      ],
+      "method": "map",
+      "jaccard": 0.8778,
+      "note": "id map Jaccard 0.88; top-1 chunk confirmed by text (v4 chunk(s) holding the claim's required terms)",
+      "literal_map_v4_ids": [
+        "2002_p0090"
+      ]
+    },
+    {
+      "v3_id": "2003_p0054",
+      "label_set": "dev",
+      "v4_ids": [
+        "2003_p0056"
+      ],
+      "method": "map",
+      "jaccard": 0.88,
+      "note": "id map Jaccard 0.88; top-1 chunk confirmed by text (v4 chunk(s) holding the claim's required terms)",
+      "literal_map_v4_ids": [
+        "2003_p0056"
+      ]
+    },
+    {
+      "v3_id": "2003_p0110",
+      "label_set": "dev",
+      "v4_ids": [
+        "2003_p0109"
+      ],
+      "method": "manual",
+      "jaccard": 0.5804,
+      "note": "id map Jaccard 0.58, top-1 2003_p0110 not among holders; v4 chunk(s) holding the claim's required terms",
+      "literal_map_v4_ids": [
+        "2003_p0110"
+      ]
+    },
+    {
+      "v3_id": "2004_p0116",
+      "label_set": "dev",
+      "v4_ids": [
+        "2004_p0105"
+      ],
+      "method": "manual",
+      "jaccard": 0.7108,
+      "note": "id map Jaccard 0.71, top-1 2004_p0106 not among holders; v4 chunk(s) holding the claim's required terms",
+      "literal_map_v4_ids": [
+        "2004_p0106"
+      ]
+    },
+    {
+      "v3_id": "2006_p0026",
+      "label_set": "dev",
+      "v4_ids": [
+        "2006_p0019",
+        "2006_p0018"
+      ],
+      "method": "manual",
+      "jaccard": 0.7576,
+      "note": "id map Jaccard 0.76, top-1 2006_p0019 among holders; v4 chunk(s) holding the claim's required terms",
+      "literal_map_v4_ids": [
+        "2006_p0019"
+      ]
+    },
+    {
+      "v3_id": "2007_p0086",
+      "label_set": "dev",
+      "v4_ids": [
+        "2007_p0081"
+      ],
+      "method": "map",
+      "jaccard": 0.8652,
+      "note": "id map Jaccard 0.87; top-1 chunk confirmed by text (v4 chunk(s) holding the claim's required terms)",
+      "literal_map_v4_ids": [
+        "2007_p0081"
+      ]
+    },
+    {
+      "v3_id": "2008_p0028",
+      "label_set": "dev",
+      "v4_ids": [
+        "2008_p0022"
+      ],
+      "method": "map",
+      "jaccard": 0.8625,
+      "note": "id map Jaccard 0.86; top-1 chunk confirmed by text (v4 chunk(s) holding the claim's required terms)",
+      "literal_map_v4_ids": [
+        "2008_p0022"
+      ]
+    },
+    {
+      "v3_id": "2009_p0021",
+      "label_set": "dev",
+      "v4_ids": [
+        "2009_p0016"
+      ],
+      "method": "map",
+      "jaccard": 0.8182,
+      "note": "id map Jaccard 0.82; top-1 chunk confirmed by text (v4 chunk(s) holding the claim's required terms)",
+      "literal_map_v4_ids": [
+        "2009_p0016"
+      ]
+    },
+    {
+      "v3_id": "2009_p0042",
+      "label_set": "dev",
+      "v4_ids": [
+        "2009_p0039"
+      ],
+      "method": "map",
+      "jaccard": 0.7347,
+      "note": "id map Jaccard 0.73; top-1 chunk confirmed by text (v4 chunk(s) holding the claim's required terms)",
+      "literal_map_v4_ids": [
+        "2009_p0039"
+      ]
+    },
+    {
+      "v3_id": "2010_p0030",
+      "label_set": "dev",
+      "v4_ids": [
+        "2010_p0020"
+      ],
+      "method": "manual",
+      "jaccard": 0.4587,
+      "note": "id map Jaccard 0.46, top-1 2010_p0019 not among holders; v4 chunk(s) holding the claim's required terms",
+      "literal_map_v4_ids": [
+        "2010_p0020"
+      ]
+    },
+    {
+      "v3_id": "2011_p0026",
+      "label_set": "dev",
+      "v4_ids": [
+        "2011_p0022"
+      ],
+      "method": "map",
+      "jaccard": 0.7931,
+      "note": "id map Jaccard 0.79; top-1 chunk confirmed by text (v4 chunk(s) holding the claim's required terms)",
+      "literal_map_v4_ids": [
+        "2011_p0022"
+      ]
+    },
+    {
+      "v3_id": "2012_p0016",
+      "label_set": "dev",
+      "v4_ids": [
+        "2012_p0010"
+      ],
+      "method": "manual",
+      "jaccard": 0.6907,
+      "note": "id map Jaccard 0.69, top-1 2012_p0011 not among holders; v4 chunk(s) holding the claim's required terms",
+      "literal_map_v4_ids": [
+        "2012_p0011"
+      ]
+    },
+    {
+      "v3_id": "2012_p0109",
+      "label_set": "dev",
+      "v4_ids": [
+        "2012_p0102"
+      ],
+      "method": "map",
+      "jaccard": 1.0,
+      "note": "id map Jaccard 1.00; top-1 chunk confirmed by text (v4 chunk(s) holding the claim's required terms)",
+      "literal_map_v4_ids": [
+        "2012_p0102"
+      ]
+    },
+    {
+      "v3_id": "2013_p0018",
+      "label_set": "dev",
+      "v4_ids": [
+        "2013_p0013"
+      ],
+      "method": "map",
+      "jaccard": 0.8444,
+      "note": "id map Jaccard 0.84; top-1 chunk confirmed by text (v4 chunk(s) holding the claim's required terms)",
+      "literal_map_v4_ids": [
+        "2013_p0013"
+      ]
+    },
+    {
+      "v3_id": "2013_p0046",
+      "label_set": "dev",
+      "v4_ids": [
+        "2013_p0043",
+        "2013_p0044"
+      ],
+      "method": "manual",
+      "jaccard": 0.5528,
+      "note": "v3 paragraph (BHSI + Peter Eastwood) is split: BHSI in 0043, 'led by Peter Eastwood' in 0044",
+      "literal_map_v4_ids": [
+        "2013_p0043"
+      ]
+    },
+    {
+      "v3_id": "2014_p0026",
+      "label_set": "dev",
+      "v4_ids": [
+        "2014_p0019"
+      ],
+      "method": "map",
+      "jaccard": 0.8265,
+      "note": "id map Jaccard 0.83; top-1 chunk confirmed by text (v4 chunk(s) holding the claim's required terms)",
+      "literal_map_v4_ids": [
+        "2014_p0019"
+      ]
+    },
+    {
+      "v3_id": "2014_p0136",
+      "label_set": "dev",
+      "v4_ids": [
+        "2014_p0129"
+      ],
+      "method": "map",
+      "jaccard": 0.8854,
+      "note": "id map Jaccard 0.89; top-1 chunk confirmed by text (v4 chunk(s) holding the claim's required terms)",
+      "literal_map_v4_ids": [
+        "2014_p0129"
+      ]
+    },
+    {
+      "v3_id": "2015_p0022",
+      "label_set": "dev",
+      "v4_ids": [
+        "2015_p0018"
+      ],
+      "method": "map",
+      "jaccard": 0.614,
+      "note": "id map Jaccard 0.61; top-1 chunk confirmed by text (v4 chunk(s) holding the claim's required terms)",
+      "literal_map_v4_ids": [
+        "2015_p0018"
+      ]
+    },
+    {
+      "v3_id": "2016_p0017",
+      "label_set": "dev",
+      "v4_ids": [
+        "2016_p0014"
+      ],
+      "method": "map",
+      "jaccard": 0.6535,
+      "note": "id map Jaccard 0.65; top-1 chunk confirmed by text (v4 chunk(s) holding the claim's required terms)",
+      "literal_map_v4_ids": [
+        "2016_p0014"
+      ]
+    },
+    {
+      "v3_id": "2016_p0018",
+      "label_set": "dev",
+      "v4_ids": [
+        "2016_p0015"
+      ],
+      "method": "map",
+      "jaccard": 0.701,
+      "note": "id map Jaccard 0.70; top-1 chunk confirmed by text (v4 chunk(s) holding the claim's required terms)",
+      "literal_map_v4_ids": [
+        "2016_p0015"
+      ]
+    },
+    {
+      "v3_id": "2017_p0039",
+      "label_set": "dev",
+      "v4_ids": [
+        "2017_p0033"
+      ],
+      "method": "manual",
+      "jaccard": 0.8111,
+      "note": "id map Jaccard 0.81, top-1 2017_p0032 not among holders; v4 chunk(s) holding the claim's required terms",
+      "literal_map_v4_ids": [
+        "2017_p0032"
+      ]
+    },
+    {
+      "v3_id": "2017_p0047",
+      "label_set": "dev",
+      "v4_ids": [
+        "2017_p0042"
+      ],
+      "method": "map",
+      "jaccard": 0.78,
+      "note": "id map Jaccard 0.78; top-1 chunk confirmed by text (v4 chunk(s) holding the claim's required terms)",
+      "literal_map_v4_ids": [
+        "2017_p0042"
+      ]
+    },
+    {
+      "v3_id": "2019_p0020",
+      "label_set": "dev",
+      "v4_ids": [
+        "2019_p0011"
+      ],
+      "method": "map",
+      "jaccard": 0.5545,
+      "note": "id map Jaccard 0.55; top-1 chunk confirmed by text (v4 chunk(s) holding the claim's required terms)",
+      "literal_map_v4_ids": [
+        "2019_p0011"
+      ]
+    },
+    {
+      "v3_id": "2020_p0020",
+      "label_set": "dev",
+      "v4_ids": [
+        "2020_p0007"
+      ],
+      "method": "manual",
+      "jaccard": 0.7634,
+      "note": "id map Jaccard 0.76, top-1 2020_p0008 not among holders; v4 chunk(s) holding the claim's required terms",
+      "literal_map_v4_ids": [
+        "2020_p0008"
+      ]
+    },
+    {
+      "v3_id": "2020_p0081",
+      "label_set": "dev",
+      "v4_ids": [
+        "2020_p0072"
+      ],
+      "method": "map",
+      "jaccard": 0.5556,
+      "note": "id map Jaccard 0.56; top-1 chunk confirmed by text (v4 chunk(s) holding the claim's required terms)",
+      "literal_map_v4_ids": [
+        "2020_p0072"
+      ]
+    },
+    {
+      "v3_id": "2021_p0030",
+      "label_set": "dev",
+      "v4_ids": [
+        "2021_p0018"
+      ],
+      "method": "map",
+      "jaccard": 0.7232,
+      "note": "id map Jaccard 0.72; top-1 chunk confirmed by text (v4 chunk(s) holding the claim's required terms)",
+      "literal_map_v4_ids": [
+        "2021_p0018"
+      ]
+    },
+    {
+      "v3_id": "2021_p0056",
+      "label_set": "dev",
+      "v4_ids": [
+        "2021_p0043"
+      ],
+      "method": "map",
+      "jaccard": 0.5078,
+      "note": "id map Jaccard 0.51; top-1 chunk confirmed by text (v4 chunk(s) holding the claim's required terms)",
+      "literal_map_v4_ids": [
+        "2021_p0043"
+      ]
+    },
+    {
+      "v3_id": "2022_p0021",
+      "label_set": "dev",
+      "v4_ids": [
+        "2022_p0009"
+      ],
+      "method": "map",
+      "jaccard": 0.5769,
+      "note": "id map Jaccard 0.58; top-1 chunk confirmed by text (v4 chunk(s) holding the claim's required terms)",
+      "literal_map_v4_ids": [
+        "2022_p0009"
+      ]
+    },
+    {
+      "v3_id": "2022_p0028",
+      "label_set": "dev",
+      "v4_ids": [
+        "2022_p0016"
+      ],
+      "method": "manual",
+      "jaccard": 0.6222,
+      "note": "id map Jaccard 0.62, top-1 2022_p0017 not among holders; v4 chunk(s) holding the claim's required terms",
+      "literal_map_v4_ids": [
+        "2022_p0017"
+      ]
+    },
+    {
+      "v3_id": "2023_p0002",
+      "label_set": "dev",
+      "v4_ids": [
+        "2023_p0002"
+      ],
+      "method": "map",
+      "jaccard": 0.9355,
+      "note": "id map Jaccard 0.94; top-1 chunk confirmed by text (v4 chunk(s) holding the claim's required terms)",
+      "literal_map_v4_ids": [
+        "2023_p0002"
+      ]
+    },
+    {
+      "v3_id": "2023_p0014",
+      "label_set": "dev",
+      "v4_ids": [
+        "2023_p0014"
+      ],
+      "method": "map",
+      "jaccard": 1.0,
+      "note": "id map Jaccard 1.00; top-1 chunk confirmed by text (v4 chunk(s) holding the claim's required terms)",
+      "literal_map_v4_ids": [
+        "2023_p0014"
+      ]
+    },
+    {
+      "v3_id": "2024_p0019",
+      "label_set": "dev",
+      "v4_ids": [
+        "2024_p0018",
+        "2024_p0019"
+      ],
+      "method": "manual",
+      "jaccard": 0.413,
+      "note": "id map Jaccard 0.41, top-1 2024_p0018 among holders; v4 chunk(s) holding the claim's required terms",
+      "literal_map_v4_ids": [
+        "2024_p0018",
+        "2024_p0019"
+      ]
+    },
+    {
+      "v3_id": "2024_p0041",
+      "label_set": "dev",
+      "v4_ids": [
+        "2024_p0042"
+      ],
+      "method": "map",
+      "jaccard": 0.9318,
+      "note": "id map Jaccard 0.93; top-1 chunk confirmed by text (v4 chunk(s) holding the claim's required terms)",
+      "literal_map_v4_ids": [
+        "2024_p0042"
+      ]
+    },
+    {
+      "v3_id": "1977_p0000",
+      "label_set": "hard_neg",
+      "v4_ids": [
+        "1977_p0000"
+      ],
+      "method": "map",
+      "jaccard": 1.0,
+      "note": "id map Jaccard 1.00; top-1 chunk confirmed by text (v4 chunk(s) with >=50% of their tokens in the v3 text covering >=30% of it)",
+      "literal_map_v4_ids": [
+        "1977_p0000"
+      ]
+    },
+    {
+      "v3_id": "1977_p0034",
+      "label_set": "hard_neg",
+      "v4_ids": [
+        "1977_p0034"
+      ],
+      "method": "map",
+      "jaccard": 1.0,
+      "note": "id map Jaccard 1.00; top-1 chunk confirmed by text (v4 chunk(s) with >=50% of their tokens in the v3 text covering >=30% of it)",
+      "literal_map_v4_ids": [
+        "1977_p0034"
+      ]
+    },
+    {
+      "v3_id": "1979_p0007",
+      "label_set": "hard_neg",
+      "v4_ids": [
+        "1979_p0007"
+      ],
+      "method": "map",
+      "jaccard": 1.0,
+      "note": "id map Jaccard 1.00; top-1 chunk confirmed by text (v4 chunk(s) with >=50% of their tokens in the v3 text covering >=30% of it)",
+      "literal_map_v4_ids": [
+        "1979_p0007"
+      ]
+    },
+    {
+      "v3_id": "1981_p0024",
+      "label_set": "hard_neg",
+      "v4_ids": [
+        "1981_p0024"
+      ],
+      "method": "map",
+      "jaccard": 1.0,
+      "note": "id map Jaccard 1.00; top-1 chunk confirmed by text (v4 chunk(s) with >=50% of their tokens in the v3 text covering >=30% of it)",
+      "literal_map_v4_ids": [
+        "1981_p0024"
+      ]
+    },
+    {
+      "v3_id": "1983_p0017",
+      "label_set": "hard_neg",
+      "v4_ids": [
+        "1983_p0017"
+      ],
+      "method": "map",
+      "jaccard": 1.0,
+      "note": "id map Jaccard 1.00; top-1 chunk confirmed by text (v4 chunk(s) with >=50% of their tokens in the v3 text covering >=30% of it)",
+      "literal_map_v4_ids": [
+        "1983_p0017"
+      ]
+    },
+    {
+      "v3_id": "1983_p0102",
+      "label_set": "hard_neg",
+      "v4_ids": [
+        "1983_p0102"
+      ],
+      "method": "map",
+      "jaccard": 1.0,
+      "note": "id map Jaccard 1.00; top-1 chunk confirmed by text (v4 chunk(s) with >=50% of their tokens in the v3 text covering >=30% of it)",
+      "literal_map_v4_ids": [
+        "1983_p0102"
+      ]
+    },
+    {
+      "v3_id": "1983_p0104",
+      "label_set": "hard_neg",
+      "v4_ids": [
+        "1983_p0104"
+      ],
+      "method": "map",
+      "jaccard": 1.0,
+      "note": "id map Jaccard 1.00; top-1 chunk confirmed by text (v4 chunk(s) with >=50% of their tokens in the v3 text covering >=30% of it)",
+      "literal_map_v4_ids": [
+        "1983_p0104"
+      ]
+    },
+    {
+      "v3_id": "1983_p0106",
+      "label_set": "hard_neg",
+      "v4_ids": [
+        "1983_p0106"
+      ],
+      "method": "map",
+      "jaccard": 1.0,
+      "note": "id map Jaccard 1.00; top-1 chunk confirmed by text (v4 chunk(s) with >=50% of their tokens in the v3 text covering >=30% of it)",
+      "literal_map_v4_ids": [
+        "1983_p0106"
+      ]
+    },
+    {
+      "v3_id": "1983_p0108",
+      "label_set": "hard_neg",
+      "v4_ids": [
+        "1983_p0108"
+      ],
+      "method": "map",
+      "jaccard": 1.0,
+      "note": "id map Jaccard 1.00; top-1 chunk confirmed by text (v4 chunk(s) with >=50% of their tokens in the v3 text covering >=30% of it)",
+      "literal_map_v4_ids": [
+        "1983_p0108"
+      ]
+    },
+    {
+      "v3_id": "1986_p0027",
+      "label_set": "hard_neg",
+      "v4_ids": [
+        "1986_p0027"
+      ],
+      "method": "map",
+      "jaccard": 1.0,
+      "note": "id map Jaccard 1.00; top-1 chunk confirmed by text (v4 chunk(s) with >=50% of their tokens in the v3 text covering >=30% of it)",
+      "literal_map_v4_ids": [
+        "1986_p0027"
+      ]
+    },
+    {
+      "v3_id": "1986_p0072",
+      "label_set": "hard_neg",
+      "v4_ids": [
+        "1986_p0072"
+      ],
+      "method": "map",
+      "jaccard": 1.0,
+      "note": "id map Jaccard 1.00; top-1 chunk confirmed by text (v4 chunk(s) with >=50% of their tokens in the v3 text covering >=30% of it)",
+      "literal_map_v4_ids": [
+        "1986_p0072"
+      ]
+    },
+    {
+      "v3_id": "1986_p0140",
+      "label_set": "hard_neg",
+      "v4_ids": [
+        "1986_p0140"
+      ],
+      "method": "map",
+      "jaccard": 1.0,
+      "note": "id map Jaccard 1.00; top-1 chunk confirmed by text (v4 chunk(s) with >=50% of their tokens in the v3 text covering >=30% of it)",
+      "literal_map_v4_ids": [
+        "1986_p0140"
+      ]
+    },
+    {
+      "v3_id": "1987_p0066",
+      "label_set": "hard_neg",
+      "v4_ids": [
+        "1987_p0066"
+      ],
+      "method": "map",
+      "jaccard": 1.0,
+      "note": "id map Jaccard 1.00; top-1 chunk confirmed by text (v4 chunk(s) with >=50% of their tokens in the v3 text covering >=30% of it)",
+      "literal_map_v4_ids": [
+        "1987_p0066"
+      ]
+    },
+    {
+      "v3_id": "1987_p0067",
+      "label_set": "hard_neg",
+      "v4_ids": [
+        "1987_p0067"
+      ],
+      "method": "map",
+      "jaccard": 1.0,
+      "note": "id map Jaccard 1.00; top-1 chunk confirmed by text (v4 chunk(s) with >=50% of their tokens in the v3 text covering >=30% of it)",
+      "literal_map_v4_ids": [
+        "1987_p0067"
+      ]
+    },
+    {
+      "v3_id": "1987_p0086",
+      "label_set": "hard_neg",
+      "v4_ids": [
+        "1987_p0086"
+      ],
+      "method": "map",
+      "jaccard": 1.0,
+      "note": "id map Jaccard 1.00; top-1 chunk confirmed by text (v4 chunk(s) with >=50% of their tokens in the v3 text covering >=30% of it)",
+      "literal_map_v4_ids": [
+        "1987_p0086"
+      ]
+    },
+    {
+      "v3_id": "1987_p0098",
+      "label_set": "hard_neg",
+      "v4_ids": [
+        "1987_p0098"
+      ],
+      "method": "map",
+      "jaccard": 1.0,
+      "note": "id map Jaccard 1.00; top-1 chunk confirmed by text (v4 chunk(s) with >=50% of their tokens in the v3 text covering >=30% of it)",
+      "literal_map_v4_ids": [
+        "1987_p0098"
+      ]
+    },
+    {
+      "v3_id": "1989_p0036",
+      "label_set": "hard_neg",
+      "v4_ids": [
+        "1989_p0036"
+      ],
+      "method": "map",
+      "jaccard": 1.0,
+      "note": "id map Jaccard 1.00; top-1 chunk confirmed by text (v4 chunk(s) with >=50% of their tokens in the v3 text covering >=30% of it)",
+      "literal_map_v4_ids": [
+        "1989_p0036"
+      ]
+    },
+    {
+      "v3_id": "1990_p0021",
+      "label_set": "hard_neg",
+      "v4_ids": [
+        "1990_p0021"
+      ],
+      "method": "map",
+      "jaccard": 1.0,
+      "note": "id map Jaccard 1.00; top-1 chunk confirmed by text (v4 chunk(s) with >=50% of their tokens in the v3 text covering >=30% of it)",
+      "literal_map_v4_ids": [
+        "1990_p0021"
+      ]
+    },
+    {
+      "v3_id": "1990_p0030",
+      "label_set": "hard_neg",
+      "v4_ids": [
+        "1990_p0030"
+      ],
+      "method": "map",
+      "jaccard": 1.0,
+      "note": "id map Jaccard 1.00; top-1 chunk confirmed by text (v4 chunk(s) with >=50% of their tokens in the v3 text covering >=30% of it)",
+      "literal_map_v4_ids": [
+        "1990_p0030"
+      ]
+    },
+    {
+      "v3_id": "1991_p0013",
+      "label_set": "hard_neg",
+      "v4_ids": [
+        "1991_p0013"
+      ],
+      "method": "map",
+      "jaccard": 1.0,
+      "note": "id map Jaccard 1.00; top-1 chunk confirmed by text (v4 chunk(s) with >=50% of their tokens in the v3 text covering >=30% of it)",
+      "literal_map_v4_ids": [
+        "1991_p0013"
+      ]
+    },
+    {
+      "v3_id": "1991_p0036",
+      "label_set": "hard_neg",
+      "v4_ids": [
+        "1991_p0036"
+      ],
+      "method": "map",
+      "jaccard": 1.0,
+      "note": "id map Jaccard 1.00; top-1 chunk confirmed by text (v4 chunk(s) with >=50% of their tokens in the v3 text covering >=30% of it)",
+      "literal_map_v4_ids": [
+        "1991_p0036"
+      ]
+    },
+    {
+      "v3_id": "1992_p0032",
+      "label_set": "hard_neg",
+      "v4_ids": [
+        "1992_p0032"
+      ],
+      "method": "map",
+      "jaccard": 1.0,
+      "note": "id map Jaccard 1.00; top-1 chunk confirmed by text (v4 chunk(s) with >=50% of their tokens in the v3 text covering >=30% of it)",
+      "literal_map_v4_ids": [
+        "1992_p0032"
+      ]
+    },
+    {
+      "v3_id": "1993_p0008",
+      "label_set": "hard_neg",
+      "v4_ids": [
+        "1993_p0008"
+      ],
+      "method": "map",
+      "jaccard": 1.0,
+      "note": "id map Jaccard 1.00; top-1 chunk confirmed by text (v4 chunk(s) with >=50% of their tokens in the v3 text covering >=30% of it)",
+      "literal_map_v4_ids": [
+        "1993_p0008"
+      ]
+    },
+    {
+      "v3_id": "1993_p0027",
+      "label_set": "hard_neg",
+      "v4_ids": [
+        "1993_p0027"
+      ],
+      "method": "map",
+      "jaccard": 1.0,
+      "note": "id map Jaccard 1.00; top-1 chunk confirmed by text (v4 chunk(s) with >=50% of their tokens in the v3 text covering >=30% of it)",
+      "literal_map_v4_ids": [
+        "1993_p0027"
+      ]
+    },
+    {
+      "v3_id": "1993_p0105",
+      "label_set": "hard_neg",
+      "v4_ids": [
+        "1993_p0105"
+      ],
+      "method": "map",
+      "jaccard": 1.0,
+      "note": "id map Jaccard 1.00; top-1 chunk confirmed by text (v4 chunk(s) with >=50% of their tokens in the v3 text covering >=30% of it)",
+      "literal_map_v4_ids": [
+        "1993_p0105"
+      ]
+    },
+    {
+      "v3_id": "1994_p0027",
+      "label_set": "hard_neg",
+      "v4_ids": [
+        "1994_p0027"
+      ],
+      "method": "map",
+      "jaccard": 1.0,
+      "note": "id map Jaccard 1.00; top-1 chunk confirmed by text (v4 chunk(s) with >=50% of their tokens in the v3 text covering >=30% of it)",
+      "literal_map_v4_ids": [
+        "1994_p0027"
+      ]
+    },
+    {
+      "v3_id": "1994_p0053",
+      "label_set": "hard_neg",
+      "v4_ids": [
+        "1994_p0053"
+      ],
+      "method": "map",
+      "jaccard": 1.0,
+      "note": "id map Jaccard 1.00; top-1 chunk confirmed by text (v4 chunk(s) with >=50% of their tokens in the v3 text covering >=30% of it)",
+      "literal_map_v4_ids": [
+        "1994_p0053"
+      ]
+    },
+    {
+      "v3_id": "1995_p0039",
+      "label_set": "hard_neg",
+      "v4_ids": [
+        "1995_p0039"
+      ],
+      "method": "map",
+      "jaccard": 1.0,
+      "note": "id map Jaccard 1.00; top-1 chunk confirmed by text (v4 chunk(s) with >=50% of their tokens in the v3 text covering >=30% of it)",
+      "literal_map_v4_ids": [
+        "1995_p0039"
+      ]
+    },
+    {
+      "v3_id": "1995_p0051",
+      "label_set": "hard_neg",
+      "v4_ids": [
+        "1995_p0051"
+      ],
+      "method": "map",
+      "jaccard": 1.0,
+      "note": "id map Jaccard 1.00; top-1 chunk confirmed by text (v4 chunk(s) with >=50% of their tokens in the v3 text covering >=30% of it)",
+      "literal_map_v4_ids": [
+        "1995_p0051"
+      ]
+    },
+    {
+      "v3_id": "1995_p0064",
+      "label_set": "hard_neg",
+      "v4_ids": [
+        "1995_p0064"
+      ],
+      "method": "map",
+      "jaccard": 1.0,
+      "note": "id map Jaccard 1.00; top-1 chunk confirmed by text (v4 chunk(s) with >=50% of their tokens in the v3 text covering >=30% of it)",
+      "literal_map_v4_ids": [
+        "1995_p0064"
+      ]
+    },
+    {
+      "v3_id": "1996_p0056",
+      "label_set": "hard_neg",
+      "v4_ids": [
+        "1996_p0056"
+      ],
+      "method": "map",
+      "jaccard": 1.0,
+      "note": "id map Jaccard 1.00; top-1 chunk confirmed by text (v4 chunk(s) with >=50% of their tokens in the v3 text covering >=30% of it)",
+      "literal_map_v4_ids": [
+        "1996_p0056"
+      ]
+    },
+    {
+      "v3_id": "1996_p0057",
+      "label_set": "hard_neg",
+      "v4_ids": [
+        "1996_p0057"
+      ],
+      "method": "map",
+      "jaccard": 1.0,
+      "note": "id map Jaccard 1.00; top-1 chunk confirmed by text (v4 chunk(s) with >=50% of their tokens in the v3 text covering >=30% of it)",
+      "literal_map_v4_ids": [
+        "1996_p0057"
+      ]
+    },
+    {
+      "v3_id": "1999_p0013",
+      "label_set": "hard_neg",
+      "v4_ids": [
+        "1999_p0013"
+      ],
+      "method": "map",
+      "jaccard": 0.8481,
+      "note": "id map Jaccard 0.85; top-1 chunk confirmed by text (v4 chunk(s) with >=50% of their tokens in the v3 text covering >=30% of it)",
+      "literal_map_v4_ids": [
+        "1999_p0013"
+      ]
+    },
+    {
+      "v3_id": "1999_p0026",
+      "label_set": "hard_neg",
+      "v4_ids": [
+        "1999_p0028",
+        "1999_p0029"
+      ],
+      "method": "manual",
+      "jaccard": 0.6316,
+      "note": "id map Jaccard 0.63, top-1 1999_p0028 among holders; v4 chunk(s) with >=50% of their tokens in the v3 text covering >=30% of it",
+      "literal_map_v4_ids": [
+        "1999_p0028"
+      ]
+    },
+    {
+      "v3_id": "1999_p0027",
+      "label_set": "hard_neg",
+      "v4_ids": [
+        "1999_p0030"
+      ],
+      "method": "map",
+      "jaccard": 1.0,
+      "note": "id map Jaccard 1.00; top-1 chunk confirmed by text (v4 chunk(s) with >=50% of their tokens in the v3 text covering >=30% of it)",
+      "literal_map_v4_ids": [
+        "1999_p0030"
+      ]
+    },
+    {
+      "v3_id": "1999_p0070",
+      "label_set": "hard_neg",
+      "v4_ids": [
+        "1999_p0074",
+        "1999_p0075"
+      ],
+      "method": "manual",
+      "jaccard": 0.6275,
+      "note": "id map Jaccard 0.63, top-1 1999_p0074 among holders; v4 chunk(s) with >=50% of their tokens in the v3 text covering >=30% of it",
+      "literal_map_v4_ids": [
+        "1999_p0074"
+      ]
+    },
+    {
+      "v3_id": "1999_p0081",
+      "label_set": "hard_neg",
+      "v4_ids": [
+        "1999_p0085",
+        "1999_p0084"
+      ],
+      "method": "manual",
+      "jaccard": 0.6535,
+      "note": "id map Jaccard 0.65, top-1 1999_p0085 among holders; v4 chunk(s) with >=50% of their tokens in the v3 text covering >=30% of it",
+      "literal_map_v4_ids": [
+        "1999_p0085"
+      ]
+    },
+    {
+      "v3_id": "2000_p0043",
+      "label_set": "hard_neg",
+      "v4_ids": [
+        "2000_p0046",
+        "2000_p0047"
+      ],
+      "method": "manual",
+      "jaccard": 0.7255,
+      "note": "id map Jaccard 0.73, top-1 2000_p0046 among holders; v4 chunk(s) with >=50% of their tokens in the v3 text covering >=30% of it",
+      "literal_map_v4_ids": [
+        "2000_p0046"
+      ]
+    },
+    {
+      "v3_id": "2000_p0046",
+      "label_set": "hard_neg",
+      "v4_ids": [
+        "2000_p0050",
+        "2000_p0051"
+      ],
+      "method": "manual",
+      "jaccard": 0.5446,
+      "note": "id map Jaccard 0.54, top-1 2000_p0050 among holders; v4 chunk(s) with >=50% of their tokens in the v3 text covering >=30% of it",
+      "literal_map_v4_ids": [
+        "2000_p0050"
+      ]
+    },
+    {
+      "v3_id": "2001_p0060",
+      "label_set": "hard_neg",
+      "v4_ids": [
+        "2001_p0063",
+        "2001_p0062"
+      ],
+      "method": "manual",
+      "jaccard": 0.6571,
+      "note": "id map Jaccard 0.66, top-1 2001_p0063 among holders; v4 chunk(s) with >=50% of their tokens in the v3 text covering >=30% of it",
+      "literal_map_v4_ids": [
+        "2001_p0063"
+      ]
+    },
+    {
+      "v3_id": "2001_p0061",
+      "label_set": "hard_neg",
+      "v4_ids": [
+        "2001_p0063",
+        "2001_p0064"
+      ],
+      "method": "manual",
+      "jaccard": 0.3984,
+      "note": "'$4.25 billion in float / $221 million' in 0063, policy-count disappointment in 0064",
+      "literal_map_v4_ids": [
+        "2001_p0063",
+        "2001_p0064"
+      ]
+    },
+    {
+      "v3_id": "2001_p0062",
+      "label_set": "hard_neg",
+      "v4_ids": [
+        "2001_p0066",
+        "2001_p0065"
+      ],
+      "method": "manual",
+      "jaccard": 0.5882,
+      "note": "id map Jaccard 0.59, top-1 2001_p0066 among holders; v4 chunk(s) with >=50% of their tokens in the v3 text covering >=30% of it",
+      "literal_map_v4_ids": [
+        "2001_p0066"
+      ]
+    },
+    {
+      "v3_id": "2002_p0007",
+      "label_set": "hard_neg",
+      "v4_ids": [
+        "2002_p0005",
+        "2002_p0006"
+      ],
+      "method": "manual",
+      "jaccard": 0.6196,
+      "note": "id map Jaccard 0.62, top-1 2002_p0005 among holders; v4 chunk(s) with >=50% of their tokens in the v3 text covering >=30% of it",
+      "literal_map_v4_ids": [
+        "2002_p0005"
+      ]
+    },
+    {
+      "v3_id": "2002_p0049",
+      "label_set": "hard_neg",
+      "v4_ids": [
+        "2002_p0049"
+      ],
+      "method": "map",
+      "jaccard": 0.9151,
+      "note": "id map Jaccard 0.92; top-1 chunk confirmed by text (v4 chunk(s) with >=50% of their tokens in the v3 text covering >=30% of it)",
+      "literal_map_v4_ids": [
+        "2002_p0049"
+      ]
+    },
+    {
+      "v3_id": "2002_p0053",
+      "label_set": "hard_neg",
+      "v4_ids": [
+        "2002_p0054"
+      ],
+      "method": "map",
+      "jaccard": 0.8868,
+      "note": "id map Jaccard 0.89; top-1 chunk confirmed by text (v4 chunk(s) with >=50% of their tokens in the v3 text covering >=30% of it)",
+      "literal_map_v4_ids": [
+        "2002_p0054"
+      ]
+    },
+    {
+      "v3_id": "2004_p0033",
+      "label_set": "hard_neg",
+      "v4_ids": [
+        "2004_p0025"
+      ],
+      "method": "map",
+      "jaccard": 1.0,
+      "note": "id map Jaccard 1.00; top-1 chunk confirmed by text (v4 chunk(s) with >=50% of their tokens in the v3 text covering >=30% of it)",
+      "literal_map_v4_ids": [
+        "2004_p0025"
+      ]
+    },
+    {
+      "v3_id": "2004_p0050",
+      "label_set": "hard_neg",
+      "v4_ids": [
+        "2004_p0041"
+      ],
+      "method": "map",
+      "jaccard": 1.0,
+      "note": "id map Jaccard 1.00; top-1 chunk confirmed by text (v4 chunk(s) with >=50% of their tokens in the v3 text covering >=30% of it)",
+      "literal_map_v4_ids": [
+        "2004_p0041"
+      ]
+    },
+    {
+      "v3_id": "2004_p0069",
+      "label_set": "hard_neg",
+      "v4_ids": [
+        "2004_p0060",
+        "2004_p0061"
+      ],
+      "method": "manual",
+      "jaccard": 0.5412,
+      "note": "id map Jaccard 0.54, top-1 2004_p0060 among holders; v4 chunk(s) with >=50% of their tokens in the v3 text covering >=30% of it",
+      "literal_map_v4_ids": [
+        "2004_p0060"
+      ]
+    },
+    {
+      "v3_id": "2005_p0031",
+      "label_set": "hard_neg",
+      "v4_ids": [
+        "2005_p0025"
+      ],
+      "method": "map",
+      "jaccard": 1.0,
+      "note": "id map Jaccard 1.00; top-1 chunk confirmed by text (v4 chunk(s) with >=50% of their tokens in the v3 text covering >=30% of it)",
+      "literal_map_v4_ids": [
+        "2005_p0025"
+      ]
+    },
+    {
+      "v3_id": "2005_p0084",
+      "label_set": "hard_neg",
+      "v4_ids": [
+        "2005_p0075"
+      ],
+      "method": "map",
+      "jaccard": 0.9524,
+      "note": "id map Jaccard 0.95; top-1 chunk confirmed by text (v4 chunk(s) with >=50% of their tokens in the v3 text covering >=30% of it)",
+      "literal_map_v4_ids": [
+        "2005_p0075"
+      ]
+    },
+    {
+      "v3_id": "2005_p0086",
+      "label_set": "hard_neg",
+      "v4_ids": [
+        "2005_p0077"
+      ],
+      "method": "map",
+      "jaccard": 1.0,
+      "note": "id map Jaccard 1.00; top-1 chunk confirmed by text (v4 chunk(s) with >=50% of their tokens in the v3 text covering >=30% of it)",
+      "literal_map_v4_ids": [
+        "2005_p0077"
+      ]
+    },
+    {
+      "v3_id": "2006_p0038",
+      "label_set": "hard_neg",
+      "v4_ids": [
+        "2006_p0031"
+      ],
+      "method": "map",
+      "jaccard": 1.0,
+      "note": "id map Jaccard 1.00; top-1 chunk confirmed by text (v4 chunk(s) with >=50% of their tokens in the v3 text covering >=30% of it)",
+      "literal_map_v4_ids": [
+        "2006_p0031"
+      ]
+    },
+    {
+      "v3_id": "2007_p0034",
+      "label_set": "hard_neg",
+      "v4_ids": [
+        "2007_p0032"
+      ],
+      "method": "map",
+      "jaccard": 1.0,
+      "note": "id map Jaccard 1.00; top-1 chunk confirmed by text (v4 chunk(s) with >=50% of their tokens in the v3 text covering >=30% of it)",
+      "literal_map_v4_ids": [
+        "2007_p0032"
+      ]
+    },
+    {
+      "v3_id": "2007_p0035",
+      "label_set": "hard_neg",
+      "v4_ids": [
+        "2007_p0033"
+      ],
+      "method": "map",
+      "jaccard": 0.9286,
+      "note": "id map Jaccard 0.93; top-1 chunk confirmed by text (v4 chunk(s) with >=50% of their tokens in the v3 text covering >=30% of it)",
+      "literal_map_v4_ids": [
+        "2007_p0033"
+      ]
+    },
+    {
+      "v3_id": "2007_p0053",
+      "label_set": "hard_neg",
+      "v4_ids": [
+        "2007_p0052"
+      ],
+      "method": "map",
+      "jaccard": 0.7882,
+      "note": "id map Jaccard 0.79; top-1 chunk confirmed by text (v4 chunk(s) with >=50% of their tokens in the v3 text covering >=30% of it)",
+      "literal_map_v4_ids": [
+        "2007_p0052"
+      ]
+    },
+    {
+      "v3_id": "2008_p0019",
+      "label_set": "hard_neg",
+      "v4_ids": [
+        "2008_p0013",
+        "2008_p0014"
+      ],
+      "method": "manual",
+      "jaccard": 0.7209,
+      "note": "id map Jaccard 0.72, top-1 2008_p0013 among holders; v4 chunk(s) with >=50% of their tokens in the v3 text covering >=30% of it",
+      "literal_map_v4_ids": [
+        "2008_p0013"
+      ]
+    },
+    {
+      "v3_id": "2008_p0024",
+      "label_set": "hard_neg",
+      "v4_ids": [
+        "2008_p0018",
+        "2008_p0019"
+      ],
+      "method": "manual",
+      "jaccard": 0.5631,
+      "note": "id map Jaccard 0.56, top-1 2008_p0018 among holders; v4 chunk(s) with >=50% of their tokens in the v3 text covering >=30% of it",
+      "literal_map_v4_ids": [
+        "2008_p0018"
+      ]
+    },
+    {
+      "v3_id": "2008_p0106",
+      "label_set": "hard_neg",
+      "v4_ids": [
+        "2008_p0104",
+        "2008_p0105"
+      ],
+      "method": "manual",
+      "jaccard": 0.7379,
+      "note": "id map Jaccard 0.74, top-1 2008_p0104 among holders; v4 chunk(s) with >=50% of their tokens in the v3 text covering >=30% of it",
+      "literal_map_v4_ids": [
+        "2008_p0104"
+      ]
+    },
+    {
+      "v3_id": "2009_p0030",
+      "label_set": "hard_neg",
+      "v4_ids": [
+        "2009_p0027",
+        "2009_p0026"
+      ],
+      "method": "manual",
+      "jaccard": 0.5357,
+      "note": "id map Jaccard 0.54, top-1 2009_p0027 among holders; v4 chunk(s) with >=50% of their tokens in the v3 text covering >=30% of it",
+      "literal_map_v4_ids": [
+        "2009_p0027"
+      ]
+    },
+    {
+      "v3_id": "2009_p0036",
+      "label_set": "hard_neg",
+      "v4_ids": [
+        "2009_p0033",
+        "2009_p0032"
+      ],
+      "method": "manual",
+      "jaccard": 0.5391,
+      "note": "id map Jaccard 0.54, top-1 2009_p0033 among holders; v4 chunk(s) with >=50% of their tokens in the v3 text covering >=30% of it",
+      "literal_map_v4_ids": [
+        "2009_p0033"
+      ]
+    },
+    {
+      "v3_id": "2009_p0087",
+      "label_set": "hard_neg",
+      "v4_ids": [
+        "2009_p0081",
+        "2009_p0080"
+      ],
+      "method": "manual",
+      "jaccard": 0.6636,
+      "note": "id map Jaccard 0.66, top-1 2009_p0081 among holders; v4 chunk(s) with >=50% of their tokens in the v3 text covering >=30% of it",
+      "literal_map_v4_ids": [
+        "2009_p0081"
+      ]
+    },
+    {
+      "v3_id": "2010_p0030",
+      "label_set": "hard_neg",
+      "v4_ids": [
+        "2010_p0020"
+      ],
+      "method": "manual",
+      "jaccard": 0.4587,
+      "note": "float '$66 billion' sentence is in 0020; 0019 holds only the section heading/intro",
+      "literal_map_v4_ids": [
+        "2010_p0020"
+      ]
+    },
+    {
+      "v3_id": "2010_p0048",
+      "label_set": "hard_neg",
+      "v4_ids": [
+        "2010_p0037"
+      ],
+      "method": "map",
+      "jaccard": 0.7887,
+      "note": "id map Jaccard 0.79; top-1 chunk confirmed by text (v4 chunk(s) with >=50% of their tokens in the v3 text covering >=30% of it)",
+      "literal_map_v4_ids": [
+        "2010_p0037"
+      ]
+    },
+    {
+      "v3_id": "2010_p0064",
+      "label_set": "hard_neg",
+      "v4_ids": [
+        "2010_p0052",
+        "2010_p0053"
+      ],
+      "method": "manual",
+      "jaccard": 0.6064,
+      "note": "id map Jaccard 0.61, top-1 2010_p0052 among holders; v4 chunk(s) with >=50% of their tokens in the v3 text covering >=30% of it",
+      "literal_map_v4_ids": [
+        "2010_p0052"
+      ]
+    },
+    {
+      "v3_id": "2010_p0108",
+      "label_set": "hard_neg",
+      "v4_ids": [
+        "2010_p0095"
+      ],
+      "method": "map",
+      "jaccard": 1.0,
+      "note": "id map Jaccard 1.00; top-1 chunk confirmed by text (v4 chunk(s) with >=50% of their tokens in the v3 text covering >=30% of it)",
+      "literal_map_v4_ids": [
+        "2010_p0095"
+      ]
+    },
+    {
+      "v3_id": "2010_p0112",
+      "label_set": "hard_neg",
+      "v4_ids": [
+        "2010_p0099"
+      ],
+      "method": "map",
+      "jaccard": 0.9057,
+      "note": "id map Jaccard 0.91; top-1 chunk confirmed by text (v4 chunk(s) with >=50% of their tokens in the v3 text covering >=30% of it)",
+      "literal_map_v4_ids": [
+        "2010_p0099"
+      ]
+    },
+    {
+      "v3_id": "2011_p0050",
+      "label_set": "hard_neg",
+      "v4_ids": [
+        "2011_p0048"
+      ],
+      "method": "map",
+      "jaccard": 0.7248,
+      "note": "id map Jaccard 0.72; top-1 chunk confirmed by text (v4 chunk(s) with >=50% of their tokens in the v3 text covering >=30% of it)",
+      "literal_map_v4_ids": [
+        "2011_p0048"
+      ]
+    },
+    {
+      "v3_id": "2011_p0087",
+      "label_set": "hard_neg",
+      "v4_ids": [
+        "2011_p0083",
+        "2011_p0084"
+      ],
+      "method": "manual",
+      "jaccard": 0.5985,
+      "note": "id map Jaccard 0.60, top-1 2011_p0083 among holders; v4 chunk(s) with >=50% of their tokens in the v3 text covering >=30% of it",
+      "literal_map_v4_ids": [
+        "2011_p0083"
+      ]
+    },
+    {
+      "v3_id": "2011_p0103",
+      "label_set": "hard_neg",
+      "v4_ids": [
+        "2011_p0100",
+        "2011_p0099"
+      ],
+      "method": "manual",
+      "jaccard": 0.5338,
+      "note": "id map Jaccard 0.53, top-1 2011_p0100 among holders; v4 chunk(s) with >=50% of their tokens in the v3 text covering >=30% of it",
+      "literal_map_v4_ids": [
+        "2011_p0100"
+      ]
+    },
+    {
+      "v3_id": "2011_p0104",
+      "label_set": "hard_neg",
+      "v4_ids": [
+        "2011_p0100"
+      ],
+      "method": "map",
+      "jaccard": 0.625,
+      "note": "id map Jaccard 0.62; top-1 chunk confirmed by text (v4 chunk(s) with >=50% of their tokens in the v3 text covering >=30% of it)",
+      "literal_map_v4_ids": [
+        "2011_p0100"
+      ]
+    },
+    {
+      "v3_id": "2012_p0022",
+      "label_set": "hard_neg",
+      "v4_ids": [
+        "2012_p0016"
+      ],
+      "method": "map",
+      "jaccard": 0.8058,
+      "note": "id map Jaccard 0.81; top-1 chunk confirmed by text (v4 chunk(s) with >=50% of their tokens in the v3 text covering >=30% of it)",
+      "literal_map_v4_ids": [
+        "2012_p0016"
+      ]
+    },
+    {
+      "v3_id": "2012_p0035",
+      "label_set": "hard_neg",
+      "v4_ids": [
+        "2012_p0030"
+      ],
+      "method": "map",
+      "jaccard": 0.9074,
+      "note": "id map Jaccard 0.91; top-1 chunk confirmed by text (v4 chunk(s) with >=50% of their tokens in the v3 text covering >=30% of it)",
+      "literal_map_v4_ids": [
+        "2012_p0030"
+      ]
+    },
+    {
+      "v3_id": "2012_p0043",
+      "label_set": "hard_neg",
+      "v4_ids": [
+        "2012_p0040",
+        "2012_p0039"
+      ],
+      "method": "manual",
+      "jaccard": 0.5104,
+      "note": "id map Jaccard 0.51, top-1 2012_p0040 among holders; v4 chunk(s) with >=50% of their tokens in the v3 text covering >=30% of it",
+      "literal_map_v4_ids": [
+        "2012_p0040"
+      ]
+    },
+    {
+      "v3_id": "2013_p0025",
+      "label_set": "hard_neg",
+      "v4_ids": [
+        "2013_p0020",
+        "2013_p0021"
+      ],
+      "method": "manual",
+      "jaccard": 0.52,
+      "note": "id map Jaccard 0.52, top-1 2013_p0020 among holders; v4 chunk(s) with >=50% of their tokens in the v3 text covering >=30% of it",
+      "literal_map_v4_ids": [
+        "2013_p0020"
+      ]
+    },
+    {
+      "v3_id": "2014_p0156",
+      "label_set": "hard_neg",
+      "v4_ids": [
+        "2014_p0152",
+        "2014_p0153"
+      ],
+      "method": "manual",
+      "jaccard": 0.5842,
+      "note": "id map Jaccard 0.58, top-1 2014_p0152 among holders; v4 chunk(s) with >=50% of their tokens in the v3 text covering >=30% of it",
+      "literal_map_v4_ids": [
+        "2014_p0152"
+      ]
+    },
+    {
+      "v3_id": "2014_p0194",
+      "label_set": "hard_neg",
+      "v4_ids": [
+        "2014_p0195",
+        "2014_p0194"
+      ],
+      "method": "manual",
+      "jaccard": 0.7917,
+      "note": "id map Jaccard 0.79, top-1 2014_p0195 among holders; v4 chunk(s) with >=50% of their tokens in the v3 text covering >=30% of it",
+      "literal_map_v4_ids": [
+        "2014_p0195"
+      ]
+    },
+    {
+      "v3_id": "2016_p0041",
+      "label_set": "hard_neg",
+      "v4_ids": [
+        "2016_p0040"
+      ],
+      "method": "manual",
+      "jaccard": 0.4554,
+      "note": "float table (1970-2016) is the whole of v4 0040",
+      "literal_map_v4_ids": [
+        "2016_p0040"
+      ]
+    },
+    {
+      "v3_id": "2018_p0064",
+      "label_set": "hard_neg",
+      "v4_ids": [
+        "2018_p0059",
+        "2018_p0060"
+      ],
+      "method": "manual",
+      "jaccard": 0.7333,
+      "note": "id map Jaccard 0.73, top-1 2018_p0059 among holders; v4 chunk(s) with >=50% of their tokens in the v3 text covering >=30% of it",
+      "literal_map_v4_ids": [
+        "2018_p0059"
+      ]
+    },
+    {
+      "v3_id": "2020_p0030",
+      "label_set": "hard_neg",
+      "v4_ids": [
+        "2020_p0019",
+        "2020_p0020"
+      ],
+      "method": "manual",
+      "jaccard": 0.5333,
+      "note": "id map Jaccard 0.53, top-1 2020_p0019 among holders; v4 chunk(s) with >=50% of their tokens in the v3 text covering >=30% of it",
+      "literal_map_v4_ids": [
+        "2020_p0019"
+      ]
+    },
+    {
+      "v3_id": "2021_p0024",
+      "label_set": "hard_neg",
+      "v4_ids": [
+        "2021_p0012"
+      ],
+      "method": "map",
+      "jaccard": 1.0,
+      "note": "id map Jaccard 1.00; top-1 chunk confirmed by text (v4 chunk(s) with >=50% of their tokens in the v3 text covering >=30% of it)",
+      "literal_map_v4_ids": [
+        "2021_p0012"
+      ]
+    },
+    {
+      "v3_id": "2021_p0025",
+      "label_set": "hard_neg",
+      "v4_ids": [
+        "2021_p0013"
+      ],
+      "method": "map",
+      "jaccard": 0.7234,
+      "note": "id map Jaccard 0.72; top-1 chunk confirmed by text (v4 chunk(s) with >=50% of their tokens in the v3 text covering >=30% of it)",
+      "literal_map_v4_ids": [
+        "2021_p0013"
+      ]
+    },
+    {
+      "v3_id": "2022_p0021",
+      "label_set": "hard_neg",
+      "v4_ids": [
+        "2022_p0009",
+        "2022_p0008"
+      ],
+      "method": "manual",
+      "jaccard": 0.5769,
+      "note": "id map Jaccard 0.58, top-1 2022_p0009 among holders; v4 chunk(s) with >=50% of their tokens in the v3 text covering >=30% of it",
+      "literal_map_v4_ids": [
+        "2022_p0009"
+      ]
+    },
+    {
+      "v3_id": "2022_p0025",
+      "label_set": "hard_neg",
+      "v4_ids": [
+        "2022_p0012",
+        "2022_p0013"
+      ],
+      "method": "manual",
+      "jaccard": 0.5785,
+      "note": "id map Jaccard 0.58, top-1 2022_p0012 among holders; v4 chunk(s) with >=50% of their tokens in the v3 text covering >=30% of it",
+      "literal_map_v4_ids": [
+        "2022_p0012"
+      ]
+    },
+    {
+      "v3_id": "2022_p0026",
+      "label_set": "hard_neg",
+      "v4_ids": [
+        "2022_p0014",
+        "2022_p0015"
+      ],
+      "method": "manual",
+      "jaccard": 0.679,
+      "note": "id map Jaccard 0.68, top-1 2022_p0014 among holders; v4 chunk(s) with >=50% of their tokens in the v3 text covering >=30% of it",
+      "literal_map_v4_ids": [
+        "2022_p0014"
+      ]
+    },
+    {
+      "v3_id": "2023_p0010",
+      "label_set": "hard_neg",
+      "v4_ids": [
+        "2023_p0010"
+      ],
+      "method": "map",
+      "jaccard": 0.7125,
+      "note": "id map Jaccard 0.71; top-1 chunk confirmed by text (v4 chunk(s) with >=50% of their tokens in the v3 text covering >=30% of it)",
+      "literal_map_v4_ids": [
+        "2023_p0010"
+      ]
+    }
+  ]
+}
