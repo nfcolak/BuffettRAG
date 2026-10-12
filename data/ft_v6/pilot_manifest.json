@@ -1,0 +1,152 @@
+{
+  "by_kind": {
+    "follow_up": {
+      "attempted": 2,
+      "keep_rate": 0.5,
+      "kept": 1,
+      "reasons": {
+        "parts_count": 1
+      },
+      "sentences_per_target": 2.0,
+      "teacher_seconds": 142.8
+    },
+    "multipart": {
+      "attempted": 3,
+      "keep_rate": 0.333,
+      "kept": 1,
+      "reasons": {
+        "dependent_start": 1,
+        "error_RuntimeError": 1
+      },
+      "sentences_per_target": 4.0,
+      "teacher_seconds": 640.5
+    },
+    "refusal": {
+      "attempted": 2,
+      "keep_rate": 0.5,
+      "kept": 1,
+      "reasons": {
+        "refusal_terms_present_in_served": 1
+      },
+      "sentences_per_target": null,
+      "teacher_seconds": 98.0
+    },
+    "single": {
+      "attempted": 2,
+      "keep_rate": 0.5,
+      "kept": 1,
+      "reasons": {
+        "bad_sentence": 1
+      },
+      "sentences_per_target": 4.0,
+      "teacher_seconds": 167.8
+    },
+    "temporal": {
+      "attempted": 3,
+      "keep_rate": 0.333,
+      "kept": 1,
+      "reasons": {
+        "dependent_start": 2
+      },
+      "sentences_per_target": 4.0,
+      "teacher_seconds": 90.3
+    }
+  },
+  "corpus_sha256": "8263f08958729a77febf0922e7bbc4161bedd5fdb3e9a8b3fc9a64ab681ab5f0",
+  "counts_per_split_kind": {
+    "train": {
+      "follow_up": 1,
+      "multipart": 1,
+      "refusal": 1,
+      "single": 1,
+      "temporal": 1
+    },
+    "valid": {}
+  },
+  "eta": {
+    "hours_by_kind": {
+      "follow_up": 6.98,
+      "multipart": 172.22,
+      "refusal": 7.19,
+      "single": 8.2,
+      "temporal": 4.41
+    },
+    "hours_total": 199.01,
+    "rows": 1760
+  },
+  "exclusion_counts": {
+    "answer_benchmark_v3": 9,
+    "dev_cases": 82,
+    "gold_set_py": 695,
+    "hard_negatives_v2": 47,
+    "hard_negatives_v3": 16,
+    "hard_negatives_v4": 85,
+    "heldout_v1": 25,
+    "heldout_v2": 45,
+    "heldout_v3": 44,
+    "heldout_v4": 42,
+    "heldout_v4_checker": 118,
+    "heldout_v5": 137,
+    "heldout_v5_checker": 315,
+    "heldout_v6": 142,
+    "heldout_v6_checker": 378,
+    "ids_not_in_corpus": 6,
+    "union_ids": 1552,
+    "with_neighbours": 2619
+  },
+  "max_seq": 6144,
+  "natural_miss_share": 0.0,
+  "pilot_note": "round 1 (all kinds, original code) then multipart+temporal re-run after the dependent_start repair + worked example; bad_sentence check added afterwards (one single row removed)",
+  "pilot_per_kind": "2-3 attempts per kind (machine load average 8-13, Metal OOM once)",
+  "prompt_version": "v2",
+  "rejection_reasons": {
+    "bad_sentence": 1,
+    "dependent_start": 3,
+    "error_RuntimeError": 1,
+    "parts_count": 1,
+    "refusal_terms_present_in_served": 1
+  },
+  "row_counts_per_kind": {
+    "follow_up": 1,
+    "multipart": 1,
+    "refusal": 1,
+    "single": 1,
+    "temporal": 1
+  },
+  "rows_per_minute": 0.263,
+  "seed": 13,
+  "target_rows": 1760,
+  "teacher": "/Users/necatifurkancolak/AI-Workplace/Projects/done/BuffettRAG/models/teacher-qwen2.5-14b-mlx4",
+  "teacher_license": "Apache-2.0 (open weights)",
+  "valid_years": [
+    1988,
+    1993,
+    1995,
+    2018,
+    2020
+  ],
+  "wall_seconds": 1139.5,
+  "kaggle_plan": {
+    "command": "build_ft_v6.py plan --n 2600 --seed 7 --out data/ft_v6/jobs.jsonl --smoke-out data/ft_v6/jobs_smoke.jsonl",
+    "teacher": "Qwen/Qwen2.5-32B-Instruct-AWQ (Kaggle 2xT4, vLLM 0.18.1)",
+    "jobs": 2610,
+    "jobs_per_kind": {
+      "multipart": 1432,
+      "refusal": 392,
+      "single": 262,
+      "follow_up": 262,
+      "temporal": 262
+    },
+    "jobs_per_split": {
+      "train": 2368,
+      "valid": 242
+    },
+    "teacher_jobs": 2414,
+    "template_refusals_without_teacher": 196,
+    "longest_teacher_prompt_tokens": 1360,
+    "smoke_jobs": 30,
+    "jobs_sha256": "f68d636bcb802522229a163081c013dc46f04626a95e86187b0bb8aef77d816a",
+    "exclusions": "spent sets up to heldout_v6 + dev_cases + hard_negatives + gold_set.py (2,619 ids with neighbours); heldout_v7/v8 are not on this branch: pass --exclude-ids at plan and assemble",
+    "assemble_smoke": "hand-written teacher output for 5 jobs (one per kind), assemble kept multipart=1 single=1 follow_up=1 temporal=1 refusal=1; partnership_rejected=0 (v3 index in this worktree has no bpl passages)"
+  }
+}
