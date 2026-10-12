@@ -107,6 +107,7 @@ def test_splitter_skips_salutations_headers_and_signatures():
 
 
 def test_offtopic_incidental_keyword_refuses_before_generation(monkeypatch):
+    monkeypatch.setenv("EVIDENCE_GATE_SOFT", "0")
     from src.services.ask_flow import _generate_answer
     hits = [SearchHit("p", "We use computer models to estimate the cost of insurance operations.", {}, 1.0)]
     question = "How do I configure a firewall to protect a computer?"
