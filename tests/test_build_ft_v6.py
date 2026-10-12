@@ -248,3 +248,74 @@ def test_training_rows_equal_the_serving_split_of_the_same_prompt(monkeypatch):
             assert (system, user) == (rows[0]['content'], rows[1]['content'])
         else:
             assert user.startswith('BEGIN UNTRUSTED PASSAGES')
+
+
+# ------------------------------------------------------------------ --passages-mix (FT-r3: mixed served context sizes)
+def test_passages_mix_parsing():
+    assert B.parse_passages_mix(None) == [8] and B.parse_passages_mix('') == [8]
+    assert B.parse_passages_mix('8,12,16') == [8, 12, 16]
+    for bad in ('8,x', '0', '8,40', ','):
+        with pytest.raises(ValueError):
+            B.parse_passages_mix(bad)
+
+
+def test_pick_k_is_deterministic_in_the_mix_and_spread_over_it():
+    mix = [8, 12, 16]
+    ids = [f'v6:multipart:train:{i:04d}' for i in range(600)]
+    first = [B.pick_k(i, mix) for i in ids]
+    assert first == [B.pick_k(i, mix) for i in ids] and set(first) == set(mix)
+    assert all(100 <= first.count(k) <= 300 for k in mix)
+    assert {B.pick_k(i, [8]) for i in ids} == {8}
+    assert B.k_histogram([{'k': 16}, {'k': 8}, {'k': 16}, {}]) == {'8': 2, '16': 2}
+
+
+def test_k16_row_prompt_equals_the_serving_prompt_for_the_same_question():
+    """The training user/system messages of a 16-passage row are exactly what ask_flow + llama_provider.split_prompt send at K=16."""
+    from src.generation.prompt import build_cited_prompt
+    from src.generation.providers.llama_provider import split_prompt
+    hits = [hit(f'1990_p{i:04d}', [f'Passage number {i} says something distinct about topic {i} for the test.'], year=1990 + i % 5) for i in range(16)]
+    history = [{'role': 'user', 'content': 'How many shares did Berkshire repurchase?'}, {'role': 'assistant', 'content': 'See [1].'}]
+    for hist in (None, history):
+        system, user = split_prompt(build_cited_prompt('What happened next in 1995?', hits, hist))
+        rows = B.chat_messages('What happened next in 1995?', hits, hist)
+        assert rows == [{'role': 'system', 'content': system}, {'role': 'user', 'content': user}]
+        assert user.count('\n[16] (year=') == 1 and '[17]' not in user
+
+
+class FakeServing:
+    """Records the LLM_CONTEXT_PASSAGES each call sees and serves that many unrelated passages."""
+    def __init__(self):
+        self.seen = []
+
+    def prompts(self, question, history=None):
+        k = int(os.environ['LLM_CONTEXT_PASSAGES'])
+        self.seen.append(k)
+        hits = [hit(f'1990_p{i:04d}', [f'Unrelated passage {i} about something else entirely in the test.']) for i in range(k)]
+        return [{'period': None, 'hits': hits, 'gate': True, 'retrieved_ids': [h.id for h in hits], 'reranked': True}]
+
+
+def test_generator_serves_each_row_with_its_own_k_and_gold_sources_stay_inside(tmp_path, monkeypatch):
+    monkeypatch.delenv('LLM_CONTEXT_PASSAGES', raising=False)
+    source = doc('1995_p0001', S)
+    serving = FakeServing()
+    gen = B.Generator(None, serving, {'1995_p0001': source}, set(), tmp_path, None, B.MAX_SEQ_MIX, False, [8, 12, 16])
+    plan = B.validate_plan(plan_obj(), 'multipart', [source])[1]
+    rows = []
+    for index in range(30):
+        job = {'id': f'v6:multipart:train:{index:04d}', 'kind': 'multipart', 'split': 'train', 'source_ids': ['1995_p0001']}
+        record = {'k': B.pick_k(job['id'], gen.mix)}
+        row, reason = gen._finish(job, [source], plan, None, record)
+        assert reason is None and row['k'] == record['k'] and row['passages'] == row['k'] and B.check_row(row) == []
+        assert '1995_p0001' in row['passage_ids'] and len(row['injected']) == 1
+        rows.append(row)
+    assert serving.seen == [r['k'] for r in rows] and 'LLM_CONTEXT_PASSAGES' not in os.environ
+    assert set(B.k_histogram(rows)) == {'8', '12', '16'}
+    default = B.Generator(None, FakeServing(), {}, set(), tmp_path / 'd', None)
+    assert default.mix == [8] and default.max_seq == B.MAX_SEQ
+
+
+def test_assemble_flags_parse(monkeypatch):
+    seen = {}
+    monkeypatch.setattr(B, 'assemble_command', lambda args: seen.setdefault('a', args))
+    B.main(['assemble', '--jobs', 'j.jsonl', '--teacher', 't.jsonl', '--passages-mix', '8,12,16'])
+    assert seen['a'].passages_mix == '8,12,16' and seen['a'].max_seq is None
