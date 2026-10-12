@@ -72,7 +72,7 @@ ID_RE = re.compile(r"(\d{4})_p(\d{4})")
 PASSAGE_WORDING = ("the passage", "this passage", "the passages", "the letter says", "the letter states",
                    "according to the letter", "the excerpt", "the text says")
 COPY_NGRAM = 8
-YEAR_PATTERN = re.compile(r"\d{4}")
+YEAR_PATTERN = re.compile(r"(?:\\b|\^)?(\d{4})(?:\\b|\$)?")
 
 
 def require(condition: bool, message: str) -> None:
@@ -330,7 +330,8 @@ def check_part(part: str, context: tuple | None = None) -> tuple[str, dict]:
             require("history" not in case and "expected_coverage_note" not in case and "multi_part" not in case,
                     f"{qid}: invalid refusal additions")
             if category == "future_absent_year":
-                named = {int(p) for p in patterns if YEAR_PATTERN.fullmatch(p)}
+                # A year may be a bare "2033" or regex-anchored ("\b2033\b", "^2033$").
+                named = {int(m.group(1)) for m in (YEAR_PATTERN.fullmatch(p) for p in patterns) if m}
                 require(bool(named) and not named & corpus_years, f"{qid}: future year pattern must name an absent year")
             if category == "both_sides_unsupported":
                 sides = case.get("unsupported_sides", [])
