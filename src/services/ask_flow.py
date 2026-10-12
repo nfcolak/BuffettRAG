@@ -26,6 +26,7 @@ from src.generation.prompt import (
     parse_citations,
     strip_chat_artifacts,
 )
+from src.generation.answer_expand import expand_answer
 from src.generation.compare import comparison_periods, generate_comparison_answer, prepare_answer_context
 from src.generation.decompose import answer_by_parts, split_question
 from src.generation.evidence_gate import assess_evidence
@@ -203,7 +204,14 @@ def _finalize_answer(llm, prompt: str, context_hits, raw_answer: str, max_new_to
         return answer, []
     validation = validate_and_filter_answer(answer, context_hits)
     answer = validation.safe_answer or REFUSAL_LINE
+    if answer != REFUSAL_LINE:
+        answer = expand_answer(answer, context_hits)
     return answer, parse_citations(answer, context_hits)
+
+
+def _refusal_retry_enabled() -> bool:
+    import config
+    return os.getenv("ANSWER_REFUSAL_RETRY", str(config.ANSWER_REFUSAL_RETRY)) == "1"
 
 
 def _generate_answer(llm, prompt: str, context_hits, max_new_tokens: int, query: Optional[str] = None,
@@ -211,6 +219,7 @@ def _generate_answer(llm, prompt: str, context_hits, max_new_tokens: int, query:
     if is_grounded(llm):
         return _generate_grounded(llm, query or "", context_hits, max_new_tokens, history)
     is_comparison = bool(query and comparison_periods(query))
+    soft_gate = False
     if query and not is_comparison:
         evidence = assess_evidence(query, context_hits, extra_queries=extra_queries)
         soft_gate = (
@@ -237,10 +246,27 @@ def _generate_answer(llm, prompt: str, context_hits, max_new_tokens: int, query:
                 llm, query, context_hits, history=history, max_new_tokens=max_new_tokens,
                 extra_queries=extra_queries,
             )
-            return comparison.answer, comparison.citations
+            expanded = expand_answer(comparison.answer, context_hits)
+            if expanded == comparison.answer:
+                return comparison.answer, comparison.citations
+            return expanded, parse_citations(expanded, context_hits)
         raw_answer = llm.generate(prompt, max_new_tokens=max_new_tokens)
     except Exception as exc:
         if EXPOSE_DEBUG_STATUS:
             print(f"[backend] LLM provider unavailable: {exc}", flush=True)
         return _llm_error_message(exc), []
-    return _finalize_answer(llm, prompt, context_hits, raw_answer, max_new_tokens)
+    answer, citations = _finalize_answer(llm, prompt, context_hits, raw_answer, max_new_tokens)
+    if answer == REFUSAL_LINE and soft_gate and len(context_hits) > 3 and _refusal_retry_enabled():
+        # The soft gate let weak evidence through and the model refused: ask once with the top 3 passages.
+        top = list(context_hits[:3])
+        retry_prompt = build_cited_prompt(query=query, hits=top, history=history)
+        try:
+            retry_raw = llm.generate(retry_prompt, max_new_tokens=max_new_tokens)
+        except Exception as exc:
+            if EXPOSE_DEBUG_STATUS:
+                print(f"[backend] LLM provider unavailable: {exc}", flush=True)
+            return answer, citations
+        retried = _finalize_answer(llm, retry_prompt, top, retry_raw, max_new_tokens)
+        if retried[0] != REFUSAL_LINE:
+            return retried
+    return answer, citations
