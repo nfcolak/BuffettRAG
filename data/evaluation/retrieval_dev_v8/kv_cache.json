@@ -1,0 +1,11 @@
+{
+  "source": "GGUF header of buffett-qwen2.5-7b-ft-r1-q4_k_m.gguf (metadata only)",
+  "layers": 28,
+  "n_kv_heads": 4,
+  "head_dim": 128,
+  "bytes_per_token_f16": 57344,
+  "formula": "2 (K,V) * layers * n_kv_heads * head_dim * 2 bytes * n_ctx",
+  "kv_cache_MiB_n_ctx_8192": 448.0,
+  "kv_cache_MiB_n_ctx_12288": 672.0,
+  "kv_cache_MiB_n_ctx_16384": 896.0
+}

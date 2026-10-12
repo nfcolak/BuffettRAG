@@ -112,3 +112,26 @@ def test_harness_metric_and_bootstrap():
     case = {"relevant_ids": ["r"], "hard_negative_ids": ["n"], "ranked_ids": ["n", "r"]}
     assert harness.hn_pass(case) is False
     assert harness.hn_pass(dict(case, ranked_ids=["r", "n"])) is True
+
+
+def test_n_ctx_read_at_call_time(monkeypatch):
+    from src.generation.providers.llama_provider import LlamaCppProvider
+
+    monkeypatch.delenv("LLM_N_CTX", raising=False)
+    assert config.llm_n_ctx() == 16384
+    provider = LlamaCppProvider(model_path="x.gguf")
+    monkeypatch.setenv("LLM_N_CTX", "16384")
+    assert config.llm_n_ctx() == 16384 and provider.n_ctx == 16384
+    assert LlamaCppProvider(model_path="x.gguf", n_ctx=4096).n_ctx == 4096
+
+
+def test_year_filter_min_and_scaffold_strip(monkeypatch):
+    from src.retrieval.query_expansion import strip_question_scaffolding
+    from src.retrieval.retriever import detect_year_filter
+
+    monkeypatch.setenv("RETRIEVAL_YEAR_FILTER_MIN", "1970")
+    assert detect_year_filter("What did Buffett say in 1961 about the Dow?") is None
+    monkeypatch.setenv("RETRIEVAL_YEAR_FILTER_MIN", "1957")
+    assert detect_year_filter("What did Buffett say in 1961 about the Dow?") == {"year": 1961}
+    assert strip_question_scaffolding("What did Buffett say about the Dow in 1961?") == "Dow 1961"
+    assert strip_question_scaffolding("Why does he use 3 years as a test?") == "use 3 years test"

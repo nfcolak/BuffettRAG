@@ -1,0 +1,5922 @@
+{
+  "baseline": "baseline",
+  "final": "n16p16r30",
+  "notes": "- Pool: 359 answerable cases / 875 claims (heldout_v3..v6, dev_cases, devpl 37 cases / 110 claims) served on the active corpus v5_pl (chunks_v5_pl + faiss_v5_pl, MPS embedder/reranker) with the base commit's defaults as baseline (multipart on, 8 passages, n_ctx 8192, rerank depth 15). Stub LLM, nothing generated, no 7B/14B model loaded.\n- All pool sets except devpl are spent (used for selection before); gains are development estimates, not blind. devpl was never used to tune before this run but is part of the pooled selection here.\n- Miss analysis (baseline, 190 unserved claims): see the cause table and `misses_baseline.csv`. `cap_dedupe_merge_drop` (44) are claims whose gold chunk text IS in the prompt as neighbour text of another served passage (`gold_text_in_prompt=True`) but whose id is not a served passage id, so the id metric counts them as misses; the merged-ids column shows that coverage. Ranks are for the best gold id of the claim over the whole-question and per-part queries, unfiltered, 200 deep (BM25, dense, RRF of both); `rerank_rank_top50` re-ranks the fused top 50 with the cross-encoder (gold-year scoped when the question names a year/period).\n- After-state cause table: `causes_<config>.json` exists for the baseline only (the miss analysis takes ~12 min on the shared machine); rerun `served_context_recall.py misses --out DIR --config NAME[:K=V,...]` for a final config.\n- Not changed/measured: RETRIEVAL_RERANK_FETCH=1 with RERANK_CANDIDATES>30 (fetch_k is 30 by default, so depths above 30 need it; rr50 not completed within the time box), ANSWER_CONTEXT_NEIGHBORS, neighbour anchors, MMR.\n- RRF k 20/120, RETRIEVAL_DEDUP=0, followup turns 2/always, RETRIEVAL_YEAR_FILTER_WEIGHT=3 changed nothing or nothing significant; BM25 or dense weight 1.5 and part slots 1/3 lowered recall. Rerank order is decided by the cross-encoder, so fusion constants only matter through the candidate set.\n- Determinism section: baseline vs stored heldout_v6 ids differs for 41/79 cases because the stored runs used corpus v3 and the active corpus now also holds the partnership letters (bpl ids occur in old answers); not a regression signal.\n- Latency: p50 is wall time plus the measured cost of cached model calls (shared, swapping machine): indicative only. Deeper rerank costs ~2x (30 vs 15 cross-encoder pairs per query).\n- Prompt size: with n_ctx 16384 and 1024 tokens reserved for the answer the prompt must be <= 15360 tokens. 20 passages reached 16030 tokens with the 4 chars/token budget (`LLM_CHARS_PER_TOKEN`), so 20 passages need a stricter value (~3.2) and were not adopted; 16 passages peak at 12946 tokens. KV cache (f16, llama.cpp formula, GGUF header of the served model, no model load): 56 KiB/token = 448 MiB at 8192, 672 MiB at 12288, 896 MiB at 16384 (+448 MiB vs today). See `kv_cache.json`.\n- A longer prompt (16 passages ~ 8-13k tokens vs ~5-7k) slows prefill roughly in proportion and may change 7B behaviour (lost-in-the-middle, more refusals/hallucination); this run only measures whether the gold passage reaches the prompt. An answer-level check with the 7B is still required before relying on it.\n- Defaults applied in config.py: LLM_N_CTX 16384, LLM_CONTEXT_PASSAGES 16 (7B), RERANK_CANDIDATES 30, (each still overridable by its environment variable; `served_context_recall.py` pins the old values as BASELINE_ENV). Two tests in tests/test_ft_v4_generator.py fail afterwards: scripts/ft/round4.py (outside this unit's Files) asserts `LLM_CONTEXT_PASSAGES == SERVING_PASSAGES (8)`; its constant must become 16 for the generator-parity guard to match serving.\n- Target not reached: pooled 85.5% (devpl 76.4%) against the 90% goal; remaining misses are mostly rerank/depth (gold ranked 31-200 or demoted) and neighbour-only coverage; 20 passages (86.5%, devpl 79.1%) need a stricter LLM_CHARS_PER_TOKEN to fit 16384.\n- RETRIEVAL_QUERY_STRIP=1 and RETRIEVAL_YEAR_FILTER_MIN=1957 stay OFF: alone each has a CI95 lower bound < 0 (strip +0.91pp [-0.34, +2.29]; yr1957 +0.46pp [-0.34, +1.26], devpl 65.5%). Together with 16 passages/rerank 30 (combo16r30: 85.5% pooled, devpl 76.4%) they add +0.7pp pooled / +3.7pp devpl over n16p16r30 (84.8% / 72.7%), not tested separately; they are the next candidates for the default after a blind check.\n",
+  "overrides": {
+    "baseline": {
+      "LLM_CONTEXT_PASSAGES": "8"
+    },
+    "bm25w15": {
+      "LLM_CONTEXT_PASSAGES": "8",
+      "HYBRID_BM25_WEIGHT": "1.5"
+    },
+    "combo16": {
+      "LLM_CONTEXT_PASSAGES": "16",
+      "LLM_N_CTX": "16384",
+      "RERANK_CANDIDATES": "16",
+      "RETRIEVAL_YEAR_FILTER_MIN": "1957",
+      "RETRIEVAL_QUERY_STRIP": "1",
+      "MAX_NEW_TOKENS": "1024"
+    },
+    "combo16r30": {
+      "LLM_CONTEXT_PASSAGES": "16",
+      "LLM_N_CTX": "16384",
+      "RERANK_CANDIDATES": "30",
+      "RETRIEVAL_YEAR_FILTER_MIN": "1957",
+      "RETRIEVAL_QUERY_STRIP": "1",
+      "MAX_NEW_TOKENS": "1024"
+    },
+    "combo20r30": {
+      "LLM_CONTEXT_PASSAGES": "20",
+      "LLM_N_CTX": "16384",
+      "RERANK_CANDIDATES": "30",
+      "RETRIEVAL_YEAR_FILTER_MIN": "1957",
+      "RETRIEVAL_QUERY_STRIP": "1",
+      "MAX_NEW_TOKENS": "1024"
+    },
+    "dedup0": {
+      "LLM_CONTEXT_PASSAGES": "8",
+      "RETRIEVAL_DEDUP": "0"
+    },
+    "densew15": {
+      "LLM_CONTEXT_PASSAGES": "8",
+      "HYBRID_VECTOR_WEIGHT": "1.5"
+    },
+    "fu2": {
+      "LLM_CONTEXT_PASSAGES": "8",
+      "RETRIEVAL_FOLLOWUP_TURNS": "2"
+    },
+    "fualways": {
+      "LLM_CONTEXT_PASSAGES": "8",
+      "RETRIEVAL_FOLLOWUP_ALWAYS": "1"
+    },
+    "n12p10": {
+      "LLM_CONTEXT_PASSAGES": "10",
+      "LLM_N_CTX": "12288",
+      "MAX_NEW_TOKENS": "1024"
+    },
+    "n12p12": {
+      "LLM_CONTEXT_PASSAGES": "12",
+      "LLM_N_CTX": "12288",
+      "MAX_NEW_TOKENS": "1024"
+    },
+    "n12p16": {
+      "LLM_CONTEXT_PASSAGES": "16",
+      "LLM_N_CTX": "12288",
+      "RERANK_CANDIDATES": "16",
+      "MAX_NEW_TOKENS": "1024"
+    },
+    "n12p8": {
+      "LLM_CONTEXT_PASSAGES": "8",
+      "LLM_N_CTX": "12288",
+      "MAX_NEW_TOKENS": "1024"
+    },
+    "n16p10": {
+      "LLM_CONTEXT_PASSAGES": "10",
+      "LLM_N_CTX": "16384",
+      "MAX_NEW_TOKENS": "1024"
+    },
+    "n16p12": {
+      "LLM_CONTEXT_PASSAGES": "12",
+      "LLM_N_CTX": "16384",
+      "MAX_NEW_TOKENS": "1024"
+    },
+    "n16p16": {
+      "LLM_CONTEXT_PASSAGES": "16",
+      "LLM_N_CTX": "16384",
+      "RERANK_CANDIDATES": "16",
+      "MAX_NEW_TOKENS": "1024"
+    },
+    "n16p16r30": {
+      "LLM_CONTEXT_PASSAGES": "16",
+      "LLM_N_CTX": "16384",
+      "RERANK_CANDIDATES": "30",
+      "MAX_NEW_TOKENS": "1024"
+    },
+    "n16p20r30": {
+      "LLM_CONTEXT_PASSAGES": "20",
+      "LLM_N_CTX": "16384",
+      "RERANK_CANDIDATES": "30",
+      "MAX_NEW_TOKENS": "1024"
+    },
+    "n16p8": {
+      "LLM_CONTEXT_PASSAGES": "8",
+      "LLM_N_CTX": "16384",
+      "MAX_NEW_TOKENS": "1024"
+    },
+    "rr30": {
+      "LLM_CONTEXT_PASSAGES": "8",
+      "RERANK_CANDIDATES": "30"
+    },
+    "rrfk120": {
+      "LLM_CONTEXT_PASSAGES": "8",
+      "RRF_K": "120"
+    },
+    "rrfk20": {
+      "LLM_CONTEXT_PASSAGES": "8",
+      "RRF_K": "20"
+    },
+    "slots1": {
+      "LLM_CONTEXT_PASSAGES": "8",
+      "RETRIEVAL_PART_SLOTS": "1"
+    },
+    "slots3": {
+      "LLM_CONTEXT_PASSAGES": "8",
+      "RETRIEVAL_PART_SLOTS": "3"
+    },
+    "strip": {
+      "LLM_CONTEXT_PASSAGES": "8",
+      "RETRIEVAL_QUERY_STRIP": "1"
+    },
+    "yr1957": {
+      "LLM_CONTEXT_PASSAGES": "8",
+      "RETRIEVAL_YEAR_FILTER_MIN": "1957"
+    },
+    "yrw3": {
+      "LLM_CONTEXT_PASSAGES": "8",
+      "RETRIEVAL_YEAR_FILTER_WEIGHT": "3"
+    }
+  },
+  "summary": {
+    "baseline": {
+      "pooled": {
+        "cases": 359,
+        "claims": 875,
+        "claims_served": 685,
+        "claim_recall": 0.7828571428571428,
+        "claim_recall_merged": 0.8331428571428572,
+        "case_any_gold": 0.8885793871866295
+      },
+      "per_set": {
+        "dev_cases": {
+          "cases": 71,
+          "claims": 95,
+          "claims_served": 89,
+          "claim_recall": 0.9368421052631579,
+          "claim_recall_merged": 0.9578947368421052,
+          "case_any_gold": 0.9436619718309859
+        },
+        "devpl": {
+          "cases": 37,
+          "claims": 110,
+          "claims_served": 67,
+          "claim_recall": 0.6090909090909091,
+          "claim_recall_merged": 0.7090909090909091,
+          "case_any_gold": 0.8108108108108109
+        },
+        "heldout_v3": {
+          "cases": 34,
+          "claims": 41,
+          "claims_served": 32,
+          "claim_recall": 0.7804878048780488,
+          "claim_recall_merged": 0.8536585365853658,
+          "case_any_gold": 0.7941176470588235
+        },
+        "heldout_v4": {
+          "cases": 34,
+          "claims": 60,
+          "claims_served": 54,
+          "claim_recall": 0.9,
+          "claim_recall_merged": 0.9,
+          "case_any_gold": 0.9117647058823529
+        },
+        "heldout_v5a": {
+          "cases": 52,
+          "claims": 149,
+          "claims_served": 112,
+          "claim_recall": 0.7516778523489933,
+          "claim_recall_merged": 0.8187919463087249,
+          "case_any_gold": 0.8653846153846154
+        },
+        "heldout_v5b": {
+          "cases": 52,
+          "claims": 150,
+          "claims_served": 124,
+          "claim_recall": 0.8266666666666667,
+          "claim_recall_merged": 0.8666666666666667,
+          "case_any_gold": 0.9038461538461539
+        },
+        "heldout_v6a": {
+          "cases": 38,
+          "claims": 118,
+          "claims_served": 88,
+          "claim_recall": 0.7457627118644068,
+          "claim_recall_merged": 0.7966101694915254,
+          "case_any_gold": 0.8947368421052632
+        },
+        "heldout_v6b": {
+          "cases": 41,
+          "claims": 152,
+          "claims_served": 119,
+          "claim_recall": 0.7828947368421053,
+          "claim_recall_merged": 0.8223684210526315,
+          "case_any_gold": 0.926829268292683
+        }
+      },
+      "per_type": {
+        "answerable": {
+          "cases": 8,
+          "claims": 12,
+          "claims_served": 10,
+          "claim_recall": 0.8333333333333334,
+          "claim_recall_merged": 0.8333333333333334,
+          "case_any_gold": 0.875
+        },
+        "company": {
+          "cases": 80,
+          "claims": 193,
+          "claims_served": 158,
+          "claim_recall": 0.8186528497409327,
+          "claim_recall_merged": 0.8860103626943006,
+          "case_any_gold": 0.925
+        },
+        "fact_number": {
+          "cases": 83,
+          "claims": 197,
+          "claims_served": 161,
+          "claim_recall": 0.817258883248731,
+          "claim_recall_merged": 0.8781725888324873,
+          "case_any_gold": 0.891566265060241
+        },
+        "follow_up": {
+          "cases": 51,
+          "claims": 119,
+          "claims_served": 105,
+          "claim_recall": 0.8823529411764706,
+          "claim_recall_merged": 0.8823529411764706,
+          "case_any_gold": 0.8823529411764706
+        },
+        "opinion": {
+          "cases": 83,
+          "claims": 189,
+          "claims_served": 141,
+          "claim_recall": 0.746031746031746,
+          "claim_recall_merged": 0.8412698412698413,
+          "case_any_gold": 0.8795180722891566
+        },
+        "temporal_comparison": {
+          "cases": 54,
+          "claims": 165,
+          "claims_served": 110,
+          "claim_recall": 0.6666666666666666,
+          "claim_recall_merged": 0.6727272727272727,
+          "case_any_gold": 0.8518518518518519
+        }
+      },
+      "latency_p50_ms": 1303.2,
+      "wall_p50_ms": 1232.58,
+      "prompt_tokens_max": 7389,
+      "prompt_tokens_p50": 4386,
+      "passages_p50": 8,
+      "n_ctx_ok": true,
+      "tokens_left_min": 803,
+      "hard_negatives_passed": 36,
+      "hard_negatives_n": 40
+    },
+    "bm25w15": {
+      "pooled": {
+        "cases": 359,
+        "claims": 875,
+        "claims_served": 671,
+        "claim_recall": 0.7668571428571429,
+        "claim_recall_merged": 0.8205714285714286,
+        "case_any_gold": 0.8857938718662952
+      },
+      "per_set": {
+        "dev_cases": {
+          "cases": 71,
+          "claims": 95,
+          "claims_served": 89,
+          "claim_recall": 0.9368421052631579,
+          "claim_recall_merged": 0.9578947368421052,
+          "case_any_gold": 0.9436619718309859
+        },
+        "devpl": {
+          "cases": 37,
+          "claims": 110,
+          "claims_served": 68,
+          "claim_recall": 0.6181818181818182,
+          "claim_recall_merged": 0.7090909090909091,
+          "case_any_gold": 0.8378378378378378
+        },
+        "heldout_v3": {
+          "cases": 34,
+          "claims": 41,
+          "claims_served": 32,
+          "claim_recall": 0.7804878048780488,
+          "claim_recall_merged": 0.8536585365853658,
+          "case_any_gold": 0.7941176470588235
+        },
+        "heldout_v4": {
+          "cases": 34,
+          "claims": 60,
+          "claims_served": 55,
+          "claim_recall": 0.9166666666666666,
+          "claim_recall_merged": 0.9166666666666666,
+          "case_any_gold": 0.9411764705882353
+        },
+        "heldout_v5a": {
+          "cases": 52,
+          "claims": 149,
+          "claims_served": 109,
+          "claim_recall": 0.7315436241610739,
+          "claim_recall_merged": 0.7919463087248322,
+          "case_any_gold": 0.8461538461538461
+        },
+        "heldout_v5b": {
+          "cases": 52,
+          "claims": 150,
+          "claims_served": 122,
+          "claim_recall": 0.8133333333333334,
+          "claim_recall_merged": 0.8666666666666667,
+          "case_any_gold": 0.8846153846153846
+        },
+        "heldout_v6a": {
+          "cases": 38,
+          "claims": 118,
+          "claims_served": 81,
+          "claim_recall": 0.6864406779661016,
+          "claim_recall_merged": 0.7796610169491526,
+          "case_any_gold": 0.868421052631579
+        },
+        "heldout_v6b": {
+          "cases": 41,
+          "claims": 152,
+          "claims_served": 115,
+          "claim_recall": 0.756578947368421,
+          "claim_recall_merged": 0.7828947368421053,
+          "case_any_gold": 0.926829268292683
+        }
+      },
+      "per_type": {
+        "answerable": {
+          "cases": 8,
+          "claims": 12,
+          "claims_served": 10,
+          "claim_recall": 0.8333333333333334,
+          "claim_recall_merged": 0.8333333333333334,
+          "case_any_gold": 0.875
+        },
+        "company": {
+          "cases": 80,
+          "claims": 193,
+          "claims_served": 156,
+          "claim_recall": 0.8082901554404145,
+          "claim_recall_merged": 0.8652849740932642,
+          "case_any_gold": 0.9375
+        },
+        "fact_number": {
+          "cases": 83,
+          "claims": 197,
+          "claims_served": 158,
+          "claim_recall": 0.8020304568527918,
+          "claim_recall_merged": 0.8730964467005076,
+          "case_any_gold": 0.891566265060241
+        },
+        "follow_up": {
+          "cases": 51,
+          "claims": 119,
+          "claims_served": 100,
+          "claim_recall": 0.8403361344537815,
+          "claim_recall_merged": 0.8571428571428571,
+          "case_any_gold": 0.8431372549019608
+        },
+        "opinion": {
+          "cases": 83,
+          "claims": 189,
+          "claims_served": 136,
+          "claim_recall": 0.7195767195767195,
+          "claim_recall_merged": 0.8201058201058201,
+          "case_any_gold": 0.8795180722891566
+        },
+        "temporal_comparison": {
+          "cases": 54,
+          "claims": 165,
+          "claims_served": 111,
+          "claim_recall": 0.6727272727272727,
+          "claim_recall_merged": 0.6787878787878788,
+          "case_any_gold": 0.8518518518518519
+        }
+      },
+      "latency_p50_ms": 847.76,
+      "wall_p50_ms": 181.33,
+      "prompt_tokens_max": 7389,
+      "prompt_tokens_p50": 4409,
+      "passages_p50": 8,
+      "n_ctx_ok": true,
+      "tokens_left_min": 803,
+      "hard_negatives_passed": 36,
+      "hard_negatives_n": 40
+    },
+    "combo16": {
+      "pooled": {
+        "cases": 359,
+        "claims": 875,
+        "claims_served": 718,
+        "claim_recall": 0.8205714285714286,
+        "claim_recall_merged": 0.8617142857142858,
+        "case_any_gold": 0.9164345403899722
+      },
+      "per_set": {
+        "dev_cases": {
+          "cases": 71,
+          "claims": 95,
+          "claims_served": 91,
+          "claim_recall": 0.9578947368421052,
+          "claim_recall_merged": 0.968421052631579,
+          "case_any_gold": 0.971830985915493
+        },
+        "devpl": {
+          "cases": 37,
+          "claims": 110,
+          "claims_served": 84,
+          "claim_recall": 0.7636363636363637,
+          "claim_recall_merged": 0.8181818181818182,
+          "case_any_gold": 0.918918918918919
+        },
+        "heldout_v3": {
+          "cases": 34,
+          "claims": 41,
+          "claims_served": 35,
+          "claim_recall": 0.8536585365853658,
+          "claim_recall_merged": 0.9024390243902439,
+          "case_any_gold": 0.8529411764705882
+        },
+        "heldout_v4": {
+          "cases": 34,
+          "claims": 60,
+          "claims_served": 54,
+          "claim_recall": 0.9,
+          "claim_recall_merged": 0.9,
+          "case_any_gold": 0.9411764705882353
+        },
+        "heldout_v5a": {
+          "cases": 52,
+          "claims": 149,
+          "claims_served": 116,
+          "claim_recall": 0.7785234899328859,
+          "claim_recall_merged": 0.8120805369127517,
+          "case_any_gold": 0.8846153846153846
+        },
+        "heldout_v5b": {
+          "cases": 52,
+          "claims": 150,
+          "claims_served": 124,
+          "claim_recall": 0.8266666666666667,
+          "claim_recall_merged": 0.8866666666666667,
+          "case_any_gold": 0.9038461538461539
+        },
+        "heldout_v6a": {
+          "cases": 38,
+          "claims": 118,
+          "claims_served": 89,
+          "claim_recall": 0.7542372881355932,
+          "claim_recall_merged": 0.8305084745762712,
+          "case_any_gold": 0.8947368421052632
+        },
+        "heldout_v6b": {
+          "cases": 41,
+          "claims": 152,
+          "claims_served": 125,
+          "claim_recall": 0.8223684210526315,
+          "claim_recall_merged": 0.8486842105263158,
+          "case_any_gold": 0.926829268292683
+        }
+      },
+      "per_type": {
+        "answerable": {
+          "cases": 8,
+          "claims": 12,
+          "claims_served": 10,
+          "claim_recall": 0.8333333333333334,
+          "claim_recall_merged": 0.8333333333333334,
+          "case_any_gold": 0.875
+        },
+        "company": {
+          "cases": 80,
+          "claims": 193,
+          "claims_served": 168,
+          "claim_recall": 0.8704663212435233,
+          "claim_recall_merged": 0.9533678756476683,
+          "case_any_gold": 0.9625
+        },
+        "fact_number": {
+          "cases": 83,
+          "claims": 197,
+          "claims_served": 169,
+          "claim_recall": 0.8578680203045685,
+          "claim_recall_merged": 0.8781725888324873,
+          "case_any_gold": 0.9156626506024096
+        },
+        "follow_up": {
+          "cases": 51,
+          "claims": 119,
+          "claims_served": 100,
+          "claim_recall": 0.8403361344537815,
+          "claim_recall_merged": 0.8571428571428571,
+          "case_any_gold": 0.8431372549019608
+        },
+        "opinion": {
+          "cases": 83,
+          "claims": 189,
+          "claims_served": 153,
+          "claim_recall": 0.8095238095238095,
+          "claim_recall_merged": 0.8835978835978836,
+          "case_any_gold": 0.927710843373494
+        },
+        "temporal_comparison": {
+          "cases": 54,
+          "claims": 165,
+          "claims_served": 118,
+          "claim_recall": 0.7151515151515152,
+          "claim_recall_merged": 0.7151515151515152,
+          "case_any_gold": 0.9074074074074074
+        }
+      },
+      "latency_p50_ms": 1264.35,
+      "wall_p50_ms": 96.47,
+      "prompt_tokens_max": 10847,
+      "prompt_tokens_p50": 7679,
+      "passages_p50": 16,
+      "n_ctx_ok": true,
+      "tokens_left_min": 5537,
+      "hard_negatives_passed": 36,
+      "hard_negatives_n": 40
+    },
+    "combo16r30": {
+      "pooled": {
+        "cases": 359,
+        "claims": 875,
+        "claims_served": 748,
+        "claim_recall": 0.8548571428571429,
+        "claim_recall_merged": 0.8948571428571429,
+        "case_any_gold": 0.9387186629526463
+      },
+      "per_set": {
+        "dev_cases": {
+          "cases": 71,
+          "claims": 95,
+          "claims_served": 90,
+          "claim_recall": 0.9473684210526315,
+          "claim_recall_merged": 0.968421052631579,
+          "case_any_gold": 0.9577464788732394
+        },
+        "devpl": {
+          "cases": 37,
+          "claims": 110,
+          "claims_served": 84,
+          "claim_recall": 0.7636363636363637,
+          "claim_recall_merged": 0.8272727272727273,
+          "case_any_gold": 0.9459459459459459
+        },
+        "heldout_v3": {
+          "cases": 34,
+          "claims": 41,
+          "claims_served": 39,
+          "claim_recall": 0.9512195121951219,
+          "claim_recall_merged": 0.9512195121951219,
+          "case_any_gold": 0.9705882352941176
+        },
+        "heldout_v4": {
+          "cases": 34,
+          "claims": 60,
+          "claims_served": 56,
+          "claim_recall": 0.9333333333333333,
+          "claim_recall_merged": 0.9333333333333333,
+          "case_any_gold": 0.9411764705882353
+        },
+        "heldout_v5a": {
+          "cases": 52,
+          "claims": 149,
+          "claims_served": 123,
+          "claim_recall": 0.825503355704698,
+          "claim_recall_merged": 0.8657718120805369,
+          "case_any_gold": 0.9038461538461539
+        },
+        "heldout_v5b": {
+          "cases": 52,
+          "claims": 150,
+          "claims_served": 127,
+          "claim_recall": 0.8466666666666667,
+          "claim_recall_merged": 0.8866666666666667,
+          "case_any_gold": 0.9230769230769231
+        },
+        "heldout_v6a": {
+          "cases": 38,
+          "claims": 118,
+          "claims_served": 99,
+          "claim_recall": 0.8389830508474576,
+          "claim_recall_merged": 0.9067796610169492,
+          "case_any_gold": 0.9473684210526315
+        },
+        "heldout_v6b": {
+          "cases": 41,
+          "claims": 152,
+          "claims_served": 130,
+          "claim_recall": 0.8552631578947368,
+          "claim_recall_merged": 0.8947368421052632,
+          "case_any_gold": 0.926829268292683
+        }
+      },
+      "per_type": {
+        "answerable": {
+          "cases": 8,
+          "claims": 12,
+          "claims_served": 10,
+          "claim_recall": 0.8333333333333334,
+          "claim_recall_merged": 0.8333333333333334,
+          "case_any_gold": 0.875
+        },
+        "company": {
+          "cases": 80,
+          "claims": 193,
+          "claims_served": 175,
+          "claim_recall": 0.9067357512953368,
+          "claim_recall_merged": 0.9689119170984456,
+          "case_any_gold": 0.9875
+        },
+        "fact_number": {
+          "cases": 83,
+          "claims": 197,
+          "claims_served": 168,
+          "claim_recall": 0.8527918781725888,
+          "claim_recall_merged": 0.8883248730964467,
+          "case_any_gold": 0.9156626506024096
+        },
+        "follow_up": {
+          "cases": 51,
+          "claims": 119,
+          "claims_served": 108,
+          "claim_recall": 0.907563025210084,
+          "claim_recall_merged": 0.907563025210084,
+          "case_any_gold": 0.9019607843137255
+        },
+        "opinion": {
+          "cases": 83,
+          "claims": 189,
+          "claims_served": 157,
+          "claim_recall": 0.8306878306878307,
+          "claim_recall_merged": 0.91005291005291,
+          "case_any_gold": 0.9518072289156626
+        },
+        "temporal_comparison": {
+          "cases": 54,
+          "claims": 165,
+          "claims_served": 130,
+          "claim_recall": 0.7878787878787878,
+          "claim_recall_merged": 0.793939393939394,
+          "case_any_gold": 0.9259259259259259
+        }
+      },
+      "latency_p50_ms": 2146.03,
+      "wall_p50_ms": 283.7,
+      "prompt_tokens_max": 13332,
+      "prompt_tokens_p50": 7638,
+      "passages_p50": 16,
+      "n_ctx_ok": true,
+      "tokens_left_min": 3052,
+      "hard_negatives_passed": 36,
+      "hard_negatives_n": 40
+    },
+    "combo20r30": {
+      "pooled": {
+        "cases": 359,
+        "claims": 875,
+        "claims_served": 757,
+        "claim_recall": 0.8651428571428571,
+        "claim_recall_merged": 0.8994285714285715,
+        "case_any_gold": 0.947075208913649
+      },
+      "per_set": {
+        "dev_cases": {
+          "cases": 71,
+          "claims": 95,
+          "claims_served": 91,
+          "claim_recall": 0.9578947368421052,
+          "claim_recall_merged": 0.968421052631579,
+          "case_any_gold": 0.971830985915493
+        },
+        "devpl": {
+          "cases": 37,
+          "claims": 110,
+          "claims_served": 87,
+          "claim_recall": 0.7909090909090909,
+          "claim_recall_merged": 0.8363636363636363,
+          "case_any_gold": 0.9459459459459459
+        },
+        "heldout_v3": {
+          "cases": 34,
+          "claims": 41,
+          "claims_served": 40,
+          "claim_recall": 0.975609756097561,
+          "claim_recall_merged": 0.975609756097561,
+          "case_any_gold": 1.0
+        },
+        "heldout_v4": {
+          "cases": 34,
+          "claims": 60,
+          "claims_served": 56,
+          "claim_recall": 0.9333333333333333,
+          "claim_recall_merged": 0.9333333333333333,
+          "case_any_gold": 0.9411764705882353
+        },
+        "heldout_v5a": {
+          "cases": 52,
+          "claims": 149,
+          "claims_served": 127,
+          "claim_recall": 0.8523489932885906,
+          "claim_recall_merged": 0.8791946308724832,
+          "case_any_gold": 0.9230769230769231
+        },
+        "heldout_v5b": {
+          "cases": 52,
+          "claims": 150,
+          "claims_served": 127,
+          "claim_recall": 0.8466666666666667,
+          "claim_recall_merged": 0.8866666666666667,
+          "case_any_gold": 0.9230769230769231
+        },
+        "heldout_v6a": {
+          "cases": 38,
+          "claims": 118,
+          "claims_served": 99,
+          "claim_recall": 0.8389830508474576,
+          "claim_recall_merged": 0.9067796610169492,
+          "case_any_gold": 0.9473684210526315
+        },
+        "heldout_v6b": {
+          "cases": 41,
+          "claims": 152,
+          "claims_served": 130,
+          "claim_recall": 0.8552631578947368,
+          "claim_recall_merged": 0.8947368421052632,
+          "case_any_gold": 0.926829268292683
+        }
+      },
+      "per_type": {
+        "answerable": {
+          "cases": 8,
+          "claims": 12,
+          "claims_served": 10,
+          "claim_recall": 0.8333333333333334,
+          "claim_recall_merged": 0.8333333333333334,
+          "case_any_gold": 0.875
+        },
+        "company": {
+          "cases": 80,
+          "claims": 193,
+          "claims_served": 175,
+          "claim_recall": 0.9067357512953368,
+          "claim_recall_merged": 0.9689119170984456,
+          "case_any_gold": 0.9875
+        },
+        "fact_number": {
+          "cases": 83,
+          "claims": 197,
+          "claims_served": 171,
+          "claim_recall": 0.868020304568528,
+          "claim_recall_merged": 0.8934010152284264,
+          "case_any_gold": 0.9156626506024096
+        },
+        "follow_up": {
+          "cases": 51,
+          "claims": 119,
+          "claims_served": 109,
+          "claim_recall": 0.9159663865546218,
+          "claim_recall_merged": 0.9159663865546218,
+          "case_any_gold": 0.9215686274509803
+        },
+        "opinion": {
+          "cases": 83,
+          "claims": 189,
+          "claims_served": 159,
+          "claim_recall": 0.8412698412698413,
+          "claim_recall_merged": 0.91005291005291,
+          "case_any_gold": 0.963855421686747
+        },
+        "temporal_comparison": {
+          "cases": 54,
+          "claims": 165,
+          "claims_served": 133,
+          "claim_recall": 0.806060606060606,
+          "claim_recall_merged": 0.806060606060606,
+          "case_any_gold": 0.9444444444444444
+        }
+      },
+      "latency_p50_ms": 2101.32,
+      "wall_p50_ms": 89.14,
+      "prompt_tokens_max": 16407,
+      "prompt_tokens_p50": 9326,
+      "passages_p50": 20,
+      "n_ctx_ok": false,
+      "tokens_left_min": -23,
+      "hard_negatives_passed": 36,
+      "hard_negatives_n": 40
+    },
+    "dedup0": {
+      "pooled": {
+        "cases": 359,
+        "claims": 875,
+        "claims_served": 685,
+        "claim_recall": 0.7828571428571428,
+        "claim_recall_merged": 0.8331428571428572,
+        "case_any_gold": 0.8885793871866295
+      },
+      "per_set": {
+        "dev_cases": {
+          "cases": 71,
+          "claims": 95,
+          "claims_served": 89,
+          "claim_recall": 0.9368421052631579,
+          "claim_recall_merged": 0.9578947368421052,
+          "case_any_gold": 0.9436619718309859
+        },
+        "devpl": {
+          "cases": 37,
+          "claims": 110,
+          "claims_served": 67,
+          "claim_recall": 0.6090909090909091,
+          "claim_recall_merged": 0.7090909090909091,
+          "case_any_gold": 0.8108108108108109
+        },
+        "heldout_v3": {
+          "cases": 34,
+          "claims": 41,
+          "claims_served": 32,
+          "claim_recall": 0.7804878048780488,
+          "claim_recall_merged": 0.8536585365853658,
+          "case_any_gold": 0.7941176470588235
+        },
+        "heldout_v4": {
+          "cases": 34,
+          "claims": 60,
+          "claims_served": 54,
+          "claim_recall": 0.9,
+          "claim_recall_merged": 0.9,
+          "case_any_gold": 0.9117647058823529
+        },
+        "heldout_v5a": {
+          "cases": 52,
+          "claims": 149,
+          "claims_served": 112,
+          "claim_recall": 0.7516778523489933,
+          "claim_recall_merged": 0.8187919463087249,
+          "case_any_gold": 0.8653846153846154
+        },
+        "heldout_v5b": {
+          "cases": 52,
+          "claims": 150,
+          "claims_served": 124,
+          "claim_recall": 0.8266666666666667,
+          "claim_recall_merged": 0.8666666666666667,
+          "case_any_gold": 0.9038461538461539
+        },
+        "heldout_v6a": {
+          "cases": 38,
+          "claims": 118,
+          "claims_served": 88,
+          "claim_recall": 0.7457627118644068,
+          "claim_recall_merged": 0.7966101694915254,
+          "case_any_gold": 0.8947368421052632
+        },
+        "heldout_v6b": {
+          "cases": 41,
+          "claims": 152,
+          "claims_served": 119,
+          "claim_recall": 0.7828947368421053,
+          "claim_recall_merged": 0.8223684210526315,
+          "case_any_gold": 0.926829268292683
+        }
+      },
+      "per_type": {
+        "answerable": {
+          "cases": 8,
+          "claims": 12,
+          "claims_served": 10,
+          "claim_recall": 0.8333333333333334,
+          "claim_recall_merged": 0.8333333333333334,
+          "case_any_gold": 0.875
+        },
+        "company": {
+          "cases": 80,
+          "claims": 193,
+          "claims_served": 158,
+          "claim_recall": 0.8186528497409327,
+          "claim_recall_merged": 0.8860103626943006,
+          "case_any_gold": 0.925
+        },
+        "fact_number": {
+          "cases": 83,
+          "claims": 197,
+          "claims_served": 161,
+          "claim_recall": 0.817258883248731,
+          "claim_recall_merged": 0.8781725888324873,
+          "case_any_gold": 0.891566265060241
+        },
+        "follow_up": {
+          "cases": 51,
+          "claims": 119,
+          "claims_served": 105,
+          "claim_recall": 0.8823529411764706,
+          "claim_recall_merged": 0.8823529411764706,
+          "case_any_gold": 0.8823529411764706
+        },
+        "opinion": {
+          "cases": 83,
+          "claims": 189,
+          "claims_served": 141,
+          "claim_recall": 0.746031746031746,
+          "claim_recall_merged": 0.8412698412698413,
+          "case_any_gold": 0.8795180722891566
+        },
+        "temporal_comparison": {
+          "cases": 54,
+          "claims": 165,
+          "claims_served": 110,
+          "claim_recall": 0.6666666666666666,
+          "claim_recall_merged": 0.6727272727272727,
+          "case_any_gold": 0.8518518518518519
+        }
+      },
+      "latency_p50_ms": 779.18,
+      "wall_p50_ms": 43.93,
+      "prompt_tokens_max": 7389,
+      "prompt_tokens_p50": 4386,
+      "passages_p50": 8,
+      "n_ctx_ok": true,
+      "tokens_left_min": 803,
+      "hard_negatives_passed": 36,
+      "hard_negatives_n": 40
+    },
+    "densew15": {
+      "pooled": {
+        "cases": 359,
+        "claims": 875,
+        "claims_served": 668,
+        "claim_recall": 0.7634285714285715,
+        "claim_recall_merged": 0.8228571428571428,
+        "case_any_gold": 0.8662952646239555
+      },
+      "per_set": {
+        "dev_cases": {
+          "cases": 71,
+          "claims": 95,
+          "claims_served": 87,
+          "claim_recall": 0.9157894736842105,
+          "claim_recall_merged": 0.9368421052631579,
+          "case_any_gold": 0.9154929577464789
+        },
+        "devpl": {
+          "cases": 37,
+          "claims": 110,
+          "claims_served": 63,
+          "claim_recall": 0.5727272727272728,
+          "claim_recall_merged": 0.6818181818181818,
+          "case_any_gold": 0.7567567567567568
+        },
+        "heldout_v3": {
+          "cases": 34,
+          "claims": 41,
+          "claims_served": 32,
+          "claim_recall": 0.7804878048780488,
+          "claim_recall_merged": 0.8536585365853658,
+          "case_any_gold": 0.7941176470588235
+        },
+        "heldout_v4": {
+          "cases": 34,
+          "claims": 60,
+          "claims_served": 52,
+          "claim_recall": 0.8666666666666667,
+          "claim_recall_merged": 0.8666666666666667,
+          "case_any_gold": 0.8823529411764706
+        },
+        "heldout_v5a": {
+          "cases": 52,
+          "claims": 149,
+          "claims_served": 114,
+          "claim_recall": 0.7651006711409396,
+          "claim_recall_merged": 0.8187919463087249,
+          "case_any_gold": 0.8653846153846154
+        },
+        "heldout_v5b": {
+          "cases": 52,
+          "claims": 150,
+          "claims_served": 115,
+          "claim_recall": 0.7666666666666667,
+          "claim_recall_merged": 0.8466666666666667,
+          "case_any_gold": 0.8461538461538461
+        },
+        "heldout_v6a": {
+          "cases": 38,
+          "claims": 118,
+          "claims_served": 88,
+          "claim_recall": 0.7457627118644068,
+          "claim_recall_merged": 0.8305084745762712,
+          "case_any_gold": 0.9210526315789473
+        },
+        "heldout_v6b": {
+          "cases": 41,
+          "claims": 152,
+          "claims_served": 117,
+          "claim_recall": 0.7697368421052632,
+          "claim_recall_merged": 0.8026315789473685,
+          "case_any_gold": 0.9024390243902439
+        }
+      },
+      "per_type": {
+        "answerable": {
+          "cases": 8,
+          "claims": 12,
+          "claims_served": 9,
+          "claim_recall": 0.75,
+          "claim_recall_merged": 0.75,
+          "case_any_gold": 0.75
+        },
+        "company": {
+          "cases": 80,
+          "claims": 193,
+          "claims_served": 157,
+          "claim_recall": 0.8134715025906736,
+          "claim_recall_merged": 0.8860103626943006,
+          "case_any_gold": 0.925
+        },
+        "fact_number": {
+          "cases": 83,
+          "claims": 197,
+          "claims_served": 158,
+          "claim_recall": 0.8020304568527918,
+          "claim_recall_merged": 0.8527918781725888,
+          "case_any_gold": 0.8674698795180723
+        },
+        "follow_up": {
+          "cases": 51,
+          "claims": 119,
+          "claims_served": 99,
+          "claim_recall": 0.8319327731092437,
+          "claim_recall_merged": 0.8319327731092437,
+          "case_any_gold": 0.8431372549019608
+        },
+        "opinion": {
+          "cases": 83,
+          "claims": 189,
+          "claims_served": 137,
+          "claim_recall": 0.7248677248677249,
+          "claim_recall_merged": 0.8624338624338624,
+          "case_any_gold": 0.8674698795180723
+        },
+        "temporal_comparison": {
+          "cases": 54,
+          "claims": 165,
+          "claims_served": 108,
+          "claim_recall": 0.6545454545454545,
+          "claim_recall_merged": 0.6666666666666666,
+          "case_any_gold": 0.8148148148148148
+        }
+      },
+      "latency_p50_ms": 859.98,
+      "wall_p50_ms": 201.2,
+      "prompt_tokens_max": 7389,
+      "prompt_tokens_p50": 4415,
+      "passages_p50": 8,
+      "n_ctx_ok": true,
+      "tokens_left_min": 803,
+      "hard_negatives_passed": 37,
+      "hard_negatives_n": 40
+    },
+    "fu2": {
+      "pooled": {
+        "cases": 359,
+        "claims": 875,
+        "claims_served": 685,
+        "claim_recall": 0.7828571428571428,
+        "claim_recall_merged": 0.8331428571428572,
+        "case_any_gold": 0.8885793871866295
+      },
+      "per_set": {
+        "dev_cases": {
+          "cases": 71,
+          "claims": 95,
+          "claims_served": 89,
+          "claim_recall": 0.9368421052631579,
+          "claim_recall_merged": 0.9578947368421052,
+          "case_any_gold": 0.9436619718309859
+        },
+        "devpl": {
+          "cases": 37,
+          "claims": 110,
+          "claims_served": 67,
+          "claim_recall": 0.6090909090909091,
+          "claim_recall_merged": 0.7090909090909091,
+          "case_any_gold": 0.8108108108108109
+        },
+        "heldout_v3": {
+          "cases": 34,
+          "claims": 41,
+          "claims_served": 32,
+          "claim_recall": 0.7804878048780488,
+          "claim_recall_merged": 0.8536585365853658,
+          "case_any_gold": 0.7941176470588235
+        },
+        "heldout_v4": {
+          "cases": 34,
+          "claims": 60,
+          "claims_served": 54,
+          "claim_recall": 0.9,
+          "claim_recall_merged": 0.9,
+          "case_any_gold": 0.9117647058823529
+        },
+        "heldout_v5a": {
+          "cases": 52,
+          "claims": 149,
+          "claims_served": 112,
+          "claim_recall": 0.7516778523489933,
+          "claim_recall_merged": 0.8187919463087249,
+          "case_any_gold": 0.8653846153846154
+        },
+        "heldout_v5b": {
+          "cases": 52,
+          "claims": 150,
+          "claims_served": 124,
+          "claim_recall": 0.8266666666666667,
+          "claim_recall_merged": 0.8666666666666667,
+          "case_any_gold": 0.9038461538461539
+        },
+        "heldout_v6a": {
+          "cases": 38,
+          "claims": 118,
+          "claims_served": 88,
+          "claim_recall": 0.7457627118644068,
+          "claim_recall_merged": 0.7966101694915254,
+          "case_any_gold": 0.8947368421052632
+        },
+        "heldout_v6b": {
+          "cases": 41,
+          "claims": 152,
+          "claims_served": 119,
+          "claim_recall": 0.7828947368421053,
+          "claim_recall_merged": 0.8223684210526315,
+          "case_any_gold": 0.926829268292683
+        }
+      },
+      "per_type": {
+        "answerable": {
+          "cases": 8,
+          "claims": 12,
+          "claims_served": 10,
+          "claim_recall": 0.8333333333333334,
+          "claim_recall_merged": 0.8333333333333334,
+          "case_any_gold": 0.875
+        },
+        "company": {
+          "cases": 80,
+          "claims": 193,
+          "claims_served": 158,
+          "claim_recall": 0.8186528497409327,
+          "claim_recall_merged": 0.8860103626943006,
+          "case_any_gold": 0.925
+        },
+        "fact_number": {
+          "cases": 83,
+          "claims": 197,
+          "claims_served": 161,
+          "claim_recall": 0.817258883248731,
+          "claim_recall_merged": 0.8781725888324873,
+          "case_any_gold": 0.891566265060241
+        },
+        "follow_up": {
+          "cases": 51,
+          "claims": 119,
+          "claims_served": 105,
+          "claim_recall": 0.8823529411764706,
+          "claim_recall_merged": 0.8823529411764706,
+          "case_any_gold": 0.8823529411764706
+        },
+        "opinion": {
+          "cases": 83,
+          "claims": 189,
+          "claims_served": 141,
+          "claim_recall": 0.746031746031746,
+          "claim_recall_merged": 0.8412698412698413,
+          "case_any_gold": 0.8795180722891566
+        },
+        "temporal_comparison": {
+          "cases": 54,
+          "claims": 165,
+          "claims_served": 110,
+          "claim_recall": 0.6666666666666666,
+          "claim_recall_merged": 0.6727272727272727,
+          "case_any_gold": 0.8518518518518519
+        }
+      },
+      "latency_p50_ms": 1286.2,
+      "wall_p50_ms": 766.85,
+      "prompt_tokens_max": 7389,
+      "prompt_tokens_p50": 4386,
+      "passages_p50": 8,
+      "n_ctx_ok": true,
+      "tokens_left_min": 803,
+      "hard_negatives_passed": 36,
+      "hard_negatives_n": 40
+    },
+    "fualways": {
+      "pooled": {
+        "cases": 359,
+        "claims": 875,
+        "claims_served": 684,
+        "claim_recall": 0.7817142857142857,
+        "claim_recall_merged": 0.832,
+        "case_any_gold": 0.8885793871866295
+      },
+      "per_set": {
+        "dev_cases": {
+          "cases": 71,
+          "claims": 95,
+          "claims_served": 89,
+          "claim_recall": 0.9368421052631579,
+          "claim_recall_merged": 0.9578947368421052,
+          "case_any_gold": 0.9436619718309859
+        },
+        "devpl": {
+          "cases": 37,
+          "claims": 110,
+          "claims_served": 67,
+          "claim_recall": 0.6090909090909091,
+          "claim_recall_merged": 0.7090909090909091,
+          "case_any_gold": 0.8108108108108109
+        },
+        "heldout_v3": {
+          "cases": 34,
+          "claims": 41,
+          "claims_served": 32,
+          "claim_recall": 0.7804878048780488,
+          "claim_recall_merged": 0.8536585365853658,
+          "case_any_gold": 0.7941176470588235
+        },
+        "heldout_v4": {
+          "cases": 34,
+          "claims": 60,
+          "claims_served": 54,
+          "claim_recall": 0.9,
+          "claim_recall_merged": 0.9,
+          "case_any_gold": 0.9117647058823529
+        },
+        "heldout_v5a": {
+          "cases": 52,
+          "claims": 149,
+          "claims_served": 109,
+          "claim_recall": 0.7315436241610739,
+          "claim_recall_merged": 0.7986577181208053,
+          "case_any_gold": 0.8461538461538461
+        },
+        "heldout_v5b": {
+          "cases": 52,
+          "claims": 150,
+          "claims_served": 124,
+          "claim_recall": 0.8266666666666667,
+          "claim_recall_merged": 0.8666666666666667,
+          "case_any_gold": 0.9038461538461539
+        },
+        "heldout_v6a": {
+          "cases": 38,
+          "claims": 118,
+          "claims_served": 90,
+          "claim_recall": 0.7627118644067796,
+          "claim_recall_merged": 0.8135593220338984,
+          "case_any_gold": 0.9210526315789473
+        },
+        "heldout_v6b": {
+          "cases": 41,
+          "claims": 152,
+          "claims_served": 119,
+          "claim_recall": 0.7828947368421053,
+          "claim_recall_merged": 0.8223684210526315,
+          "case_any_gold": 0.926829268292683
+        }
+      },
+      "per_type": {
+        "answerable": {
+          "cases": 8,
+          "claims": 12,
+          "claims_served": 10,
+          "claim_recall": 0.8333333333333334,
+          "claim_recall_merged": 0.8333333333333334,
+          "case_any_gold": 0.875
+        },
+        "company": {
+          "cases": 80,
+          "claims": 193,
+          "claims_served": 158,
+          "claim_recall": 0.8186528497409327,
+          "claim_recall_merged": 0.8860103626943006,
+          "case_any_gold": 0.925
+        },
+        "fact_number": {
+          "cases": 83,
+          "claims": 197,
+          "claims_served": 161,
+          "claim_recall": 0.817258883248731,
+          "claim_recall_merged": 0.8781725888324873,
+          "case_any_gold": 0.891566265060241
+        },
+        "follow_up": {
+          "cases": 51,
+          "claims": 119,
+          "claims_served": 104,
+          "claim_recall": 0.8739495798319328,
+          "claim_recall_merged": 0.8739495798319328,
+          "case_any_gold": 0.8823529411764706
+        },
+        "opinion": {
+          "cases": 83,
+          "claims": 189,
+          "claims_served": 141,
+          "claim_recall": 0.746031746031746,
+          "claim_recall_merged": 0.8412698412698413,
+          "case_any_gold": 0.8795180722891566
+        },
+        "temporal_comparison": {
+          "cases": 54,
+          "claims": 165,
+          "claims_served": 110,
+          "claim_recall": 0.6666666666666666,
+          "claim_recall_merged": 0.6727272727272727,
+          "case_any_gold": 0.8518518518518519
+        }
+      },
+      "latency_p50_ms": 1303.2,
+      "wall_p50_ms": 876.86,
+      "prompt_tokens_max": 7389,
+      "prompt_tokens_p50": 4373,
+      "passages_p50": 8,
+      "n_ctx_ok": true,
+      "tokens_left_min": 803,
+      "hard_negatives_passed": 36,
+      "hard_negatives_n": 40
+    },
+    "n12p10": {
+      "pooled": {
+        "cases": 359,
+        "claims": 875,
+        "claims_served": 692,
+        "claim_recall": 0.7908571428571428,
+        "claim_recall_merged": 0.84,
+        "case_any_gold": 0.8941504178272981
+      },
+      "per_set": {
+        "dev_cases": {
+          "cases": 71,
+          "claims": 95,
+          "claims_served": 90,
+          "claim_recall": 0.9473684210526315,
+          "claim_recall_merged": 0.968421052631579,
+          "case_any_gold": 0.9577464788732394
+        },
+        "devpl": {
+          "cases": 37,
+          "claims": 110,
+          "claims_served": 69,
+          "claim_recall": 0.6272727272727273,
+          "claim_recall_merged": 0.7181818181818181,
+          "case_any_gold": 0.8108108108108109
+        },
+        "heldout_v3": {
+          "cases": 34,
+          "claims": 41,
+          "claims_served": 34,
+          "claim_recall": 0.8292682926829268,
+          "claim_recall_merged": 0.9024390243902439,
+          "case_any_gold": 0.8235294117647058
+        },
+        "heldout_v4": {
+          "cases": 34,
+          "claims": 60,
+          "claims_served": 54,
+          "claim_recall": 0.9,
+          "claim_recall_merged": 0.9,
+          "case_any_gold": 0.9117647058823529
+        },
+        "heldout_v5a": {
+          "cases": 52,
+          "claims": 149,
+          "claims_served": 112,
+          "claim_recall": 0.7516778523489933,
+          "claim_recall_merged": 0.8187919463087249,
+          "case_any_gold": 0.8653846153846154
+        },
+        "heldout_v5b": {
+          "cases": 52,
+          "claims": 150,
+          "claims_served": 124,
+          "claim_recall": 0.8266666666666667,
+          "claim_recall_merged": 0.8666666666666667,
+          "case_any_gold": 0.9038461538461539
+        },
+        "heldout_v6a": {
+          "cases": 38,
+          "claims": 118,
+          "claims_served": 89,
+          "claim_recall": 0.7542372881355932,
+          "claim_recall_merged": 0.7966101694915254,
+          "case_any_gold": 0.8947368421052632
+        },
+        "heldout_v6b": {
+          "cases": 41,
+          "claims": 152,
+          "claims_served": 120,
+          "claim_recall": 0.7894736842105263,
+          "claim_recall_merged": 0.8355263157894737,
+          "case_any_gold": 0.926829268292683
+        }
+      },
+      "per_type": {
+        "answerable": {
+          "cases": 8,
+          "claims": 12,
+          "claims_served": 10,
+          "claim_recall": 0.8333333333333334,
+          "claim_recall_merged": 0.8333333333333334,
+          "case_any_gold": 0.875
+        },
+        "company": {
+          "cases": 80,
+          "claims": 193,
+          "claims_served": 158,
+          "claim_recall": 0.8186528497409327,
+          "claim_recall_merged": 0.8860103626943006,
+          "case_any_gold": 0.925
+        },
+        "fact_number": {
+          "cases": 83,
+          "claims": 197,
+          "claims_served": 164,
+          "claim_recall": 0.8324873096446701,
+          "claim_recall_merged": 0.8883248730964467,
+          "case_any_gold": 0.9036144578313253
+        },
+        "follow_up": {
+          "cases": 51,
+          "claims": 119,
+          "claims_served": 105,
+          "claim_recall": 0.8823529411764706,
+          "claim_recall_merged": 0.8823529411764706,
+          "case_any_gold": 0.8823529411764706
+        },
+        "opinion": {
+          "cases": 83,
+          "claims": 189,
+          "claims_served": 144,
+          "claim_recall": 0.7619047619047619,
+          "claim_recall_merged": 0.8571428571428571,
+          "case_any_gold": 0.891566265060241
+        },
+        "temporal_comparison": {
+          "cases": 54,
+          "claims": 165,
+          "claims_served": 111,
+          "claim_recall": 0.6727272727272727,
+          "claim_recall_merged": 0.6787878787878788,
+          "case_any_gold": 0.8518518518518519
+        }
+      },
+      "latency_p50_ms": 759.23,
+      "wall_p50_ms": 41.95,
+      "prompt_tokens_max": 8243,
+      "prompt_tokens_p50": 5185,
+      "passages_p50": 10,
+      "n_ctx_ok": true,
+      "tokens_left_min": 4045,
+      "hard_negatives_passed": 36,
+      "hard_negatives_n": 40
+    },
+    "n12p12": {
+      "pooled": {
+        "cases": 359,
+        "claims": 875,
+        "claims_served": 693,
+        "claim_recall": 0.792,
+        "claim_recall_merged": 0.8411428571428572,
+        "case_any_gold": 0.8969359331476323
+      },
+      "per_set": {
+        "dev_cases": {
+          "cases": 71,
+          "claims": 95,
+          "claims_served": 90,
+          "claim_recall": 0.9473684210526315,
+          "claim_recall_merged": 0.968421052631579,
+          "case_any_gold": 0.9577464788732394
+        },
+        "devpl": {
+          "cases": 37,
+          "claims": 110,
+          "claims_served": 70,
+          "claim_recall": 0.6363636363636364,
+          "claim_recall_merged": 0.7272727272727273,
+          "case_any_gold": 0.8378378378378378
+        },
+        "heldout_v3": {
+          "cases": 34,
+          "claims": 41,
+          "claims_served": 34,
+          "claim_recall": 0.8292682926829268,
+          "claim_recall_merged": 0.9024390243902439,
+          "case_any_gold": 0.8235294117647058
+        },
+        "heldout_v4": {
+          "cases": 34,
+          "claims": 60,
+          "claims_served": 54,
+          "claim_recall": 0.9,
+          "claim_recall_merged": 0.9,
+          "case_any_gold": 0.9117647058823529
+        },
+        "heldout_v5a": {
+          "cases": 52,
+          "claims": 149,
+          "claims_served": 112,
+          "claim_recall": 0.7516778523489933,
+          "claim_recall_merged": 0.8187919463087249,
+          "case_any_gold": 0.8653846153846154
+        },
+        "heldout_v5b": {
+          "cases": 52,
+          "claims": 150,
+          "claims_served": 124,
+          "claim_recall": 0.8266666666666667,
+          "claim_recall_merged": 0.8666666666666667,
+          "case_any_gold": 0.9038461538461539
+        },
+        "heldout_v6a": {
+          "cases": 38,
+          "claims": 118,
+          "claims_served": 89,
+          "claim_recall": 0.7542372881355932,
+          "claim_recall_merged": 0.7966101694915254,
+          "case_any_gold": 0.8947368421052632
+        },
+        "heldout_v6b": {
+          "cases": 41,
+          "claims": 152,
+          "claims_served": 120,
+          "claim_recall": 0.7894736842105263,
+          "claim_recall_merged": 0.8355263157894737,
+          "case_any_gold": 0.926829268292683
+        }
+      },
+      "per_type": {
+        "answerable": {
+          "cases": 8,
+          "claims": 12,
+          "claims_served": 10,
+          "claim_recall": 0.8333333333333334,
+          "claim_recall_merged": 0.8333333333333334,
+          "case_any_gold": 0.875
+        },
+        "company": {
+          "cases": 80,
+          "claims": 193,
+          "claims_served": 158,
+          "claim_recall": 0.8186528497409327,
+          "claim_recall_merged": 0.8860103626943006,
+          "case_any_gold": 0.925
+        },
+        "fact_number": {
+          "cases": 83,
+          "claims": 197,
+          "claims_served": 164,
+          "claim_recall": 0.8324873096446701,
+          "claim_recall_merged": 0.8883248730964467,
+          "case_any_gold": 0.9036144578313253
+        },
+        "follow_up": {
+          "cases": 51,
+          "claims": 119,
+          "claims_served": 105,
+          "claim_recall": 0.8823529411764706,
+          "claim_recall_merged": 0.8823529411764706,
+          "case_any_gold": 0.8823529411764706
+        },
+        "opinion": {
+          "cases": 83,
+          "claims": 189,
+          "claims_served": 144,
+          "claim_recall": 0.7619047619047619,
+          "claim_recall_merged": 0.8571428571428571,
+          "case_any_gold": 0.891566265060241
+        },
+        "temporal_comparison": {
+          "cases": 54,
+          "claims": 165,
+          "claims_served": 112,
+          "claim_recall": 0.6787878787878788,
+          "claim_recall_merged": 0.6848484848484848,
+          "case_any_gold": 0.8703703703703703
+        }
+      },
+      "latency_p50_ms": 762.26,
+      "wall_p50_ms": 47.64,
+      "prompt_tokens_max": 9277,
+      "prompt_tokens_p50": 5969,
+      "passages_p50": 12,
+      "n_ctx_ok": true,
+      "tokens_left_min": 3011,
+      "hard_negatives_passed": 36,
+      "hard_negatives_n": 40
+    },
+    "n12p16": {
+      "pooled": {
+        "cases": 359,
+        "claims": 875,
+        "claims_served": 705,
+        "claim_recall": 0.8057142857142857,
+        "claim_recall_merged": 0.8571428571428571,
+        "case_any_gold": 0.9136490250696379
+      },
+      "per_set": {
+        "dev_cases": {
+          "cases": 71,
+          "claims": 95,
+          "claims_served": 91,
+          "claim_recall": 0.9578947368421052,
+          "claim_recall_merged": 0.968421052631579,
+          "case_any_gold": 0.971830985915493
+        },
+        "devpl": {
+          "cases": 37,
+          "claims": 110,
+          "claims_served": 73,
+          "claim_recall": 0.6636363636363637,
+          "claim_recall_merged": 0.7818181818181819,
+          "case_any_gold": 0.8648648648648649
+        },
+        "heldout_v3": {
+          "cases": 34,
+          "claims": 41,
+          "claims_served": 35,
+          "claim_recall": 0.8536585365853658,
+          "claim_recall_merged": 0.926829268292683,
+          "case_any_gold": 0.8529411764705882
+        },
+        "heldout_v4": {
+          "cases": 34,
+          "claims": 60,
+          "claims_served": 55,
+          "claim_recall": 0.9166666666666666,
+          "claim_recall_merged": 0.9166666666666666,
+          "case_any_gold": 0.9411764705882353
+        },
+        "heldout_v5a": {
+          "cases": 52,
+          "claims": 149,
+          "claims_served": 115,
+          "claim_recall": 0.7718120805369127,
+          "claim_recall_merged": 0.8322147651006712,
+          "case_any_gold": 0.8846153846153846
+        },
+        "heldout_v5b": {
+          "cases": 52,
+          "claims": 150,
+          "claims_served": 125,
+          "claim_recall": 0.8333333333333334,
+          "claim_recall_merged": 0.8733333333333333,
+          "case_any_gold": 0.9038461538461539
+        },
+        "heldout_v6a": {
+          "cases": 38,
+          "claims": 118,
+          "claims_served": 91,
+          "claim_recall": 0.7711864406779662,
+          "claim_recall_merged": 0.8220338983050848,
+          "case_any_gold": 0.9210526315789473
+        },
+        "heldout_v6b": {
+          "cases": 41,
+          "claims": 152,
+          "claims_served": 120,
+          "claim_recall": 0.7894736842105263,
+          "claim_recall_merged": 0.8355263157894737,
+          "case_any_gold": 0.926829268292683
+        }
+      },
+      "per_type": {
+        "answerable": {
+          "cases": 8,
+          "claims": 12,
+          "claims_served": 10,
+          "claim_recall": 0.8333333333333334,
+          "claim_recall_merged": 0.8333333333333334,
+          "case_any_gold": 0.875
+        },
+        "company": {
+          "cases": 80,
+          "claims": 193,
+          "claims_served": 160,
+          "claim_recall": 0.8290155440414507,
+          "claim_recall_merged": 0.9119170984455959,
+          "case_any_gold": 0.9375
+        },
+        "fact_number": {
+          "cases": 83,
+          "claims": 197,
+          "claims_served": 165,
+          "claim_recall": 0.8375634517766497,
+          "claim_recall_merged": 0.8883248730964467,
+          "case_any_gold": 0.9036144578313253
+        },
+        "follow_up": {
+          "cases": 51,
+          "claims": 119,
+          "claims_served": 106,
+          "claim_recall": 0.8907563025210085,
+          "claim_recall_merged": 0.8907563025210085,
+          "case_any_gold": 0.9019607843137255
+        },
+        "opinion": {
+          "cases": 83,
+          "claims": 189,
+          "claims_served": 147,
+          "claim_recall": 0.7777777777777778,
+          "claim_recall_merged": 0.873015873015873,
+          "case_any_gold": 0.9156626506024096
+        },
+        "temporal_comparison": {
+          "cases": 54,
+          "claims": 165,
+          "claims_served": 117,
+          "claim_recall": 0.7090909090909091,
+          "claim_recall_merged": 0.7151515151515152,
+          "case_any_gold": 0.9074074074074074
+        }
+      },
+      "latency_p50_ms": 856.71,
+      "wall_p50_ms": 161.9,
+      "prompt_tokens_max": 10847,
+      "prompt_tokens_p50": 7642,
+      "passages_p50": 16,
+      "n_ctx_ok": true,
+      "tokens_left_min": 1441,
+      "hard_negatives_passed": 36,
+      "hard_negatives_n": 40
+    },
+    "n12p8": {
+      "pooled": {
+        "cases": 359,
+        "claims": 875,
+        "claims_served": 685,
+        "claim_recall": 0.7828571428571428,
+        "claim_recall_merged": 0.8331428571428572,
+        "case_any_gold": 0.8885793871866295
+      },
+      "per_set": {
+        "dev_cases": {
+          "cases": 71,
+          "claims": 95,
+          "claims_served": 89,
+          "claim_recall": 0.9368421052631579,
+          "claim_recall_merged": 0.9578947368421052,
+          "case_any_gold": 0.9436619718309859
+        },
+        "devpl": {
+          "cases": 37,
+          "claims": 110,
+          "claims_served": 67,
+          "claim_recall": 0.6090909090909091,
+          "claim_recall_merged": 0.7090909090909091,
+          "case_any_gold": 0.8108108108108109
+        },
+        "heldout_v3": {
+          "cases": 34,
+          "claims": 41,
+          "claims_served": 32,
+          "claim_recall": 0.7804878048780488,
+          "claim_recall_merged": 0.8536585365853658,
+          "case_any_gold": 0.7941176470588235
+        },
+        "heldout_v4": {
+          "cases": 34,
+          "claims": 60,
+          "claims_served": 54,
+          "claim_recall": 0.9,
+          "claim_recall_merged": 0.9,
+          "case_any_gold": 0.9117647058823529
+        },
+        "heldout_v5a": {
+          "cases": 52,
+          "claims": 149,
+          "claims_served": 112,
+          "claim_recall": 0.7516778523489933,
+          "claim_recall_merged": 0.8187919463087249,
+          "case_any_gold": 0.8653846153846154
+        },
+        "heldout_v5b": {
+          "cases": 52,
+          "claims": 150,
+          "claims_served": 124,
+          "claim_recall": 0.8266666666666667,
+          "claim_recall_merged": 0.8666666666666667,
+          "case_any_gold": 0.9038461538461539
+        },
+        "heldout_v6a": {
+          "cases": 38,
+          "claims": 118,
+          "claims_served": 88,
+          "claim_recall": 0.7457627118644068,
+          "claim_recall_merged": 0.7966101694915254,
+          "case_any_gold": 0.8947368421052632
+        },
+        "heldout_v6b": {
+          "cases": 41,
+          "claims": 152,
+          "claims_served": 119,
+          "claim_recall": 0.7828947368421053,
+          "claim_recall_merged": 0.8223684210526315,
+          "case_any_gold": 0.926829268292683
+        }
+      },
+      "per_type": {
+        "answerable": {
+          "cases": 8,
+          "claims": 12,
+          "claims_served": 10,
+          "claim_recall": 0.8333333333333334,
+          "claim_recall_merged": 0.8333333333333334,
+          "case_any_gold": 0.875
+        },
+        "company": {
+          "cases": 80,
+          "claims": 193,
+          "claims_served": 158,
+          "claim_recall": 0.8186528497409327,
+          "claim_recall_merged": 0.8860103626943006,
+          "case_any_gold": 0.925
+        },
+        "fact_number": {
+          "cases": 83,
+          "claims": 197,
+          "claims_served": 161,
+          "claim_recall": 0.817258883248731,
+          "claim_recall_merged": 0.8781725888324873,
+          "case_any_gold": 0.891566265060241
+        },
+        "follow_up": {
+          "cases": 51,
+          "claims": 119,
+          "claims_served": 105,
+          "claim_recall": 0.8823529411764706,
+          "claim_recall_merged": 0.8823529411764706,
+          "case_any_gold": 0.8823529411764706
+        },
+        "opinion": {
+          "cases": 83,
+          "claims": 189,
+          "claims_served": 141,
+          "claim_recall": 0.746031746031746,
+          "claim_recall_merged": 0.8412698412698413,
+          "case_any_gold": 0.8795180722891566
+        },
+        "temporal_comparison": {
+          "cases": 54,
+          "claims": 165,
+          "claims_served": 110,
+          "claim_recall": 0.6666666666666666,
+          "claim_recall_merged": 0.6727272727272727,
+          "case_any_gold": 0.8518518518518519
+        }
+      },
+      "latency_p50_ms": 758.92,
+      "wall_p50_ms": 45.8,
+      "prompt_tokens_max": 7389,
+      "prompt_tokens_p50": 4386,
+      "passages_p50": 8,
+      "n_ctx_ok": true,
+      "tokens_left_min": 4899,
+      "hard_negatives_passed": 36,
+      "hard_negatives_n": 40
+    },
+    "n16p10": {
+      "pooled": {
+        "cases": 359,
+        "claims": 875,
+        "claims_served": 692,
+        "claim_recall": 0.7908571428571428,
+        "claim_recall_merged": 0.84,
+        "case_any_gold": 0.8941504178272981
+      },
+      "per_set": {
+        "dev_cases": {
+          "cases": 71,
+          "claims": 95,
+          "claims_served": 90,
+          "claim_recall": 0.9473684210526315,
+          "claim_recall_merged": 0.968421052631579,
+          "case_any_gold": 0.9577464788732394
+        },
+        "devpl": {
+          "cases": 37,
+          "claims": 110,
+          "claims_served": 69,
+          "claim_recall": 0.6272727272727273,
+          "claim_recall_merged": 0.7181818181818181,
+          "case_any_gold": 0.8108108108108109
+        },
+        "heldout_v3": {
+          "cases": 34,
+          "claims": 41,
+          "claims_served": 34,
+          "claim_recall": 0.8292682926829268,
+          "claim_recall_merged": 0.9024390243902439,
+          "case_any_gold": 0.8235294117647058
+        },
+        "heldout_v4": {
+          "cases": 34,
+          "claims": 60,
+          "claims_served": 54,
+          "claim_recall": 0.9,
+          "claim_recall_merged": 0.9,
+          "case_any_gold": 0.9117647058823529
+        },
+        "heldout_v5a": {
+          "cases": 52,
+          "claims": 149,
+          "claims_served": 112,
+          "claim_recall": 0.7516778523489933,
+          "claim_recall_merged": 0.8187919463087249,
+          "case_any_gold": 0.8653846153846154
+        },
+        "heldout_v5b": {
+          "cases": 52,
+          "claims": 150,
+          "claims_served": 124,
+          "claim_recall": 0.8266666666666667,
+          "claim_recall_merged": 0.8666666666666667,
+          "case_any_gold": 0.9038461538461539
+        },
+        "heldout_v6a": {
+          "cases": 38,
+          "claims": 118,
+          "claims_served": 89,
+          "claim_recall": 0.7542372881355932,
+          "claim_recall_merged": 0.7966101694915254,
+          "case_any_gold": 0.8947368421052632
+        },
+        "heldout_v6b": {
+          "cases": 41,
+          "claims": 152,
+          "claims_served": 120,
+          "claim_recall": 0.7894736842105263,
+          "claim_recall_merged": 0.8355263157894737,
+          "case_any_gold": 0.926829268292683
+        }
+      },
+      "per_type": {
+        "answerable": {
+          "cases": 8,
+          "claims": 12,
+          "claims_served": 10,
+          "claim_recall": 0.8333333333333334,
+          "claim_recall_merged": 0.8333333333333334,
+          "case_any_gold": 0.875
+        },
+        "company": {
+          "cases": 80,
+          "claims": 193,
+          "claims_served": 158,
+          "claim_recall": 0.8186528497409327,
+          "claim_recall_merged": 0.8860103626943006,
+          "case_any_gold": 0.925
+        },
+        "fact_number": {
+          "cases": 83,
+          "claims": 197,
+          "claims_served": 164,
+          "claim_recall": 0.8324873096446701,
+          "claim_recall_merged": 0.8883248730964467,
+          "case_any_gold": 0.9036144578313253
+        },
+        "follow_up": {
+          "cases": 51,
+          "claims": 119,
+          "claims_served": 105,
+          "claim_recall": 0.8823529411764706,
+          "claim_recall_merged": 0.8823529411764706,
+          "case_any_gold": 0.8823529411764706
+        },
+        "opinion": {
+          "cases": 83,
+          "claims": 189,
+          "claims_served": 144,
+          "claim_recall": 0.7619047619047619,
+          "claim_recall_merged": 0.8571428571428571,
+          "case_any_gold": 0.891566265060241
+        },
+        "temporal_comparison": {
+          "cases": 54,
+          "claims": 165,
+          "claims_served": 111,
+          "claim_recall": 0.6727272727272727,
+          "claim_recall_merged": 0.6787878787878788,
+          "case_any_gold": 0.8518518518518519
+        }
+      },
+      "latency_p50_ms": 779.97,
+      "wall_p50_ms": 45.32,
+      "prompt_tokens_max": 8243,
+      "prompt_tokens_p50": 5185,
+      "passages_p50": 10,
+      "n_ctx_ok": true,
+      "tokens_left_min": 8141,
+      "hard_negatives_passed": 36,
+      "hard_negatives_n": 40
+    },
+    "n16p12": {
+      "pooled": {
+        "cases": 359,
+        "claims": 875,
+        "claims_served": 693,
+        "claim_recall": 0.792,
+        "claim_recall_merged": 0.8411428571428572,
+        "case_any_gold": 0.8969359331476323
+      },
+      "per_set": {
+        "dev_cases": {
+          "cases": 71,
+          "claims": 95,
+          "claims_served": 90,
+          "claim_recall": 0.9473684210526315,
+          "claim_recall_merged": 0.968421052631579,
+          "case_any_gold": 0.9577464788732394
+        },
+        "devpl": {
+          "cases": 37,
+          "claims": 110,
+          "claims_served": 70,
+          "claim_recall": 0.6363636363636364,
+          "claim_recall_merged": 0.7272727272727273,
+          "case_any_gold": 0.8378378378378378
+        },
+        "heldout_v3": {
+          "cases": 34,
+          "claims": 41,
+          "claims_served": 34,
+          "claim_recall": 0.8292682926829268,
+          "claim_recall_merged": 0.9024390243902439,
+          "case_any_gold": 0.8235294117647058
+        },
+        "heldout_v4": {
+          "cases": 34,
+          "claims": 60,
+          "claims_served": 54,
+          "claim_recall": 0.9,
+          "claim_recall_merged": 0.9,
+          "case_any_gold": 0.9117647058823529
+        },
+        "heldout_v5a": {
+          "cases": 52,
+          "claims": 149,
+          "claims_served": 112,
+          "claim_recall": 0.7516778523489933,
+          "claim_recall_merged": 0.8187919463087249,
+          "case_any_gold": 0.8653846153846154
+        },
+        "heldout_v5b": {
+          "cases": 52,
+          "claims": 150,
+          "claims_served": 124,
+          "claim_recall": 0.8266666666666667,
+          "claim_recall_merged": 0.8666666666666667,
+          "case_any_gold": 0.9038461538461539
+        },
+        "heldout_v6a": {
+          "cases": 38,
+          "claims": 118,
+          "claims_served": 89,
+          "claim_recall": 0.7542372881355932,
+          "claim_recall_merged": 0.7966101694915254,
+          "case_any_gold": 0.8947368421052632
+        },
+        "heldout_v6b": {
+          "cases": 41,
+          "claims": 152,
+          "claims_served": 120,
+          "claim_recall": 0.7894736842105263,
+          "claim_recall_merged": 0.8355263157894737,
+          "case_any_gold": 0.926829268292683
+        }
+      },
+      "per_type": {
+        "answerable": {
+          "cases": 8,
+          "claims": 12,
+          "claims_served": 10,
+          "claim_recall": 0.8333333333333334,
+          "claim_recall_merged": 0.8333333333333334,
+          "case_any_gold": 0.875
+        },
+        "company": {
+          "cases": 80,
+          "claims": 193,
+          "claims_served": 158,
+          "claim_recall": 0.8186528497409327,
+          "claim_recall_merged": 0.8860103626943006,
+          "case_any_gold": 0.925
+        },
+        "fact_number": {
+          "cases": 83,
+          "claims": 197,
+          "claims_served": 164,
+          "claim_recall": 0.8324873096446701,
+          "claim_recall_merged": 0.8883248730964467,
+          "case_any_gold": 0.9036144578313253
+        },
+        "follow_up": {
+          "cases": 51,
+          "claims": 119,
+          "claims_served": 105,
+          "claim_recall": 0.8823529411764706,
+          "claim_recall_merged": 0.8823529411764706,
+          "case_any_gold": 0.8823529411764706
+        },
+        "opinion": {
+          "cases": 83,
+          "claims": 189,
+          "claims_served": 144,
+          "claim_recall": 0.7619047619047619,
+          "claim_recall_merged": 0.8571428571428571,
+          "case_any_gold": 0.891566265060241
+        },
+        "temporal_comparison": {
+          "cases": 54,
+          "claims": 165,
+          "claims_served": 112,
+          "claim_recall": 0.6787878787878788,
+          "claim_recall_merged": 0.6848484848484848,
+          "case_any_gold": 0.8703703703703703
+        }
+      },
+      "latency_p50_ms": 779.9,
+      "wall_p50_ms": 44.73,
+      "prompt_tokens_max": 9277,
+      "prompt_tokens_p50": 5969,
+      "passages_p50": 12,
+      "n_ctx_ok": true,
+      "tokens_left_min": 7107,
+      "hard_negatives_passed": 36,
+      "hard_negatives_n": 40
+    },
+    "n16p16": {
+      "pooled": {
+        "cases": 359,
+        "claims": 875,
+        "claims_served": 705,
+        "claim_recall": 0.8057142857142857,
+        "claim_recall_merged": 0.8571428571428571,
+        "case_any_gold": 0.9136490250696379
+      },
+      "per_set": {
+        "dev_cases": {
+          "cases": 71,
+          "claims": 95,
+          "claims_served": 91,
+          "claim_recall": 0.9578947368421052,
+          "claim_recall_merged": 0.968421052631579,
+          "case_any_gold": 0.971830985915493
+        },
+        "devpl": {
+          "cases": 37,
+          "claims": 110,
+          "claims_served": 73,
+          "claim_recall": 0.6636363636363637,
+          "claim_recall_merged": 0.7818181818181819,
+          "case_any_gold": 0.8648648648648649
+        },
+        "heldout_v3": {
+          "cases": 34,
+          "claims": 41,
+          "claims_served": 35,
+          "claim_recall": 0.8536585365853658,
+          "claim_recall_merged": 0.926829268292683,
+          "case_any_gold": 0.8529411764705882
+        },
+        "heldout_v4": {
+          "cases": 34,
+          "claims": 60,
+          "claims_served": 55,
+          "claim_recall": 0.9166666666666666,
+          "claim_recall_merged": 0.9166666666666666,
+          "case_any_gold": 0.9411764705882353
+        },
+        "heldout_v5a": {
+          "cases": 52,
+          "claims": 149,
+          "claims_served": 115,
+          "claim_recall": 0.7718120805369127,
+          "claim_recall_merged": 0.8322147651006712,
+          "case_any_gold": 0.8846153846153846
+        },
+        "heldout_v5b": {
+          "cases": 52,
+          "claims": 150,
+          "claims_served": 125,
+          "claim_recall": 0.8333333333333334,
+          "claim_recall_merged": 0.8733333333333333,
+          "case_any_gold": 0.9038461538461539
+        },
+        "heldout_v6a": {
+          "cases": 38,
+          "claims": 118,
+          "claims_served": 91,
+          "claim_recall": 0.7711864406779662,
+          "claim_recall_merged": 0.8220338983050848,
+          "case_any_gold": 0.9210526315789473
+        },
+        "heldout_v6b": {
+          "cases": 41,
+          "claims": 152,
+          "claims_served": 120,
+          "claim_recall": 0.7894736842105263,
+          "claim_recall_merged": 0.8355263157894737,
+          "case_any_gold": 0.926829268292683
+        }
+      },
+      "per_type": {
+        "answerable": {
+          "cases": 8,
+          "claims": 12,
+          "claims_served": 10,
+          "claim_recall": 0.8333333333333334,
+          "claim_recall_merged": 0.8333333333333334,
+          "case_any_gold": 0.875
+        },
+        "company": {
+          "cases": 80,
+          "claims": 193,
+          "claims_served": 160,
+          "claim_recall": 0.8290155440414507,
+          "claim_recall_merged": 0.9119170984455959,
+          "case_any_gold": 0.9375
+        },
+        "fact_number": {
+          "cases": 83,
+          "claims": 197,
+          "claims_served": 165,
+          "claim_recall": 0.8375634517766497,
+          "claim_recall_merged": 0.8883248730964467,
+          "case_any_gold": 0.9036144578313253
+        },
+        "follow_up": {
+          "cases": 51,
+          "claims": 119,
+          "claims_served": 106,
+          "claim_recall": 0.8907563025210085,
+          "claim_recall_merged": 0.8907563025210085,
+          "case_any_gold": 0.9019607843137255
+        },
+        "opinion": {
+          "cases": 83,
+          "claims": 189,
+          "claims_served": 147,
+          "claim_recall": 0.7777777777777778,
+          "claim_recall_merged": 0.873015873015873,
+          "case_any_gold": 0.9156626506024096
+        },
+        "temporal_comparison": {
+          "cases": 54,
+          "claims": 165,
+          "claims_served": 117,
+          "claim_recall": 0.7090909090909091,
+          "claim_recall_merged": 0.7151515151515152,
+          "case_any_gold": 0.9074074074074074
+        }
+      },
+      "latency_p50_ms": 825.68,
+      "wall_p50_ms": 46.45,
+      "prompt_tokens_max": 10847,
+      "prompt_tokens_p50": 7642,
+      "passages_p50": 16,
+      "n_ctx_ok": true,
+      "tokens_left_min": 5537,
+      "hard_negatives_passed": 36,
+      "hard_negatives_n": 40
+    },
+    "n16p16r30": {
+      "pooled": {
+        "cases": 359,
+        "claims": 875,
+        "claims_served": 742,
+        "claim_recall": 0.848,
+        "claim_recall_merged": 0.8937142857142857,
+        "case_any_gold": 0.9415041782729805
+      },
+      "per_set": {
+        "dev_cases": {
+          "cases": 71,
+          "claims": 95,
+          "claims_served": 90,
+          "claim_recall": 0.9473684210526315,
+          "claim_recall_merged": 0.968421052631579,
+          "case_any_gold": 0.9577464788732394
+        },
+        "devpl": {
+          "cases": 37,
+          "claims": 110,
+          "claims_served": 80,
+          "claim_recall": 0.7272727272727273,
+          "claim_recall_merged": 0.8090909090909091,
+          "case_any_gold": 0.9459459459459459
+        },
+        "heldout_v3": {
+          "cases": 34,
+          "claims": 41,
+          "claims_served": 37,
+          "claim_recall": 0.9024390243902439,
+          "claim_recall_merged": 0.926829268292683,
+          "case_any_gold": 0.9117647058823529
+        },
+        "heldout_v4": {
+          "cases": 34,
+          "claims": 60,
+          "claims_served": 55,
+          "claim_recall": 0.9166666666666666,
+          "claim_recall_merged": 0.9166666666666666,
+          "case_any_gold": 0.9411764705882353
+        },
+        "heldout_v5a": {
+          "cases": 52,
+          "claims": 149,
+          "claims_served": 123,
+          "claim_recall": 0.825503355704698,
+          "claim_recall_merged": 0.8791946308724832,
+          "case_any_gold": 0.9423076923076923
+        },
+        "heldout_v5b": {
+          "cases": 52,
+          "claims": 150,
+          "claims_served": 127,
+          "claim_recall": 0.8466666666666667,
+          "claim_recall_merged": 0.8866666666666667,
+          "case_any_gold": 0.9230769230769231
+        },
+        "heldout_v6a": {
+          "cases": 38,
+          "claims": 118,
+          "claims_served": 99,
+          "claim_recall": 0.8389830508474576,
+          "claim_recall_merged": 0.9152542372881356,
+          "case_any_gold": 0.9736842105263158
+        },
+        "heldout_v6b": {
+          "cases": 41,
+          "claims": 152,
+          "claims_served": 131,
+          "claim_recall": 0.8618421052631579,
+          "claim_recall_merged": 0.8947368421052632,
+          "case_any_gold": 0.926829268292683
+        }
+      },
+      "per_type": {
+        "answerable": {
+          "cases": 8,
+          "claims": 12,
+          "claims_served": 10,
+          "claim_recall": 0.8333333333333334,
+          "claim_recall_merged": 0.8333333333333334,
+          "case_any_gold": 0.875
+        },
+        "company": {
+          "cases": 80,
+          "claims": 193,
+          "claims_served": 170,
+          "claim_recall": 0.8808290155440415,
+          "claim_recall_merged": 0.9430051813471503,
+          "case_any_gold": 0.9875
+        },
+        "fact_number": {
+          "cases": 83,
+          "claims": 197,
+          "claims_served": 168,
+          "claim_recall": 0.8527918781725888,
+          "claim_recall_merged": 0.9035532994923858,
+          "case_any_gold": 0.927710843373494
+        },
+        "follow_up": {
+          "cases": 51,
+          "claims": 119,
+          "claims_served": 108,
+          "claim_recall": 0.907563025210084,
+          "claim_recall_merged": 0.907563025210084,
+          "case_any_gold": 0.9019607843137255
+        },
+        "opinion": {
+          "cases": 83,
+          "claims": 189,
+          "claims_served": 155,
+          "claim_recall": 0.8201058201058201,
+          "claim_recall_merged": 0.91005291005291,
+          "case_any_gold": 0.927710843373494
+        },
+        "temporal_comparison": {
+          "cases": 54,
+          "claims": 165,
+          "claims_served": 131,
+          "claim_recall": 0.793939393939394,
+          "claim_recall_merged": 0.8,
+          "case_any_gold": 0.9629629629629629
+        }
+      },
+      "latency_p50_ms": 2054.45,
+      "wall_p50_ms": 57.32,
+      "prompt_tokens_max": 12946,
+      "prompt_tokens_p50": 7635,
+      "passages_p50": 16,
+      "n_ctx_ok": true,
+      "tokens_left_min": 3438,
+      "hard_negatives_passed": 36,
+      "hard_negatives_n": 40
+    },
+    "n16p20r30": {
+      "pooled": {
+        "cases": 359,
+        "claims": 875,
+        "claims_served": 748,
+        "claim_recall": 0.8548571428571429,
+        "claim_recall_merged": 0.8971428571428571,
+        "case_any_gold": 0.947075208913649
+      },
+      "per_set": {
+        "dev_cases": {
+          "cases": 71,
+          "claims": 95,
+          "claims_served": 91,
+          "claim_recall": 0.9578947368421052,
+          "claim_recall_merged": 0.968421052631579,
+          "case_any_gold": 0.971830985915493
+        },
+        "devpl": {
+          "cases": 37,
+          "claims": 110,
+          "claims_served": 82,
+          "claim_recall": 0.7454545454545455,
+          "claim_recall_merged": 0.8181818181818182,
+          "case_any_gold": 0.9459459459459459
+        },
+        "heldout_v3": {
+          "cases": 34,
+          "claims": 41,
+          "claims_served": 38,
+          "claim_recall": 0.926829268292683,
+          "claim_recall_merged": 0.975609756097561,
+          "case_any_gold": 0.9411764705882353
+        },
+        "heldout_v4": {
+          "cases": 34,
+          "claims": 60,
+          "claims_served": 55,
+          "claim_recall": 0.9166666666666666,
+          "claim_recall_merged": 0.9166666666666666,
+          "case_any_gold": 0.9411764705882353
+        },
+        "heldout_v5a": {
+          "cases": 52,
+          "claims": 149,
+          "claims_served": 125,
+          "claim_recall": 0.8389261744966443,
+          "claim_recall_merged": 0.8791946308724832,
+          "case_any_gold": 0.9423076923076923
+        },
+        "heldout_v5b": {
+          "cases": 52,
+          "claims": 150,
+          "claims_served": 127,
+          "claim_recall": 0.8466666666666667,
+          "claim_recall_merged": 0.8866666666666667,
+          "case_any_gold": 0.9230769230769231
+        },
+        "heldout_v6a": {
+          "cases": 38,
+          "claims": 118,
+          "claims_served": 99,
+          "claim_recall": 0.8389830508474576,
+          "claim_recall_merged": 0.9152542372881356,
+          "case_any_gold": 0.9736842105263158
+        },
+        "heldout_v6b": {
+          "cases": 41,
+          "claims": 152,
+          "claims_served": 131,
+          "claim_recall": 0.8618421052631579,
+          "claim_recall_merged": 0.8947368421052632,
+          "case_any_gold": 0.926829268292683
+        }
+      },
+      "per_type": {
+        "answerable": {
+          "cases": 8,
+          "claims": 12,
+          "claims_served": 10,
+          "claim_recall": 0.8333333333333334,
+          "claim_recall_merged": 0.8333333333333334,
+          "case_any_gold": 0.875
+        },
+        "company": {
+          "cases": 80,
+          "claims": 193,
+          "claims_served": 170,
+          "claim_recall": 0.8808290155440415,
+          "claim_recall_merged": 0.9430051813471503,
+          "case_any_gold": 0.9875
+        },
+        "fact_number": {
+          "cases": 83,
+          "claims": 197,
+          "claims_served": 170,
+          "claim_recall": 0.8629441624365483,
+          "claim_recall_merged": 0.9086294416243654,
+          "case_any_gold": 0.927710843373494
+        },
+        "follow_up": {
+          "cases": 51,
+          "claims": 119,
+          "claims_served": 109,
+          "claim_recall": 0.9159663865546218,
+          "claim_recall_merged": 0.9159663865546218,
+          "case_any_gold": 0.9215686274509803
+        },
+        "opinion": {
+          "cases": 83,
+          "claims": 189,
+          "claims_served": 157,
+          "claim_recall": 0.8306878306878307,
+          "claim_recall_merged": 0.9153439153439153,
+          "case_any_gold": 0.9397590361445783
+        },
+        "temporal_comparison": {
+          "cases": 54,
+          "claims": 165,
+          "claims_served": 132,
+          "claim_recall": 0.8,
+          "claim_recall_merged": 0.8,
+          "case_any_gold": 0.9629629629629629
+        }
+      },
+      "latency_p50_ms": 2052.07,
+      "wall_p50_ms": 54.7,
+      "prompt_tokens_max": 16030,
+      "prompt_tokens_p50": 9346,
+      "passages_p50": 20,
+      "n_ctx_ok": false,
+      "tokens_left_min": 354,
+      "hard_negatives_passed": 36,
+      "hard_negatives_n": 40
+    },
+    "n16p8": {
+      "pooled": {
+        "cases": 359,
+        "claims": 875,
+        "claims_served": 685,
+        "claim_recall": 0.7828571428571428,
+        "claim_recall_merged": 0.8331428571428572,
+        "case_any_gold": 0.8885793871866295
+      },
+      "per_set": {
+        "dev_cases": {
+          "cases": 71,
+          "claims": 95,
+          "claims_served": 89,
+          "claim_recall": 0.9368421052631579,
+          "claim_recall_merged": 0.9578947368421052,
+          "case_any_gold": 0.9436619718309859
+        },
+        "devpl": {
+          "cases": 37,
+          "claims": 110,
+          "claims_served": 67,
+          "claim_recall": 0.6090909090909091,
+          "claim_recall_merged": 0.7090909090909091,
+          "case_any_gold": 0.8108108108108109
+        },
+        "heldout_v3": {
+          "cases": 34,
+          "claims": 41,
+          "claims_served": 32,
+          "claim_recall": 0.7804878048780488,
+          "claim_recall_merged": 0.8536585365853658,
+          "case_any_gold": 0.7941176470588235
+        },
+        "heldout_v4": {
+          "cases": 34,
+          "claims": 60,
+          "claims_served": 54,
+          "claim_recall": 0.9,
+          "claim_recall_merged": 0.9,
+          "case_any_gold": 0.9117647058823529
+        },
+        "heldout_v5a": {
+          "cases": 52,
+          "claims": 149,
+          "claims_served": 112,
+          "claim_recall": 0.7516778523489933,
+          "claim_recall_merged": 0.8187919463087249,
+          "case_any_gold": 0.8653846153846154
+        },
+        "heldout_v5b": {
+          "cases": 52,
+          "claims": 150,
+          "claims_served": 124,
+          "claim_recall": 0.8266666666666667,
+          "claim_recall_merged": 0.8666666666666667,
+          "case_any_gold": 0.9038461538461539
+        },
+        "heldout_v6a": {
+          "cases": 38,
+          "claims": 118,
+          "claims_served": 88,
+          "claim_recall": 0.7457627118644068,
+          "claim_recall_merged": 0.7966101694915254,
+          "case_any_gold": 0.8947368421052632
+        },
+        "heldout_v6b": {
+          "cases": 41,
+          "claims": 152,
+          "claims_served": 119,
+          "claim_recall": 0.7828947368421053,
+          "claim_recall_merged": 0.8223684210526315,
+          "case_any_gold": 0.926829268292683
+        }
+      },
+      "per_type": {
+        "answerable": {
+          "cases": 8,
+          "claims": 12,
+          "claims_served": 10,
+          "claim_recall": 0.8333333333333334,
+          "claim_recall_merged": 0.8333333333333334,
+          "case_any_gold": 0.875
+        },
+        "company": {
+          "cases": 80,
+          "claims": 193,
+          "claims_served": 158,
+          "claim_recall": 0.8186528497409327,
+          "claim_recall_merged": 0.8860103626943006,
+          "case_any_gold": 0.925
+        },
+        "fact_number": {
+          "cases": 83,
+          "claims": 197,
+          "claims_served": 161,
+          "claim_recall": 0.817258883248731,
+          "claim_recall_merged": 0.8781725888324873,
+          "case_any_gold": 0.891566265060241
+        },
+        "follow_up": {
+          "cases": 51,
+          "claims": 119,
+          "claims_served": 105,
+          "claim_recall": 0.8823529411764706,
+          "claim_recall_merged": 0.8823529411764706,
+          "case_any_gold": 0.8823529411764706
+        },
+        "opinion": {
+          "cases": 83,
+          "claims": 189,
+          "claims_served": 141,
+          "claim_recall": 0.746031746031746,
+          "claim_recall_merged": 0.8412698412698413,
+          "case_any_gold": 0.8795180722891566
+        },
+        "temporal_comparison": {
+          "cases": 54,
+          "claims": 165,
+          "claims_served": 110,
+          "claim_recall": 0.6666666666666666,
+          "claim_recall_merged": 0.6727272727272727,
+          "case_any_gold": 0.8518518518518519
+        }
+      },
+      "latency_p50_ms": 787.83,
+      "wall_p50_ms": 51.29,
+      "prompt_tokens_max": 7389,
+      "prompt_tokens_p50": 4386,
+      "passages_p50": 8,
+      "n_ctx_ok": true,
+      "tokens_left_min": 8995,
+      "hard_negatives_passed": 36,
+      "hard_negatives_n": 40
+    },
+    "rr30": {
+      "pooled": {
+        "cases": 359,
+        "claims": 875,
+        "claims_served": 704,
+        "claim_recall": 0.8045714285714286,
+        "claim_recall_merged": 0.8548571428571429,
+        "case_any_gold": 0.9052924791086351
+      },
+      "per_set": {
+        "dev_cases": {
+          "cases": 71,
+          "claims": 95,
+          "claims_served": 88,
+          "claim_recall": 0.9263157894736842,
+          "claim_recall_merged": 0.9473684210526315,
+          "case_any_gold": 0.9295774647887324
+        },
+        "devpl": {
+          "cases": 37,
+          "claims": 110,
+          "claims_served": 71,
+          "claim_recall": 0.6454545454545455,
+          "claim_recall_merged": 0.7272727272727273,
+          "case_any_gold": 0.8918918918918919
+        },
+        "heldout_v3": {
+          "cases": 34,
+          "claims": 41,
+          "claims_served": 34,
+          "claim_recall": 0.8292682926829268,
+          "claim_recall_merged": 0.8780487804878049,
+          "case_any_gold": 0.8529411764705882
+        },
+        "heldout_v4": {
+          "cases": 34,
+          "claims": 60,
+          "claims_served": 55,
+          "claim_recall": 0.9166666666666666,
+          "claim_recall_merged": 0.9166666666666666,
+          "case_any_gold": 0.9411764705882353
+        },
+        "heldout_v5a": {
+          "cases": 52,
+          "claims": 149,
+          "claims_served": 111,
+          "claim_recall": 0.7449664429530202,
+          "claim_recall_merged": 0.8120805369127517,
+          "case_any_gold": 0.8653846153846154
+        },
+        "heldout_v5b": {
+          "cases": 52,
+          "claims": 150,
+          "claims_served": 124,
+          "claim_recall": 0.8266666666666667,
+          "claim_recall_merged": 0.8666666666666667,
+          "case_any_gold": 0.8846153846153846
+        },
+        "heldout_v6a": {
+          "cases": 38,
+          "claims": 118,
+          "claims_served": 98,
+          "claim_recall": 0.8305084745762712,
+          "claim_recall_merged": 0.9152542372881356,
+          "case_any_gold": 0.9736842105263158
+        },
+        "heldout_v6b": {
+          "cases": 41,
+          "claims": 152,
+          "claims_served": 123,
+          "claim_recall": 0.8092105263157895,
+          "claim_recall_merged": 0.8421052631578947,
+          "case_any_gold": 0.9024390243902439
+        }
+      },
+      "per_type": {
+        "answerable": {
+          "cases": 8,
+          "claims": 12,
+          "claims_served": 10,
+          "claim_recall": 0.8333333333333334,
+          "claim_recall_merged": 0.8333333333333334,
+          "case_any_gold": 0.875
+        },
+        "company": {
+          "cases": 80,
+          "claims": 193,
+          "claims_served": 164,
+          "claim_recall": 0.8497409326424871,
+          "claim_recall_merged": 0.917098445595855,
+          "case_any_gold": 0.9625
+        },
+        "fact_number": {
+          "cases": 83,
+          "claims": 197,
+          "claims_served": 165,
+          "claim_recall": 0.8375634517766497,
+          "claim_recall_merged": 0.8781725888324873,
+          "case_any_gold": 0.9036144578313253
+        },
+        "follow_up": {
+          "cases": 51,
+          "claims": 119,
+          "claims_served": 102,
+          "claim_recall": 0.8571428571428571,
+          "claim_recall_merged": 0.8571428571428571,
+          "case_any_gold": 0.8627450980392157
+        },
+        "opinion": {
+          "cases": 83,
+          "claims": 189,
+          "claims_served": 148,
+          "claim_recall": 0.783068783068783,
+          "claim_recall_merged": 0.8994708994708994,
+          "case_any_gold": 0.9156626506024096
+        },
+        "temporal_comparison": {
+          "cases": 54,
+          "claims": 165,
+          "claims_served": 115,
+          "claim_recall": 0.696969696969697,
+          "claim_recall_merged": 0.703030303030303,
+          "case_any_gold": 0.8518518518518519
+        }
+      },
+      "latency_p50_ms": 2167.32,
+      "wall_p50_ms": 485.67,
+      "prompt_tokens_max": 7486,
+      "prompt_tokens_p50": 4356,
+      "passages_p50": 8,
+      "n_ctx_ok": false,
+      "tokens_left_min": 706,
+      "hard_negatives_passed": 35,
+      "hard_negatives_n": 40
+    },
+    "rrfk120": {
+      "pooled": {
+        "cases": 359,
+        "claims": 875,
+        "claims_served": 685,
+        "claim_recall": 0.7828571428571428,
+        "claim_recall_merged": 0.8331428571428572,
+        "case_any_gold": 0.8885793871866295
+      },
+      "per_set": {
+        "dev_cases": {
+          "cases": 71,
+          "claims": 95,
+          "claims_served": 89,
+          "claim_recall": 0.9368421052631579,
+          "claim_recall_merged": 0.9578947368421052,
+          "case_any_gold": 0.9436619718309859
+        },
+        "devpl": {
+          "cases": 37,
+          "claims": 110,
+          "claims_served": 67,
+          "claim_recall": 0.6090909090909091,
+          "claim_recall_merged": 0.7090909090909091,
+          "case_any_gold": 0.8108108108108109
+        },
+        "heldout_v3": {
+          "cases": 34,
+          "claims": 41,
+          "claims_served": 32,
+          "claim_recall": 0.7804878048780488,
+          "claim_recall_merged": 0.8536585365853658,
+          "case_any_gold": 0.7941176470588235
+        },
+        "heldout_v4": {
+          "cases": 34,
+          "claims": 60,
+          "claims_served": 54,
+          "claim_recall": 0.9,
+          "claim_recall_merged": 0.9,
+          "case_any_gold": 0.9117647058823529
+        },
+        "heldout_v5a": {
+          "cases": 52,
+          "claims": 149,
+          "claims_served": 112,
+          "claim_recall": 0.7516778523489933,
+          "claim_recall_merged": 0.8187919463087249,
+          "case_any_gold": 0.8653846153846154
+        },
+        "heldout_v5b": {
+          "cases": 52,
+          "claims": 150,
+          "claims_served": 124,
+          "claim_recall": 0.8266666666666667,
+          "claim_recall_merged": 0.8666666666666667,
+          "case_any_gold": 0.9038461538461539
+        },
+        "heldout_v6a": {
+          "cases": 38,
+          "claims": 118,
+          "claims_served": 88,
+          "claim_recall": 0.7457627118644068,
+          "claim_recall_merged": 0.7966101694915254,
+          "case_any_gold": 0.8947368421052632
+        },
+        "heldout_v6b": {
+          "cases": 41,
+          "claims": 152,
+          "claims_served": 119,
+          "claim_recall": 0.7828947368421053,
+          "claim_recall_merged": 0.8223684210526315,
+          "case_any_gold": 0.926829268292683
+        }
+      },
+      "per_type": {
+        "answerable": {
+          "cases": 8,
+          "claims": 12,
+          "claims_served": 10,
+          "claim_recall": 0.8333333333333334,
+          "claim_recall_merged": 0.8333333333333334,
+          "case_any_gold": 0.875
+        },
+        "company": {
+          "cases": 80,
+          "claims": 193,
+          "claims_served": 158,
+          "claim_recall": 0.8186528497409327,
+          "claim_recall_merged": 0.8860103626943006,
+          "case_any_gold": 0.925
+        },
+        "fact_number": {
+          "cases": 83,
+          "claims": 197,
+          "claims_served": 161,
+          "claim_recall": 0.817258883248731,
+          "claim_recall_merged": 0.8781725888324873,
+          "case_any_gold": 0.891566265060241
+        },
+        "follow_up": {
+          "cases": 51,
+          "claims": 119,
+          "claims_served": 105,
+          "claim_recall": 0.8823529411764706,
+          "claim_recall_merged": 0.8823529411764706,
+          "case_any_gold": 0.8823529411764706
+        },
+        "opinion": {
+          "cases": 83,
+          "claims": 189,
+          "claims_served": 141,
+          "claim_recall": 0.746031746031746,
+          "claim_recall_merged": 0.8412698412698413,
+          "case_any_gold": 0.8795180722891566
+        },
+        "temporal_comparison": {
+          "cases": 54,
+          "claims": 165,
+          "claims_served": 110,
+          "claim_recall": 0.6666666666666666,
+          "claim_recall_merged": 0.6727272727272727,
+          "case_any_gold": 0.8518518518518519
+        }
+      },
+      "latency_p50_ms": 818.3,
+      "wall_p50_ms": 51.72,
+      "prompt_tokens_max": 7389,
+      "prompt_tokens_p50": 4386,
+      "passages_p50": 8,
+      "n_ctx_ok": true,
+      "tokens_left_min": 803,
+      "hard_negatives_passed": 36,
+      "hard_negatives_n": 40
+    },
+    "rrfk20": {
+      "pooled": {
+        "cases": 359,
+        "claims": 875,
+        "claims_served": 685,
+        "claim_recall": 0.7828571428571428,
+        "claim_recall_merged": 0.8331428571428572,
+        "case_any_gold": 0.8885793871866295
+      },
+      "per_set": {
+        "dev_cases": {
+          "cases": 71,
+          "claims": 95,
+          "claims_served": 89,
+          "claim_recall": 0.9368421052631579,
+          "claim_recall_merged": 0.9578947368421052,
+          "case_any_gold": 0.9436619718309859
+        },
+        "devpl": {
+          "cases": 37,
+          "claims": 110,
+          "claims_served": 67,
+          "claim_recall": 0.6090909090909091,
+          "claim_recall_merged": 0.7090909090909091,
+          "case_any_gold": 0.8108108108108109
+        },
+        "heldout_v3": {
+          "cases": 34,
+          "claims": 41,
+          "claims_served": 32,
+          "claim_recall": 0.7804878048780488,
+          "claim_recall_merged": 0.8536585365853658,
+          "case_any_gold": 0.7941176470588235
+        },
+        "heldout_v4": {
+          "cases": 34,
+          "claims": 60,
+          "claims_served": 54,
+          "claim_recall": 0.9,
+          "claim_recall_merged": 0.9,
+          "case_any_gold": 0.9117647058823529
+        },
+        "heldout_v5a": {
+          "cases": 52,
+          "claims": 149,
+          "claims_served": 112,
+          "claim_recall": 0.7516778523489933,
+          "claim_recall_merged": 0.8187919463087249,
+          "case_any_gold": 0.8653846153846154
+        },
+        "heldout_v5b": {
+          "cases": 52,
+          "claims": 150,
+          "claims_served": 124,
+          "claim_recall": 0.8266666666666667,
+          "claim_recall_merged": 0.8666666666666667,
+          "case_any_gold": 0.9038461538461539
+        },
+        "heldout_v6a": {
+          "cases": 38,
+          "claims": 118,
+          "claims_served": 88,
+          "claim_recall": 0.7457627118644068,
+          "claim_recall_merged": 0.7966101694915254,
+          "case_any_gold": 0.8947368421052632
+        },
+        "heldout_v6b": {
+          "cases": 41,
+          "claims": 152,
+          "claims_served": 119,
+          "claim_recall": 0.7828947368421053,
+          "claim_recall_merged": 0.8223684210526315,
+          "case_any_gold": 0.926829268292683
+        }
+      },
+      "per_type": {
+        "answerable": {
+          "cases": 8,
+          "claims": 12,
+          "claims_served": 10,
+          "claim_recall": 0.8333333333333334,
+          "claim_recall_merged": 0.8333333333333334,
+          "case_any_gold": 0.875
+        },
+        "company": {
+          "cases": 80,
+          "claims": 193,
+          "claims_served": 158,
+          "claim_recall": 0.8186528497409327,
+          "claim_recall_merged": 0.8860103626943006,
+          "case_any_gold": 0.925
+        },
+        "fact_number": {
+          "cases": 83,
+          "claims": 197,
+          "claims_served": 161,
+          "claim_recall": 0.817258883248731,
+          "claim_recall_merged": 0.8781725888324873,
+          "case_any_gold": 0.891566265060241
+        },
+        "follow_up": {
+          "cases": 51,
+          "claims": 119,
+          "claims_served": 105,
+          "claim_recall": 0.8823529411764706,
+          "claim_recall_merged": 0.8823529411764706,
+          "case_any_gold": 0.8823529411764706
+        },
+        "opinion": {
+          "cases": 83,
+          "claims": 189,
+          "claims_served": 141,
+          "claim_recall": 0.746031746031746,
+          "claim_recall_merged": 0.8412698412698413,
+          "case_any_gold": 0.8795180722891566
+        },
+        "temporal_comparison": {
+          "cases": 54,
+          "claims": 165,
+          "claims_served": 110,
+          "claim_recall": 0.6666666666666666,
+          "claim_recall_merged": 0.6727272727272727,
+          "case_any_gold": 0.8518518518518519
+        }
+      },
+      "latency_p50_ms": 810.71,
+      "wall_p50_ms": 49.4,
+      "prompt_tokens_max": 7389,
+      "prompt_tokens_p50": 4386,
+      "passages_p50": 8,
+      "n_ctx_ok": true,
+      "tokens_left_min": 803,
+      "hard_negatives_passed": 36,
+      "hard_negatives_n": 40
+    },
+    "slots1": {
+      "pooled": {
+        "cases": 359,
+        "claims": 875,
+        "claims_served": 676,
+        "claim_recall": 0.7725714285714286,
+        "claim_recall_merged": 0.8297142857142857,
+        "case_any_gold": 0.8857938718662952
+      },
+      "per_set": {
+        "dev_cases": {
+          "cases": 71,
+          "claims": 95,
+          "claims_served": 89,
+          "claim_recall": 0.9368421052631579,
+          "claim_recall_merged": 0.9578947368421052,
+          "case_any_gold": 0.9436619718309859
+        },
+        "devpl": {
+          "cases": 37,
+          "claims": 110,
+          "claims_served": 65,
+          "claim_recall": 0.5909090909090909,
+          "claim_recall_merged": 0.7181818181818181,
+          "case_any_gold": 0.8108108108108109
+        },
+        "heldout_v3": {
+          "cases": 34,
+          "claims": 41,
+          "claims_served": 32,
+          "claim_recall": 0.7804878048780488,
+          "claim_recall_merged": 0.8536585365853658,
+          "case_any_gold": 0.7941176470588235
+        },
+        "heldout_v4": {
+          "cases": 34,
+          "claims": 60,
+          "claims_served": 54,
+          "claim_recall": 0.9,
+          "claim_recall_merged": 0.9,
+          "case_any_gold": 0.9117647058823529
+        },
+        "heldout_v5a": {
+          "cases": 52,
+          "claims": 149,
+          "claims_served": 111,
+          "claim_recall": 0.7449664429530202,
+          "claim_recall_merged": 0.7986577181208053,
+          "case_any_gold": 0.8461538461538461
+        },
+        "heldout_v5b": {
+          "cases": 52,
+          "claims": 150,
+          "claims_served": 124,
+          "claim_recall": 0.8266666666666667,
+          "claim_recall_merged": 0.8666666666666667,
+          "case_any_gold": 0.9038461538461539
+        },
+        "heldout_v6a": {
+          "cases": 38,
+          "claims": 118,
+          "claims_served": 86,
+          "claim_recall": 0.7288135593220338,
+          "claim_recall_merged": 0.7966101694915254,
+          "case_any_gold": 0.8947368421052632
+        },
+        "heldout_v6b": {
+          "cases": 41,
+          "claims": 152,
+          "claims_served": 115,
+          "claim_recall": 0.756578947368421,
+          "claim_recall_merged": 0.8157894736842105,
+          "case_any_gold": 0.926829268292683
+        }
+      },
+      "per_type": {
+        "answerable": {
+          "cases": 8,
+          "claims": 12,
+          "claims_served": 10,
+          "claim_recall": 0.8333333333333334,
+          "claim_recall_merged": 0.8333333333333334,
+          "case_any_gold": 0.875
+        },
+        "company": {
+          "cases": 80,
+          "claims": 193,
+          "claims_served": 156,
+          "claim_recall": 0.8082901554404145,
+          "claim_recall_merged": 0.8860103626943006,
+          "case_any_gold": 0.925
+        },
+        "fact_number": {
+          "cases": 83,
+          "claims": 197,
+          "claims_served": 162,
+          "claim_recall": 0.8223350253807107,
+          "claim_recall_merged": 0.883248730964467,
+          "case_any_gold": 0.891566265060241
+        },
+        "follow_up": {
+          "cases": 51,
+          "claims": 119,
+          "claims_served": 105,
+          "claim_recall": 0.8823529411764706,
+          "claim_recall_merged": 0.8823529411764706,
+          "case_any_gold": 0.8823529411764706
+        },
+        "opinion": {
+          "cases": 83,
+          "claims": 189,
+          "claims_served": 134,
+          "claim_recall": 0.708994708994709,
+          "claim_recall_merged": 0.8201058201058201,
+          "case_any_gold": 0.8674698795180723
+        },
+        "temporal_comparison": {
+          "cases": 54,
+          "claims": 165,
+          "claims_served": 109,
+          "claim_recall": 0.6606060606060606,
+          "claim_recall_merged": 0.6727272727272727,
+          "case_any_gold": 0.8518518518518519
+        }
+      },
+      "latency_p50_ms": 1265.2,
+      "wall_p50_ms": 478.17,
+      "prompt_tokens_max": 7389,
+      "prompt_tokens_p50": 4388,
+      "passages_p50": 8,
+      "n_ctx_ok": true,
+      "tokens_left_min": 803,
+      "hard_negatives_passed": 36,
+      "hard_negatives_n": 40
+    },
+    "slots3": {
+      "pooled": {
+        "cases": 359,
+        "claims": 875,
+        "claims_served": 672,
+        "claim_recall": 0.768,
+        "claim_recall_merged": 0.8205714285714286,
+        "case_any_gold": 0.8857938718662952
+      },
+      "per_set": {
+        "dev_cases": {
+          "cases": 71,
+          "claims": 95,
+          "claims_served": 89,
+          "claim_recall": 0.9368421052631579,
+          "claim_recall_merged": 0.9578947368421052,
+          "case_any_gold": 0.9436619718309859
+        },
+        "devpl": {
+          "cases": 37,
+          "claims": 110,
+          "claims_served": 63,
+          "claim_recall": 0.5727272727272728,
+          "claim_recall_merged": 0.6818181818181818,
+          "case_any_gold": 0.8108108108108109
+        },
+        "heldout_v3": {
+          "cases": 34,
+          "claims": 41,
+          "claims_served": 32,
+          "claim_recall": 0.7804878048780488,
+          "claim_recall_merged": 0.8536585365853658,
+          "case_any_gold": 0.7941176470588235
+        },
+        "heldout_v4": {
+          "cases": 34,
+          "claims": 60,
+          "claims_served": 54,
+          "claim_recall": 0.9,
+          "claim_recall_merged": 0.9,
+          "case_any_gold": 0.9117647058823529
+        },
+        "heldout_v5a": {
+          "cases": 52,
+          "claims": 149,
+          "claims_served": 110,
+          "claim_recall": 0.738255033557047,
+          "claim_recall_merged": 0.7986577181208053,
+          "case_any_gold": 0.8461538461538461
+        },
+        "heldout_v5b": {
+          "cases": 52,
+          "claims": 150,
+          "claims_served": 124,
+          "claim_recall": 0.8266666666666667,
+          "claim_recall_merged": 0.8666666666666667,
+          "case_any_gold": 0.9038461538461539
+        },
+        "heldout_v6a": {
+          "cases": 38,
+          "claims": 118,
+          "claims_served": 86,
+          "claim_recall": 0.7288135593220338,
+          "claim_recall_merged": 0.7966101694915254,
+          "case_any_gold": 0.8947368421052632
+        },
+        "heldout_v6b": {
+          "cases": 41,
+          "claims": 152,
+          "claims_served": 114,
+          "claim_recall": 0.75,
+          "claim_recall_merged": 0.7894736842105263,
+          "case_any_gold": 0.926829268292683
+        }
+      },
+      "per_type": {
+        "answerable": {
+          "cases": 8,
+          "claims": 12,
+          "claims_served": 10,
+          "claim_recall": 0.8333333333333334,
+          "claim_recall_merged": 0.8333333333333334,
+          "case_any_gold": 0.875
+        },
+        "company": {
+          "cases": 80,
+          "claims": 193,
+          "claims_served": 152,
+          "claim_recall": 0.7875647668393783,
+          "claim_recall_merged": 0.8652849740932642,
+          "case_any_gold": 0.925
+        },
+        "fact_number": {
+          "cases": 83,
+          "claims": 197,
+          "claims_served": 161,
+          "claim_recall": 0.817258883248731,
+          "claim_recall_merged": 0.8730964467005076,
+          "case_any_gold": 0.891566265060241
+        },
+        "follow_up": {
+          "cases": 51,
+          "claims": 119,
+          "claims_served": 101,
+          "claim_recall": 0.8487394957983193,
+          "claim_recall_merged": 0.8571428571428571,
+          "case_any_gold": 0.8627450980392157
+        },
+        "opinion": {
+          "cases": 83,
+          "claims": 189,
+          "claims_served": 139,
+          "claim_recall": 0.7354497354497355,
+          "claim_recall_merged": 0.8306878306878307,
+          "case_any_gold": 0.8795180722891566
+        },
+        "temporal_comparison": {
+          "cases": 54,
+          "claims": 165,
+          "claims_served": 109,
+          "claim_recall": 0.6606060606060606,
+          "claim_recall_merged": 0.6666666666666666,
+          "case_any_gold": 0.8518518518518519
+        }
+      },
+      "latency_p50_ms": 1265.2,
+      "wall_p50_ms": 478.17,
+      "prompt_tokens_max": 7389,
+      "prompt_tokens_p50": 4381,
+      "passages_p50": 8,
+      "n_ctx_ok": true,
+      "tokens_left_min": 803,
+      "hard_negatives_passed": 36,
+      "hard_negatives_n": 40
+    },
+    "strip": {
+      "pooled": {
+        "cases": 359,
+        "claims": 875,
+        "claims_served": 693,
+        "claim_recall": 0.792,
+        "claim_recall_merged": 0.8434285714285714,
+        "case_any_gold": 0.8941504178272981
+      },
+      "per_set": {
+        "dev_cases": {
+          "cases": 71,
+          "claims": 95,
+          "claims_served": 89,
+          "claim_recall": 0.9368421052631579,
+          "claim_recall_merged": 0.9578947368421052,
+          "case_any_gold": 0.9436619718309859
+        },
+        "devpl": {
+          "cases": 37,
+          "claims": 110,
+          "claims_served": 70,
+          "claim_recall": 0.6363636363636364,
+          "claim_recall_merged": 0.7181818181818181,
+          "case_any_gold": 0.8378378378378378
+        },
+        "heldout_v3": {
+          "cases": 34,
+          "claims": 41,
+          "claims_served": 32,
+          "claim_recall": 0.7804878048780488,
+          "claim_recall_merged": 0.8536585365853658,
+          "case_any_gold": 0.7941176470588235
+        },
+        "heldout_v4": {
+          "cases": 34,
+          "claims": 60,
+          "claims_served": 53,
+          "claim_recall": 0.8833333333333333,
+          "claim_recall_merged": 0.8833333333333333,
+          "case_any_gold": 0.9117647058823529
+        },
+        "heldout_v5a": {
+          "cases": 52,
+          "claims": 149,
+          "claims_served": 112,
+          "claim_recall": 0.7516778523489933,
+          "claim_recall_merged": 0.7986577181208053,
+          "case_any_gold": 0.8653846153846154
+        },
+        "heldout_v5b": {
+          "cases": 52,
+          "claims": 150,
+          "claims_served": 124,
+          "claim_recall": 0.8266666666666667,
+          "claim_recall_merged": 0.8866666666666667,
+          "case_any_gold": 0.9038461538461539
+        },
+        "heldout_v6a": {
+          "cases": 38,
+          "claims": 118,
+          "claims_served": 89,
+          "claim_recall": 0.7542372881355932,
+          "claim_recall_merged": 0.8389830508474576,
+          "case_any_gold": 0.9210526315789473
+        },
+        "heldout_v6b": {
+          "cases": 41,
+          "claims": 152,
+          "claims_served": 124,
+          "claim_recall": 0.8157894736842105,
+          "claim_recall_merged": 0.8486842105263158,
+          "case_any_gold": 0.926829268292683
+        }
+      },
+      "per_type": {
+        "answerable": {
+          "cases": 8,
+          "claims": 12,
+          "claims_served": 10,
+          "claim_recall": 0.8333333333333334,
+          "claim_recall_merged": 0.8333333333333334,
+          "case_any_gold": 0.875
+        },
+        "company": {
+          "cases": 80,
+          "claims": 193,
+          "claims_served": 161,
+          "claim_recall": 0.8341968911917098,
+          "claim_recall_merged": 0.9067357512953368,
+          "case_any_gold": 0.9375
+        },
+        "fact_number": {
+          "cases": 83,
+          "claims": 197,
+          "claims_served": 162,
+          "claim_recall": 0.8223350253807107,
+          "claim_recall_merged": 0.868020304568528,
+          "case_any_gold": 0.9036144578313253
+        },
+        "follow_up": {
+          "cases": 51,
+          "claims": 119,
+          "claims_served": 100,
+          "claim_recall": 0.8403361344537815,
+          "claim_recall_merged": 0.8571428571428571,
+          "case_any_gold": 0.8431372549019608
+        },
+        "opinion": {
+          "cases": 83,
+          "claims": 189,
+          "claims_served": 146,
+          "claim_recall": 0.7724867724867724,
+          "claim_recall_merged": 0.873015873015873,
+          "case_any_gold": 0.891566265060241
+        },
+        "temporal_comparison": {
+          "cases": 54,
+          "claims": 165,
+          "claims_served": 114,
+          "claim_recall": 0.6909090909090909,
+          "claim_recall_merged": 0.696969696969697,
+          "case_any_gold": 0.8703703703703703
+        }
+      },
+      "latency_p50_ms": 1001.31,
+      "wall_p50_ms": 238.71,
+      "prompt_tokens_max": 7389,
+      "prompt_tokens_p50": 4393,
+      "passages_p50": 8,
+      "n_ctx_ok": true,
+      "tokens_left_min": 803,
+      "hard_negatives_passed": 36,
+      "hard_negatives_n": 40
+    },
+    "yr1957": {
+      "pooled": {
+        "cases": 359,
+        "claims": 875,
+        "claims_served": 689,
+        "claim_recall": 0.7874285714285715,
+        "claim_recall_merged": 0.8342857142857143,
+        "case_any_gold": 0.8885793871866295
+      },
+      "per_set": {
+        "dev_cases": {
+          "cases": 71,
+          "claims": 95,
+          "claims_served": 89,
+          "claim_recall": 0.9368421052631579,
+          "claim_recall_merged": 0.9578947368421052,
+          "case_any_gold": 0.9436619718309859
+        },
+        "devpl": {
+          "cases": 37,
+          "claims": 110,
+          "claims_served": 72,
+          "claim_recall": 0.6545454545454545,
+          "claim_recall_merged": 0.7272727272727273,
+          "case_any_gold": 0.8378378378378378
+        },
+        "heldout_v3": {
+          "cases": 34,
+          "claims": 41,
+          "claims_served": 32,
+          "claim_recall": 0.7804878048780488,
+          "claim_recall_merged": 0.8536585365853658,
+          "case_any_gold": 0.7941176470588235
+        },
+        "heldout_v4": {
+          "cases": 34,
+          "claims": 60,
+          "claims_served": 54,
+          "claim_recall": 0.9,
+          "claim_recall_merged": 0.9,
+          "case_any_gold": 0.9117647058823529
+        },
+        "heldout_v5a": {
+          "cases": 52,
+          "claims": 149,
+          "claims_served": 112,
+          "claim_recall": 0.7516778523489933,
+          "claim_recall_merged": 0.8187919463087249,
+          "case_any_gold": 0.8653846153846154
+        },
+        "heldout_v5b": {
+          "cases": 52,
+          "claims": 150,
+          "claims_served": 124,
+          "claim_recall": 0.8266666666666667,
+          "claim_recall_merged": 0.8666666666666667,
+          "case_any_gold": 0.9038461538461539
+        },
+        "heldout_v6a": {
+          "cases": 38,
+          "claims": 118,
+          "claims_served": 87,
+          "claim_recall": 0.7372881355932204,
+          "claim_recall_merged": 0.788135593220339,
+          "case_any_gold": 0.868421052631579
+        },
+        "heldout_v6b": {
+          "cases": 41,
+          "claims": 152,
+          "claims_served": 119,
+          "claim_recall": 0.7828947368421053,
+          "claim_recall_merged": 0.8223684210526315,
+          "case_any_gold": 0.926829268292683
+        }
+      },
+      "per_type": {
+        "answerable": {
+          "cases": 8,
+          "claims": 12,
+          "claims_served": 10,
+          "claim_recall": 0.8333333333333334,
+          "claim_recall_merged": 0.8333333333333334,
+          "case_any_gold": 0.875
+        },
+        "company": {
+          "cases": 80,
+          "claims": 193,
+          "claims_served": 163,
+          "claim_recall": 0.844559585492228,
+          "claim_recall_merged": 0.9119170984455959,
+          "case_any_gold": 0.9375
+        },
+        "fact_number": {
+          "cases": 83,
+          "claims": 197,
+          "claims_served": 160,
+          "claim_recall": 0.8121827411167513,
+          "claim_recall_merged": 0.8578680203045685,
+          "case_any_gold": 0.891566265060241
+        },
+        "follow_up": {
+          "cases": 51,
+          "claims": 119,
+          "claims_served": 105,
+          "claim_recall": 0.8823529411764706,
+          "claim_recall_merged": 0.8823529411764706,
+          "case_any_gold": 0.8823529411764706
+        },
+        "opinion": {
+          "cases": 83,
+          "claims": 189,
+          "claims_served": 141,
+          "claim_recall": 0.746031746031746,
+          "claim_recall_merged": 0.8412698412698413,
+          "case_any_gold": 0.8795180722891566
+        },
+        "temporal_comparison": {
+          "cases": 54,
+          "claims": 165,
+          "claims_served": 110,
+          "claim_recall": 0.6666666666666666,
+          "claim_recall_merged": 0.6727272727272727,
+          "case_any_gold": 0.8333333333333334
+        }
+      },
+      "latency_p50_ms": 787.02,
+      "wall_p50_ms": 85.7,
+      "prompt_tokens_max": 7389,
+      "prompt_tokens_p50": 4404,
+      "passages_p50": 8,
+      "n_ctx_ok": true,
+      "tokens_left_min": 803,
+      "hard_negatives_passed": 36,
+      "hard_negatives_n": 40
+    },
+    "yrw3": {
+      "pooled": {
+        "cases": 359,
+        "claims": 875,
+        "claims_served": 685,
+        "claim_recall": 0.7828571428571428,
+        "claim_recall_merged": 0.8331428571428572,
+        "case_any_gold": 0.8885793871866295
+      },
+      "per_set": {
+        "dev_cases": {
+          "cases": 71,
+          "claims": 95,
+          "claims_served": 89,
+          "claim_recall": 0.9368421052631579,
+          "claim_recall_merged": 0.9578947368421052,
+          "case_any_gold": 0.9436619718309859
+        },
+        "devpl": {
+          "cases": 37,
+          "claims": 110,
+          "claims_served": 67,
+          "claim_recall": 0.6090909090909091,
+          "claim_recall_merged": 0.7090909090909091,
+          "case_any_gold": 0.8108108108108109
+        },
+        "heldout_v3": {
+          "cases": 34,
+          "claims": 41,
+          "claims_served": 32,
+          "claim_recall": 0.7804878048780488,
+          "claim_recall_merged": 0.8536585365853658,
+          "case_any_gold": 0.7941176470588235
+        },
+        "heldout_v4": {
+          "cases": 34,
+          "claims": 60,
+          "claims_served": 54,
+          "claim_recall": 0.9,
+          "claim_recall_merged": 0.9,
+          "case_any_gold": 0.9117647058823529
+        },
+        "heldout_v5a": {
+          "cases": 52,
+          "claims": 149,
+          "claims_served": 112,
+          "claim_recall": 0.7516778523489933,
+          "claim_recall_merged": 0.8187919463087249,
+          "case_any_gold": 0.8653846153846154
+        },
+        "heldout_v5b": {
+          "cases": 52,
+          "claims": 150,
+          "claims_served": 124,
+          "claim_recall": 0.8266666666666667,
+          "claim_recall_merged": 0.8666666666666667,
+          "case_any_gold": 0.9038461538461539
+        },
+        "heldout_v6a": {
+          "cases": 38,
+          "claims": 118,
+          "claims_served": 88,
+          "claim_recall": 0.7457627118644068,
+          "claim_recall_merged": 0.7966101694915254,
+          "case_any_gold": 0.8947368421052632
+        },
+        "heldout_v6b": {
+          "cases": 41,
+          "claims": 152,
+          "claims_served": 119,
+          "claim_recall": 0.7828947368421053,
+          "claim_recall_merged": 0.8223684210526315,
+          "case_any_gold": 0.926829268292683
+        }
+      },
+      "per_type": {
+        "answerable": {
+          "cases": 8,
+          "claims": 12,
+          "claims_served": 10,
+          "claim_recall": 0.8333333333333334,
+          "claim_recall_merged": 0.8333333333333334,
+          "case_any_gold": 0.875
+        },
+        "company": {
+          "cases": 80,
+          "claims": 193,
+          "claims_served": 158,
+          "claim_recall": 0.8186528497409327,
+          "claim_recall_merged": 0.8860103626943006,
+          "case_any_gold": 0.925
+        },
+        "fact_number": {
+          "cases": 83,
+          "claims": 197,
+          "claims_served": 161,
+          "claim_recall": 0.817258883248731,
+          "claim_recall_merged": 0.8781725888324873,
+          "case_any_gold": 0.891566265060241
+        },
+        "follow_up": {
+          "cases": 51,
+          "claims": 119,
+          "claims_served": 105,
+          "claim_recall": 0.8823529411764706,
+          "claim_recall_merged": 0.8823529411764706,
+          "case_any_gold": 0.8823529411764706
+        },
+        "opinion": {
+          "cases": 83,
+          "claims": 189,
+          "claims_served": 141,
+          "claim_recall": 0.746031746031746,
+          "claim_recall_merged": 0.8412698412698413,
+          "case_any_gold": 0.8795180722891566
+        },
+        "temporal_comparison": {
+          "cases": 54,
+          "claims": 165,
+          "claims_served": 110,
+          "claim_recall": 0.6666666666666666,
+          "claim_recall_merged": 0.6727272727272727,
+          "case_any_gold": 0.8518518518518519
+        }
+      },
+      "latency_p50_ms": 786.61,
+      "wall_p50_ms": 78.79,
+      "prompt_tokens_max": 7389,
+      "prompt_tokens_p50": 4386,
+      "passages_p50": 8,
+      "n_ctx_ok": true,
+      "tokens_left_min": 803,
+      "hard_negatives_passed": 36,
+      "hard_negatives_n": 40
+    }
+  },
+  "vs_baseline": {
+    "bm25w15": {
+      "delta": -0.016,
+      "ci95": [
+        -0.027428571428571427,
+        -0.004571428571428572
+      ],
+      "merged": {
+        "delta": -0.012571428571428572,
+        "ci95": [
+          -0.022857142857142857,
+          -0.0034285714285714284
+        ]
+      },
+      "devpl": {
+        "delta": 0.00909090909090909,
+        "ci95": [
+          -0.02727272727272727,
+          0.045454545454545456
+        ]
+      },
+      "type_deltas": {
+        "answerable": 0.0,
+        "company": -0.010362694300518172,
+        "fact_number": -0.015228426395939132,
+        "follow_up": -0.04201680672268904,
+        "opinion": -0.02645502645502651,
+        "temporal_comparison": 0.0060606060606061
+      },
+      "gate": {
+        "ci_lower_gt_0": false,
+        "hard_negatives_not_lower": true,
+        "devpl_not_lower": true,
+        "no_type_drop_gt_0.02": false,
+        "prompt_fits_n_ctx": true,
+        "all": false
+      }
+    },
+    "combo16": {
+      "delta": 0.037714285714285714,
+      "ci95": [
+        0.02057142857142857,
+        0.056
+      ],
+      "merged": {
+        "delta": 0.02857142857142857,
+        "ci95": [
+          0.012571428571428572,
+          0.044571428571428574
+        ]
+      },
+      "devpl": {
+        "delta": 0.15454545454545454,
+        "ci95": [
+          0.08181818181818182,
+          0.23636363636363636
+        ]
+      },
+      "type_deltas": {
+        "answerable": 0.0,
+        "company": 0.051813471502590636,
+        "fact_number": 0.040609137055837574,
+        "follow_up": -0.04201680672268904,
+        "opinion": 0.06349206349206349,
+        "temporal_comparison": 0.048484848484848575
+      },
+      "gate": {
+        "ci_lower_gt_0": true,
+        "hard_negatives_not_lower": true,
+        "devpl_not_lower": true,
+        "no_type_drop_gt_0.02": false,
+        "prompt_fits_n_ctx": true,
+        "all": false
+      }
+    },
+    "combo16r30": {
+      "delta": 0.072,
+      "ci95": [
+        0.053714285714285714,
+        0.09142857142857143
+      ],
+      "merged": {
+        "delta": 0.061714285714285715,
+        "ci95": [
+          0.04342857142857143,
+          0.08
+        ]
+      },
+      "devpl": {
+        "delta": 0.15454545454545454,
+        "ci95": [
+          0.07272727272727272,
+          0.23636363636363636
+        ]
+      },
+      "type_deltas": {
+        "answerable": 0.0,
+        "company": 0.08808290155440412,
+        "fact_number": 0.035532994923857864,
+        "follow_up": 0.025210084033613467,
+        "opinion": 0.08465608465608465,
+        "temporal_comparison": 0.12121212121212122
+      },
+      "gate": {
+        "ci_lower_gt_0": true,
+        "hard_negatives_not_lower": true,
+        "devpl_not_lower": true,
+        "no_type_drop_gt_0.02": true,
+        "prompt_fits_n_ctx": true,
+        "all": true
+      }
+    },
+    "combo20r30": {
+      "delta": 0.08228571428571428,
+      "ci95": [
+        0.06285714285714286,
+        0.10285714285714286
+      ],
+      "merged": {
+        "delta": 0.06628571428571428,
+        "ci95": [
+          0.048,
+          0.08457142857142858
+        ]
+      },
+      "devpl": {
+        "delta": 0.18181818181818182,
+        "ci95": [
+          0.1,
+          0.2727272727272727
+        ]
+      },
+      "type_deltas": {
+        "answerable": 0.0,
+        "company": 0.08808290155440412,
+        "fact_number": 0.050761421319796995,
+        "follow_up": 0.03361344537815125,
+        "opinion": 0.09523809523809523,
+        "temporal_comparison": 0.1393939393939394
+      },
+      "gate": {
+        "ci_lower_gt_0": true,
+        "hard_negatives_not_lower": true,
+        "devpl_not_lower": true,
+        "no_type_drop_gt_0.02": true,
+        "prompt_fits_n_ctx": false,
+        "all": false
+      }
+    },
+    "dedup0": {
+      "delta": 0.0,
+      "ci95": [
+        0.0,
+        0.0
+      ],
+      "merged": {
+        "delta": 0.0,
+        "ci95": [
+          0.0,
+          0.0
+        ]
+      },
+      "devpl": {
+        "delta": 0.0,
+        "ci95": [
+          0.0,
+          0.0
+        ]
+      },
+      "type_deltas": {
+        "answerable": 0.0,
+        "company": 0.0,
+        "fact_number": 0.0,
+        "follow_up": 0.0,
+        "opinion": 0.0,
+        "temporal_comparison": 0.0
+      },
+      "gate": {
+        "ci_lower_gt_0": false,
+        "hard_negatives_not_lower": true,
+        "devpl_not_lower": true,
+        "no_type_drop_gt_0.02": true,
+        "prompt_fits_n_ctx": true,
+        "all": false
+      }
+    },
+    "densew15": {
+      "delta": -0.019428571428571427,
+      "ci95": [
+        -0.03314285714285714,
+        -0.005714285714285714
+      ],
+      "merged": {
+        "delta": -0.010285714285714285,
+        "ci95": [
+          -0.021714285714285714,
+          0.001142857142857143
+        ]
+      },
+      "devpl": {
+        "delta": -0.03636363636363636,
+        "ci95": [
+          -0.08181818181818182,
+          0.0
+        ]
+      },
+      "type_deltas": {
+        "answerable": -0.08333333333333337,
+        "company": -0.005181347150259086,
+        "fact_number": -0.015228426395939132,
+        "follow_up": -0.05042016806722682,
+        "opinion": -0.021164021164021163,
+        "temporal_comparison": -0.012121212121212088
+      },
+      "gate": {
+        "ci_lower_gt_0": false,
+        "hard_negatives_not_lower": true,
+        "devpl_not_lower": false,
+        "no_type_drop_gt_0.02": false,
+        "prompt_fits_n_ctx": true,
+        "all": false
+      }
+    },
+    "fu2": {
+      "delta": 0.0,
+      "ci95": [
+        0.0,
+        0.0
+      ],
+      "merged": {
+        "delta": 0.0,
+        "ci95": [
+          0.0,
+          0.0
+        ]
+      },
+      "devpl": {
+        "delta": 0.0,
+        "ci95": [
+          0.0,
+          0.0
+        ]
+      },
+      "type_deltas": {
+        "answerable": 0.0,
+        "company": 0.0,
+        "fact_number": 0.0,
+        "follow_up": 0.0,
+        "opinion": 0.0,
+        "temporal_comparison": 0.0
+      },
+      "gate": {
+        "ci_lower_gt_0": false,
+        "hard_negatives_not_lower": true,
+        "devpl_not_lower": true,
+        "no_type_drop_gt_0.02": true,
+        "prompt_fits_n_ctx": true,
+        "all": false
+      }
+    },
+    "fualways": {
+      "delta": -0.001142857142857143,
+      "ci95": [
+        -0.005714285714285714,
+        0.0034285714285714284
+      ],
+      "merged": {
+        "delta": -0.001142857142857143,
+        "ci95": [
+          -0.005714285714285714,
+          0.0034285714285714284
+        ]
+      },
+      "devpl": {
+        "delta": 0.0,
+        "ci95": [
+          0.0,
+          0.0
+        ]
+      },
+      "type_deltas": {
+        "answerable": 0.0,
+        "company": 0.0,
+        "fact_number": 0.0,
+        "follow_up": -0.008403361344537785,
+        "opinion": 0.0,
+        "temporal_comparison": 0.0
+      },
+      "gate": {
+        "ci_lower_gt_0": false,
+        "hard_negatives_not_lower": true,
+        "devpl_not_lower": true,
+        "no_type_drop_gt_0.02": true,
+        "prompt_fits_n_ctx": true,
+        "all": false
+      }
+    },
+    "n12p10": {
+      "delta": 0.008,
+      "ci95": [
+        0.002285714285714286,
+        0.014857142857142857
+      ],
+      "merged": {
+        "delta": 0.006857142857142857,
+        "ci95": [
+          0.002285714285714286,
+          0.012571428571428572
+        ]
+      },
+      "devpl": {
+        "delta": 0.01818181818181818,
+        "ci95": [
+          0.0,
+          0.045454545454545456
+        ]
+      },
+      "type_deltas": {
+        "answerable": 0.0,
+        "company": 0.0,
+        "fact_number": 0.015228426395939132,
+        "follow_up": 0.0,
+        "opinion": 0.015873015873015817,
+        "temporal_comparison": 0.0060606060606061
+      },
+      "gate": {
+        "ci_lower_gt_0": true,
+        "hard_negatives_not_lower": true,
+        "devpl_not_lower": true,
+        "no_type_drop_gt_0.02": true,
+        "prompt_fits_n_ctx": true,
+        "all": true
+      }
+    },
+    "n12p12": {
+      "delta": 0.009142857142857144,
+      "ci95": [
+        0.0034285714285714284,
+        0.016
+      ],
+      "merged": {
+        "delta": 0.008,
+        "ci95": [
+          0.002285714285714286,
+          0.014857142857142857
+        ]
+      },
+      "devpl": {
+        "delta": 0.02727272727272727,
+        "ci95": [
+          0.0,
+          0.06363636363636363
+        ]
+      },
+      "type_deltas": {
+        "answerable": 0.0,
+        "company": 0.0,
+        "fact_number": 0.015228426395939132,
+        "follow_up": 0.0,
+        "opinion": 0.015873015873015817,
+        "temporal_comparison": 0.0121212121212122
+      },
+      "gate": {
+        "ci_lower_gt_0": true,
+        "hard_negatives_not_lower": true,
+        "devpl_not_lower": true,
+        "no_type_drop_gt_0.02": true,
+        "prompt_fits_n_ctx": true,
+        "all": true
+      }
+    },
+    "n12p16": {
+      "delta": 0.022857142857142857,
+      "ci95": [
+        0.013714285714285714,
+        0.03314285714285714
+      ],
+      "merged": {
+        "delta": 0.024,
+        "ci95": [
+          0.013714285714285714,
+          0.03428571428571429
+        ]
+      },
+      "devpl": {
+        "delta": 0.05454545454545454,
+        "ci95": [
+          0.01818181818181818,
+          0.1
+        ]
+      },
+      "type_deltas": {
+        "answerable": 0.0,
+        "company": 0.01036269430051806,
+        "fact_number": 0.02030456852791873,
+        "follow_up": 0.008403361344537896,
+        "opinion": 0.031746031746031744,
+        "temporal_comparison": 0.042424242424242475
+      },
+      "gate": {
+        "ci_lower_gt_0": true,
+        "hard_negatives_not_lower": true,
+        "devpl_not_lower": true,
+        "no_type_drop_gt_0.02": true,
+        "prompt_fits_n_ctx": true,
+        "all": true
+      }
+    },
+    "n12p8": {
+      "delta": 0.0,
+      "ci95": [
+        0.0,
+        0.0
+      ],
+      "merged": {
+        "delta": 0.0,
+        "ci95": [
+          0.0,
+          0.0
+        ]
+      },
+      "devpl": {
+        "delta": 0.0,
+        "ci95": [
+          0.0,
+          0.0
+        ]
+      },
+      "type_deltas": {
+        "answerable": 0.0,
+        "company": 0.0,
+        "fact_number": 0.0,
+        "follow_up": 0.0,
+        "opinion": 0.0,
+        "temporal_comparison": 0.0
+      },
+      "gate": {
+        "ci_lower_gt_0": false,
+        "hard_negatives_not_lower": true,
+        "devpl_not_lower": true,
+        "no_type_drop_gt_0.02": true,
+        "prompt_fits_n_ctx": true,
+        "all": false
+      }
+    },
+    "n16p10": {
+      "delta": 0.008,
+      "ci95": [
+        0.002285714285714286,
+        0.014857142857142857
+      ],
+      "merged": {
+        "delta": 0.006857142857142857,
+        "ci95": [
+          0.002285714285714286,
+          0.012571428571428572
+        ]
+      },
+      "devpl": {
+        "delta": 0.01818181818181818,
+        "ci95": [
+          0.0,
+          0.045454545454545456
+        ]
+      },
+      "type_deltas": {
+        "answerable": 0.0,
+        "company": 0.0,
+        "fact_number": 0.015228426395939132,
+        "follow_up": 0.0,
+        "opinion": 0.015873015873015817,
+        "temporal_comparison": 0.0060606060606061
+      },
+      "gate": {
+        "ci_lower_gt_0": true,
+        "hard_negatives_not_lower": true,
+        "devpl_not_lower": true,
+        "no_type_drop_gt_0.02": true,
+        "prompt_fits_n_ctx": true,
+        "all": true
+      }
+    },
+    "n16p12": {
+      "delta": 0.009142857142857144,
+      "ci95": [
+        0.0034285714285714284,
+        0.016
+      ],
+      "merged": {
+        "delta": 0.008,
+        "ci95": [
+          0.002285714285714286,
+          0.014857142857142857
+        ]
+      },
+      "devpl": {
+        "delta": 0.02727272727272727,
+        "ci95": [
+          0.0,
+          0.06363636363636363
+        ]
+      },
+      "type_deltas": {
+        "answerable": 0.0,
+        "company": 0.0,
+        "fact_number": 0.015228426395939132,
+        "follow_up": 0.0,
+        "opinion": 0.015873015873015817,
+        "temporal_comparison": 0.0121212121212122
+      },
+      "gate": {
+        "ci_lower_gt_0": true,
+        "hard_negatives_not_lower": true,
+        "devpl_not_lower": true,
+        "no_type_drop_gt_0.02": true,
+        "prompt_fits_n_ctx": true,
+        "all": true
+      }
+    },
+    "n16p16": {
+      "delta": 0.022857142857142857,
+      "ci95": [
+        0.013714285714285714,
+        0.03314285714285714
+      ],
+      "merged": {
+        "delta": 0.024,
+        "ci95": [
+          0.013714285714285714,
+          0.03428571428571429
+        ]
+      },
+      "devpl": {
+        "delta": 0.05454545454545454,
+        "ci95": [
+          0.01818181818181818,
+          0.1
+        ]
+      },
+      "type_deltas": {
+        "answerable": 0.0,
+        "company": 0.01036269430051806,
+        "fact_number": 0.02030456852791873,
+        "follow_up": 0.008403361344537896,
+        "opinion": 0.031746031746031744,
+        "temporal_comparison": 0.042424242424242475
+      },
+      "gate": {
+        "ci_lower_gt_0": true,
+        "hard_negatives_not_lower": true,
+        "devpl_not_lower": true,
+        "no_type_drop_gt_0.02": true,
+        "prompt_fits_n_ctx": true,
+        "all": true
+      }
+    },
+    "n16p16r30": {
+      "delta": 0.06514285714285714,
+      "ci95": [
+        0.04914285714285714,
+        0.08228571428571428
+      ],
+      "merged": {
+        "delta": 0.060571428571428575,
+        "ci95": [
+          0.044571428571428574,
+          0.07657142857142857
+        ]
+      },
+      "devpl": {
+        "delta": 0.11818181818181818,
+        "ci95": [
+          0.06363636363636363,
+          0.18181818181818182
+        ]
+      },
+      "type_deltas": {
+        "answerable": 0.0,
+        "company": 0.06217616580310881,
+        "fact_number": 0.035532994923857864,
+        "follow_up": 0.025210084033613467,
+        "opinion": 0.07407407407407407,
+        "temporal_comparison": 0.12727272727272732
+      },
+      "gate": {
+        "ci_lower_gt_0": true,
+        "hard_negatives_not_lower": true,
+        "devpl_not_lower": true,
+        "no_type_drop_gt_0.02": true,
+        "prompt_fits_n_ctx": true,
+        "all": true
+      }
+    },
+    "n16p20r30": {
+      "delta": 0.072,
+      "ci95": [
+        0.054857142857142854,
+        0.08914285714285715
+      ],
+      "merged": {
+        "delta": 0.064,
+        "ci95": [
+          0.048,
+          0.08
+        ]
+      },
+      "devpl": {
+        "delta": 0.13636363636363635,
+        "ci95": [
+          0.07272727272727272,
+          0.20909090909090908
+        ]
+      },
+      "type_deltas": {
+        "answerable": 0.0,
+        "company": 0.06217616580310881,
+        "fact_number": 0.045685279187817285,
+        "follow_up": 0.03361344537815125,
+        "opinion": 0.08465608465608465,
+        "temporal_comparison": 0.13333333333333341
+      },
+      "gate": {
+        "ci_lower_gt_0": true,
+        "hard_negatives_not_lower": true,
+        "devpl_not_lower": true,
+        "no_type_drop_gt_0.02": true,
+        "prompt_fits_n_ctx": false,
+        "all": false
+      }
+    },
+    "n16p8": {
+      "delta": 0.0,
+      "ci95": [
+        0.0,
+        0.0
+      ],
+      "merged": {
+        "delta": 0.0,
+        "ci95": [
+          0.0,
+          0.0
+        ]
+      },
+      "devpl": {
+        "delta": 0.0,
+        "ci95": [
+          0.0,
+          0.0
+        ]
+      },
+      "type_deltas": {
+        "answerable": 0.0,
+        "company": 0.0,
+        "fact_number": 0.0,
+        "follow_up": 0.0,
+        "opinion": 0.0,
+        "temporal_comparison": 0.0
+      },
+      "gate": {
+        "ci_lower_gt_0": false,
+        "hard_negatives_not_lower": true,
+        "devpl_not_lower": true,
+        "no_type_drop_gt_0.02": true,
+        "prompt_fits_n_ctx": true,
+        "all": false
+      }
+    },
+    "rr30": {
+      "delta": 0.021714285714285714,
+      "ci95": [
+        0.006857142857142857,
+        0.037714285714285714
+      ],
+      "merged": {
+        "delta": 0.021714285714285714,
+        "ci95": [
+          0.008,
+          0.036571428571428574
+        ]
+      },
+      "devpl": {
+        "delta": 0.03636363636363636,
+        "ci95": [
+          -0.01818181818181818,
+          0.09090909090909091
+        ]
+      },
+      "type_deltas": {
+        "answerable": 0.0,
+        "company": 0.031088082901554404,
+        "fact_number": 0.02030456852791873,
+        "follow_up": -0.025210084033613467,
+        "opinion": 0.03703703703703698,
+        "temporal_comparison": 0.030303030303030387
+      },
+      "gate": {
+        "ci_lower_gt_0": true,
+        "hard_negatives_not_lower": false,
+        "devpl_not_lower": true,
+        "no_type_drop_gt_0.02": false,
+        "prompt_fits_n_ctx": false,
+        "all": false
+      }
+    },
+    "rrfk120": {
+      "delta": 0.0,
+      "ci95": [
+        0.0,
+        0.0
+      ],
+      "merged": {
+        "delta": 0.0,
+        "ci95": [
+          0.0,
+          0.0
+        ]
+      },
+      "devpl": {
+        "delta": 0.0,
+        "ci95": [
+          0.0,
+          0.0
+        ]
+      },
+      "type_deltas": {
+        "answerable": 0.0,
+        "company": 0.0,
+        "fact_number": 0.0,
+        "follow_up": 0.0,
+        "opinion": 0.0,
+        "temporal_comparison": 0.0
+      },
+      "gate": {
+        "ci_lower_gt_0": false,
+        "hard_negatives_not_lower": true,
+        "devpl_not_lower": true,
+        "no_type_drop_gt_0.02": true,
+        "prompt_fits_n_ctx": true,
+        "all": false
+      }
+    },
+    "rrfk20": {
+      "delta": 0.0,
+      "ci95": [
+        0.0,
+        0.0
+      ],
+      "merged": {
+        "delta": 0.0,
+        "ci95": [
+          0.0,
+          0.0
+        ]
+      },
+      "devpl": {
+        "delta": 0.0,
+        "ci95": [
+          0.0,
+          0.0
+        ]
+      },
+      "type_deltas": {
+        "answerable": 0.0,
+        "company": 0.0,
+        "fact_number": 0.0,
+        "follow_up": 0.0,
+        "opinion": 0.0,
+        "temporal_comparison": 0.0
+      },
+      "gate": {
+        "ci_lower_gt_0": false,
+        "hard_negatives_not_lower": true,
+        "devpl_not_lower": true,
+        "no_type_drop_gt_0.02": true,
+        "prompt_fits_n_ctx": true,
+        "all": false
+      }
+    },
+    "slots1": {
+      "delta": -0.010285714285714285,
+      "ci95": [
+        -0.018285714285714287,
+        -0.002285714285714286
+      ],
+      "merged": {
+        "delta": -0.0034285714285714284,
+        "ci95": [
+          -0.010285714285714285,
+          0.0034285714285714284
+        ]
+      },
+      "devpl": {
+        "delta": -0.01818181818181818,
+        "ci95": [
+          -0.05454545454545454,
+          0.01818181818181818
+        ]
+      },
+      "type_deltas": {
+        "answerable": 0.0,
+        "company": -0.010362694300518172,
+        "fact_number": 0.005076142131979711,
+        "follow_up": 0.0,
+        "opinion": -0.03703703703703709,
+        "temporal_comparison": -0.006060606060605989
+      },
+      "gate": {
+        "ci_lower_gt_0": false,
+        "hard_negatives_not_lower": true,
+        "devpl_not_lower": false,
+        "no_type_drop_gt_0.02": false,
+        "prompt_fits_n_ctx": true,
+        "all": false
+      }
+    },
+    "slots3": {
+      "delta": -0.014857142857142857,
+      "ci95": [
+        -0.025142857142857144,
+        -0.005714285714285714
+      ],
+      "merged": {
+        "delta": -0.012571428571428572,
+        "ci95": [
+          -0.021714285714285714,
+          -0.0034285714285714284
+        ]
+      },
+      "devpl": {
+        "delta": -0.03636363636363636,
+        "ci95": [
+          -0.09090909090909091,
+          0.00909090909090909
+        ]
+      },
+      "type_deltas": {
+        "answerable": 0.0,
+        "company": -0.031088082901554404,
+        "fact_number": 0.0,
+        "follow_up": -0.03361344537815125,
+        "opinion": -0.010582010582010581,
+        "temporal_comparison": -0.006060606060605989
+      },
+      "gate": {
+        "ci_lower_gt_0": false,
+        "hard_negatives_not_lower": true,
+        "devpl_not_lower": false,
+        "no_type_drop_gt_0.02": false,
+        "prompt_fits_n_ctx": true,
+        "all": false
+      }
+    },
+    "strip": {
+      "delta": 0.009142857142857144,
+      "ci95": [
+        -0.0034285714285714284,
+        0.022857142857142857
+      ],
+      "merged": {
+        "delta": 0.010285714285714285,
+        "ci95": [
+          -0.002285714285714286,
+          0.022857142857142857
+        ]
+      },
+      "devpl": {
+        "delta": 0.02727272727272727,
+        "ci95": [
+          -0.00909090909090909,
+          0.07272727272727272
+        ]
+      },
+      "type_deltas": {
+        "answerable": 0.0,
+        "company": 0.015544041450777146,
+        "fact_number": 0.005076142131979711,
+        "follow_up": -0.04201680672268904,
+        "opinion": 0.026455026455026398,
+        "temporal_comparison": 0.024242424242424288
+      },
+      "gate": {
+        "ci_lower_gt_0": false,
+        "hard_negatives_not_lower": true,
+        "devpl_not_lower": true,
+        "no_type_drop_gt_0.02": false,
+        "prompt_fits_n_ctx": true,
+        "all": false
+      }
+    },
+    "yr1957": {
+      "delta": 0.004571428571428572,
+      "ci95": [
+        -0.0034285714285714284,
+        0.012571428571428572
+      ],
+      "merged": {
+        "delta": 0.001142857142857143,
+        "ci95": [
+          -0.006857142857142857,
+          0.009142857142857144
+        ]
+      },
+      "devpl": {
+        "delta": 0.045454545454545456,
+        "ci95": [
+          -0.00909090909090909,
+          0.1
+        ]
+      },
+      "type_deltas": {
+        "answerable": 0.0,
+        "company": 0.025906735751295318,
+        "fact_number": -0.005076142131979711,
+        "follow_up": 0.0,
+        "opinion": 0.0,
+        "temporal_comparison": 0.0
+      },
+      "gate": {
+        "ci_lower_gt_0": false,
+        "hard_negatives_not_lower": true,
+        "devpl_not_lower": true,
+        "no_type_drop_gt_0.02": true,
+        "prompt_fits_n_ctx": true,
+        "all": false
+      }
+    },
+    "yrw3": {
+      "delta": 0.0,
+      "ci95": [
+        0.0,
+        0.0
+      ],
+      "merged": {
+        "delta": 0.0,
+        "ci95": [
+          0.0,
+          0.0
+        ]
+      },
+      "devpl": {
+        "delta": 0.0,
+        "ci95": [
+          0.0,
+          0.0
+        ]
+      },
+      "type_deltas": {
+        "answerable": 0.0,
+        "company": 0.0,
+        "fact_number": 0.0,
+        "follow_up": 0.0,
+        "opinion": 0.0,
+        "temporal_comparison": 0.0
+      },
+      "gate": {
+        "ci_lower_gt_0": false,
+        "hard_negatives_not_lower": true,
+        "devpl_not_lower": true,
+        "no_type_drop_gt_0.02": true,
+        "prompt_fits_n_ctx": true,
+        "all": false
+      }
+    }
+  },
+  "determinism_hv6": {
+    "checked": 79,
+    "exact_order": 38,
+    "same_set_other_order": 0,
+    "same_ids_rate": 0.4810126582278481,
+    "mismatches": [
+      {
+        "qid": "hv6a_01",
+        "now": [
+          "2014_p0240",
+          "1981_p0039",
+          "1989_p0138",
+          "2016_p0025",
+          "2018_p0055",
+          "1987_p0120",
+          "1987_p0123",
+          "1982_p0060"
+        ],
+        "stored": [
+          "2014_p0240",
+          "1981_p0039",
+          "1989_p0138",
+          "2016_p0025",
+          "2018_p0055",
+          "2016_p0035",
+          "2014_p0230",
+          "1987_p0121"
+        ]
+      },
+      {
+        "qid": "hv6a_03",
+        "now": [
+          "1987_p0071",
+          "bpl1958_p0013",
+          "2009_p0026",
+          "1991_p0020",
+          "2018_p0033",
+          "2013_p0105",
+          "1990_p0087",
+          "1987_p0066"
+        ],
+        "stored": [
+          "2013_p0102",
+          "1987_p0071",
+          "2009_p0026",
+          "1991_p0020",
+          "2018_p0033",
+          "2013_p0105",
+          "1990_p0087",
+          "1987_p0066"
+        ]
+      },
+      {
+        "qid": "hv6a_08",
+        "now": [
+          "1989_p0132",
+          "2014_p0241",
+          "1989_p0136",
+          "2000_p0090",
+          "1986_p0124",
+          "2014_p0238",
+          "2009_p0096",
+          "1992_p0097"
+        ],
+        "stored": [
+          "1989_p0132",
+          "2014_p0241",
+          "1989_p0136",
+          "2000_p0090",
+          "1986_p0124",
+          "2014_p0230",
+          "2018_p0025",
+          "2024_p0003"
+        ]
+      },
+      {
+        "qid": "hv6a_11",
+        "now": [
+          "1999_p0056",
+          "1997_p0071",
+          "1997_p0069",
+          "1997_p0073",
+          "1999_p0059",
+          "1997_p0072",
+          "1997_p0070",
+          "2007_p0131"
+        ],
+        "stored": [
+          "1999_p0056",
+          "1997_p0071",
+          "1997_p0069",
+          "1997_p0073",
+          "1999_p0059",
+          "1997_p0072",
+          "1997_p0070",
+          "1999_p0060"
+        ]
+      },
+      {
+        "qid": "hv6a_12",
+        "now": [
+          "1997_p0096",
+          "1997_p0093",
+          "1990_p0100",
+          "1987_p0127",
+          "1995_p0082",
+          "1987_p0111",
+          "1996_p0099",
+          "1996_p0098"
+        ],
+        "stored": [
+          "1997_p0096",
+          "1997_p0093",
+          "1990_p0100",
+          "1987_p0127",
+          "1995_p0082",
+          "1987_p0111",
+          "1997_p0098",
+          "1995_p0092"
+        ]
+      },
+      {
+        "qid": "hv6a_13",
+        "now": [
+          "1999_p0072",
+          "1999_p0056",
+          "1999_p0005",
+          "1999_p0059",
+          "1999_p0058",
+          "1999_p0057",
+          "bpl1965_p0070",
+          "2014_p0191"
+        ],
+        "stored": [
+          "1999_p0072",
+          "1999_p0056",
+          "1999_p0005",
+          "1999_p0059",
+          "1999_p0058",
+          "1999_p0057",
+          "1992_p0024",
+          "1999_p0078"
+        ]
+      },
+      {
+        "qid": "hv6a_15",
+        "now": [
+          "2011_p0093",
+          "2007_p0023",
+          "2016_p0098",
+          "2007_p0024",
+          "2012_p0075",
+          "2014_p0139",
+          "2016_p0034",
+          "1980_p0012"
+        ],
+        "stored": [
+          "2011_p0093",
+          "2007_p0023",
+          "2016_p0098",
+          "2007_p0024",
+          "2012_p0075",
+          "2014_p0139",
+          "1988_p0098",
+          "2015_p0019"
+        ]
+      },
+      {
+        "qid": "hv6a_16",
+        "now": [
+          "1992_p0104",
+          "1989_p0036",
+          "1983_p0014",
+          "1988_p0030",
+          "2020_p0048",
+          "1985_p0076",
+          "1999_p0056",
+          "2020_p0050"
+        ],
+        "stored": [
+          "1992_p0104",
+          "1989_p0036",
+          "1983_p0014",
+          "1988_p0030",
+          "2020_p0048",
+          "1985_p0076",
+          "1999_p0056",
+          "1984_p0028"
+        ]
+      },
+      {
+        "qid": "hv6a_17",
+        "now": [
+          "1992_p0020",
+          "1981_p0009",
+          "2010_p0156",
+          "1982_p0088",
+          "2000_p0013",
+          "1981_p0008",
+          "1981_p0012",
+          "2006_p0040"
+        ],
+        "stored": [
+          "1992_p0020",
+          "1981_p0009",
+          "2010_p0156",
+          "1982_p0088",
+          "2000_p0013",
+          "2014_p0243",
+          "2014_p0224",
+          "2006_p0033"
+        ]
+      },
+      {
+        "qid": "hv6a_18",
+        "now": [
+          "1991_p0002",
+          "1991_p0000",
+          "1991_p0081",
+          "1991_p0014",
+          "2022_p0040",
+          "2010_p0035",
+          "2019_p0026",
+          "1997_p0018"
+        ],
+        "stored": [
+          "1991_p0002",
+          "1991_p0000",
+          "1991_p0081",
+          "1991_p0018",
+          "1991_p0001",
+          "1991_p0014",
+          "1991_p0086",
+          "1991_p0031"
+        ]
+      },
+      {
+        "qid": "hv6a_20",
+        "now": [
+          "2013_p0092",
+          "2011_p0019",
+          "2013_p0091",
+          "1989_p0098",
+          "2016_p0065",
+          "2014_p0073",
+          "2015_p0025",
+          "1984_p0106"
+        ],
+        "stored": [
+          "2013_p0092",
+          "2011_p0019",
+          "2013_p0091",
+          "1989_p0098",
+          "2016_p0065",
+          "2014_p0073",
+          "2015_p0025",
+          "2001_p0094"
+        ]
+      },
+      {
+        "qid": "hv6a_21",
+        "now": [
+          "2011_p0113",
+          "1979_p0012",
+          "1994_p0004",
+          "1999_p0095",
+          "bpl1970_p0046",
+          "1986_p0084",
+          "2021_p0040",
+          "bpl1969_p0047"
+        ],
+        "stored": [
+          "2011_p0113",
+          "1979_p0013",
+          "1979_p0012",
+          "1994_p0004",
+          "1999_p0095",
+          "1986_p0084",
+          "2003_p0035",
+          "2020_p0029"
+        ]
+      },
+      {
+        "qid": "hv6a_22",
+        "now": [
+          "2015_p0046",
+          "2015_p0026",
+          "2015_p0047",
+          "2015_p0025",
+          "2015_p0070",
+          "2015_p0068",
+          "2015_p0012",
+          "2000_p0044"
+        ],
+        "stored": [
+          "2015_p0046",
+          "2015_p0026",
+          "2015_p0047",
+          "2015_p0025",
+          "2015_p0070",
+          "2015_p0068",
+          "2015_p0012",
+          "2015_p0049"
+        ]
+      },
+      {
+        "qid": "hv6a_23",
+        "now": [
+          "2017_p0040",
+          "2017_p0041",
+          "2017_p0039",
+          "2017_p0011",
+          "2017_p0034",
+          "2017_p0042",
+          "2017_p0046",
+          "1999_p0026"
+        ],
+        "stored": [
+          "2017_p0040",
+          "2017_p0041",
+          "2017_p0039",
+          "2017_p0011",
+          "2017_p0034",
+          "2017_p0042",
+          "2017_p0046",
+          "2017_p0037"
+        ]
+      },
+      {
+        "qid": "hv6a_24",
+        "now": [
+          "1995_p0105",
+          "1996_p0012",
+          "1995_p0102",
+          "2014_p0139",
+          "1998_p0000",
+          "2002_p0089",
+          "1992_p0003",
+          "2014_p0055"
+        ],
+        "stored": [
+          "1995_p0105",
+          "1996_p0012",
+          "1995_p0102",
+          "2014_p0139",
+          "1998_p0000",
+          "2002_p0089",
+          "1992_p0003",
+          "1988_p0000"
+        ]
+      },
+      {
+        "qid": "hv6a_25",
+        "now": [
+          "1985_p0055",
+          "1985_p0058",
+          "1985_p0056",
+          "1985_p0054",
+          "2007_p0038",
+          "1983_p0119",
+          "2007_p0037",
+          "2004_p0049"
+        ],
+        "stored": [
+          "1985_p0055",
+          "1985_p0058",
+          "1985_p0056",
+          "1985_p0054",
+          "2007_p0038",
+          "1983_p0119",
+          "2007_p0037",
+          "1987_p0004"
+        ]
+      },
+      {
+        "qid": "hv6a_26",
+        "now": [
+          "1983_p0025",
+          "2014_p0014",
+          "1989_p0001",
+          "1993_p0005",
+          "2011_p0027",
+          "1994_p0012",
+          "1987_p0001",
+          "2009_p0015"
+        ],
+        "stored": [
+          "1983_p0025",
+          "2014_p0014",
+          "1989_p0001",
+          "1993_p0005",
+          "2011_p0027",
+          "2004_p0009",
+          "2014_p0013",
+          "1994_p0012"
+        ]
+      },
+      {
+        "qid": "hv6a_33",
+        "now": [
+          "2010_p0051",
+          "2002_p0015",
+          "2014_p0139",
+          "2023_p0001",
+          "2014_p0230",
+          "2006_p0160",
+          "1991_p0006",
+          "2014_p0237"
+        ],
+        "stored": [
+          "2010_p0051",
+          "2002_p0015",
+          "2014_p0139",
+          "2023_p0001",
+          "2014_p0230",
+          "2020_p0060",
+          "2014_p0037",
+          "1992_p0003"
+        ]
+      },
+      {
+        "qid": "hv6a_35",
+        "now": [
+          "2006_p0159",
+          "2007_p0130",
+          "2014_p0124",
+          "2005_p0143",
+          "1999_p0117",
+          "2015_p0166",
+          "2016_p0155",
+          "bpl1958_p0009"
+        ],
+        "stored": [
+          "2006_p0159",
+          "2007_p0130",
+          "2014_p0124",
+          "2005_p0143",
+          "1999_p0117",
+          "2009_p0111",
+          "2008_p0133",
+          "2000_p0125"
+        ]
+      },
+      {
+        "qid": "hv6b_06",
+        "now": [
+          "2016_p0096",
+          "bpl1962_p0017",
+          "2015_p0103",
+          "2011_p0096",
+          "1990_p0144",
+          "bpl1962_p0035",
+          "bpl1963_p0086",
+          "2005_p0089"
+        ],
+        "stored": [
+          "2016_p0096",
+          "2015_p0103",
+          "2011_p0096",
+          "2008_p0066",
+          "1990_p0144",
+          "1992_p0002",
+          "2017_p0063",
+          "2016_p0123"
+        ]
+      },
+      {
+        "qid": "hv6b_09",
+        "now": [
+          "1988_p0055",
+          "1988_p0056",
+          "1989_p0060",
+          "1989_p0050",
+          "1988_p0098",
+          "1988_p0047",
+          "1988_p0000",
+          "1989_p0058"
+        ],
+        "stored": [
+          "1988_p0055",
+          "1988_p0056",
+          "1989_p0060",
+          "1989_p0050",
+          "1988_p0047",
+          "1989_p0018",
+          "1988_p0123",
+          "1988_p0048"
+        ]
+      },
+      {
+        "qid": "hv6b_11",
+        "now": [
+          "1984_p0097",
+          "1989_p0118",
+          "1984_p0099",
+          "1984_p0093",
+          "1984_p0098",
+          "1984_p0116",
+          "1997_p0018",
+          "1989_p0103"
+        ],
+        "stored": [
+          "1984_p0097",
+          "1989_p0118",
+          "1984_p0099",
+          "1984_p0093",
+          "1984_p0098",
+          "1984_p0116",
+          "1992_p0069",
+          "1989_p0103"
+        ]
+      },
+      {
+        "qid": "hv6b_12",
+        "now": [
+          "1992_p0012",
+          "1992_p0011",
+          "1992_p0118",
+          "1992_p0014",
+          "1992_p0033",
+          "bpl1969_p0043",
+          "1996_p0010",
+          "1992_p0110"
+        ],
+        "stored": [
+          "1992_p0012",
+          "1992_p0011",
+          "1992_p0118",
+          "1992_p0014",
+          "1992_p0033",
+          "1992_p0097",
+          "1992_p0060",
+          "1992_p0102"
+        ]
+      },
+      {
+        "qid": "hv6b_14",
+        "now": [
+          "2014_p0103",
+          "2014_p0104",
+          "2014_p0012",
+          "2014_p0102",
+          "1986_p0120",
+          "1984_p0072",
+          "1993_p0093",
+          "2022_p0042"
+        ],
+        "stored": [
+          "2014_p0103",
+          "2014_p0104",
+          "2014_p0012",
+          "2014_p0102",
+          "2014_p0230",
+          "2014_p0139",
+          "2014_p0041",
+          "2014_p0017"
+        ]
+      },
+      {
+        "qid": "hv6b_15",
+        "now": [
+          "2016_p0035",
+          "2016_p0052",
+          "2016_p0029",
+          "2016_p0030",
+          "2016_p0010",
+          "2016_p0159",
+          "2000_p0084",
+          "2014_p0196"
+        ],
+        "stored": [
+          "2016_p0035",
+          "2016_p0052",
+          "2016_p0029",
+          "2016_p0030",
+          "2016_p0159",
+          "2016_p0014",
+          "2016_p0110",
+          "2016_p0018"
+        ]
+      },
+      {
+        "qid": "hv6b_16",
+        "now": [
+          "2004_p0050",
+          "2004_p0032",
+          "2004_p0037",
+          "2004_p0069",
+          "2004_p0068",
+          "2014_p0146",
+          "1985_p0030",
+          "1986_p0124"
+        ],
+        "stored": [
+          "2004_p0050",
+          "2004_p0032",
+          "2004_p0037",
+          "2004_p0069",
+          "2004_p0068",
+          "2004_p0033",
+          "2004_p0035",
+          "2004_p0034"
+        ]
+      },
+      {
+        "qid": "hv6b_19",
+        "now": [
+          "2008_p0073",
+          "2008_p0072",
+          "2008_p0074",
+          "2008_p0071",
+          "2008_p0114",
+          "1980_p0055",
+          "2005_p0105",
+          "2008_p0100"
+        ],
+        "stored": [
+          "2008_p0073",
+          "2008_p0072",
+          "2008_p0074",
+          "2008_p0071",
+          "2008_p0114",
+          "2008_p0081",
+          "2008_p0076",
+          "2008_p0010"
+        ]
+      },
+      {
+        "qid": "hv6b_20",
+        "now": [
+          "2004_p0064",
+          "2017_p0039",
+          "2017_p0040",
+          "2017_p0041",
+          "1993_p0051",
+          "2018_p0058",
+          "2004_p0065",
+          "2004_p0066"
+        ],
+        "stored": [
+          "2004_p0064",
+          "2017_p0039",
+          "2017_p0040",
+          "2017_p0041",
+          "1993_p0051",
+          "2018_p0058",
+          "1992_p0041",
+          "2002_p0032"
+        ]
+      },
+      {
+        "qid": "hv6b_25",
+        "now": [
+          "2024_p0020",
+          "2024_p0016",
+          "2024_p0043",
+          "2024_p0013",
+          "2024_p0021",
+          "2024_p0011",
+          "1984_p0128",
+          "1985_p0143"
+        ],
+        "stored": [
+          "2024_p0020",
+          "2024_p0016",
+          "2024_p0043",
+          "2024_p0013",
+          "2024_p0021",
+          "2024_p0011",
+          "2024_p0019",
+          "2024_p0017"
+        ]
+      },
+      {
+        "qid": "hv6b_26",
+        "now": [
+          "2022_p0040",
+          "2022_p0039",
+          "2022_p0024",
+          "2022_p0020",
+          "2001_p0084",
+          "2006_p0107",
+          "2012_p0060",
+          "2012_p0065"
+        ],
+        "stored": [
+          "2022_p0040",
+          "2022_p0039",
+          "2021_p0020",
+          "2019_p0079",
+          "2018_p0027",
+          "2022_p0024",
+          "2019_p0078",
+          "2022_p0036"
+        ]
+      },
+      {
+        "qid": "hv6b_28",
+        "now": [
+          "1991_p0018",
+          "1991_p0010",
+          "1991_p0081",
+          "1991_p0002",
+          "2002_p0102",
+          "1993_p0089",
+          "1992_p0062",
+          "1992_p0061"
+        ],
+        "stored": [
+          "1991_p0018",
+          "1991_p0010",
+          "1991_p0081",
+          "1991_p0002",
+          "1991_p0000",
+          "1991_p0069",
+          "1991_p0090",
+          "1991_p0073"
+        ]
+      },
+      {
+        "qid": "hv6b_29",
+        "now": [
+          "1986_p0025",
+          "1986_p0024",
+          "1986_p0022",
+          "1986_p0019",
+          "1986_p0087",
+          "1986_p0053",
+          "bpl1963_p0037",
+          "bpl1963_p0053"
+        ],
+        "stored": [
+          "1986_p0025",
+          "1986_p0024",
+          "1986_p0022",
+          "1986_p0019",
+          "1986_p0087",
+          "1986_p0053",
+          "1986_p0124",
+          "1986_p0023"
+        ]
+      },
+      {
+        "qid": "hv6b_32",
+        "now": [
+          "1986_p0086",
+          "1986_p0000",
+          "1986_p0014",
+          "1986_p0106",
+          "1986_p0073",
+          "1991_p0002",
+          "1998_p0010",
+          "1985_p0125"
+        ],
+        "stored": [
+          "1986_p0086",
+          "1986_p0000",
+          "1986_p0014",
+          "1986_p0106",
+          "1986_p0073",
+          "1986_p0097",
+          "1986_p0009",
+          "1986_p0096"
+        ]
+      },
+      {
+        "qid": "hv6b_33",
+        "now": [
+          "2004_p0144",
+          "2004_p0135",
+          "2004_p0116",
+          "2004_p0133",
+          "2004_p0069",
+          "2004_p0136",
+          "2004_p0145",
+          "2024_p0043"
+        ],
+        "stored": [
+          "2004_p0144",
+          "2004_p0135",
+          "2004_p0116",
+          "2004_p0133",
+          "2004_p0069",
+          "2004_p0136",
+          "2004_p0104",
+          "2004_p0014"
+        ]
+      },
+      {
+        "qid": "hv6b_34",
+        "now": [
+          "2002_p0019",
+          "2002_p0022",
+          "2002_p0007",
+          "2002_p0136",
+          "2002_p0044",
+          "2002_p0006",
+          "2014_p0141",
+          "2014_p0017"
+        ],
+        "stored": [
+          "2002_p0019",
+          "2002_p0022",
+          "2002_p0007",
+          "2002_p0136",
+          "2002_p0044",
+          "2002_p0006",
+          "2002_p0053",
+          "2002_p0046"
+        ]
+      },
+      {
+        "qid": "hv6b_37",
+        "now": [
+          "1998_p0000",
+          "1998_p0107",
+          "1998_p0052",
+          "1998_p0007",
+          "1998_p0019",
+          "1998_p0096",
+          "1998_p0001",
+          "1998_p0106",
+          "1998_p0108",
+          "1998_p0051",
+          "1998_p0053",
+          "1998_p0006",
+          "2006_p0150",
+          "2006_p0021",
+          "2006_p0149",
+          "2006_p0151",
+          "2006_p0020",
+          "2006_p0022"
+        ],
+        "stored": [
+          "1998_p0000",
+          "1998_p0107",
+          "1998_p0052",
+          "1998_p0007",
+          "1998_p0019",
+          "1998_p0096",
+          "1998_p0001",
+          "1998_p0106",
+          "1998_p0108",
+          "1998_p0051",
+          "1998_p0053",
+          "1998_p0006",
+          "2006_p0150",
+          "2006_p0005",
+          "2006_p0149",
+          "2006_p0151",
+          "2006_p0004",
+          "2006_p0006"
+        ]
+      },
+      {
+        "qid": "hv6b_38",
+        "now": [
+          "1988_p0061",
+          "1988_p0066",
+          "1988_p0062",
+          "1988_p0064",
+          "2002_p0095",
+          "1993_p0085",
+          "2006_p0014",
+          "1987_p0081"
+        ],
+        "stored": [
+          "1988_p0061",
+          "1988_p0066",
+          "1988_p0067",
+          "1988_p0062",
+          "1988_p0029",
+          "1988_p0098",
+          "1988_p0103",
+          "1988_p0125"
+        ]
+      },
+      {
+        "qid": "hv6b_40",
+        "now": [
+          "1988_p0098",
+          "1988_p0087",
+          "1989_p0083",
+          "1988_p0097",
+          "1988_p0093",
+          "2014_p0240",
+          "2014_p0244",
+          "1989_p0054"
+        ],
+        "stored": [
+          "1988_p0098",
+          "1988_p0087",
+          "1988_p0088",
+          "1989_p0083",
+          "1988_p0096",
+          "1988_p0085",
+          "1988_p0097",
+          "1988_p0091"
+        ]
+      },
+      {
+        "qid": "hv6b_41",
+        "now": [
+          "2008_p0043",
+          "2018_p0063",
+          "2013_p0021",
+          "2010_p0051",
+          "2009_p0036",
+          "1996_p0002",
+          "1999_p0039",
+          "1981_p0007"
+        ],
+        "stored": [
+          "2008_p0043",
+          "2018_p0063",
+          "2013_p0021",
+          "2010_p0051",
+          "2009_p0036",
+          "1996_p0002",
+          "2009_p0033",
+          "2013_p0052"
+        ]
+      },
+      {
+        "qid": "hv6b_42",
+        "now": [
+          "1998_p0011",
+          "1998_p0107",
+          "1998_p0000",
+          "1998_p0012",
+          "1998_p0009",
+          "1998_p0052",
+          "2001_p0010",
+          "1985_p0030"
+        ],
+        "stored": [
+          "1998_p0011",
+          "1998_p0107",
+          "1998_p0000",
+          "1998_p0012",
+          "1998_p0009",
+          "1998_p0052",
+          "1998_p0049",
+          "1998_p0094"
+        ]
+      },
+      {
+        "qid": "hv6b_46",
+        "now": [
+          "2006_p0120",
+          "2006_p0119",
+          "2006_p0089",
+          "2006_p0121",
+          "2006_p0118",
+          "2006_p0088",
+          "2006_p0090",
+          "2014_p0029",
+          "2014_p0079",
+          "2014_p0012",
+          "2014_p0021",
+          "2014_p0105",
+          "2014_p0028",
+          "2014_p0030",
+          "2014_p0078",
+          "2014_p0080",
+          "2014_p0011",
+          "2014_p0013",
+          "2014_p0020"
+        ],
+        "stored": [
+          "2006_p0120",
+          "2006_p0119",
+          "2006_p0089",
+          "2006_p0087",
+          "2006_p0121",
+          "2006_p0118",
+          "2006_p0088",
+          "2006_p0090",
+          "2006_p0086",
+          "2014_p0029",
+          "2014_p0079",
+          "2014_p0012",
+          "2014_p0021",
+          "2014_p0028",
+          "2014_p0030",
+          "2014_p0078",
+          "2014_p0080",
+          "2014_p0011",
+          "2014_p0013",
+          "2014_p0020",
+          "2014_p0022"
+        ]
+      }
+    ]
+  },
+  "bootstrap": {
+    "draws": 10000,
+    "seed": 0
+  },
+  "causes": {
+    "baseline": {
+      "missed_claims": 190,
+      "total_claims": 875,
+      "by_cause": {
+        "all": {
+          "lexical_gap": 17,
+          "rerank_demotion": 49,
+          "candidate_depth_cut": 55,
+          "cap_dedupe_merge_drop": 44,
+          "period_year_filter": 13,
+          "multipart_split_error": 10,
+          "followup_context_missing": 2
+        },
+        "heldout_v3": {
+          "lexical_gap": 0,
+          "rerank_demotion": 4,
+          "candidate_depth_cut": 2,
+          "cap_dedupe_merge_drop": 3,
+          "period_year_filter": 0,
+          "multipart_split_error": 0,
+          "followup_context_missing": 0
+        },
+        "heldout_v4": {
+          "lexical_gap": 1,
+          "rerank_demotion": 3,
+          "candidate_depth_cut": 1,
+          "cap_dedupe_merge_drop": 0,
+          "period_year_filter": 1,
+          "multipart_split_error": 0,
+          "followup_context_missing": 0
+        },
+        "heldout_v5a": {
+          "lexical_gap": 0,
+          "rerank_demotion": 18,
+          "candidate_depth_cut": 7,
+          "cap_dedupe_merge_drop": 10,
+          "period_year_filter": 0,
+          "multipart_split_error": 2,
+          "followup_context_missing": 0
+        },
+        "heldout_v5b": {
+          "lexical_gap": 3,
+          "rerank_demotion": 7,
+          "candidate_depth_cut": 7,
+          "cap_dedupe_merge_drop": 6,
+          "period_year_filter": 3,
+          "multipart_split_error": 0,
+          "followup_context_missing": 0
+        },
+        "heldout_v6a": {
+          "lexical_gap": 4,
+          "rerank_demotion": 9,
+          "candidate_depth_cut": 7,
+          "cap_dedupe_merge_drop": 6,
+          "period_year_filter": 0,
+          "multipart_split_error": 2,
+          "followup_context_missing": 2
+        },
+        "heldout_v6b": {
+          "lexical_gap": 0,
+          "rerank_demotion": 7,
+          "candidate_depth_cut": 12,
+          "cap_dedupe_merge_drop": 6,
+          "period_year_filter": 6,
+          "multipart_split_error": 2,
+          "followup_context_missing": 0
+        },
+        "dev_cases": {
+          "lexical_gap": 0,
+          "rerank_demotion": 1,
+          "candidate_depth_cut": 1,
+          "cap_dedupe_merge_drop": 2,
+          "period_year_filter": 2,
+          "multipart_split_error": 0,
+          "followup_context_missing": 0
+        },
+        "devpl": {
+          "lexical_gap": 9,
+          "rerank_demotion": 0,
+          "candidate_depth_cut": 18,
+          "cap_dedupe_merge_drop": 11,
+          "period_year_filter": 1,
+          "multipart_split_error": 4,
+          "followup_context_missing": 0
+        }
+      }
+    }
+  },
+  "rows_digest": {
+    "baseline": {
+      "cases": 359
+    },
+    "bm25w15": {
+      "cases": 359
+    },
+    "combo16": {
+      "cases": 359
+    },
+    "combo16r30": {
+      "cases": 359
+    },
+    "combo20r30": {
+      "cases": 359
+    },
+    "dedup0": {
+      "cases": 359
+    },
+    "densew15": {
+      "cases": 359
+    },
+    "fu2": {
+      "cases": 359
+    },
+    "fualways": {
+      "cases": 359
+    },
+    "n12p10": {
+      "cases": 359
+    },
+    "n12p12": {
+      "cases": 359
+    },
+    "n12p16": {
+      "cases": 359
+    },
+    "n12p8": {
+      "cases": 359
+    },
+    "n16p10": {
+      "cases": 359
+    },
+    "n16p12": {
+      "cases": 359
+    },
+    "n16p16": {
+      "cases": 359
+    },
+    "n16p16r30": {
+      "cases": 359
+    },
+    "n16p20r30": {
+      "cases": 359
+    },
+    "n16p8": {
+      "cases": 359
+    },
+    "rr30": {
+      "cases": 359
+    },
+    "rrfk120": {
+      "cases": 359
+    },
+    "rrfk20": {
+      "cases": 359
+    },
+    "slots1": {
+      "cases": 359
+    },
+    "slots3": {
+      "cases": 359
+    },
+    "strip": {
+      "cases": 359
+    },
+    "yr1957": {
+      "cases": 359
+    },
+    "yrw3": {
+      "cases": 359
+    }
+  }
+}

@@ -126,7 +126,7 @@ ANSWER_CONTEXT_NEIGHBORS = int(os.getenv("ANSWER_CONTEXT_NEIGHBORS", "1"))
 # 9000 chars (~2250 tokens) per passage keeps neighbor expansion from truncating.
 ANSWER_CONTEXT_MAX_CHARS = int(os.getenv("ANSWER_CONTEXT_MAX_CHARS", "9000"))
 # Max candidates sent to the cross-encoder (cost is linear in this).
-RERANK_CANDIDATES = int(os.getenv("RERANK_CANDIDATES", "15"))
+RERANK_CANDIDATES = int(os.getenv("RERANK_CANDIDATES", "30"))  # was 15; retrieval_dev_v8
 # Query expansion: "auto" (only when first-pass evidence is weak) | "always" | "off"
 # Defaults to "off": a small embedded model produces unreliable expansions.
 EXPANSION_MODE = os.getenv("EXPANSION_MODE", "off").strip().lower()
@@ -147,14 +147,14 @@ DEFAULT_LLM_PROVIDER = os.getenv("DEFAULT_LLM_PROVIDER", "llama").strip().lower(
 LLM_MODEL_PATH = Path(os.getenv("LLM_MODEL_PATH", "models/ft/7b_r1/buffett-qwen2.5-7b-ft-r1-q4_k_m.gguf"))
 if not LLM_MODEL_PATH.is_absolute():
     LLM_MODEL_PATH = BASE_DIR / LLM_MODEL_PATH
-LLM_N_CTX = int(os.getenv("LLM_N_CTX", "8192"))
+LLM_N_CTX = int(os.getenv("LLM_N_CTX", "16384"))  # was 8192; retrieval_dev_v8
 LLM_N_THREADS = int(os.getenv("LLM_N_THREADS", "0"))  # 0 = auto
 LLM_TEMPERATURE = float(os.getenv("LLM_TEMPERATURE", "0.1"))
 LLM_GPU_LAYERS = int(os.getenv("LLM_GPU_LAYERS", "-1"))  # -1 = all (Metal); 0 = CPU only
 # A small CPU model cannot take 8 long passages, so cap the prompt at 5. 7B GGUF
-# models get 8: the dev check (80 cases) showed fewer unneeded refusals (13 -> 9 of
+# models get 16 (retrieval_dev_v8; 8 before, with n_ctx 8192): the dev check (80 cases) showed fewer unneeded refusals (13 -> 9 of
 # 71) with no metric loss.
-_DEFAULT_CONTEXT_PASSAGES = "8" if "7b" in LLM_MODEL_PATH.name.lower() else "5"
+_DEFAULT_CONTEXT_PASSAGES = "16" if "7b" in LLM_MODEL_PATH.name.lower() else "5"
 LLM_CONTEXT_PASSAGES = int(os.getenv("LLM_CONTEXT_PASSAGES", _DEFAULT_CONTEXT_PASSAGES))
 LLM_PASSAGE_MAX_CHARS = int(os.getenv("LLM_PASSAGE_MAX_CHARS", "1800"))
 # Neighbour-sentence expansion (src/generation/answer_expand.py): passage sentences added after / before every
@@ -172,7 +172,7 @@ ANSWER_REFUSAL_RETRY = os.getenv("ANSWER_REFUSAL_RETRY", "1")
 # retrieval_setting() / llm_context_passages() so an env var set later still applies.
 # -----------------------------------------------------------------------------
 RETRIEVAL_DEFAULTS: dict = {
-    "RERANK_CANDIDATES": 15,          # candidates sent to the cross-encoder
+    "RERANK_CANDIDATES": 30,          # candidates sent to the cross-encoder (was 15)
     "RRF_K": 60,                      # reciprocal-rank-fusion constant
     "HYBRID_VECTOR_WEIGHT": 1.0,      # dense ranking weight in the hybrid fusion
     "HYBRID_BM25_WEIGHT": 1.0,        # BM25 ranking weight in the hybrid fusion
@@ -185,6 +185,11 @@ RETRIEVAL_DEFAULTS: dict = {
     "RETRIEVAL_NEIGHBOR_ANCHORS": 0,  # neighbours of the top-N hits appended as own passages
     "RETRIEVAL_MMR_LAMBDA": 1.0,      # <1: MMR diversity over the reranked pool (1 = off)
     "LLM_CHARS_PER_TOKEN": 4.0,       # prompt-budget estimate used to drop passages that would not fit n_ctx
+    "RETRIEVAL_QUERY_STRIP": 0,       # 1: add a candidate ranking from the query without question scaffolding
+    "RETRIEVAL_YEAR_FILTER_MIN": 1970,  # earliest year the auto year filter recognises (1957 = partnership years too)
+    "RETRIEVAL_YEAR_FILTER_WEIGHT": 2,  # weight of the year-filtered ranking against the unfiltered one in the boost
+    "RETRIEVAL_DEDUP": 1,             # 0: no near-duplicate removal of the reranked pool
+    "RETRIEVAL_RERANK_FETCH": 0,      # 1: fetch at least RERANK_CANDIDATES candidates (deeper rerank pool than fetch_k)
 }
 
 
@@ -195,6 +200,12 @@ def retrieval_setting(name: str):
     if raw is None or not raw.strip():
         return default
     return type(default)(float(raw)) if isinstance(default, int) else float(raw)
+
+
+def llm_n_ctx() -> int:
+    """LLM_N_CTX at call time (default 16384): the llama window and the prompt budget of the served context."""
+    raw = os.environ.get("LLM_N_CTX")
+    return int(raw) if raw and raw.strip() else 16384
 
 
 def llm_context_passages() -> int:
