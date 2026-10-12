@@ -7,6 +7,7 @@ numbers map to real passages.
 
 from __future__ import annotations
 
+import os
 import re
 from typing import Dict, List, Optional, Sequence
 
@@ -91,6 +92,59 @@ numbered passages.
 """
 
 
+# Prompt version v2 (coverage prompt for the ft_v6 retrain). v1 above is the text the live FT-r1
+# model was trained on and stays unchanged; v2 differs in exactly three places.
+_V2_CORPUS = (
+    "Warren Buffett's Buffett Partnership letters (1957-1970) and Berkshire Hathaway shareholder letters (1977-2024)"
+)
+_V1_CORPUS = "Warren Buffett's annual Berkshire Hathaway shareholder letters (1977-2024)"
+_V1_PARTIAL = (
+    "If the passages answer only part of the question, answer that part and identify the missing evidence. "
+)
+_V2_COVERAGE = (
+    "Answer every part of the question: state each relevant fact from the passages in its own sentence, "
+    "copying the passage sentence when possible (both sentences when one fact spans two), with its citation. "
+    "Write a gap line only for a part that is genuinely absent from the passages. "
+)
+_V1_TONE = "- Concise: one solid sentence beats two vague ones.\n"
+_V2_TONE = "- Complete first: leave no relevant fact out; keep each sentence plain and direct.\n"
+
+
+def _make_system_prompt_v2() -> str:
+    text = SYSTEM_PROMPT
+    # The v1 text wraps lines with backslash continuations; the strings below are the joined forms.
+    joined_corpus = (
+        "Warren Buffett's annual Berkshire Hathaway shareholder letters (1977-2024), using "
+    )
+    assert joined_corpus in text and _V1_TONE in text
+    text = text.replace(joined_corpus, _V2_CORPUS + ", using ", 1)
+    assert _V1_PARTIAL in text
+    text = text.replace(_V1_PARTIAL, _V2_COVERAGE, 1)
+    return text.replace(_V1_TONE, _V2_TONE, 1)
+
+
+SYSTEM_PROMPT_V2 = _make_system_prompt_v2()
+PROMPT_VERSIONS = {"v1": SYSTEM_PROMPT, "v2": SYSTEM_PROMPT_V2}
+
+
+def prompt_version() -> str:
+    """Active prompt version, read at call time: env PROMPT_VERSION wins over config.PROMPT_VERSION (default v1)."""
+    value = os.environ.get("PROMPT_VERSION")
+    if value is None:
+        import config
+
+        value = config.PROMPT_VERSION
+    value = str(value).strip().lower() or "v1"
+    if value not in PROMPT_VERSIONS:
+        raise ValueError(f"unknown PROMPT_VERSION {value!r}; expected one of {sorted(PROMPT_VERSIONS)}")
+    return value
+
+
+def system_prompt(version: Optional[str] = None) -> str:
+    """System prompt text for `version` (None = the active version)."""
+    return PROMPT_VERSIONS[version or prompt_version()]
+
+
 def _passage_block(hits: Sequence[SearchHit]) -> str:
     """Format passages as a numbered list with year headers."""
     lines: List[str] = []
@@ -144,7 +198,7 @@ def build_cited_prompt(
         "If multiple passages support a claim, cite them like [1,3]."
     )
 
-    return f"{SYSTEM_PROMPT}\n\n{user_block}\n\nAnswer:"
+    return f"{system_prompt()}\n\n{user_block}\n\nAnswer:"
 
 
 _CITATION_RE = re.compile(r"\[(\d+(?:\s*,\s*\d+)*)\]")

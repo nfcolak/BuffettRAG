@@ -136,6 +136,8 @@ RERANK_TOP_K = 8
 # Generation
 # -----------------------------------------------------------------------------
 LLM_MAX_NEW_TOKENS = 900
+# Serving prompt version (src/generation/prompt.py): v1 = text FT-r1 was trained on, v2 = coverage prompt. Env wins at call time.
+PROMPT_VERSION = os.getenv("PROMPT_VERSION", "v1")
 # Providers: "llama" (embedded llama.cpp GGUF model) | "mlx" | "grounded". The extractive engine was removed.
 # No external API is used anywhere.
 DEFAULT_LLM_PROVIDER = os.getenv("DEFAULT_LLM_PROVIDER", "llama").strip().lower()
