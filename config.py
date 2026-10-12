@@ -33,13 +33,16 @@ RAW_DATA_DIR = DATA_DIR / "raw"
 OUTPUT_DIR = DATA_DIR / "processed"
 CHUNKS_FILE = OUTPUT_DIR / "chunks.jsonl"
 CHUNKS_V2_FILE = OUTPUT_DIR / "chunks_v2.jsonl"  # historical compatibility corpus
-CHUNKS_V3_FILE = OUTPUT_DIR / "chunks_v3_paragraph.jsonl"  # active paragraph-aware corpus
+CHUNKS_V3_PARAGRAPH_FILE = OUTPUT_DIR / "chunks_v3_paragraph.jsonl"  # v3: Berkshire letters 1977-2024 only
+CHUNKS_V5_PL_FILE = OUTPUT_DIR / "chunks_v5_pl.jsonl"  # v5_pl: v3 rows + Buffett Partnership letters 1957-1970
+# Legacy name kept for every consumer that imports it: it now names the ACTIVE corpus (v5_pl).
+CHUNKS_V3_FILE = CHUNKS_V5_PL_FILE
 METADATA_FILE = OUTPUT_DIR / "metadata.json"
 METADATA_V2_FILE = OUTPUT_DIR / "metadata_v2.json"
 
 INDEX_DIR = DATA_DIR / "indices"
 CHROMA_DIR = INDEX_DIR / "chroma"
-FAISS_DIR = INDEX_DIR / os.getenv("FAISS_INDEX_NAME", "faiss_v3")
+FAISS_DIR = INDEX_DIR / os.getenv("FAISS_INDEX_NAME", "faiss_v5_pl")
 
 EVAL_DIR = DATA_DIR / "evaluation"
 
@@ -63,7 +66,7 @@ CHUNK_SIZE_V2 = 800
 CHUNK_OVERLAP_V2 = 120
 CHUNK_MIN_CHARS_V2 = 160
 
-START_YEAR = 1977
+START_YEAR = 1957
 END_YEAR = 2024
 TOTAL_LETTERS = END_YEAR - START_YEAR + 1
 

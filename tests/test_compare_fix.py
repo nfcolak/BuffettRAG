@@ -131,7 +131,7 @@ def test_detector_ignores_event_year_without_cue_and_out_of_range_years():
     assert detect_temporal_comparison("Who took charge of Star Furniture in 1997 after the 1962 sale?") is None
     assert detect_temporal_comparison("How much did it pay in 1995, and what did he expect in 2011?") is None
     # Out-of-range year is dropped even with a cue.
-    assert detect_temporal_comparison("Compare Berkshire's combined ratio in 1965 and 1985.") is None
+    assert detect_temporal_comparison("Compare Berkshire's combined ratio in 1945 and 1985.") is None
     assert detect_temporal_comparison("How does 2014 compare with 2033?") is None
     # "YYYY letters" adjacency is enough without a cue; cues work too.
     assert detect_temporal_comparison("What did NetJets report in the 2002 and 2003 letters?") == [

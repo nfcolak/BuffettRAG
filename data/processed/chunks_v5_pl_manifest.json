@@ -1,0 +1,134 @@
+{
+  "schema_version": 1,
+  "corpus": "v5_pl",
+  "source_pdf": {
+    "path": "/Users/necatifurkancolak/AI-Workplace/Artifacts/BuffettRAG/pv7/sources/ivey_bpl.pdf",
+    "sha256": "9f2899d4b97f56b8c27368895aa5138dfb3e84f68b1328a124fcd00cb8b12c37",
+    "pages": 152
+  },
+  "extractor": "pymupdf-blocks (scripts/ingest/build_partnership_corpus.py); pymupdf 1.28.2",
+  "year_assignment": "printed '<YYYY> Letter' heading where present (first six letters); otherwise the year the letter reports on (LETTER_YEAR table)",
+  "page_numbers_removed": 152,
+  "chunk_config": {
+    "size": 800,
+    "overlap": 120,
+    "min_chunk_chars": 160,
+    "chunker": "paragraph_v3"
+  },
+  "per_year": {
+    "1957": {
+      "passages": 13,
+      "words": 1284,
+      "letters": 1,
+      "source_file": "buffett_partnership_1957.txt",
+      "source_sha256": "718b9e02e2da8463b8d4c2066f15dcfb23a136e7ad0d3d3f73d3008fa1882ffa"
+    },
+    "1958": {
+      "passages": 14,
+      "words": 1332,
+      "letters": 1,
+      "source_file": "buffett_partnership_1958.txt",
+      "source_sha256": "0dfa82a80f4e612b34500e1414524c42b74893068606d40787c4a2256a14b4ca"
+    },
+    "1959": {
+      "passages": 10,
+      "words": 900,
+      "letters": 1,
+      "source_file": "buffett_partnership_1959.txt",
+      "source_sha256": "975351b1b4c74e1fd19e41b1732b4ebc1977ceb76431f099ef133de918dc8505"
+    },
+    "1960": {
+      "passages": 40,
+      "words": 3934,
+      "letters": 2,
+      "source_file": "buffett_partnership_1960.txt",
+      "source_sha256": "64c2b9fdcb0aa716ac17bd91fa7fa8248b59016a5a0d852ca431933ec631b6b1"
+    },
+    "1961": {
+      "passages": 46,
+      "words": 4518,
+      "letters": 1,
+      "source_file": "buffett_partnership_1961.txt",
+      "source_sha256": "f35f5826ab1770ad8a58b5192bb74776323724cecd896a186de518bc6a867776"
+    },
+    "1962": {
+      "passages": 91,
+      "words": 8958,
+      "letters": 3,
+      "source_file": "buffett_partnership_1962.txt",
+      "source_sha256": "33ca713dc65f48d2cc3a9fe96222ce14f8a6114cce4de8c3afd3fadf0c231f81"
+    },
+    "1963": {
+      "passages": 89,
+      "words": 8965,
+      "letters": 3,
+      "source_file": "buffett_partnership_1963.txt",
+      "source_sha256": "1d98f09c9055823fb8141b4cbae0cfa9d51d700c46cb40fd67910ee709bbae1d"
+    },
+    "1964": {
+      "passages": 95,
+      "words": 9072,
+      "letters": 2,
+      "source_file": "buffett_partnership_1964.txt",
+      "source_sha256": "2a0aac943d84f9a831751442ac1971371d130beea737a6ab17710e170e099229"
+    },
+    "1965": {
+      "passages": 85,
+      "words": 8245,
+      "letters": 3,
+      "source_file": "buffett_partnership_1965.txt",
+      "source_sha256": "2f1424a7f6e79a2e9e7e2c483572bf732e365f7a8abeb1d96f0e8c7e943a8ead"
+    },
+    "1966": {
+      "passages": 65,
+      "words": 6356,
+      "letters": 2,
+      "source_file": "buffett_partnership_1966.txt",
+      "source_sha256": "2efe94c8a5c0b841ed8109b326676e04e069ab2961e890a3f5c577c3b9f114e7"
+    },
+    "1967": {
+      "passages": 60,
+      "words": 5691,
+      "letters": 3,
+      "source_file": "buffett_partnership_1967.txt",
+      "source_sha256": "98a2be6fae8fafa2ec95437de1890cff936d610330bd49647b3883db5498bd5f"
+    },
+    "1968": {
+      "passages": 46,
+      "words": 4315,
+      "letters": 2,
+      "source_file": "buffett_partnership_1968.txt",
+      "source_sha256": "6523b12c5d924182de0c514c1c4c0db4887f30be8b214f36343a72d71b551270"
+    },
+    "1969": {
+      "passages": 94,
+      "words": 8548,
+      "letters": 4,
+      "source_file": "buffett_partnership_1969.txt",
+      "source_sha256": "39f37c5e0ab3c1303d275f982ad6c0f09bc1018fcd2eaf9dc5fba8b950cf09ab"
+    },
+    "1970": {
+      "passages": 55,
+      "words": 5465,
+      "letters": 1,
+      "source_file": "buffett_partnership_1970.txt",
+      "source_sha256": "10094b932737ad086a318a0df53bdfaac8b2810abdb3163112b525e6c4924474"
+    }
+  },
+  "v3_file": {
+    "path": "data/processed/chunks_v3_paragraph.jsonl",
+    "sha256": "8263f08958729a77febf0922e7bbc4161bedd5fdb3e9a8b3fc9a64ab681ab5f0",
+    "rows": 5831
+  },
+  "new_file": {
+    "path": "data/processed/chunks_v5_pl.jsonl",
+    "sha256": "42478c6a7327cc139f34678c7abd2884447f1f109de285474a6fbb7799740c7c",
+    "rows": 6634
+  },
+  "rows": {
+    "v3": 5831,
+    "partnership": 803,
+    "total": 6634
+  },
+  "partnership_words": 77583
+}

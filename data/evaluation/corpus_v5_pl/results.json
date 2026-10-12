@@ -1,0 +1,131 @@
+{
+ "schema_version": 1,
+ "cross_encoder_rerank": false,
+ "top_k": 8,
+ "fetch_k": 30,
+ "metrics": {
+  "v3": {
+   "gold50": {
+    "n": 50,
+    "recall@8": 0.94,
+    "mrr": 0.7557,
+    "pl_slots": 0,
+    "top8_slots": 400,
+    "queries_with_pl": 0
+   },
+   "dev": {
+    "n": 71,
+    "recall@8": 0.9296,
+    "mrr": 0.6891,
+    "pl_slots": 0,
+    "top8_slots": 568,
+    "queries_with_pl": 0
+   },
+   "hard_neg": {
+    "n": 40,
+    "recall@8": 0.9,
+    "mrr": 0.7913,
+    "pl_slots": 0,
+    "top8_slots": 320,
+    "queries_with_pl": 0
+   },
+   "pooled": {
+    "n": 161,
+    "recall@8": 0.9255,
+    "mrr": 0.7352,
+    "pl_slots": 0,
+    "top8_slots": 1288,
+    "queries_with_pl": 0
+   }
+  },
+  "v5_pl": {
+   "gold50": {
+    "n": 50,
+    "recall@8": 0.94,
+    "mrr": 0.7557,
+    "pl_slots": 11,
+    "top8_slots": 400,
+    "queries_with_pl": 8
+   },
+   "dev": {
+    "n": 71,
+    "recall@8": 0.9296,
+    "mrr": 0.6838,
+    "pl_slots": 5,
+    "top8_slots": 568,
+    "queries_with_pl": 2
+   },
+   "hard_neg": {
+    "n": 40,
+    "recall@8": 0.9,
+    "mrr": 0.8037,
+    "pl_slots": 1,
+    "top8_slots": 320,
+    "queries_with_pl": 1
+   },
+   "pooled": {
+    "n": 161,
+    "recall@8": 0.9255,
+    "mrr": 0.7359,
+    "pl_slots": 17,
+    "top8_slots": 1288,
+    "queries_with_pl": 11
+   }
+  }
+ },
+ "hard_neg_passed": {
+  "v3": {
+   "passed": 35,
+   "n": 40
+  },
+  "v5_pl": {
+   "passed": 35,
+   "n": 40
+  }
+ },
+ "hard_neg_changed": [],
+ "pooled_recall@8_drop": 0.0,
+ "queries_with_changed_metrics": [
+  {
+   "query": "dev:adv04",
+   "v3_r8": 1.0,
+   "v5_pl_r8": 1.0,
+   "v3_rr": 0.5,
+   "v5_pl_rr": 0.125,
+   "v5_pl_pl_slots": 4,
+   "v5_pl_filter": {
+    "multi_subquery": [
+     {
+      "year": 1965
+     },
+     {
+      "year": 1985
+     }
+    ]
+   }
+  },
+  {
+   "query": "hard_neg:hn4_30_voting_weighing_machine",
+   "v3_r8": 1.0,
+   "v5_pl_r8": 1.0,
+   "v3_rr": 0.5,
+   "v5_pl_rr": 1.0,
+   "v5_pl_pl_slots": 1,
+   "v5_pl_filter": null
+  }
+ ],
+ "per_query_pl_slots": {
+  "gold50:g09": 1,
+  "gold50:g10": 1,
+  "gold50:g26": 1,
+  "gold50:g29": 2,
+  "gold50:g31": 1,
+  "gold50:g36": 3,
+  "gold50:g41": 1,
+  "gold50:g44": 1,
+  "dev:aq05_index": 1,
+  "dev:adv04": 4,
+  "hard_neg:hn4_30_voting_weighing_machine": 1
+ },
+ "regression": "OK"
+}

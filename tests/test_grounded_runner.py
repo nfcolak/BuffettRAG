@@ -2,12 +2,16 @@
 from __future__ import annotations
 
 import json
+from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
 
 from scripts.eval import run_live_benchmark as runner
 from src.evaluation.supported_claims import supported_claims_met
+
+
+_V3_CORPUS = Path(__file__).resolve().parents[1] / "data/processed/chunks_v3_paragraph.jsonl"  # fixtures are frozen on v3
 
 
 class _Provider:
@@ -28,7 +32,7 @@ class _Provider:
 
 def _run(monkeypatch, provider, tmp_path, **kwargs):
     monkeypatch.setattr(runner, "create_llm_provider", lambda **_k: provider)
-    return runner.run(provider="mlx", retrieval="bm25", output=tmp_path / "out.json", **kwargs)
+    return runner.run(corpus=_V3_CORPUS, provider="mlx", retrieval="bm25", output=tmp_path / "out.json", **kwargs)
 
 
 def test_manifest_rows_and_resume_skip_completed(monkeypatch, tmp_path):
