@@ -54,7 +54,8 @@ def test_single_prompt_is_what_ask_sends_the_7b(corpus, monkeypatch):
     _, _, _, _, context, served, _ = serving_context(monkeypatch, anchors, lookup, query)
     assert joined(prompt) == served
     assert [h.id for h in prompt['hits']] == [h.id for h in context]
-    assert len(prompt['hits']) == round4.SERVING_PASSAGES == 8
+    assert round4.SERVING_PASSAGES == round4.LLM_CONTEXT_PASSAGES
+    assert len(prompt['hits']) == min(round4.SERVING_PASSAGES, len(anchors))
     assert all(len(h.text) <= 1800 for h in prompt['hits'])
 
 

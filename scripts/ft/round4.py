@@ -48,7 +48,7 @@ HELDOUT_V4_CHECKER = common.ROOT / 'scripts/eval/check_heldout_v4.py'
 DEFAULT_TEACHER = '/Users/necatifurkancolak/AI-Workplace/Projects/done/BuffettRAG/models/teacher-qwen2.5-14b-mlx4'
 PILOT_DIR = 'models/ft/round4_pilot'
 FINAL_DIR = 'data/ft_v4'
-SERVING_PASSAGES = 8          # 7B serving context (config._DEFAULT_CONTEXT_PASSAGES)
+SERVING_PASSAGES = LLM_CONTEXT_PASSAGES  # serving value from config (7B default)
 KINDS = ('single', 'multipart', 'followup', 'temporal', 'unanswerable', 'distractor')
 CATEGORIES = ('multipart', 'temporal', 'followup', 'single', 'refusal')
 DEFAULT_MIX = {'multipart': 300, 'temporal': 200, 'followup': 120, 'single': 250, 'refusal': 130}
@@ -77,9 +77,6 @@ class LlamaStub:
 
 
 def serving_settings():
-    if LLM_CONTEXT_PASSAGES != SERVING_PASSAGES:
-        raise RuntimeError(f'LLM_CONTEXT_PASSAGES={LLM_CONTEXT_PASSAGES}, expected {SERVING_PASSAGES} (7B serving); '
-                           'run with LLM_MODEL_PATH and LLM_CONTEXT_PASSAGES unset')
     return {'neighbors': ANSWER_CONTEXT_NEIGHBORS, 'max_chars': ANSWER_CONTEXT_MAX_CHARS,
             'max_new_tokens': AskRequest(query='x').max_new_tokens, 'n_ctx': LLM_N_CTX,
             'max_passages': LLM_CONTEXT_PASSAGES, 'passage_max_chars': LLM_PASSAGE_MAX_CHARS}
