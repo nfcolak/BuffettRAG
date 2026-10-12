@@ -125,5 +125,28 @@
     2018,
     2020
   ],
-  "wall_seconds": 1139.5
+  "wall_seconds": 1139.5,
+  "kaggle_plan": {
+    "command": "build_ft_v6.py plan --n 2600 --seed 7 --out data/ft_v6/jobs.jsonl --smoke-out data/ft_v6/jobs_smoke.jsonl",
+    "teacher": "Qwen/Qwen2.5-32B-Instruct-AWQ (Kaggle 2xT4, vLLM 0.18.1)",
+    "jobs": 2610,
+    "jobs_per_kind": {
+      "multipart": 1432,
+      "refusal": 392,
+      "single": 262,
+      "follow_up": 262,
+      "temporal": 262
+    },
+    "jobs_per_split": {
+      "train": 2368,
+      "valid": 242
+    },
+    "teacher_jobs": 2414,
+    "template_refusals_without_teacher": 196,
+    "longest_teacher_prompt_tokens": 1360,
+    "smoke_jobs": 30,
+    "jobs_sha256": "f68d636bcb802522229a163081c013dc46f04626a95e86187b0bb8aef77d816a",
+    "exclusions": "spent sets up to heldout_v6 + dev_cases + hard_negatives + gold_set.py (2,619 ids with neighbours); heldout_v7/v8 are not on this branch: pass --exclude-ids at plan and assemble",
+    "assemble_smoke": "hand-written teacher output for 5 jobs (one per kind), assemble kept multipart=1 single=1 follow_up=1 temporal=1 refusal=1; partnership_rejected=0 (v3 index in this worktree has no bpl passages)"
+  }
 }

@@ -47,3 +47,19 @@ def test_v2_differs_in_the_three_specified_places():
     assert "annual Berkshire Hathaway" not in v2
     a, b = v1.splitlines(), v2.splitlines()
     assert len(a) == len(b) and sum(x != y for x, y in zip(a, b)) == 3
+
+
+@pytest.mark.parametrize("version", ["v1", "v2"])
+def test_split_prompt_uses_the_active_version_and_matches_training_rows(monkeypatch, version):
+    """Serving split == training row: system text is the active version's, unstripped; user starts at the passages."""
+    from src.generation.providers.llama_provider import split_prompt
+
+    monkeypatch.setenv("PROMPT_VERSION", version)
+    prompt = P.build_cited_prompt("Q?", _hits())
+    system, user = split_prompt(prompt)
+    assert system == P.system_prompt(version)
+    assert system.endswith("\n") == P.system_prompt(version).endswith("\n")
+    assert user.startswith("BEGIN UNTRUSTED PASSAGES") and user.endswith("\n\nAnswer:")
+    assert prompt.startswith(system + "\n\n") and prompt[len(system) + 2:].strip() == user
+    other = "v1" if version == "v2" else "v2"
+    assert system != P.system_prompt(other)

@@ -15,7 +15,7 @@ from config import (
     LLM_N_THREADS,
     LLM_TEMPERATURE,
 )
-from src.generation.prompt import SYSTEM_PROMPT
+from src.generation.prompt import system_prompt
 
 _SEED = 42
 _USER_MARKERS = ("BEGIN RECENT CONVERSATION", "BEGIN UNTRUSTED PASSAGES")
@@ -62,10 +62,13 @@ def split_prompt(prompt: str) -> Tuple[str, str]:
     """Split the grounded prompt from build_cited_prompt into (system, user)."""
     # Keep the trailing "Answer:" cue and the system prompt's trailing newline:
     # both match the fine-tuning rows exactly (training/serving parity).
+    # The system text is the ACTIVE prompt version's (v1 = what FT-r1 trained on, v2 = coverage prompt),
+    # returned unstripped, exactly as the training rows carry it.
     text = prompt.strip()
-    if text.startswith(SYSTEM_PROMPT.strip()):
-        user = text[len(SYSTEM_PROMPT.strip()):].strip()
-        return SYSTEM_PROMPT, user
+    system_text = system_prompt()
+    if text.startswith(system_text.strip()):
+        user = text[len(system_text.strip()):].strip()
+        return system_text, user
     positions = [text.find(m) for m in _USER_MARKERS if text.find(m) >= 0]
     if not positions:
         return "", text

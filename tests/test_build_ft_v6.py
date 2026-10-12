@@ -173,3 +173,78 @@ def test_distinctive_terms_and_quota_shape():
     quotas = B.quotas_for(1760)
     assert sum(quotas.values()) == 1760 and sum(n for (_, s), n in quotas.items() if s == 'valid') == 160
     assert quotas[('multipart', 'train')] + quotas[('multipart', 'valid')] == 968
+
+
+# ------------------------------------------------------------------ plan / assemble split
+def test_partnership_in_context_is_detected_by_id_source_and_collection():
+    clean = [hit('1990_p0001', ['Plain Berkshire text for the test.'])]
+    assert not B.served_has_partnership(clean)
+    assert B.served_has_partnership(clean + [hit('bpl1960_p0003', ['Partnership text.'], year=1960)])
+    merged = SearchHit(id='1990_p0001', text='x', metadata={'merged_ids': ['bpl1960_p0004'], 'year': 1990}, score=1.)
+    assert B.served_has_partnership([merged])
+    assert B.served_has_partnership([SearchHit(id='x', text='x', metadata={'collection': 'partnership', 'year': 1960}, score=1.)])
+    row = make_row()
+    assert B.check_row(row) == []
+    assert 'partnership_passage' in B.check_row(dict(row, passage_ids=['1990_p0001', 'bpl1960_p0001']))
+    assert 'partnership_passage' in B.check_row(dict(row, context_passage_ids=['bpl1961_p0002']))
+    bad_source = row['messages'][1]['content'].replace('buffet_1995.txt', 'buffett_partnership_1960.txt', 1)
+    assert 'partnership_passage' in B.check_row(dict(row, messages=[row['messages'][0], {'role': 'user', 'content': bad_source}, row['messages'][2]]))
+
+
+def test_job_record_holds_the_exact_teacher_messages_and_shape_info():
+    d = doc('1995_p0001', S)
+    job = {'id': 'v6:multipart:train:0000', 'kind': 'multipart', 'split': 'train', 'source_ids': ['1995_p0001']}
+    rec = B.job_record(job, {'1995_p0001': d}, {'corpus_sha256': 'x'}, lambda messages: 123)
+    assert rec['messages'] == [{'role': 'system', 'content': B.SYSTEM}, {'role': 'user', 'content': B.teacher_prompt(job, [d])}]
+    assert (rec['needs_teacher'], rec['expect'], rec['n_passages'], rec['sentence_counts'], rec['parts_range'], rec['prompt_tokens']) == \
+        (True, 'plan', 1, [5], [3, 5], 123)
+    assert rec['sampling']['temperature'] == B.TEMPERATURE and rec['sampling']['max_tokens'] == B.MAX_TEACHER_TOKENS
+    template = B.job_record({'id': 'r', 'kind': 'refusal', 'split': 'train', 'source_ids': ['1995_p0001'], 'variant': 'template', 'template': 'Q?'},
+                            {'1995_p0001': d}, {}, None)
+    assert template['messages'] is None and template['needs_teacher'] is False and template['expect'] == 'refusal'
+
+
+def test_order_jobs_interleaves_kinds_and_keeps_every_job():
+    jobs = [{'id': f'{k}{s}{i}', 'kind': k, 'split': s} for k, n in (('multipart', 8), ('refusal', 4)) for s in ('train',) for i in range(n)]
+    ordered = B.order_jobs(jobs)
+    assert sorted(j['id'] for j in ordered) == sorted(j['id'] for j in jobs)
+    assert {j['kind'] for j in ordered[:3]} == {'multipart', 'refusal'}
+
+
+def test_recorded_generator_validates_the_recorded_json_like_the_local_teacher():
+    d = doc('1995_p0001', S)
+    gen = B.RecordedGenerator({'a': {'raw': 'Sure: ' + __import__('json').dumps(plan_obj()), 'calls': 2}, 'b': {'raw': 'not json'}}, None, {}, set(), '.', None)
+    value, reason = gen.ask_teacher({'id': 'a'}, '', {}, lambda obj: B.validate_plan(obj, 'multipart', [d]))
+    assert reason is None and len(value['obligations']) == 3
+    record = {}
+    assert gen.ask_teacher({'id': 'b'}, '', record, lambda obj: B.validate_plan(obj, 'multipart', [d]))[1] == 'json_invalid'
+    assert gen.ask_teacher({'id': 'missing'}, '', {}, lambda obj: (None, obj))[1] == 'no_teacher_output'
+
+
+def test_legacy_flags_route_to_teach_local_and_subcommands_parse(monkeypatch):
+    seen = {}
+    monkeypatch.setattr(B, 'run', lambda args, parser: seen.setdefault('run', args))
+    monkeypatch.setattr(B, 'plan_command', lambda args: seen.setdefault('plan', args))
+    monkeypatch.setattr(B, 'assemble_command', lambda args: seen.setdefault('assemble', args))
+    B.main(['--pilot', '2', '--kinds', 'refusal'])
+    assert seen['run'].pilot == 2 and seen['run'].kinds == 'refusal' and seen['run'].command == 'teach-local'
+    B.main(['plan', '--n', '2600', '--seed', '7', '--out', 'x.jsonl'])
+    assert (seen['plan'].n, seen['plan'].seed) == (2600, 7)
+    B.main(['assemble', '--jobs', 'j.jsonl', '--teacher', 't.jsonl'])
+    assert seen['assemble'].out_dir == B.OUT_DIR and seen['assemble'].target is None
+
+
+def test_training_rows_equal_the_serving_split_of_the_same_prompt(monkeypatch):
+    """chat_messages (training) and llama_provider.split_prompt (serving) give the same system/user for the active version."""
+    from src.generation.prompt import build_cited_prompt
+    from src.generation.providers.llama_provider import split_prompt
+    hits = [hit('1995_p0001', S)]
+    for version in ('v1', 'v2'):
+        monkeypatch.setenv('PROMPT_VERSION', version)
+        prompt = build_cited_prompt('What happened in 1995?', hits)
+        system, user = split_prompt(prompt)
+        if version == 'v2':
+            rows = B.chat_messages('What happened in 1995?', hits)
+            assert (system, user) == (rows[0]['content'], rows[1]['content'])
+        else:
+            assert user.startswith('BEGIN UNTRUSTED PASSAGES')

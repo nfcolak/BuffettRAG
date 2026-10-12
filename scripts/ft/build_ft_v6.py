@@ -1,9 +1,12 @@
 """ft_v6 generator: completeness training data (many-obligation questions, verbatim multi-sentence targets) for a retrained 7B.
 
-Usage (VECTOR_BACKEND=faiss HF_HUB_OFFLINE=1 PYTHON_DOTENV_DISABLED=1, LLM_MODEL_PATH / LLM_CONTEXT_PASSAGES unset):
-  PY scripts/ft/build_ft_v6.py --pilot 20 [--kinds multipart,refusal] [--max-minutes M]   # per-kind pilot -> data/ft_v6/pilot_run, pilot.jsonl
-  PY scripts/ft/build_ft_v6.py [--target 1760] [--max-minutes M]                           # resumable full run -> data/ft_v6/{train,valid}.jsonl
-  PY scripts/ft/build_ft_v6.py --verify data/ft_v6/pilot.jsonl                             # offline re-check of every row, prints OK rows=<n>
+Three stages (VECTOR_BACKEND=faiss HF_HUB_OFFLINE=1 PYTHON_DOTENV_DISABLED=1, LLM_MODEL_PATH / LLM_CONTEXT_PASSAGES unset):
+  PY scripts/ft/build_ft_v6.py plan --n 2600 --seed 7 --out data/ft_v6/jobs.jsonl         # no LLM: sample jobs + the exact teacher messages
+  (teacher: Kaggle kernel reads jobs.jsonl, writes teacher_out.jsonl -- see the pv7/kaggle-teacher kit)
+  PY scripts/ft/build_ft_v6.py assemble --jobs data/ft_v6/jobs.jsonl --teacher teacher_out.jsonl   # no LLM: rows, checks, splits, manifest
+  PY scripts/ft/build_ft_v6.py teach-local --pilot 20 [--kinds multipart,refusal] [--max-minutes M]   # today's MLX path (small smoke runs)
+  PY scripts/ft/build_ft_v6.py teach-local [--target 1760] [--max-minutes M]                          # resumable local run -> data/ft_v6/{train,valid}.jsonl
+  PY scripts/ft/build_ft_v6.py verify data/ft_v6/pilot.jsonl                                           # offline re-check of every row (old `--verify` still works)
 
 Design (differs from round5, whose teacher WROTE the answer and lost 60-75% of its rows to validator/paraphrase rejects):
   * The 14B teacher only WRITES THE QUESTION and says which passage sentences answer each part (3-5 parts; 1-2 adjacent sentences each).
@@ -11,7 +14,8 @@ Design (differs from round5, whose teacher WROTE the answer and lost 60-75% of i
     numbered against the SERVING context (real hybrid retrieval, 8 passages, prompt version v2). A source passage the retrieval did
     not serve is put into a random slot replacing a served passage; this is recorded in `injected`.
   * Jobs come from Berkshire passages (corpus v3) that are not gold/relevant (+-1 neighbour) in any spent evaluation set; partnership
-    passages (bpl*) are never used.
+    passages (bpl*) are never used as sources and a row whose SERVED context holds one is rejected (counted in the manifest).
+    Spent-set passages may still appear in the served context as distractors (only sources are excluded; --strict-context rejects them).
 """
 from __future__ import annotations
 
@@ -19,6 +23,7 @@ import argparse
 from collections import Counter, defaultdict
 import fcntl
 import glob
+import gzip
 import json
 import os
 from pathlib import Path
@@ -58,6 +63,10 @@ CITATION_END = re.compile(r'\s*\[(\d+(?:\s*,\s*\d+)*)\]\s*$')
 PASSAGE_HEADER = re.compile(r'(?m)^\[(\d+)\] \(year=([^,\n]*), source=([^)\n]*)\)\n')
 WORD = re.compile(r'[a-z0-9]+')
 MAX_TEACHER_TOKENS = 700
+TEMPERATURE = .1
+KAGGLE_TEACHER = 'Qwen/Qwen2.5-32B-Instruct-AWQ'
+EXPECT = {'multipart': 'plan', 'temporal': 'plan', 'single': 'plan', 'follow_up': 'follow_up', 'refusal': 'refusal'}   # teacher JSON shape per kind
+PARTNERSHIP_REASONS = ('partnership_in_context', 'partnership_passage')
 _PLAN_EXAMPLE = (
     'WORKED EXAMPLE (other passages). Sentences: P1.S1 "Berkshire repurchased 120,000 shares during 1995." P1.S2 "The buyback was funded from retained earnings." '
     'P1.S3 "This explains why float grew." P1.S4 "Float reached $3.4 billion." P1.S5 "GEICO added 400,000 policyholders." '
@@ -70,6 +79,17 @@ WORKED_EXAMPLES: dict = {'multipart': _PLAN_EXAMPLE, 'temporal': _PLAN_EXAMPLE} 
 
 def norm(text):
     return re.sub(r'\s+', ' ', text).strip()
+
+
+def is_partnership(ident_or_source):
+    """A Buffett Partnership passage id (bpl<YYYY>_p<NNNN>) or its source file (buffett_partnership_<YYYY>.txt)."""
+    text = str(ident_or_source or '')
+    return text.startswith('bpl') or 'partnership' in text.lower()
+
+
+def served_has_partnership(hits):
+    return any(is_partnership(i) for i in round5.served_ids(hits)) or any(
+        str(h.metadata.get('collection', '')) == 'partnership' or is_partnership(h.metadata.get('source_file')) for h in hits)
 
 
 def words(text):
@@ -503,7 +523,8 @@ def check_row(row, *, excluded=None, count_tokens=None):
     passages = parse_prompt_passages(user)
     if not 1 <= len(passages) <= 8 or sorted(passages) != list(range(1, len(passages) + 1)):
         return problems + ['passage_slots']
-    if any('bpl' in str(i) for i in (row.get('served_ids') or []) + (row.get('source_ids') or [])):
+    if any(is_partnership(i) for i in (row.get('served_ids') or []) + (row.get('source_ids') or []) + (row.get('passage_ids') or [])
+           + (row.get('context_passage_ids') or [])) or any(is_partnership(src) for _, src, _ in passages.values()):
         problems.append('partnership_passage')
     if excluded and set(row.get('source_ids') or []) & set(excluded):
         problems.append('source_excluded')
@@ -601,7 +622,7 @@ class Generator:
     def ask_teacher(self, job, prompt, record, validate):
         messages = [{'role': 'system', 'content': SYSTEM}, {'role': 'user', 'content': prompt}]
         for attempt in range(2):
-            raw, metrics = self.teacher.generate(messages, f'{job["id"]}:v6:{attempt}', max_tokens=MAX_TEACHER_TOKENS, temperature=.1)
+            raw, metrics = self.teacher.generate(messages, f'{job["id"]}:v6:{attempt}', max_tokens=MAX_TEACHER_TOKENS, temperature=TEMPERATURE)
             if metrics.get('finish_reason') == 'budget':
                 return None, 'budget'
             record['teacher_calls'] += 1
@@ -658,7 +679,7 @@ class Generator:
         if len(prompts) != 1 or not prompts[0]['hits']:
             return None, 'no_context'
         hits = prompts[0]['hits']
-        if self.strict_context is False and any(str(h.id).startswith('bpl') for h in hits):
+        if served_has_partnership(hits):      # partnership passages are evaluation-only: never in a training prompt (also with --strict-context off)
             return None, 'partnership_in_context'
         if any(term_present(t, [h.text for h in hits]) for t in terms):
             return None, 'refusal_terms_present_in_served'
@@ -674,8 +695,7 @@ class Generator:
         prompt = prompts[0]
         if not prompt['hits']:
             return None, 'no_context'
-        served = round5.served_ids(prompt['hits'])
-        if any(str(i).startswith('bpl') for i in served):
+        if served_has_partnership(prompt['hits']):
             return None, 'partnership_in_context'
         if self.strict_context and round5.context_ids(prompt['hits'], self.full) & self.excluded:
             return None, 'excluded_passage_in_context'
@@ -755,6 +775,187 @@ def manifest_for(out, rows, attempts, counts, identity, seconds, target):
             'by_kind': by_kind, 'natural_miss_share': round(sum(r['natural_miss'] for r in rows) / max(1, len(rows)), 3),
             'rejection_reasons': dict(Counter(a['reason'] for a in attempts if a['reason'])),
             'wall_seconds': round(seconds, 1), 'rows_per_minute': round(60 * kept_total / seconds, 3) if seconds else None}
+
+
+# ------------------------------------------------------------------ jobs file: plan (no LLM) and assemble (no LLM)
+def open_text(path, mode='r'):
+    return gzip.open(path, mode + 't', encoding='utf-8') if str(path).endswith('.gz') else open(path, mode, encoding='utf-8')
+
+
+def read_jsonl_file(path):
+    with open_text(path) as handle:
+        return [json.loads(line) for line in handle if line.strip()]
+
+
+def write_jsonl_file(path, rows):
+    path = Path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    tmp = path.with_name('tmp-' + path.name)
+    with open_text(tmp, 'w') as handle:
+        for row in rows:
+            handle.write(json.dumps(row, ensure_ascii=False) + '\n')
+    tmp.replace(path)
+
+
+def read_id_file(path):
+    """Extra passage ids to exclude (e.g. spent sets that are not on this branch): a JSON list or one id per line."""
+    if not path:
+        return set()
+    text = Path(path).read_text()
+    try:
+        data = json.loads(text)
+        if isinstance(data, list):
+            return {str(i) for i in data}
+    except json.JSONDecodeError:
+        pass
+    return {line.strip() for line in text.splitlines() if line.strip() and not line.startswith('#')}
+
+
+def teacher_messages(job, docs):
+    """The exact chat the teacher receives (None for a template refusal, which needs no teacher)."""
+    if job['kind'] == 'refusal':
+        if job.get('variant') == 'template':
+            return None
+        prompt = refusal_prompt(docs)
+    else:
+        prompt = teacher_prompt(job, docs)
+    return [{'role': 'system', 'content': SYSTEM}, {'role': 'user', 'content': prompt}]
+
+
+def job_record(job, full, identity, count_tokens=None):
+    """One self-contained line of jobs.jsonl: the sampled job plus everything the Kaggle teacher and the shape check need."""
+    docs = [full[i] for i in job['source_ids']]
+    messages = teacher_messages(job, docs)
+    lo, hi = PARTS.get(job['kind'], (0, 0))
+    seed = int(common.sha(f'{common.SEED}:{job["id"]}:v6:0'.encode())[:8], 16)
+    return {**job, 'year': int(docs[0].metadata['year']), 'expect': EXPECT[job['kind']], 'needs_teacher': messages is not None,
+            'n_passages': len(docs), 'sentence_counts': [len(sentences_of(d)) for d in docs], 'parts_range': [lo, hi] if lo else None,
+            'sampling': {'temperature': TEMPERATURE, 'max_tokens': MAX_TEACHER_TOKENS, 'seed': seed},
+            'messages': messages, 'prompt_tokens': count_tokens(messages) if messages and count_tokens else None, 'identity': identity}
+
+
+def order_jobs(jobs):
+    """Interleave kinds and splits proportionally so that a partial teacher run still has the intended mix."""
+    groups = Counter((j['kind'], j['split']) for j in jobs)
+    position = {}
+    keyed = []
+    for job in jobs:
+        group = (job['kind'], job['split'])
+        index = position[group] = position.get(group, -1) + 1
+        keyed.append(((index + .5) / groups[group], KINDS.index(job['kind']), job['split'], job))
+    return [item[3] for item in sorted(keyed, key=lambda item: item[:3])]
+
+
+def plan_jobs(n, seed, exclude_ids=()):
+    """n jobs in total, kind mix and splits as quotas_for(n); sampling is build_plan with rng seed `seed` (exclusions as always)."""
+    full, excluded, counts, valid_years, identity = load_inputs(KAGGLE_TEACHER)
+    extra = set(exclude_ids)
+    excluded = excluded | extra
+    identity = {'corpus_sha256': identity['corpus_sha256'], 'plan_seed': seed, 'n': n, 'valid_years': identity['valid_years'],
+                'exclusion_with_neighbours': len(excluded), 'extra_exclude_ids': len(extra)}
+    plan = build_plan(full, excluded, valid_years, quotas_for(n), 1.0, identity, seed)
+    _, count_tokens = round4.token_counter(DEFAULT_TEACHER)      # the Qwen2.5 tokenizer is shared by 14B and 32B
+    return [job_record(job, full, identity, count_tokens) for job in order_jobs(plan['jobs'])], counts
+
+
+def smoke_jobs(jobs, per_kind=6):
+    chosen = []
+    for kind in KINDS:
+        chosen += [j for j in jobs if j['kind'] == kind and j['needs_teacher']][:per_kind]
+    return chosen
+
+
+def plan_command(args):
+    jobs, counts = plan_jobs(args.n, args.seed, read_id_file(args.exclude_ids))
+    write_jsonl_file(args.out, jobs)
+    by_kind = Counter(j['kind'] for j in jobs)
+    tokens = [j['prompt_tokens'] for j in jobs if j['prompt_tokens']]
+    print(f'jobs={len(jobs)} per_kind={dict(by_kind)} teacher_jobs={sum(j["needs_teacher"] for j in jobs)} '
+          f'longest_prompt_tokens={max(tokens)} mean_prompt_tokens={sum(tokens) // len(tokens)} excluded_with_neighbours={counts["with_neighbours"]}')
+    print(f'sha256={common.sha(Path(args.out).read_bytes())} bytes={Path(args.out).stat().st_size}')
+    if args.smoke_out:
+        smoke = smoke_jobs(jobs, args.smoke_per_kind)
+        write_jsonl_file(args.smoke_out, smoke)
+        print(f'smoke jobs={len(smoke)} per_kind={dict(Counter(j["kind"] for j in smoke))}')
+
+
+def read_teacher_output(path):
+    """id -> record; a later line for the same id wins (a resumed or re-run kernel), a record with a parsed answer wins over a failed one."""
+    records = {}
+    for rec in read_jsonl_file(path):
+        old = records.get(rec['id'])
+        if old is None or rec.get('ok') or not old.get('ok'):
+            records[rec['id']] = rec
+    return records
+
+
+class RecordedGenerator(Generator):
+    """Generator whose 'teacher' is a recorded Kaggle output: same validation, no retry (the kernel already retried shape errors)."""
+
+    def __init__(self, recorded, *args, **kwargs):
+        super().__init__(None, *args, **kwargs)
+        self.recorded = recorded
+
+    def ask_teacher(self, job, prompt, record, validate):
+        rec = self.recorded.get(job['id'])
+        if rec is None:
+            return None, 'no_teacher_output'
+        record['teacher_calls'] = rec.get('calls', 1)
+        record['teacher_tokens'] = rec.get('tokens', 0)
+        reason, value = validate(parse_json(rec.get('raw')))
+        if reason is None:
+            return value, None
+        record.setdefault('first_reasons', []).append(reason)
+        return None, reason
+
+
+def assemble_command(args):
+    os.environ['PROMPT_VERSION'] = PROMPT_VERSION
+    if round4.LLM_CONTEXT_PASSAGES != 8:
+        raise SystemExit('LLM_CONTEXT_PASSAGES must be 8 (unset LLM_MODEL_PATH / LLM_CONTEXT_PASSAGES)')
+    jobs_path, teacher_path = Path(args.jobs), Path(args.teacher)
+    jobs, recorded = read_jsonl_file(jobs_path), read_teacher_output(teacher_path)
+    full, excluded, counts, valid_years, identity = load_inputs(KAGGLE_TEACHER)
+    extra = read_id_file(args.exclude_ids)
+    excluded = excluded | extra
+    counts.update(extra_exclude_ids=len(extra), with_neighbours=len(excluded))
+    wrong = {j['identity']['corpus_sha256'] for j in jobs if j.get('identity')} - {identity['corpus_sha256']}
+    if wrong:
+        raise SystemExit('jobs were planned on a different corpus than data/processed/chunks_v3_paragraph.jsonl; re-run plan')
+    identity = {**identity, 'jobs_sha256': common.sha(jobs_path.read_bytes()), 'teacher_output_sha256': common.sha(teacher_path.read_bytes()),
+                'plan': jobs[0]['identity'] if jobs else None}
+    out = Path(args.out_dir)
+    work = out / 'assemble_run'
+    work.mkdir(parents=True, exist_ok=True)
+    for name in ('examples.jsonl', 'example_attempts.jsonl'):        # assemble is a pure function of its inputs: no resume state
+        (work / name).unlink(missing_ok=True)
+    _, count_tokens = round4.token_counter(DEFAULT_TEACHER)
+    generator = RecordedGenerator(recorded, round5.load_serving(), full, excluded, work, count_tokens, MAX_SEQ, args.strict_context)
+    quotas = quotas_for(args.target) if args.target else None
+    started = time.monotonic()
+    for index, job in enumerate(jobs, 1):
+        key = (job['kind'], job['split'])
+        if job['kind'] not in KINDS:
+            continue
+        if quotas is not None and sum(1 for a in generator.attempts if a['kept'] and (a['kind'], a['split']) == key) >= quotas[key]:
+            continue
+        generator.attempt(job)
+        if index % 100 == 0:
+            print(f'assembled {index}/{len(jobs)} kept={len(generator.rows)}', flush=True)
+    materialize(out, generator.rows)
+    seconds = time.monotonic() - started
+    manifest = manifest_for(out, generator.rows, generator.attempts, counts, identity, seconds, args.target or len(jobs))
+    reasons = manifest['rejection_reasons']
+    manifest.update(jobs=len(jobs), jobs_per_kind=dict(Counter(j['kind'] for j in jobs)), teacher_records=len(recorded),
+                    teacher_jobs_without_output=sum(1 for j in jobs if j.get('needs_teacher') and j['id'] not in recorded),
+                    partnership_rejected=sum(reasons.get(r, 0) for r in PARTNERSHIP_REASONS),
+                    spent_set_distractor_rows=sum(1 for r in generator.rows if set(r['context_passage_ids']) & excluded),
+                    strict_context=bool(args.strict_context))
+    common.atomic_json(out / 'manifest.json', manifest)
+    kept = manifest['row_counts_per_kind']
+    print('kept rows per kind: ' + ' '.join(f'{k}={kept[k]}' for k in KINDS) + f' total={sum(kept.values())} of jobs={len(jobs)}')
+    print(f'rejected: {reasons}')
+    print(f'partnership_rejected={manifest["partnership_rejected"]} spent_set_distractor_rows={manifest["spent_set_distractor_rows"]} -> {out}/{{train,valid}}.jsonl, manifest.json')
 
 
 # ------------------------------------------------------------------ run / verify
@@ -871,16 +1072,49 @@ def eta(manifest, quotas):
 
 
 def main(argv=None):
+    argv = list(sys.argv[1:] if argv is None else argv)
+    commands = ('plan', 'teach-local', 'assemble', 'verify')
+    if argv and argv[0] not in commands + ('-h', '--help'):
+        argv = ['teach-local'] + argv                  # the pre-split CLI (--pilot / --target / --verify ...) is teach-local
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument('--pilot', type=int, metavar='N', help='attempt N jobs per kind into data/ft_v6/pilot_run (+ pilot.jsonl, pilot_manifest.json)')
-    parser.add_argument('--kinds', help='comma-separated subset of kinds (pilot re-runs)')
-    parser.add_argument('--target', type=int, default=1760, help='total rows (default 1600 train + 160 valid)')
-    parser.add_argument('--oversample', type=float, default=2.5, help='plan size multiple of each quota')
-    parser.add_argument('--max-minutes', type=float, help='stop teacher work after this wall-clock time')
-    parser.add_argument('--strict-context', action='store_true', help='reject rows whose served context holds an excluded (spent-set) passage')
-    parser.add_argument('--verify', metavar='JSONL', help='re-check every row of a generated jsonl; prints OK rows=<n>')
+    sub = parser.add_subparsers(dest='command', required=True)
+
+    p = sub.add_parser('plan', help='sample jobs + exact teacher messages -> jobs.jsonl (no LLM)')
+    p.add_argument('--n', type=int, required=True, help='total number of jobs (kind mix as SHARE, 1/11 of each kind valid)')
+    p.add_argument('--seed', type=int, required=True, help='rng seed of the job sampling')
+    p.add_argument('--out', required=True, help='jobs file (.jsonl or .jsonl.gz)')
+    p.add_argument('--smoke-out', help='also write a small smoke file (first --smoke-per-kind teacher jobs of each kind)')
+    p.add_argument('--smoke-per-kind', type=int, default=6)
+    p.add_argument('--exclude-ids', help='file of extra passage ids (JSON list or one per line) that must not be sources')
+
+    t = sub.add_parser('teach-local', help="today's MLX teacher path (pilot / small runs)")
+    t.add_argument('--pilot', type=int, metavar='N', help='attempt N jobs per kind into data/ft_v6/pilot_run (+ pilot.jsonl, pilot_manifest.json)')
+    t.add_argument('--kinds', help='comma-separated subset of kinds (pilot re-runs)')
+    t.add_argument('--target', type=int, default=1760, help='total rows (default 1600 train + 160 valid)')
+    t.add_argument('--oversample', type=float, default=2.5, help='plan size multiple of each quota')
+    t.add_argument('--max-minutes', type=float, help='stop teacher work after this wall-clock time')
+    t.add_argument('--strict-context', action='store_true', help='reject rows whose served context holds an excluded (spent-set) passage')
+    t.add_argument('--verify', metavar='JSONL', help='re-check every row of a generated jsonl; prints OK rows=<n>')
+
+    a = sub.add_parser('assemble', help='teacher output + jobs -> rows, checks, splits, manifest (no LLM)')
+    a.add_argument('--jobs', required=True)
+    a.add_argument('--teacher', required=True, help='teacher_out.jsonl written by the Kaggle kernel')
+    a.add_argument('--out-dir', default=OUT_DIR, help=f'writes train.jsonl, valid.jsonl, split_metadata.jsonl, manifest.json here (default {OUT_DIR})')
+    a.add_argument('--target', type=int, help='cap kept rows per (kind, split) at the quotas of this total (default: keep all)')
+    a.add_argument('--exclude-ids', help='file of extra passage ids that must not be sources (spent sets not on this branch)')
+    a.add_argument('--strict-context', action='store_true', help='also reject rows whose served context holds an excluded (spent-set) passage')
+
+    v = sub.add_parser('verify', help='offline re-check of every row of a generated jsonl')
+    v.add_argument('path')
+
     args = parser.parse_args(argv)
     os.environ['PROMPT_VERSION'] = PROMPT_VERSION
+    if args.command == 'plan':
+        return plan_command(args)
+    if args.command == 'assemble':
+        return assemble_command(args)
+    if args.command == 'verify':
+        return verify(args.path)
     if args.verify:
         return verify(args.verify)
     return run(args, parser)
