@@ -65,7 +65,7 @@ def test_validate_plan_accepts_adjacent_pair_and_builds_obligations():
     ({'parts': plan_obj()['parts'][:2]}, 'parts_count'),
     ({'parts': [{'ask': 'a', 'passage': 1, 'sentences': [1, 3]}] + plan_obj()['parts'][1:]}, 'non_adjacent'),
     ({'parts': [{'ask': 'a', 'passage': 1, 'sentences': [9]}] + plan_obj()['parts'][1:]}, 'sentence_index'),
-    ({'parts': [{'ask': 'a', 'passage': 1, 'sentences': [3]}] + plan_obj()['parts'][1:]}, 'dependent_start'),
+    ({'parts': [{'ask': 'a', 'passage': 1, 'sentences': [2]}, {'ask': 'b', 'passage': 1, 'sentences': [3]}, {'ask': 'c', 'passage': 1, 'sentences': [5]}]}, 'dependent_start'),
     ({'parts': [{'ask': 'a', 'passage': 1, 'sentences': [4]}] + plan_obj()['parts'][1:]}, 'duplicate_sentence'),
     ({'question': 'How big was float?'}, 'bad_question'),
     ({'question': 'What does the passage say about the buyback of shares and the float growth in the year?'}, 'question_refers_to_passage'),
@@ -73,6 +73,17 @@ def test_validate_plan_accepts_adjacent_pair_and_builds_obligations():
 def test_validate_plan_rejects(change, expected):
     reason, _ = B.validate_plan(plan_obj(**change), 'multipart', [doc('1995_p0001', S)])
     assert reason == expected
+
+
+def test_dependent_sentence_is_repaired_with_its_predecessor():
+    parts = [{'ask': 'a', 'passage': 1, 'sentences': [1]}, {'ask': 'b', 'passage': 1, 'sentences': [3]}, {'ask': 'c', 'passage': 1, 'sentences': [5]}]
+    reason, plan = B.validate_plan(plan_obj(parts=parts), 'multipart', [doc('1995_p0001', S)])
+    assert reason is None and plan['obligations'][1]['sentence_numbers'] == [2, 3]
+
+
+def test_layout_debris_is_not_a_fact():
+    assert B.bad_sentence('Late in 2009 * * * * * * we agreed to buy BNSF.') and B.bad_sentence('limited way that I do with subsidiaries.')
+    assert not B.bad_sentence(S[0])
 
 
 def test_temporal_needs_the_year_in_the_question():
