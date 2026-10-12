@@ -21,6 +21,8 @@ _CITATIONS = re.compile(r"\[(\d+(?:\s*,\s*\d+)*)\]")
 # Each period's list keeps its anchors plus neighbours up to this many passages (token budget still applies).
 PERIOD_PASSAGES = 12
 SOFT_GATE_FLOOR = 0.15
+# A period whose call refused although its passages pass the evidence gate is asked once more with this many.
+RETRY_PASSAGES = 3
 _CLAUSE_SPLIT_RE = re.compile(r"[,;:?]|\s+(?:and|with|versus|vs\.?)\s+", re.IGNORECASE)
 # Closing quote + citation marker ends a sentence even without . ! ?
 _QUOTE_CITE_END_RE = re.compile(r"([\"\u201d\u2019']\s*(?:\[\d+(?:\s*,\s*\d+)*\])+)[ \t]+(?=[A-Z0-9\"\u201c(])")
@@ -132,6 +134,21 @@ def prepare_answer_context(
     return fitted
 
 
+def period_question(query: str, period: Dict[str, Any], periods: Sequence[Dict[str, Any]]) -> str:
+    """The question a single period's call is asked: the period-neutral focused query, not the comparison.
+
+    A comparative question makes the model refuse a lone period ("do not claim a change unless both
+    sides support it"). The focus note names the period even when focusing dropped its year.
+    """
+    return f"{period_focused_query(query, period, periods)} (focus: {period_label(period)})"
+
+
+def _ask_period(llm, question: str, indexed: Sequence[tuple], history, max_new_tokens: int) -> str:
+    prompt = build_cited_prompt(question, [hit for _, hit in indexed], history=history)
+    raw = llm.generate(prompt, max_new_tokens=min(max_new_tokens, 300))
+    return format_answer_markdown(strip_chat_artifacts(raw))
+
+
 @dataclass
 class ComparisonAnswer:
     answer: str
@@ -159,27 +176,32 @@ def generate_comparison_answer(
                    if _meta_matches(hit.metadata, period)]
         subset = [hit for _, hit in indexed]
         part = ""
+        used = indexed
         # Period-focused terms can only add evidence: when the shared stem sits in a clause that
         # names the other period, focusing drops it (hv31 2016: 0.33 -> 0.00), so keep the better.
         focused = period_focused_query(query, period, all_periods)
         gates = [assess_evidence(q, subset, extra_queries=extra_queries) for q in dict.fromkeys([focused, query])]
         overlap = max(g.best_overlap for g in gates)
+        gate_passed = any(g.sufficient for g in gates)
         # Soft gate: weak lexical overlap still reaches the model, which (or the validator) may refuse.
-        if any(g.sufficient for g in gates) or (_soft_gate() and overlap >= SOFT_GATE_FLOOR):
-            prompt = build_cited_prompt(f"{query} (focus: {label})", subset, history=history)
-            raw = llm.generate(prompt, max_new_tokens=min(max_new_tokens, 300))
-            clean = format_answer_markdown(strip_chat_artifacts(raw))
+        if gate_passed or (_soft_gate() and overlap >= SOFT_GATE_FLOOR):
+            question = period_question(query, period, all_periods)
+            clean = _ask_period(llm, question, indexed, history, max_new_tokens)
+            if clean == REFUSAL_LINE and gate_passed and len(indexed) > RETRY_PASSAGES:
+                # The evidence gate passed but the model refused: ask once more with only the top passages.
+                used = indexed[:RETRY_PASSAGES]
+                clean = _ask_period(llm, question, used, history, max_new_tokens)
             if clean != REFUSAL_LINE:
-                validation = validate_and_filter_answer(clean, subset)
+                validation = validate_and_filter_answer(clean, [hit for _, hit in used])
                 part = validation.safe_answer
                 blocked.extend(validation.blocked_claims)
                 for item in validation.validations:
                     item = dict(item)
-                    item["cited_indexes"] = [indexed[i][0] - 1 for i in item["cited_indexes"]]
+                    item["cited_indexes"] = [used[i][0] - 1 for i in item["cited_indexes"]]
                     validations.append(item)
                 nli_available |= validation.nli_available
         if part:
-            mapping = {local: global_index for local, (global_index, _) in enumerate(indexed, 1)}
+            mapping = {local: global_index for local, (global_index, _) in enumerate(used, 1)}
             def renumber(match):
                 numbers = [mapping[int(value.strip())] for value in match.group(1).split(",")
                            if int(value.strip()) in mapping]

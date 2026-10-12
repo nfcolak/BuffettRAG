@@ -309,6 +309,7 @@ def run(
     model_path: Optional[Path] = None,
     output: Optional[Path] = None,
     resume: bool = False,
+    qids: Optional[List[str]] = None,
 ) -> Dict[str, Any]:
     """Validate every fixture first, then call backend.ask without HTTP/startup."""
     if retrieval not in {"bm25", "hybrid"}:
@@ -341,6 +342,11 @@ def run(
     if payload.get("corpus_sha256") and payload["corpus_sha256"] != corpus_hash:
         raise FixtureValidationError("Fixture corpus SHA256 does not match the active corpus")
     selected_cases = cases[:max_cases] if max_cases is not None else cases
+    if qids:
+        unknown = sorted(set(qids) - {case["qid"] for case in cases})
+        if unknown:
+            raise FixtureValidationError(f"--qids not in the cases file: {unknown}")
+        selected_cases = [case for case in selected_cases if case["qid"] in set(qids)]
     cases_hash = hashlib.sha256(cases_path.read_bytes()).hexdigest()
     sidecar = _Sidecar(output, grounded_run)
     prior_rows: Dict[str, Dict[str, Any]] = {}
@@ -526,6 +532,7 @@ def main() -> int:
                         help="grounded/mlx: skip qids already in <output>.rows.jsonl")
     parser.add_argument("--temperature", type=float, default=0.0)
     parser.add_argument("--max-cases", type=int, default=None)
+    parser.add_argument("--qids", default=None, help="comma-separated qids; only these cases are run")
     parser.add_argument("--retrieval", choices=("bm25", "hybrid"), default="hybrid")
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--save-raw", action="store_true", help="store each raw (pre-validation) model answer per case as rows[].raw_answers")
@@ -533,7 +540,8 @@ def main() -> int:
     try:
         result = run(args.corpus, args.cases, provider=args.provider,
                      temperature=args.temperature, max_cases=args.max_cases, retrieval=args.retrieval, save_raw=args.save_raw,
-                     composer=args.composer, model_path=args.model_path, output=args.output, resume=args.resume)
+                     composer=args.composer, model_path=args.model_path, output=args.output, resume=args.resume,
+                     qids=[q.strip() for q in args.qids.split(",") if q.strip()] if args.qids else None)
         args.output.parent.mkdir(parents=True, exist_ok=True)
         args.output.write_text(json.dumps(result, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     except FixtureValidationError as exc:

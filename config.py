@@ -155,6 +155,13 @@ LLM_GPU_LAYERS = int(os.getenv("LLM_GPU_LAYERS", "-1"))  # -1 = all (Metal); 0 =
 _DEFAULT_CONTEXT_PASSAGES = "8" if "7b" in LLM_MODEL_PATH.name.lower() else "5"
 LLM_CONTEXT_PASSAGES = int(os.getenv("LLM_CONTEXT_PASSAGES", _DEFAULT_CONTEXT_PASSAGES))
 LLM_PASSAGE_MAX_CHARS = int(os.getenv("LLM_PASSAGE_MAX_CHARS", "1800"))
+# Neighbour-sentence expansion (src/generation/answer_expand.py): passage sentences added after / before every
+# answer sentence that is a verbatim span of its cited passage. 0/0 = off. Read from the environment at call time.
+ANSWER_NEIGHBOR_AFTER = int(os.getenv("ANSWER_NEIGHBOR_AFTER", "0"))
+ANSWER_NEIGHBOR_BEFORE = int(os.getenv("ANSWER_NEIGHBOR_BEFORE", "0"))
+ANSWER_MAX_SENTENCES = int(os.getenv("ANSWER_MAX_SENTENCES", "12"))
+# Retry once with the top 3 passages when the soft evidence gate let evidence through and the model still refused.
+ANSWER_REFUSAL_RETRY = os.getenv("ANSWER_REFUSAL_RETRY", "1")
 
 # -----------------------------------------------------------------------------
 # Retrieval / served-context settings, read from the environment AT CALL TIME
