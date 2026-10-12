@@ -21,6 +21,7 @@ from __future__ import annotations
 
 import argparse
 from collections import Counter, defaultdict
+from contextlib import contextmanager
 import fcntl
 import glob
 import gzip
@@ -46,7 +47,9 @@ ROOT = common.ROOT
 PROMPT_VERSION = 'v2'
 OUT_DIR = 'data/ft_v6'
 DEFAULT_TEACHER = round4.DEFAULT_TEACHER
-MAX_SEQ = 6144                       # colab/train_7b_lora.ipynb
+MAX_SEQ = 6144                       # colab/train_7b_lora.ipynb (8-passage rows)
+DEFAULT_PASSAGES = 8                 # served context size of the default (no --passages-mix) rows
+MAX_SEQ_MIX = 12288                  # row length cap with --passages-mix (colab/train_7b_lora_r3.ipynb cap)
 KINDS = ('multipart', 'single', 'follow_up', 'temporal', 'refusal')
 SHARE = {'multipart': .55, 'single': .10, 'follow_up': .10, 'temporal': .10, 'refusal': .15}
 PARTS = {'multipart': (3, 5), 'single': (2, 3), 'follow_up': (2, 3), 'temporal': (3, 5)}
@@ -94,6 +97,39 @@ def served_has_partnership(hits):
 
 def words(text):
     return WORD.findall(text.lower())
+
+
+def parse_passages_mix(text):
+    """'8,12,16' -> [8, 12, 16] (a repeated size is weighted); None/'' -> [DEFAULT_PASSAGES]."""
+    if not text:
+        return [DEFAULT_PASSAGES]
+    try:
+        mix = [int(part) for part in str(text).split(',') if part.strip()]
+    except ValueError:
+        raise ValueError(f'bad --passages-mix {text!r}; expected integers like 8,12,16') from None
+    if not mix or any(not 1 <= k <= 32 for k in mix):
+        raise ValueError(f'bad --passages-mix {text!r}; sizes must be 1..32')
+    return mix
+
+
+def pick_k(job_id, mix):
+    """Served context size of one row: a deterministic hash of the job id picks from `mix`."""
+    mix = list(mix)
+    return mix[int(common.sha(f'{common.SEED}:k:{job_id}'.encode())[:8], 16) % len(mix)]
+
+
+@contextmanager
+def serving_passages(k):
+    """Serve with LLM_CONTEXT_PASSAGES=k (ask_flow reads it at call time), restoring the caller's value afterwards."""
+    old = os.environ.get('LLM_CONTEXT_PASSAGES')
+    os.environ['LLM_CONTEXT_PASSAGES'] = str(k)
+    try:
+        yield
+    finally:
+        if old is None:
+            os.environ.pop('LLM_CONTEXT_PASSAGES', None)
+        else:
+            os.environ['LLM_CONTEXT_PASSAGES'] = old
 
 
 # ------------------------------------------------------------------ exclusions
@@ -521,7 +557,7 @@ def check_row(row, *, excluded=None, count_tokens=None):
     if system != system_prompt(PROMPT_VERSION):
         problems.append('system_prompt_not_v2')
     passages = parse_prompt_passages(user)
-    if not 1 <= len(passages) <= 8 or sorted(passages) != list(range(1, len(passages) + 1)):
+    if not 1 <= len(passages) <= max(DEFAULT_PASSAGES, row.get('k') or 0) or sorted(passages) != list(range(1, len(passages) + 1)):
         return problems + ['passage_slots']
     if any(is_partnership(i) for i in (row.get('served_ids') or []) + (row.get('source_ids') or []) + (row.get('passage_ids') or [])
            + (row.get('context_passage_ids') or [])) or any(is_partnership(src) for _, src, _ in passages.values()):
@@ -584,9 +620,10 @@ def append(path, row):
 
 
 class Generator:
-    def __init__(self, teacher, serving, full, excluded, out, count_tokens, max_seq=MAX_SEQ, strict_context=False):
+    def __init__(self, teacher, serving, full, excluded, out, count_tokens, max_seq=MAX_SEQ, strict_context=False, passages_mix=None):
         self.teacher, self.serving, self.full, self.excluded, self.out = teacher, serving, full, excluded, Path(out)
         self.count_tokens, self.max_seq, self.strict_context = count_tokens, max_seq, strict_context
+        self.mix = parse_passages_mix(passages_mix) if not isinstance(passages_mix, list) else list(passages_mix)
         self.rows = common.read_jsonl(self.out / 'examples.jsonl')
         self.attempts = common.read_jsonl(self.out / 'example_attempts.jsonl')
         self.done = {a['id'] for a in self.attempts}
@@ -595,7 +632,8 @@ class Generator:
     def attempt(self, job):
         """One job -> attempt record (and an examples row when kept). Never raises for data problems."""
         started = time.monotonic()
-        record = {'id': job['id'], 'kind': job['kind'], 'split': job['split'], 'kept': False, 'reason': None, 'teacher_calls': 0}
+        record = {'id': job['id'], 'kind': job['kind'], 'split': job['split'], 'k': pick_k(job['id'], self.mix), 'kept': False, 'reason': None,
+                  'teacher_calls': 0}
         row = None
         try:
             row, reason = self._attempt(job, record)
@@ -675,7 +713,8 @@ class Generator:
             question, terms = value
         if norm(question).lower() in self.known:
             return None, 'duplicate_question'
-        prompts = self.serving.prompts(question)
+        with serving_passages(record['k']):
+            prompts = self.serving.prompts(question)
         if len(prompts) != 1 or not prompts[0]['hits']:
             return None, 'no_context'
         hits = prompts[0]['hits']
@@ -684,12 +723,13 @@ class Generator:
         if any(term_present(t, [h.text for h in hits]) for t in terms):
             return None, 'refusal_terms_present_in_served'
         messages = chat_messages(question, hits) + [{'role': 'assistant', 'content': REFUSAL_LINE}]
-        row = self.row(job, docs, question, [], hits, messages, None, [], prompts[0], {'absent_terms': terms})
+        row = self.row(job, docs, question, [], hits, messages, None, [], prompts[0], {'absent_terms': terms, 'k': record['k']})
         return self.finalize(row)
 
     def _finish(self, job, docs, plan, history, record):
         question = plan['question']
-        prompts = self.serving.prompts(question, history)
+        with serving_passages(record['k']):
+            prompts = self.serving.prompts(question, history)
         if len(prompts) != 1 or prompts[0]['period'] is not None:
             return None, 'comparison_path_question'
         prompt = prompts[0]
@@ -707,7 +747,7 @@ class Generator:
         if target is None:
             return None, 'sentence_not_servable'
         messages = chat_messages(question, hits, history) + [{'role': 'assistant', 'content': target}]
-        row = self.row(job, docs, question, plan['obligations'], hits, messages, history, injected, prompt, {'slots': slots})
+        row = self.row(job, docs, question, plan['obligations'], hits, messages, history, injected, prompt, {'slots': slots, 'k': record['k']})
         return self.finalize(row)
 
     def row(self, job, docs, question, obligations, hits, messages, history, injected, prompt, extra):
@@ -767,9 +807,14 @@ def summarize(attempts, rows, seconds):
     return by_kind, kept_total
 
 
-def manifest_for(out, rows, attempts, counts, identity, seconds, target):
+def k_histogram(rows):
+    return {str(k): n for k, n in sorted(Counter(r.get('k') or DEFAULT_PASSAGES for r in rows).items())}
+
+
+def manifest_for(out, rows, attempts, counts, identity, seconds, target, max_seq=MAX_SEQ, mix=None):
     by_kind, kept_total = summarize(attempts, rows, seconds)
-    return {**identity, 'prompt_version': PROMPT_VERSION, 'max_seq': MAX_SEQ, 'target_rows': target, 'exclusion_counts': counts,
+    return {**identity, 'prompt_version': PROMPT_VERSION, 'max_seq': max_seq, 'passages_mix': list(mix or [DEFAULT_PASSAGES]), 'k_histogram': k_histogram(rows),
+            'target_rows': target, 'exclusion_counts': counts,
             'row_counts_per_kind': {k: sum(r['kind'] == k for r in rows) for k in KINDS},
             'counts_per_split_kind': {s: dict(Counter(r['kind'] for r in rows if r['split'] == s)) for s in ('train', 'valid')},
             'by_kind': by_kind, 'natural_miss_share': round(sum(r['natural_miss'] for r in rows) / max(1, len(rows)), 3),
@@ -911,8 +956,8 @@ class RecordedGenerator(Generator):
 
 def assemble_command(args):
     os.environ['PROMPT_VERSION'] = PROMPT_VERSION
-    if round4.LLM_CONTEXT_PASSAGES != 8:
-        raise SystemExit('LLM_CONTEXT_PASSAGES must be 8 (unset LLM_MODEL_PATH / LLM_CONTEXT_PASSAGES)')
+    mix = parse_passages_mix(args.passages_mix)       # every row serves with its own LLM_CONTEXT_PASSAGES (no flag: 8, as before)
+    max_seq = args.max_seq or (MAX_SEQ_MIX if args.passages_mix else MAX_SEQ)
     jobs_path, teacher_path = Path(args.jobs), Path(args.teacher)
     jobs, recorded = read_jsonl_file(jobs_path), read_teacher_output(teacher_path)
     full, excluded, counts, valid_years, identity = load_inputs(KAGGLE_TEACHER)
@@ -930,7 +975,7 @@ def assemble_command(args):
     for name in ('examples.jsonl', 'example_attempts.jsonl'):        # assemble is a pure function of its inputs: no resume state
         (work / name).unlink(missing_ok=True)
     _, count_tokens = round4.token_counter(DEFAULT_TEACHER)
-    generator = RecordedGenerator(recorded, round5.load_serving(), full, excluded, work, count_tokens, MAX_SEQ, args.strict_context)
+    generator = RecordedGenerator(recorded, round5.load_serving(), full, excluded, work, count_tokens, max_seq, args.strict_context, mix)
     quotas = quotas_for(args.target) if args.target else None
     started = time.monotonic()
     for index, job in enumerate(jobs, 1):
@@ -944,7 +989,7 @@ def assemble_command(args):
             print(f'assembled {index}/{len(jobs)} kept={len(generator.rows)}', flush=True)
     materialize(out, generator.rows)
     seconds = time.monotonic() - started
-    manifest = manifest_for(out, generator.rows, generator.attempts, counts, identity, seconds, args.target or len(jobs))
+    manifest = manifest_for(out, generator.rows, generator.attempts, counts, identity, seconds, args.target or len(jobs), max_seq, mix)
     reasons = manifest['rejection_reasons']
     manifest.update(jobs=len(jobs), jobs_per_kind=dict(Counter(j['kind'] for j in jobs)), teacher_records=len(recorded),
                     teacher_jobs_without_output=sum(1 for j in jobs if j.get('needs_teacher') and j['id'] not in recorded),
@@ -1103,6 +1148,8 @@ def main(argv=None):
     a.add_argument('--target', type=int, help='cap kept rows per (kind, split) at the quotas of this total (default: keep all)')
     a.add_argument('--exclude-ids', help='file of extra passage ids that must not be sources (spent sets not on this branch)')
     a.add_argument('--strict-context', action='store_true', help='also reject rows whose served context holds an excluded (spent-set) passage')
+    a.add_argument('--passages-mix', help='served context sizes, e.g. 8,12,16: each row picks one by a hash of its job id (default: 8 for every row)')
+    a.add_argument('--max-seq', type=int, help=f'reject rows longer than this many tokens (default {MAX_SEQ}; {MAX_SEQ_MIX} with --passages-mix)')
 
     v = sub.add_parser('verify', help='offline re-check of every row of a generated jsonl')
     v.add_argument('path')
