@@ -13,9 +13,9 @@ from config import (
     CHUNKS_V3_FILE,
     EXPANSION_MODE,
     EXPOSE_DEBUG_STATUS,
-    LLM_N_CTX,
     LLM_PASSAGE_MAX_CHARS,
     llm_context_passages,
+    llm_n_ctx,
     retrieval_setting,
 )
 from src.generation.prompt import (
@@ -170,7 +170,7 @@ def _prepare_ask_steps(req: AskRequest):
             llm, hits, _state.get("docs_by_id", {}), req.query, history=history_dicts,
             followup=build_followup_retrieval_query(req.query, history_dicts) != req.query,
             neighbors=retrieval_setting("ANSWER_CONTEXT_NEIGHBORS"), max_chars=ANSWER_CONTEXT_MAX_CHARS,
-            max_new_tokens=req.max_new_tokens, n_ctx=LLM_N_CTX,
+            max_new_tokens=req.max_new_tokens, n_ctx=llm_n_ctx(),
             max_passages=llm_context_passages(), passage_max_chars=LLM_PASSAGE_MAX_CHARS,
         )
         prompt = build_cited_prompt(query=req.query, hits=context_hits, history=history_dicts)

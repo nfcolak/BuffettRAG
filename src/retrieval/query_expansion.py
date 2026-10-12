@@ -43,6 +43,23 @@ def build_followup_retrieval_query(query: str, history: Optional[Sequence[Dict[s
         words = [word for word in words if not re.fullmatch(r"(?:19|20)\d{2}s?", word)]
     return " ".join([query, *dict.fromkeys(words)]).strip()
 
+_SCAFFOLD_WORDS = _SEARCH_STOPWORDS | frozenset(
+    """whom whose where explain describe tell mention mentioned discuss discussed give gives given according
+    he please me us tell does doing done being may might should shall must much many one two own his her him
+    first second third part parts both each another whether regarding concerning refer refers""".split())
+
+
+def strip_question_scaffolding(query: str) -> str:
+    """The query's content words without question scaffolding (wh-words, auxiliaries, "tell me about").
+
+    Numbers, years, names and every other content word keep their order; the result is a candidate query for
+    retrieval only (the full question is still what the reranker and the answer model see).
+    """
+    kept = [word for word in re.findall(r"[A-Za-z0-9][A-Za-z0-9'’.%$,-]*", query)
+            if word.lower().strip(".,'’-") not in _SCAFFOLD_WORDS or re.search(r"\d", word)]
+    return " ".join(kept).strip()
+
+
 _EXPANSION_PROMPT = """\
 You expand search queries over Warren Buffett's Berkshire Hathaway shareholder \
 letters (1977-2024). Given the question below, list 3 to 8 extra search keywords \

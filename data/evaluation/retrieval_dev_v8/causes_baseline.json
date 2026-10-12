@@ -1,0 +1,87 @@
+{
+  "missed_claims": 190,
+  "total_claims": 875,
+  "by_cause": {
+    "all": {
+      "lexical_gap": 17,
+      "rerank_demotion": 49,
+      "candidate_depth_cut": 55,
+      "cap_dedupe_merge_drop": 44,
+      "period_year_filter": 13,
+      "multipart_split_error": 10,
+      "followup_context_missing": 2
+    },
+    "heldout_v3": {
+      "lexical_gap": 0,
+      "rerank_demotion": 4,
+      "candidate_depth_cut": 2,
+      "cap_dedupe_merge_drop": 3,
+      "period_year_filter": 0,
+      "multipart_split_error": 0,
+      "followup_context_missing": 0
+    },
+    "heldout_v4": {
+      "lexical_gap": 1,
+      "rerank_demotion": 3,
+      "candidate_depth_cut": 1,
+      "cap_dedupe_merge_drop": 0,
+      "period_year_filter": 1,
+      "multipart_split_error": 0,
+      "followup_context_missing": 0
+    },
+    "heldout_v5a": {
+      "lexical_gap": 0,
+      "rerank_demotion": 18,
+      "candidate_depth_cut": 7,
+      "cap_dedupe_merge_drop": 10,
+      "period_year_filter": 0,
+      "multipart_split_error": 2,
+      "followup_context_missing": 0
+    },
+    "heldout_v5b": {
+      "lexical_gap": 3,
+      "rerank_demotion": 7,
+      "candidate_depth_cut": 7,
+      "cap_dedupe_merge_drop": 6,
+      "period_year_filter": 3,
+      "multipart_split_error": 0,
+      "followup_context_missing": 0
+    },
+    "heldout_v6a": {
+      "lexical_gap": 4,
+      "rerank_demotion": 9,
+      "candidate_depth_cut": 7,
+      "cap_dedupe_merge_drop": 6,
+      "period_year_filter": 0,
+      "multipart_split_error": 2,
+      "followup_context_missing": 2
+    },
+    "heldout_v6b": {
+      "lexical_gap": 0,
+      "rerank_demotion": 7,
+      "candidate_depth_cut": 12,
+      "cap_dedupe_merge_drop": 6,
+      "period_year_filter": 6,
+      "multipart_split_error": 2,
+      "followup_context_missing": 0
+    },
+    "dev_cases": {
+      "lexical_gap": 0,
+      "rerank_demotion": 1,
+      "candidate_depth_cut": 1,
+      "cap_dedupe_merge_drop": 2,
+      "period_year_filter": 2,
+      "multipart_split_error": 0,
+      "followup_context_missing": 0
+    },
+    "devpl": {
+      "lexical_gap": 9,
+      "rerank_demotion": 0,
+      "candidate_depth_cut": 18,
+      "cap_dedupe_merge_drop": 11,
+      "period_year_filter": 1,
+      "multipart_split_error": 4,
+      "followup_context_missing": 0
+    }
+  }
+}

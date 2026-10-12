@@ -44,12 +44,21 @@ CASE_FILES = {
     "heldout_v6a": "heldout_v6/answer_benchmark_heldout_v6_a.json",
     "heldout_v6b": "heldout_v6/answer_benchmark_heldout_v6_b.json",
     "dev_cases": "grounded_dev_v1/confirm/dev_cases.json",
+    "devpl": "devpl/devpl.json",  # partnership letters 1957-1970 (corpus v5_pl)
 }
 HARD_NEGATIVES = "hard_negatives_v4/hard_negatives_v4.json"
 STORED_V6 = Path("/Users/necatifurkancolak/AI-Workplace/Artifacts/BuffettRAG/fix-v6/runs")
 TOKENIZER_DIR = MAIN / "models/ft/7b_r1/adapter"  # Qwen2.5-7B tokenizer of the served FT model
-MIN_ANSWER_TOKENS = 768
-BASELINE_ENV = {"LLM_CONTEXT_PASSAGES": "8", "RETRIEVAL_MULTIPART": "0"}  # the pre-v7 serving defaults (run_arm.sh)
+MIN_ANSWER_TOKENS = 768  # tokens left for the answer at the default n_ctx 8192 (max_new_tokens 900 in the request)
+LONG_CTX_ANSWER_TOKENS = 1024  # configs that set MAX_NEW_TOKENS keep this many tokens free
+# The serving defaults of base commit 0055475 (multipart on), pinned so that the baseline stays reproducible after the
+# defaults in config.py change (retrieval_dev_v8 moved them).
+BASELINE_ENV = {"LLM_CONTEXT_PASSAGES": "8", "LLM_N_CTX": "8192", "RERANK_CANDIDATES": "15",
+                "RETRIEVAL_QUERY_STRIP": "0", "RETRIEVAL_YEAR_FILTER_MIN": "1970"}
+HARNESS_KEYS = ("MAX_NEW_TOKENS",)  # per-config keys that are request fields, not environment variables
+SPLIT_CORPUS = ("chunks_v5_pl.jsonl", "faiss_v5_pl")  # active corpus of main (v3 + partnership letters)
+RANK_DEPTH = 200
+RERANK_DIAG_DEPTH = 50  # fused candidates re-ranked by the cross-encoder in the miss analysis
 
 
 # ----------------------------------------------------------------------------- cases
@@ -189,11 +198,11 @@ def build_environment(cache: _Cache):
     from src.storage.embeddings import BGEEmbedder
     from src.storage.faiss_store import FaissStore
 
-    docs = load_chunks_as_docs(MAIN / "data/processed/chunks_v3_paragraph.jsonl")
+    docs = load_chunks_as_docs(MAIN / "data/processed" / SPLIT_CORPUS[0])
     embedder = BGEEmbedder(model_name=EMBEDDING_MODEL_PRIMARY, device=EMBEDDING_DEVICE)
-    store = FaissStore(persist_dir=MAIN / "data/indices/faiss_v3", dim=embedder.dimension)
+    store = FaissStore(persist_dir=MAIN / "data/indices" / SPLIT_CORPUS[1], dim=embedder.dimension)
     if len(store) != len(docs):
-        raise RuntimeError(f"faiss_v3 has {len(store)} vectors for {len(docs)} chunks")
+        raise RuntimeError(f"{SPLIT_CORPUS[1]} has {len(store)} vectors for {len(docs)} chunks")
     reranker = CrossEncoderReranker(device=EMBEDDING_DEVICE)
     retriever = Retriever(vector_store=store, embedder=CachedEmbedder(embedder, cache), docs=docs,
                           reranker=CachedReranker(reranker, cache))
@@ -210,6 +219,8 @@ class _Env:
 
     def __enter__(self):
         for key, value in self.overrides.items():
+            if key in HARNESS_KEYS:
+                continue
             self.saved[key] = os.environ.get(key)
             os.environ[key] = str(value)
 
@@ -236,8 +247,10 @@ def prompt_tokens(tok, prompt: str) -> int:
     return len(tok(text, add_special_tokens=False)["input_ids"])
 
 
-def serve_one(ask_flow, cache: _Cache, tok, query: str, history: List[Dict[str, str]]) -> Dict[str, Any]:
-    req = ask_flow.AskRequest(query=query, history=history, strategy="hybrid", rerank=True)
+def serve_one(ask_flow, cache: _Cache, tok, query: str, history: List[Dict[str, str]],
+              max_new_tokens: Optional[int] = None) -> Dict[str, Any]:
+    extra = {"max_new_tokens": int(max_new_tokens)} if max_new_tokens else {}
+    req = ask_flow.AskRequest(query=query, history=history, strategy="hybrid", rerank=True, **extra)
     cache.hits_embed = cache.hits_pairs = 0
     start = time.perf_counter()
     _, hits, used_filter, reranked, context_hits, prompt, _ = ask_flow._prepare_ask(req)
@@ -252,29 +265,46 @@ def serve_one(ask_flow, cache: _Cache, tok, query: str, history: List[Dict[str, 
         "wall_ms": round(wall * 1000, 2),
         "latency_ms": round(effective * 1000, 2),
         "used_filter": used_filter,
+        "n_ctx": int(os.environ.get("LLM_N_CTX") or 8192),
     }
+
+
+def _is_default(key: str, value: str) -> bool:
+    import config
+
+    if key in BASELINE_ENV:
+        return str(value) == BASELINE_ENV[key]
+    default = config.RETRIEVAL_DEFAULTS.get(key)
+    try:
+        return default is not None and float(value) == float(default)
+    except ValueError:
+        return False
 
 
 def _scope_predicate(overrides: Dict[str, str]):
     """(query, history) -> can this configuration change the result of that case?
 
-    Settings that act on a subset of questions (follow-ups, multi-part, temporal comparisons) leave every other
-    case byte-identical to the baseline, so those baseline rows are reused instead of re-served.
+    Settings that act on a subset of questions (follow-ups, multi-part, temporal comparisons, questions that name a
+    year) leave every other case byte-identical to the baseline, so those baseline rows are reused.
     """
+    import re
+
     from src.generation.decompose import split_question
     from src.retrieval.query_expansion import build_followup_retrieval_query
     from src.retrieval.retriever import detect_temporal_comparison
 
     scopes = []
     for key in overrides:
-        if overrides[key] == BASELINE_ENV.get(key):
+        if key in HARNESS_KEYS or _is_default(key, overrides[key]):
             continue
         if key.startswith("RETRIEVAL_FOLLOWUP"):
             scopes.append(lambda q, h: bool(h))
-        elif key == "RETRIEVAL_MULTIPART":
+        elif key in ("RETRIEVAL_MULTIPART", "RETRIEVAL_PART_SLOTS"):
             scopes.append(lambda q, h: len(split_question(build_followup_retrieval_query(q, h))) >= 2)
         elif key == "RETRIEVAL_PERIOD_RESERVE":
             scopes.append(lambda q, h: bool(detect_temporal_comparison(build_followup_retrieval_query(q, h))))
+        elif key in ("RETRIEVAL_YEAR_FILTER_MIN", "RETRIEVAL_YEAR_FILTER_WEIGHT"):
+            scopes.append(lambda q, h: bool(re.search(r"\b(19[5-9]\d|20[0-2]\d)\b", build_followup_retrieval_query(q, h))))
         else:
             return lambda q, h: True
     if not scopes:
@@ -290,6 +320,8 @@ def run_config(name: str, overrides: Dict[str, str], ask_flow, cache: _Cache, to
     base_rows = {r["qid"]: r for r in base["rows"]} if base else {}
     base_hn = {r["qid"]: r for r in base["hard_negatives"]} if base else {}
     in_scope = _scope_predicate(overrides) if base else (lambda q, h: True)
+    if overrides.get("LLM_N_CTX") not in (None, "8192") or overrides.get("MAX_NEW_TOKENS"):
+        in_scope = lambda q, h: True  # the window changes every case
     reused = 0
     with _Env(overrides):
         for i, case in enumerate(pool[:limit]):
@@ -297,7 +329,7 @@ def run_config(name: str, overrides: Dict[str, str], ask_flow, cache: _Cache, to
                 rows.append(base_rows[case["qid"]])
                 reused += 1
                 continue
-            row = serve_one(ask_flow, cache, tok, case["query"], case["history"])
+            row = serve_one(ask_flow, cache, tok, case["query"], case["history"], overrides.get("MAX_NEW_TOKENS"))
             rows.append({"set": case["set"], "qid": case["qid"], "type": case["type"], "claims": case["claims"], **row})
             if (i + 1) % 50 == 0:
                 cache.save()
@@ -306,7 +338,7 @@ def run_config(name: str, overrides: Dict[str, str], ask_flow, cache: _Cache, to
             if case["qid"] in base_hn and not in_scope(case["query"], []):
                 hn_rows.append(base_hn[case["qid"]])
                 continue
-            res = serve_one(ask_flow, cache, tok, case["query"], [])
+            res = serve_one(ask_flow, cache, tok, case["query"], [], overrides.get("MAX_NEW_TOKENS"))
             hn_rows.append({"qid": case["qid"], "relevant_ids": case["relevant_ids"],
                             "hard_negative_ids": case["hard_negative_ids"], "ranked_ids": res["retrieved_ids"],
                             "latency_ms": res["latency_ms"]})
@@ -324,6 +356,8 @@ def parse_config(text: str):
     for item in filter(None, rest.split(",")):
         key, _, value = item.partition("=")
         overrides[key.strip()] = value.strip()
+    if overrides.get("LLM_N_CTX") != "8192" and "MAX_NEW_TOKENS" not in overrides:
+        overrides["MAX_NEW_TOKENS"] = str(LONG_CTX_ANSWER_TOKENS)  # long-window configs keep 1024 tokens for the answer
     return name.strip(), overrides
 
 
@@ -365,7 +399,9 @@ def summarize(result: Dict[str, Any]) -> Dict[str, Any]:
         "prompt_tokens_max": max(toks) if toks else None,
         "prompt_tokens_p50": statistics.median(toks) if toks else None,
         "passages_p50": statistics.median(len(r["passage_ids"]) for r in rows) if rows else None,
-        "n_ctx_ok": all(8192 - t >= MIN_ANSWER_TOKENS for t in toks),
+        "n_ctx_ok": all(r.get("n_ctx", 8192) - r["prompt_tokens"] >= int(result["overrides"].get("MAX_NEW_TOKENS") or MIN_ANSWER_TOKENS)
+                        for r in rows) if rows else True,
+        "tokens_left_min": min((r.get("n_ctx", 8192) - r["prompt_tokens"] for r in rows), default=None),
         "hard_negatives_passed": sum(hn_pass(r) for r in hn),
         "hard_negatives_n": len(hn),
     }
@@ -408,7 +444,10 @@ def determinism_check(base_result: Dict[str, Any], extra_rows: Optional[List[Dic
             "same_ids_rate": same / checked if checked else None, "mismatches": mismatches}
 
 
-def report(out: Path, final: str, base_name: str = "baseline", notes: str = "") -> None:
+def report(out: Path, final: str, base_name: str = "baseline", notes: str = "", dest: Optional[Path] = None,
+           causes: Optional[Path] = None) -> None:
+    dest = dest or out
+    dest.mkdir(parents=True, exist_ok=True)
     results = {p.stem[len("served_"):]: json.loads(p.read_text(encoding="utf-8"))
                for p in sorted(out.glob("served_*.json"))}
     base = results[base_name]
@@ -421,12 +460,16 @@ def report(out: Path, final: str, base_name: str = "baseline", notes: str = "") 
             continue
         comp = paired_bootstrap(base["rows"], res["rows"])
         comp["merged"] = paired_bootstrap(base["rows"], res["rows"], "merged_ids")
+        dev = [i for i, r in enumerate(base["rows"]) if r["set"] == "devpl"]
+        comp["devpl"] = paired_bootstrap([base["rows"][i] for i in dev], [res["rows"][i] for i in dev]) if dev else None
         b, c = summary[base_name], summary[name]
         type_drops = {t: c["per_type"][t]["claim_recall"] - b["per_type"][t]["claim_recall"] for t in b["per_type"]}
         comp["type_deltas"] = type_drops
         comp["gate"] = {
             "ci_lower_gt_0": comp["ci95"][0] > 0,
             "hard_negatives_not_lower": c["hard_negatives_passed"] >= b["hard_negatives_passed"],
+            "devpl_not_lower": (c["per_set"].get("devpl", {}).get("claim_recall") or 0)
+            >= (b["per_set"].get("devpl", {}).get("claim_recall") or 0),
             "no_type_drop_gt_0.02": all(d >= -0.02 for d in type_drops.values()),
             "prompt_fits_n_ctx": c["n_ctx_ok"],
         }
@@ -435,9 +478,12 @@ def report(out: Path, final: str, base_name: str = "baseline", notes: str = "") 
     payload = {"baseline": base_name, "final": final, "notes": notes, "overrides": {n: r["overrides"] for n, r in results.items()},
                "summary": summary, "vs_baseline": comps, "determinism_hv6": {
                    k: v for k, v in determinism.items()}, "bootstrap": {"draws": 10000, "seed": 0}}
-    (out / "results.json").write_text(json.dumps(payload, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
-    (out / "comparison.md").write_text(render_markdown(payload), encoding="utf-8")
-    print(f"wrote {out / 'results.json'} and comparison.md")
+    payload["causes"] = {p.stem[len("causes_"):]: json.loads(p.read_text(encoding="utf-8"))
+                         for p in sorted((causes or dest).glob("causes_*.json"))}
+    payload["rows_digest"] = {n: {"cases": len(r["rows"])} for n, r in results.items()}
+    (dest / "results.json").write_text(json.dumps(payload, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    (dest / "comparison.md").write_text(render_markdown(payload), encoding="utf-8")
+    print(f"wrote {dest / 'results.json'} and comparison.md")
 
 
 def _pct(x: Optional[float]) -> str:
@@ -447,7 +493,7 @@ def _pct(x: Optional[float]) -> str:
 def render_markdown(p: Dict[str, Any]) -> str:
     s, comps, base = p["summary"], p["vs_baseline"], p["baseline"]
     names = list(s)
-    lines = ["# Retrieval dev v7: served-context recall", "",
+    lines = ["# Retrieval dev v8: served-context recall (corpus v5_pl, pool incl. devpl)", "",
              "Claim-level served recall = share of gold claims whose `gold_passage_ids` hit the ids of the passages "
              "placed in the 7B prompt (the `hits` list of /ask). Pool: answerable cases of heldout_v3..v6 and "
              "dev_cases (all spent). Secondary column: ids merged into a served passage as neighbour text.", ""]
@@ -471,6 +517,16 @@ def render_markdown(p: Dict[str, Any]) -> str:
                      f"{_pct(a['claim_recall_merged'])} | {_pct(a['case_any_gold'])} | "
                      f"{s[n]['hard_negatives_passed']}/{s[n]['hard_negatives_n']} | {s[n]['latency_p50_ms']:.0f} | "
                      f"{s[n]['prompt_tokens_max']} | {gate} |")
+    lines += ["", "## devpl only (claim recall, paired bootstrap on the devpl claims)", "",
+              "| config | claims served | claim recall % | delta pp | CI95 pp |", "|---|---|---|---|---|"]
+    for n in names:
+        a = s[n]["per_set"].get("devpl")
+        if not a:
+            continue
+        c = (comps.get(n) or {}).get("devpl")
+        lines.append(f"| {n} | {a['claims_served']}/{a['claims']} | {_pct(a['claim_recall'])} | "
+                     + ("" if c is None else f"{100 * c['delta']:+.2f} | [{100 * c['ci95'][0]:+.2f}, {100 * c['ci95'][1]:+.2f}]") + " |"
+                     + ("" if c is not None else " |"))
     lines += ["", "## Per set (claim recall %)", "", "| config | " + " | ".join(s[base]["per_set"]) + " |",
               "|" + "---|" * (len(s[base]["per_set"]) + 1)]
     for n in names:
@@ -489,11 +545,21 @@ def render_markdown(p: Dict[str, Any]) -> str:
         a = s[n]
         lines.append(f"| {n} | {a['latency_p50_ms']:.0f} | {a['wall_p50_ms']:.0f} | {a['passages_p50']} | "
                      f"{a['prompt_tokens_p50']} | {a['prompt_tokens_max']} | {a['n_ctx_ok']} |")
+    if p.get("causes"):
+        names_c = list(p["causes"])
+        lines += ["", "## Cause of the unserved claims (miss analysis, claims)", "",
+                  "| cause | " + " | ".join(f"{n} (missed {p['causes'][n]['missed_claims']})" for n in names_c) + " |",
+                  "|" + "---|" * (len(names_c) + 1)]
+        for cause in CAUSES:
+            lines.append(f"| {cause} | " + " | ".join(str(p["causes"][n]["by_cause"]["all"][cause]) for n in names_c) + " |")
+        lines += ["", "Per set, first configuration: " + "; ".join(
+            f"{k}: {sum(v.values())}" for k, v in p["causes"][names_c[0]]["by_cause"].items() if k != "all")]
     lines += ["", "## Overrides", ""] + [f"- {n}: {p['overrides'][n]}" for n in names]
     if p.get("notes"):
         lines += ["", "## Caveats and candidates not measured", "", p["notes"].strip()]
     final = p["final"]
-    changed = {k: v for k, v in p["overrides"].get(final, {}).items() if BASELINE_ENV.get(k) != v}
+    changed = {k: v for k, v in p["overrides"].get(final, {}).items()
+               if BASELINE_ENV.get(k) != v and k not in HARNESS_KEYS}
     verdict = comps.get(final, {}).get("gate", {}).get("all", False) if final != base else False
     lines += ["", "## Rule and decision", "",
               "A candidate becomes the default only when its pooled claim-level served-recall gain has a paired "
@@ -511,6 +577,133 @@ def render_markdown(p: Dict[str, Any]) -> str:
     return "\n".join(lines) + "\n"
 
 
+# ----------------------------------------------------------------------------- miss analysis
+CAUSES = ["lexical_gap", "rerank_demotion", "candidate_depth_cut", "cap_dedupe_merge_drop", "period_year_filter",
+          "multipart_split_error", "followup_context_missing"]
+
+
+def _rank(hits, gold: set) -> Optional[int]:
+    for i, hit in enumerate(hits):
+        if hit.id in gold:
+            return i + 1
+    return None
+
+
+def _fmt(rank: Optional[int]) -> str:
+    return str(rank) if rank is not None else f">{RANK_DEPTH}"
+
+
+def diagnose_miss(ask_flow, cache, case: Dict[str, Any], row: Dict[str, Any], claim: List[str]) -> Dict[str, Any]:
+    """Where the best gold passage of one unserved claim sits in each stage, which queries were used, and a cause."""
+    from config import RETRIEVAL_FETCH_K, retrieval_setting
+    from src.generation.decompose import split_question
+    from src.retrieval.query_expansion import build_followup_retrieval_query
+    from src.retrieval.retriever import (_meta_matches, detect_temporal_comparison, detect_year_filter,
+                                         reciprocal_rank_fusion)
+
+    retriever = ask_flow._state["retriever"]
+    docs_by_id = ask_flow._state["docs_by_id"]
+    gold = set(claim)
+    resolved = build_followup_retrieval_query(case["query"], case["history"])
+    parts = split_question(resolved)
+    multipart = len(parts) >= 2 and bool(retrieval_setting("RETRIEVAL_MULTIPART"))
+    periods = detect_temporal_comparison(resolved)
+    year_filter = detect_year_filter(resolved)
+    gold_years = sorted({docs_by_id[g].metadata.get("year") for g in gold if g in docs_by_id})
+    gold_filter = ({"year": gold_years[0]} if gold_years else None)
+    queries = [resolved] + (parts if multipart else [])
+
+    def stage_ranks(query: str, where) -> Dict[str, Any]:
+        dense = retriever._vector_search(query, RANK_DEPTH, where)
+        bm25 = retriever._bm25_search(query, RANK_DEPTH, where)
+        weights = (retrieval_setting("HYBRID_VECTOR_WEIGHT"), retrieval_setting("HYBRID_BM25_WEIGHT"))
+        fused = reciprocal_rank_fusion([dense, bm25], top_k=2 * RANK_DEPTH, weights=None if weights == (1.0, 1.0) else weights)
+        return {"dense": _rank(dense, gold), "bm25": _rank(bm25, gold), "fused": _rank(fused, gold), "fused_hits": fused}
+
+    per_query = {q: stage_ranks(q, None) for q in queries}
+    best_q = min(queries, key=lambda q: per_query[q]["fused"] or 10 ** 6)
+    best = per_query[best_q]
+    in_year = stage_ranks(resolved, gold_filter) if gold_filter else None
+    # The year filter / period split scopes the gold's own year; the scoped rank is the one retrieval can reach.
+    year_scoped = bool(year_filter or periods)
+    scoped_ok = bool(gold_years) and (
+        (year_filter is not None and any(_meta_matches({"year": y}, year_filter) for y in gold_years))
+        or (periods and any(_meta_matches({"year": y}, p) for p in periods for y in gold_years)))
+    reach = in_year["fused"] if (year_scoped and scoped_ok and in_year) else best["fused"]
+    pool_hits = (in_year["fused_hits"] if (year_scoped and scoped_ok and in_year) else best["fused_hits"])[:RERANK_DIAG_DEPTH]
+    rerank_rank = None
+    if pool_hits:
+        order = ask_flow._state["retriever"].reranker.rerank(resolved, pool_hits, top_k=len(pool_hits))
+        rerank_rank = _rank(order, gold)
+    depth = retrieval_setting("RERANK_CANDIDATES")
+    served_text = bool(gold & set(row["merged_ids"]))
+    in_retrieved = bool(gold & set(row["retrieved_ids"]))
+    mult_rank = best["fused"]
+    if in_retrieved:
+        cause = "cap_dedupe_merge_drop"
+    elif served_text and not in_retrieved:
+        cause = "cap_dedupe_merge_drop"
+    elif year_scoped and not scoped_ok:
+        cause = "period_year_filter"
+    elif case["history"] and (reach is None or reach > depth):
+        cause = "followup_context_missing"
+    elif multipart and mult_rank is not None and mult_rank <= depth:
+        cause = "multipart_split_error"
+    elif reach is not None and reach <= depth:
+        cause = "rerank_demotion"
+    elif reach is not None and reach <= RANK_DEPTH:
+        cause = "candidate_depth_cut"
+    else:
+        cause = "lexical_gap"
+    return {
+        "set": case["set"], "qid": case["qid"], "type": case["type"], "query": case["query"],
+        "history_turns": len(case["history"]), "gold_ids": "|".join(sorted(gold)), "gold_years": "|".join(map(str, gold_years)),
+        "bm25_rank": _fmt(best["bm25"]), "dense_rank": _fmt(best["dense"]), "fused_rank": _fmt(best["fused"]),
+        "fused_rank_in_gold_year": _fmt(in_year["fused"]) if in_year else "",
+        "rerank_rank_top50": str(rerank_rank) if rerank_rank else f">{RERANK_DIAG_DEPTH}", "rerank_depth": depth,
+        "in_retrieved": in_retrieved, "gold_text_in_prompt": served_text,
+        "queries_used": json.dumps(queries, ensure_ascii=False), "best_query_idx": queries.index(best_q),
+        "year_filter": json.dumps(year_filter) if year_filter else "", "periods": json.dumps(periods) if periods else "",
+        "n_parts": len(parts), "cause": cause,
+    }
+
+
+def cause_table(rows: List[Dict[str, Any]], total_claims: int) -> Dict[str, Any]:
+    table: Dict[str, Dict[str, int]] = {"all": {c: 0 for c in CAUSES}}
+    for row in rows:
+        for key in ("all", row["set"]):
+            table.setdefault(key, {c: 0 for c in CAUSES})[row["cause"]] += 1
+    return {"missed_claims": len(rows), "total_claims": total_claims, "by_cause": table}
+
+
+def run_misses(out: Path, config_name: str, target: Path) -> None:
+    import csv
+
+    cache = _Cache(out / "model_cache.pkl")
+    ask_flow = build_environment(cache)
+    result = json.loads((out / f"served_{config_name}.json").read_text(encoding="utf-8"))
+    cases = {c["qid"]: c for c in load_pool()}
+    rows = []
+    total = sum(len(r["claims"]) for r in result["rows"])
+    with _Env(result["overrides"]):
+        for row in result["rows"]:
+            for idx, hit in enumerate(claim_hits(row)):
+                if hit:
+                    continue
+                rec = diagnose_miss(ask_flow, cache, cases[row["qid"]], row, row["claims"][idx])
+                rec["claim_idx"] = idx
+                rows.append(rec)
+            cache.save()
+    target.mkdir(parents=True, exist_ok=True)
+    with (target / f"misses_{config_name}.csv").open("w", newline="", encoding="utf-8") as fh:
+        writer = csv.DictWriter(fh, fieldnames=list(rows[0].keys()) if rows else ["qid"])
+        writer.writeheader()
+        writer.writerows(rows)
+    (target / f"causes_{config_name}.json").write_text(json.dumps(cause_table(rows, total), indent=2) + "\n", encoding="utf-8")
+    print(f"[misses {config_name}] {len(rows)} missed claims of {total}: "
+          f"{cause_table(rows, total)['by_cause']['all']}", flush=True)
+
+
 # ----------------------------------------------------------------------------- main
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -525,10 +718,21 @@ def main() -> int:
     rp.add_argument("--out", type=Path, required=True)
     rp.add_argument("--final", required=True)
     rp.add_argument("--notes", type=Path, default=None, help="text file inserted as 'Caveats' in comparison.md")
+    rp.add_argument("--dest", type=Path, default=None, help="where results.json/comparison.md go (default: --out)")
+    rp.add_argument("--causes", type=Path, default=None, help="dir with causes_<config>.json (cause table before/after)")
+    ms = sub.add_parser("misses", help="miss analysis of one served configuration")
+    ms.add_argument("--out", type=Path, required=True)
+    ms.add_argument("--config", required=True)
+    ms.add_argument("--dest", type=Path, required=True, help="writes misses_<config>.csv and causes_<config>.json here")
     args = ap.parse_args()
     args.out.mkdir(parents=True, exist_ok=True)
     if args.cmd == "report":
-        report(args.out, args.final, notes=args.notes.read_text(encoding="utf-8") if args.notes else "")
+        report(args.out, args.final, notes=args.notes.read_text(encoding="utf-8") if args.notes else "",
+               dest=args.dest, causes=args.causes)
+        return 0
+    if args.cmd == "misses":
+        name, overrides = parse_config(args.config)
+        run_misses(args.out, name, args.dest)
         return 0
     cache = _Cache(args.out / "model_cache.pkl")
     ask_flow = build_environment(cache)

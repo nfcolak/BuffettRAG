@@ -11,7 +11,7 @@ from config import (
     LLM_GPU_LAYERS,
     LLM_MAX_NEW_TOKENS,
     LLM_MODEL_PATH,
-    LLM_N_CTX,
+    llm_n_ctx,
     LLM_N_THREADS,
     LLM_TEMPERATURE,
 )
@@ -79,17 +79,21 @@ class LlamaCppProvider:
     def __init__(
         self,
         model_path: Path | str = LLM_MODEL_PATH,
-        n_ctx: int = LLM_N_CTX,
+        n_ctx: Optional[int] = None,
         n_threads: int = LLM_N_THREADS,
         n_gpu_layers: int = LLM_GPU_LAYERS,
         temperature: float = LLM_TEMPERATURE,
     ) -> None:
         self.model_path = Path(model_path)
-        self.n_ctx = n_ctx
+        self._n_ctx = n_ctx  # None: LLM_N_CTX read at call time
         self.n_threads = n_threads
         self.n_gpu_layers = n_gpu_layers
         self.temperature = temperature
         self.model = self.model_path.name
+
+    @property
+    def n_ctx(self) -> int:
+        return self._n_ctx if self._n_ctx is not None else llm_n_ctx()
 
     def _llm(self):
         return _load_model(self.model_path, self.n_ctx, self.n_threads, self.n_gpu_layers)

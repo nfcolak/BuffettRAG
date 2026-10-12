@@ -50,7 +50,7 @@ class RetrievalResult:
     reranked: bool = False
 
 
-_YEAR_RE = re.compile(r"\b(19[7-9]\d|20[0-2]\d)\b")
+_YEAR_RE = re.compile(r"\b(19[5-9]\d|20[0-2]\d)\b")  # RETRIEVAL_YEAR_FILTER_MIN (1970) picks the earliest year used
 _DECADE_WORD_RE = re.compile(
     r"\b(1970s|1980s|1990s|2000s|2010s|2020s|seventies|eighties|nineties)\b",
     re.IGNORECASE,
@@ -203,7 +203,8 @@ def detect_year_filter(query: str) -> Optional[Dict[str, Any]]:
         a, b = _DECADE_WORD_TO_RANGE[m.group(1).lower()]
         return {"year": {"$gte": a, "$lte": b}}
 
-    years = _YEAR_RE.findall(q)
+    first_year = retrieval_setting("RETRIEVAL_YEAR_FILTER_MIN")
+    years = [y for y in _YEAR_RE.findall(q) if int(y) >= first_year]
     if len(years) == 1:
         return {"year": int(years[0])}
     if len(years) >= 2:
@@ -484,6 +485,13 @@ class Retriever:
         _split_parts: bool = True,
     ) -> "RetrievalResult":
         applied_filter: Optional[Dict[str, Any]] = dict(where) if where else None
+        if rerank and self.reranker is not None and retrieval_setting("RETRIEVAL_RERANK_FETCH"):
+            fetch_k = max(fetch_k, retrieval_setting("RERANK_CANDIDATES"))
+        if (retrieval_setting("RETRIEVAL_QUERY_STRIP") and not retrieval_query
+                and strategy in ("hybrid", "hybrid_multi", "bm25")):
+            from src.retrieval.query_expansion import strip_question_scaffolding
+            stripped = strip_question_scaffolding(query)
+            retrieval_query = stripped if stripped and stripped != query else None
 
         # The lexical path uses the same per-period reservation as hybrid.
         if strategy in ("hybrid", "hybrid_multi", "bm25") and auto_year_filter and not where:
@@ -530,8 +538,9 @@ class Retriever:
                 # rather than a hard constraint so a wrong guess cannot zero
                 # out recall. Filtered ranking is weighted double in the merge.
                 unfiltered = self._hybrid_for_filter(query, fetch_k, None)
+                weight = max(1, retrieval_setting("RETRIEVAL_YEAR_FILTER_WEIGHT"))
                 candidates = reciprocal_rank_fusion(
-                    [candidates, candidates, unfiltered], top_k=fetch_k
+                    [*([candidates] * weight), unfiltered], top_k=fetch_k
                 )
         else:
             raise ValueError(f"Unknown strategy: {strategy}")
@@ -542,7 +551,7 @@ class Retriever:
             rerank_pool = self.reranker.rerank(
                 query, to_rerank, top_k=min(len(to_rerank), max(top_k * 2, top_k + 4))
             )
-            deduped = deduplicate_hits(rerank_pool)
+            deduped = deduplicate_hits(rerank_pool) if retrieval_setting("RETRIEVAL_DEDUP") else list(rerank_pool)
             lam = retrieval_setting("RETRIEVAL_MMR_LAMBDA")
             candidates = mmr_select(deduped, top_k, lam) if lam < 1.0 else deduped[:top_k]
             reranked = True
