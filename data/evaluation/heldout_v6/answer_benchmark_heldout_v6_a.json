@@ -1,0 +1,2670 @@
+{
+  "schema_version": 1,
+  "purpose": "Frozen blind set measured once per system, never used for tuning. Scope: source-heldout (earlier-set gold/relevant passages, hard negatives and FT answer passages excluded; neighbouring passages and FT context overlap allowed), not unseen-evidence. Curated from the frozen corpus without running any retriever or model. Part a uses only odd letter years.",
+  "frozen": true,
+  "created": "2026-10-12",
+  "source_corpus": "data/processed/chunks_v3_paragraph.jsonl",
+  "corpus_sha256": "8263f08958729a77febf0922e7bbc4161bedd5fdb3e9a8b3fc9a64ab681ab5f0",
+  "part": "a",
+  "cases": [
+    {
+      "qid": "hv6a_01",
+      "question_type": "opinion",
+      "answerable": true,
+      "years": [
+        1987
+      ],
+      "query": "Why does Buffett refuse to chase extra returns by borrowing heavily, and how does he decide when to take on debt anyway?",
+      "gold_passage_ids": [
+        "1987_p0120",
+        "1987_p0123"
+      ],
+      "relevant_ids": [
+        "1987_p0120",
+        "1987_p0123"
+      ],
+      "gold_claims": [
+        {
+          "claim": "Because good decisions eventually produce satisfactory results without leverage, it is wrong to risk what is important, including the welfare of innocent bystanders such as policyholders and employees, for some extra returns that are relatively unimportant.",
+          "required_terms": [
+            "innocent bystanders",
+            "extra returns that are relatively"
+          ],
+          "gold_passage_ids": [
+            "1987_p0120"
+          ],
+          "verification_note": "1987 letter (1987_p0120); unit=qualitative statement; definition=Because good decisions eventually produce satisfactory results without leverage, it is..."
+        },
+        {
+          "claim": "He has no ability to forecast interest rates, and believes that no one else can either.",
+          "required_terms": [
+            "no ability to forecast",
+            "no one else can"
+          ],
+          "gold_passage_ids": [
+            "1987_p0123"
+          ],
+          "verification_note": "1987 letter (1987_p0123); unit=qualitative statement; definition=He has no ability to forecast interest rates, and believes that no one else can either."
+        },
+        {
+          "claim": "Berkshire therefore simply borrows when conditions seem non-oppressive, since you should always carry a loaded gun to shoot rare, fast-moving elephants.",
+          "required_terms": [
+            "non-oppressive",
+            "carry a loaded gun"
+          ],
+          "gold_passage_ids": [
+            "1987_p0123"
+          ],
+          "verification_note": "1987 letter (1987_p0123); unit=qualitative statement; definition=Berkshire therefore simply borrows when conditions seem non-oppressive, since you shoul..."
+        }
+      ],
+      "multi_part": true,
+      "accept": {
+        "min_claim_coverage": 1.0,
+        "require_valid_citation": true
+      },
+      "reject": {
+        "forbidden_terms": []
+      },
+      "verification_note": "1987_p0120, 1987_p0123 supply the 3 claims (innocent bystanders; no ability to forecast; non-oppressive).",
+      "ft_context_overlap": true
+    },
+    {
+      "qid": "hv6a_02",
+      "question_type": "opinion",
+      "answerable": true,
+      "years": [
+        2005
+      ],
+      "query": "How does Buffett's story of the Gotrocks family explain why heavy trading and paying outside advisers leaves investors with less of the pie?",
+      "gold_passage_ids": [
+        "2005_p0109",
+        "2005_p0112",
+        "2005_p0117"
+      ],
+      "relevant_ids": [
+        "2005_p0109",
+        "2005_p0112",
+        "2005_p0117"
+      ],
+      "gold_claims": [
+        {
+          "claim": "In aggregate, owners cannot earn more than their businesses earn between now and Judgment Day; there is no magic that extracts wealth beyond what the companies create.",
+          "required_terms": [
+            "Judgment Day",
+            "no magic"
+          ],
+          "gold_passage_ids": [
+            "2005_p0109"
+          ],
+          "verification_note": "2005 letter (2005_p0109); unit=qualitative statement; definition=In aggregate, owners cannot earn more than their businesses earn between now and Judgme..."
+        },
+        {
+          "claim": "When Helpers are hired to rearrange who owns what, the family's gain equals business earnings minus commissions paid, so the more they trade, the smaller their share of the pie.",
+          "required_terms": [
+            "commissions paid",
+            "smaller their share of the pie"
+          ],
+          "gold_passage_ids": [
+            "2005_p0112"
+          ],
+          "verification_note": "2005 letter (2005_p0112); unit=qualitative statement; definition=When Helpers are hired to rearrange who owns what, the family's gain equals business ea..."
+        },
+        {
+          "claim": "A record portion of owners' earnings now goes to a swelling army of Helpers, who take large portions of the winnings and leave owners with the losses and large fixed fees.",
+          "required_terms": [
+            "swelling army of Helpers",
+            "large fixed fees"
+          ],
+          "gold_passage_ids": [
+            "2005_p0117"
+          ],
+          "verification_note": "2005 letter (2005_p0117); unit=qualitative statement; definition=A record portion of owners' earnings now goes to a swelling army of Helpers, who take l..."
+        }
+      ],
+      "multi_part": true,
+      "accept": {
+        "min_claim_coverage": 1.0,
+        "require_valid_citation": true
+      },
+      "reject": {
+        "forbidden_terms": []
+      },
+      "verification_note": "2005_p0109, 2005_p0112, 2005_p0117 supply the 3 claims (Judgment Day; commissions paid; swelling army of Helpers).",
+      "ft_context_overlap": true
+    },
+    {
+      "qid": "hv6a_03",
+      "question_type": "opinion",
+      "answerable": true,
+      "years": [
+        2013
+      ],
+      "query": "What does Buffett tell investors about predicting the market, and about watching daily prices instead of what an investment produces?",
+      "gold_passage_ids": [
+        "2013_p0101",
+        "2013_p0102"
+      ],
+      "relevant_ids": [
+        "2013_p0101",
+        "2013_p0102"
+      ],
+      "gold_claims": [
+        {
+          "claim": "If you focus on the prospective price change of a purchase, you are speculating; half of all coin-flippers win their first toss, but none of those winners has an expectation of profit if he keeps playing.",
+          "required_terms": [
+            "you are speculating",
+            "coin-flippers"
+          ],
+          "gold_passage_ids": [
+            "2013_p0101"
+          ],
+          "verification_note": "2013 letter (2013_p0101); unit=qualitative statement; definition=If you focus on the prospective price change of a purchase, you are speculating; half o..."
+        },
+        {
+          "claim": "The fact that an asset has appreciated in the recent past is never a reason to buy it.",
+          "required_terms": [
+            "appreciated in the recent past",
+            "never a reason to buy it"
+          ],
+          "gold_passage_ids": [
+            "2013_p0101"
+          ],
+          "verification_note": "2013 letter (2013_p0101); unit=qualitative statement; definition=The fact that an asset has appreciated in the recent past is never a reason to buy it."
+        },
+        {
+          "claim": "Forming macro opinions or listening to others' macro or market predictions is a waste of time and dangerous because it may blur the facts that are truly important.",
+          "required_terms": [
+            "macro opinions",
+            "waste of time"
+          ],
+          "gold_passage_ids": [
+            "2013_p0102"
+          ],
+          "verification_note": "2013 letter (2013_p0102); unit=qualitative statement; definition=Forming macro opinions or listening to others' macro or market predictions is a waste o..."
+        },
+        {
+          "claim": "Games are won by players who focus on the playing field, not by those watching daily valuations on the scoreboard.",
+          "required_terms": [
+            "daily valuations",
+            "playing field"
+          ],
+          "gold_passage_ids": [
+            "2013_p0102"
+          ],
+          "verification_note": "2013 letter (2013_p0102); unit=qualitative statement; definition=Games are won by players who focus on the playing field, not by those watching daily va..."
+        }
+      ],
+      "multi_part": true,
+      "accept": {
+        "min_claim_coverage": 1.0,
+        "require_valid_citation": true
+      },
+      "reject": {
+        "forbidden_terms": []
+      },
+      "verification_note": "2013_p0101, 2013_p0102 supply the 4 claims (you are speculating; appreciated in the recent past; macro opinions; daily valuations).",
+      "ft_context_overlap": true
+    },
+    {
+      "qid": "hv6a_04",
+      "question_type": "opinion",
+      "answerable": true,
+      "years": [
+        2001
+      ],
+      "query": "Why does Buffett dislike the insurance industry's phrase 'loss development' and oppose discounting property/casualty reserves?",
+      "gold_passage_ids": [
+        "2001_p0068",
+        "2001_p0073"
+      ],
+      "relevant_ids": [
+        "2001_p0068",
+        "2001_p0073"
+      ],
+      "gold_claims": [
+        {
+          "claim": "The losses did not 'develop': they were there all along, and what happened was that management made an error in estimation.",
+          "required_terms": [
+            "error in estimation",
+            "there all along"
+          ],
+          "gold_passage_ids": [
+            "2001_p0068"
+          ],
+          "verification_note": "2001 letter (2001_p0068); unit=qualitative statement; definition=The losses did not 'develop': they were there all along, and what happened was that man..."
+        },
+        {
+          "claim": "It is folly to suggest discounting reserves because reserves cannot be precisely established, and forces such as medical inflation keep making them inadequate.",
+          "required_terms": [
+            "folly to suggest",
+            "medical inflation"
+          ],
+          "gold_passage_ids": [
+            "2001_p0073"
+          ],
+          "verification_note": "2001 letter (2001_p0073); unit=qualitative statement; definition=It is folly to suggest discounting reserves because reserves cannot be precisely establ..."
+        },
+        {
+          "claim": "Discounting would exacerbate this already-serious situation and give companies that are inclined to fudge a new tool.",
+          "required_terms": [
+            "exacerbate this already-serious situation",
+            "inclined to fudge"
+          ],
+          "gold_passage_ids": [
+            "2001_p0073"
+          ],
+          "verification_note": "2001 letter (2001_p0073); unit=qualitative statement; definition=Discounting would exacerbate this already-serious situation and give companies that are..."
+        }
+      ],
+      "multi_part": true,
+      "accept": {
+        "min_claim_coverage": 1.0,
+        "require_valid_citation": true
+      },
+      "reject": {
+        "forbidden_terms": []
+      },
+      "verification_note": "2001_p0068, 2001_p0073 supply the 3 claims (error in estimation; folly to suggest; exacerbate this already-serious situation).",
+      "ft_context_overlap": true
+    },
+    {
+      "qid": "hv6a_05",
+      "question_type": "opinion",
+      "answerable": true,
+      "years": [
+        1993
+      ],
+      "query": "What reasoning does Buffett give for holding a stock the way a business owner would, instead of selling on a broker's advice to take a profit?",
+      "gold_passage_ids": [
+        "1993_p0059",
+        "1993_p0060"
+      ],
+      "relevant_ids": [
+        "1993_p0059",
+        "1993_p0060"
+      ],
+      "gold_claims": [
+        {
+          "claim": "Asked about a star subsidiary, a CEO would say 'Why should I part with my crown jewel?', yet he will impetuously move his personal portfolio on superficial arguments from a broker.",
+          "required_terms": [
+            "part with my crown",
+            "superficial arguments"
+          ],
+          "gold_passage_ids": [
+            "1993_p0059"
+          ],
+          "verification_note": "1993 letter (1993_p0059); unit=qualitative statement; definition=Asked about a star subsidiary, a CEO would say 'Why should I part with my crown jewel?'..."
+        },
+        {
+          "claim": "The worst of these arguments is perhaps that you can't go broke taking a profit.",
+          "required_terms": [
+            "go broke taking a profit",
+            "The worst of"
+          ],
+          "gold_passage_ids": [
+            "1993_p0059"
+          ],
+          "verification_note": "1993 letter (1993_p0059); unit=qualitative statement; definition=The worst of these arguments is perhaps that you can't go broke taking a profit."
+        },
+        {
+          "claim": "An investor should ordinarily hold a small piece of an outstanding business with the same tenacity that an owner would exhibit if he owned all of that business.",
+          "required_terms": [
+            "hold a small piece",
+            "same tenacity that an owner"
+          ],
+          "gold_passage_ids": [
+            "1993_p0060"
+          ],
+          "verification_note": "1993 letter (1993_p0060); unit=qualitative statement; definition=An investor should ordinarily hold a small piece of an outstanding business with the sa..."
+        }
+      ],
+      "multi_part": true,
+      "accept": {
+        "min_claim_coverage": 1.0,
+        "require_valid_citation": true
+      },
+      "reject": {
+        "forbidden_terms": []
+      },
+      "verification_note": "1993_p0059, 1993_p0060 supply the 3 claims (part with my crown; go broke taking a profit; hold a small piece).",
+      "ft_context_overlap": true
+    },
+    {
+      "qid": "hv6a_06",
+      "question_type": "opinion",
+      "answerable": true,
+      "years": [
+        2019
+      ],
+      "query": "Why does Buffett tell shareholders they need not worry about what happens once he and Charlie are gone?",
+      "gold_passage_ids": [
+        "2019_p0057",
+        "2019_p0058"
+      ],
+      "relevant_ids": [
+        "2019_p0057",
+        "2019_p0058"
+      ],
+      "gold_claims": [
+        {
+          "claim": "Berkshire is 100% prepared for their departure, and the first reason is that its assets are deployed in an extraordinary variety of businesses that earn attractive returns on the capital they use.",
+          "required_terms": [
+            "100% prepared",
+            "attractive returns on the capital they use"
+          ],
+          "gold_passage_ids": [
+            "2019_p0057"
+          ],
+          "verification_note": "2019 letter (2019_p0057); unit=figure; definition=Berkshire is 100% prepared for their departure, and the first reason is that its assets..."
+        },
+        {
+          "claim": "Berkshire's financial affairs will be managed to withstand extreme external shocks, and it has skilled and devoted top managers for whom the job is more than a high-paying position.",
+          "required_terms": [
+            "external shocks",
+            "skilled and devoted top managers"
+          ],
+          "gold_passage_ids": [
+            "2019_p0058"
+          ],
+          "verification_note": "2019 letter (2019_p0058); unit=qualitative statement; definition=Berkshire's financial affairs will be managed to withstand extreme external shocks, and..."
+        },
+        {
+          "claim": "Berkshire's directors - your guardians - are constantly focused on the welfare of owners and on the nurturing of a culture that is rare among giant corporations.",
+          "required_terms": [
+            "your guardians",
+            "nurturing of a culture"
+          ],
+          "gold_passage_ids": [
+            "2019_p0058"
+          ],
+          "verification_note": "2019 letter (2019_p0058); unit=qualitative statement; definition=Berkshire's directors - your guardians - are constantly focused on the welfare of owner..."
+        }
+      ],
+      "multi_part": true,
+      "accept": {
+        "min_claim_coverage": 1.0,
+        "require_valid_citation": true
+      },
+      "reject": {
+        "forbidden_terms": []
+      },
+      "verification_note": "2019_p0057, 2019_p0058 supply the 3 claims (100% prepared; external shocks; your guardians).",
+      "ft_context_overlap": false
+    },
+    {
+      "qid": "hv6a_07",
+      "question_type": "opinion",
+      "answerable": true,
+      "years": [
+        1991
+      ],
+      "query": "Why did Buffett say newspapers, television and magazines had begun to behave like ordinary businesses instead of franchises?",
+      "gold_passage_ids": [
+        "1991_p0022",
+        "1991_p0024"
+      ],
+      "relevant_ids": [
+        "1991_p0022",
+        "1991_p0024"
+      ],
+      "gold_claims": [
+        {
+          "claim": "Newspaper, television and magazine properties have begun to resemble businesses more than franchises in their economic behavior.",
+          "required_terms": [
+            "resemble businesses more than franchises",
+            "economic behavior"
+          ],
+          "gold_passage_ids": [
+            "1991_p0022"
+          ],
+          "verification_note": "1991 letter (1991_p0022); unit=qualitative statement; definition=Newspaper, television and magazine properties have begun to resemble businesses more th..."
+        },
+        {
+          "claim": "A business earns exceptional profits only if it is the low-cost operator or if supply of its product or service is tight.",
+          "required_terms": [
+            "low-cost operator",
+            "earns exceptional profits only if it"
+          ],
+          "gold_passage_ids": [
+            "1991_p0024"
+          ],
+          "verification_note": "1991 letter (1991_p0024); unit=qualitative statement; definition=A business earns exceptional profits only if it is the low-cost operator or if supply o..."
+        },
+        {
+          "claim": "Tightness in supply usually does not last long, and a business, unlike a franchise, can be killed by poor management.",
+          "required_terms": [
+            "does not last long",
+            "killed by poor management"
+          ],
+          "gold_passage_ids": [
+            "1991_p0024"
+          ],
+          "verification_note": "1991 letter (1991_p0024); unit=qualitative statement; definition=Tightness in supply usually does not last long, and a business, unlike a franchise, can..."
+        }
+      ],
+      "multi_part": true,
+      "accept": {
+        "min_claim_coverage": 1.0,
+        "require_valid_citation": true
+      },
+      "reject": {
+        "forbidden_terms": []
+      },
+      "verification_note": "1991_p0022, 1991_p0024 supply the 3 claims (resemble businesses more than franchises; low-cost operator; does not last long).",
+      "ft_context_overlap": true
+    },
+    {
+      "qid": "hv6a_08",
+      "question_type": "opinion",
+      "answerable": true,
+      "years": [
+        1989
+      ],
+      "query": "What did Buffett call his most surprising discovery in business, and what kind of mistake does he say cost shareholders dearly?",
+      "gold_passage_ids": [
+        "1989_p0132",
+        "1989_p0136"
+      ],
+      "relevant_ids": [
+        "1989_p0132",
+        "1989_p0136"
+      ],
+      "gold_claims": [
+        {
+          "claim": "His most surprising discovery was the overwhelming importance in business of an unseen force that he calls the institutional imperative.",
+          "required_terms": [
+            "most surprising discovery",
+            "unseen force"
+          ],
+          "gold_passage_ids": [
+            "1989_p0132"
+          ],
+          "verification_note": "1989 letter (1989_p0132); unit=qualitative statement; definition=His most surprising discovery was the overwhelming importance in business of an unseen..."
+        },
+        {
+          "claim": "He had assumed decent, intelligent, and experienced managers would automatically make rational decisions, but learned that rationality frequently wilts when the institutional imperative comes into play.",
+          "required_terms": [
+            "experienced managers would automatically make",
+            "rationality frequently wilts"
+          ],
+          "gold_passage_ids": [
+            "1989_p0132"
+          ],
+          "verification_note": "1989 letter (1989_p0132); unit=qualitative statement; definition=He had assumed decent, intelligent, and experienced managers would automatically make r..."
+        },
+        {
+          "claim": "Some of his worst mistakes were invisible: he passed on a couple of really big purchases he fully understood, and the cost to shareholders has been huge.",
+          "required_terms": [
+            "passed on a couple of really",
+            "has been huge"
+          ],
+          "gold_passage_ids": [
+            "1989_p0136"
+          ],
+          "verification_note": "1989 letter (1989_p0136); unit=qualitative statement; definition=Some of his worst mistakes were invisible: he passed on a couple of really big purchase..."
+        }
+      ],
+      "multi_part": true,
+      "accept": {
+        "min_claim_coverage": 1.0,
+        "require_valid_citation": true
+      },
+      "reject": {
+        "forbidden_terms": []
+      },
+      "verification_note": "1989_p0132, 1989_p0136 supply the 3 claims (most surprising discovery; experienced managers would automatically make; passed on a couple of really).",
+      "ft_context_overlap": true
+    },
+    {
+      "qid": "hv6a_09",
+      "question_type": "opinion",
+      "answerable": true,
+      "years": [
+        1985
+      ],
+      "query": "Why does Buffett say Berkshire cannot repeat its past rate of gain, pointing to both the stock market and the company's own size?",
+      "gold_passage_ids": [
+        "1985_p0002",
+        "1985_p0004"
+      ],
+      "relevant_ids": [
+        "1985_p0002",
+        "1985_p0004"
+      ],
+      "gold_claims": [
+        {
+          "claim": "The stock market offers very little opportunity compared with 1964-1984, and Berkshire cannot find significantly-undervalued equities for its insurance portfolios.",
+          "required_terms": [
+            "very little opportunity",
+            "significantly-undervalued equities"
+          ],
+          "gold_passage_ids": [
+            "1985_p0002"
+          ],
+          "verification_note": "1985 letter (1985_p0002); unit=qualitative statement; definition=The stock market offers very little opportunity compared with 1964-1984, and Berkshire..."
+        },
+        {
+          "claim": "The more telling factor is size: an iron law of business is that growth eventually dampens exceptional economics, and equity capital is more than twenty times what it was ten years earlier.",
+          "required_terms": [
+            "iron law of business",
+            "twenty times"
+          ],
+          "gold_passage_ids": [
+            "1985_p0004"
+          ],
+          "verification_note": "1985 letter (1985_p0004); unit=qualitative statement; definition=The more telling factor is size: an iron law of business is that growth eventually damp..."
+        },
+        {
+          "claim": "No company he knows of that amassed $1 billion of equity has kept earning 20% or more on equity over ten years while reinvesting all or substantially all of its earnings.",
+          "required_terms": [
+            "$1 billion of equity",
+            "20% or more"
+          ],
+          "gold_passage_ids": [
+            "1985_p0004"
+          ],
+          "verification_note": "1985 letter (1985_p0004); unit=figure; definition=No company he knows of that amassed $1 billion of equity has kept earning 20% or more o..."
+        }
+      ],
+      "multi_part": true,
+      "accept": {
+        "min_claim_coverage": 1.0,
+        "require_valid_citation": true
+      },
+      "reject": {
+        "forbidden_terms": []
+      },
+      "verification_note": "1985_p0002, 1985_p0004 supply the 3 claims (very little opportunity; iron law of business; $1 billion of equity).",
+      "ft_context_overlap": true
+    },
+    {
+      "qid": "hv6a_10",
+      "question_type": "company",
+      "answerable": true,
+      "years": [
+        1987
+      ],
+      "query": "In his 1987 letter, how did Buffett explain what makes his operating managers succeed, and what maxim guides Nebraska Furniture Mart?",
+      "gold_passage_ids": [
+        "1987_p0022",
+        "1987_p0026"
+      ],
+      "relevant_ids": [
+        "1987_p0022",
+        "1987_p0026"
+      ],
+      "gold_claims": [
+        {
+          "claim": "Berkshire's managers produced extraordinary results by doing rather ordinary things, but doing them exceptionally well.",
+          "required_terms": [
+            "doing rather ordinary things",
+            "doing them exceptionally well"
+          ],
+          "gold_passage_ids": [
+            "1987_p0022"
+          ],
+          "verification_note": "1987 letter (1987_p0022); unit=qualitative statement; definition=Berkshire's managers produced extraordinary results by doing rather ordinary things, bu..."
+        },
+        {
+          "claim": "Rose Blumkin, the 94-year-old chairman of Nebraska Furniture Mart, is held up as someone students of business management should study.",
+          "required_terms": [
+            "Rose Blumkin",
+            "94-year-old chairman"
+          ],
+          "gold_passage_ids": [
+            "1987_p0022"
+          ],
+          "verification_note": "1987 letter (1987_p0022); unit=figure; definition=Rose Blumkin, the 94-year-old chairman of Nebraska Furniture Mart, is held up as someon..."
+        },
+        {
+          "claim": "NFM will keep growing by following Mrs. B's maxim: sell cheap and tell the truth.",
+          "required_terms": [
+            "Sell cheap and tell the truth",
+            "maxim"
+          ],
+          "gold_passage_ids": [
+            "1987_p0026"
+          ],
+          "verification_note": "1987 letter (1987_p0026); unit=qualitative statement; definition=NFM will keep growing by following Mrs. B's maxim: sell cheap and tell the truth."
+        }
+      ],
+      "multi_part": true,
+      "accept": {
+        "min_claim_coverage": 1.0,
+        "require_valid_citation": true
+      },
+      "reject": {
+        "forbidden_terms": []
+      },
+      "verification_note": "1987_p0022, 1987_p0026 supply the 3 claims (doing rather ordinary things; Rose Blumkin; Sell cheap and tell the truth).",
+      "ft_context_overlap": true
+    },
+    {
+      "qid": "hv6a_11",
+      "question_type": "company",
+      "answerable": true,
+      "years": [
+        1997
+      ],
+      "query": "How did Berkshire's deal with Star Furniture come about, and what did the Wolffs do for their associates?",
+      "gold_passage_ids": [
+        "1997_p0071",
+        "1997_p0073"
+      ],
+      "relevant_ids": [
+        "1997_p0071",
+        "1997_p0073"
+      ],
+      "gold_claims": [
+        {
+          "claim": "Melvyn Wolff, Star's controlling shareholder and CEO, wanted to talk after Salomon's Bob Denham told Buffett, and he came to the annual meeting.",
+          "required_terms": [
+            "Melvyn Wolff",
+            "Bob Denham"
+          ],
+          "gold_passage_ids": [
+            "1997_p0071"
+          ],
+          "verification_note": "1997 letter (1997_p0071); unit=qualitative statement; definition=Melvyn Wolff, Star's controlling shareholder and CEO, wanted to talk after Salomon's Bo..."
+        },
+        {
+          "claim": "Buffett and Wolff made the deal in a single, two-hour session in New York.",
+          "required_terms": [
+            "two-hour session",
+            "New York"
+          ],
+          "gold_passage_ids": [
+            "1997_p0071"
+          ],
+          "verification_note": "1997 letter (1997_p0071); unit=qualitative statement; definition=Buffett and Wolff made the deal in a single, two-hour session in New York."
+        },
+        {
+          "claim": "Melvyn and Shirley Wolff had Star make large special payments to everyone in the business, funded with their own money rather than Berkshire's.",
+          "required_terms": [
+            "special payments",
+            "everyone in the business"
+          ],
+          "gold_passage_ids": [
+            "1997_p0073"
+          ],
+          "verification_note": "1997 letter (1997_p0073); unit=qualitative statement; definition=Melvyn and Shirley Wolff had Star make large special payments to everyone in the busine..."
+        }
+      ],
+      "multi_part": true,
+      "accept": {
+        "min_claim_coverage": 1.0,
+        "require_valid_citation": true
+      },
+      "reject": {
+        "forbidden_terms": []
+      },
+      "verification_note": "1997_p0071, 1997_p0073 supply the 3 claims (Melvyn Wolff; two-hour session; special payments).",
+      "ft_context_overlap": false
+    },
+    {
+      "qid": "hv6a_12",
+      "question_type": "company",
+      "answerable": true,
+      "years": [
+        1997
+      ],
+      "query": "How did Buffett say the Salomon and US Airways convertible preferreds turned out, and what did he admit about his own record on the airline?",
+      "gold_passage_ids": [
+        "1997_p0095",
+        "1997_p0096"
+      ],
+      "relevant_ids": [
+        "1997_p0095",
+        "1997_p0096"
+      ],
+      "gold_claims": [
+        {
+          "claim": "Salomon merged into Travelers Group, and Berkshire owed thanks to Deryck Maughan and Bob Denham for rescuing and restoring the company.",
+          "required_terms": [
+            "merged into Travelers Group",
+            "Deryck Maughan"
+          ],
+          "gold_passage_ids": [
+            "1997_p0095"
+          ],
+          "verification_note": "1997 letter (1997_p0095); unit=qualitative statement; definition=Salomon merged into Travelers Group, and Berkshire owed thanks to Deryck Maughan and Bo..."
+        },
+        {
+          "claim": "Berkshire's final results from its Salomon investment will be far better than I anticipated two years ago, he said.",
+          "required_terms": [
+            "far better than I anticipated",
+            "Salomon investment"
+          ],
+          "gold_passage_ids": [
+            "1997_p0096"
+          ],
+          "verification_note": "1997 letter (1997_p0096); unit=qualitative statement; definition=Berkshire's final results from its Salomon investment will be far better than I anticip..."
+        },
+        {
+          "claim": "US Airways' resuscitation borders on the miraculous, though he was wrong to buy and wrong to repeatedly try to unload the stock at 50 cents on the dollar.",
+          "required_terms": [
+            "borders on the miraculous",
+            "50 cents on the dollar"
+          ],
+          "gold_passage_ids": [
+            "1997_p0096"
+          ],
+          "verification_note": "1997 letter (1997_p0096); unit=figure; definition=US Airways' resuscitation borders on the miraculous, though he was wrong to buy and wro..."
+        }
+      ],
+      "multi_part": true,
+      "accept": {
+        "min_claim_coverage": 1.0,
+        "require_valid_citation": true
+      },
+      "reject": {
+        "forbidden_terms": []
+      },
+      "verification_note": "1997_p0095, 1997_p0096 supply the 3 claims (merged into Travelers Group; far better than I anticipated; borders on the miraculous).",
+      "ft_context_overlap": false
+    },
+    {
+      "qid": "hv6a_13",
+      "question_type": "company",
+      "answerable": true,
+      "years": [
+        1999
+      ],
+      "query": "How did Berkshire come to acquire Jordan's furniture, and what makes the business distinctive?",
+      "gold_passage_ids": [
+        "1999_p0056",
+        "1999_p0057"
+      ],
+      "relevant_ids": [
+        "1999_p0056",
+        "1999_p0057"
+      ],
+      "gold_claims": [
+        {
+          "claim": "The Blumkins, Bill Child and Melvyn Wolff all pointed him to the Tatelman brothers of New England and their furniture business.",
+          "required_terms": [
+            "Tatelman brothers of New England",
+            "Melvyn Wolff"
+          ],
+          "gold_passage_ids": [
+            "1999_p0056"
+          ],
+          "verification_note": "1999 letter (1999_p0056); unit=qualitative statement; definition=The Blumkins, Bill Child and Melvyn Wolff all pointed him to the Tatelman brothers of N..."
+        },
+        {
+          "claim": "The business had been in the family since 1927, when the brothers' grandfather began operations in a Boston suburb.",
+          "required_terms": [
+            "since 1927",
+            "Boston suburb"
+          ],
+          "gold_passage_ids": [
+            "1999_p0057"
+          ],
+          "verification_note": "1999 letter (1999_p0057); unit=figure; definition=The business had been in the family since 1927, when the brothers' grandfather began op..."
+        },
+        {
+          "claim": "Jordan's is the largest furniture retailer in New Hampshire as well as Massachusetts and gives customers a 'shoppertainment' experience.",
+          "required_terms": [
+            "largest furniture retailer",
+            "shoppertainment"
+          ],
+          "gold_passage_ids": [
+            "1999_p0057"
+          ],
+          "verification_note": "1999 letter (1999_p0057); unit=qualitative statement; definition=Jordan's is the largest furniture retailer in New Hampshire as well as Massachusetts an..."
+        }
+      ],
+      "multi_part": true,
+      "accept": {
+        "min_claim_coverage": 1.0,
+        "require_valid_citation": true
+      },
+      "reject": {
+        "forbidden_terms": []
+      },
+      "verification_note": "1999_p0056, 1999_p0057 supply the 3 claims (Tatelman brothers of New England; since 1927; largest furniture retailer).",
+      "ft_context_overlap": true
+    },
+    {
+      "qid": "hv6a_14",
+      "question_type": "company",
+      "answerable": true,
+      "years": [
+        2003
+      ],
+      "query": "What did Buffett report about Shaw Industries and Fruit of the Loom in his 2003 letter?",
+      "gold_passage_ids": [
+        "2003_p0105"
+      ],
+      "relevant_ids": [
+        "2003_p0105"
+      ],
+      "gold_claims": [
+        {
+          "claim": "Shaw bought carpet operations from Dixie Group that should add about $240 million to sales, lifting volume to nearly $5 billion.",
+          "required_terms": [
+            "Dixie Group",
+            "$240 million"
+          ],
+          "gold_passage_ids": [
+            "2003_p0105"
+          ],
+          "verification_note": "2003 letter (2003_p0105); unit=figure; definition=Shaw bought carpet operations from Dixie Group that should add about $240 million to sa..."
+        },
+        {
+          "claim": "Shaw is the world's largest manufacturer of broadloom carpet and had a record year.",
+          "required_terms": [
+            "broadloom carpet",
+            "record year"
+          ],
+          "gold_passage_ids": [
+            "2003_p0105"
+          ],
+          "verification_note": "2003 letter (2003_p0105); unit=qualitative statement; definition=Shaw is the world's largest manufacturer of broadloom carpet and had a record year."
+        },
+        {
+          "claim": "Fruit of the Loom has a 148-year-old brand and accounted for 42.3% of men's and boys' underwear sold through mass merchandisers.",
+          "required_terms": [
+            "148-year-old",
+            "42.3%"
+          ],
+          "gold_passage_ids": [
+            "2003_p0105"
+          ],
+          "verification_note": "2003 letter (2003_p0105); unit=figure; definition=Fruit of the Loom has a 148-year-old brand and accounted for 42.3% of men's and boys' u..."
+        }
+      ],
+      "multi_part": true,
+      "accept": {
+        "min_claim_coverage": 1.0,
+        "require_valid_citation": true
+      },
+      "reject": {
+        "forbidden_terms": []
+      },
+      "verification_note": "2003_p0105 supply the 3 claims (Dixie Group; broadloom carpet; 148-year-old).",
+      "ft_context_overlap": true
+    },
+    {
+      "qid": "hv6a_15",
+      "question_type": "company",
+      "answerable": true,
+      "years": [
+        2007
+      ],
+      "query": "What did Berkshire agree to pay for Marmon, and how would it buy the rest of the company?",
+      "gold_passage_ids": [
+        "2007_p0021",
+        "2007_p0023"
+      ],
+      "relevant_ids": [
+        "2007_p0021",
+        "2007_p0023"
+      ],
+      "gold_claims": [
+        {
+          "claim": "Berkshire would soon buy 60% of Marmon, with an initial outlay of $4.5 billion.",
+          "required_terms": [
+            "60% of Marmon",
+            "$4.5 billion"
+          ],
+          "gold_passage_ids": [
+            "2007_p0023"
+          ],
+          "verification_note": "2007 letter (2007_p0023); unit=figure; definition=Berkshire would soon buy 60% of Marmon, with an initial outlay of $4.5 billion."
+        },
+        {
+          "claim": "It will acquire virtually all of the balance within six years, and the price of its later purchases will be based on a formula tied to earnings.",
+          "required_terms": [
+            "virtually all of the balance",
+            "later purchases"
+          ],
+          "gold_passage_ids": [
+            "2007_p0023"
+          ],
+          "verification_note": "2007 letter (2007_p0023); unit=qualitative statement; definition=It will acquire virtually all of the balance within six years, and the price of its lat..."
+        },
+        {
+          "claim": "Buffett admired Jay Pritzker and his brother Bob, who for nearly 50 years ran Marmon Group, the home of most Pritzker businesses.",
+          "required_terms": [
+            "Marmon Group",
+            "nearly 50 years"
+          ],
+          "gold_passage_ids": [
+            "2007_p0021"
+          ],
+          "verification_note": "2007 letter (2007_p0021); unit=figure; definition=Buffett admired Jay Pritzker and his brother Bob, who for nearly 50 years ran Marmon Gr..."
+        }
+      ],
+      "multi_part": true,
+      "accept": {
+        "min_claim_coverage": 1.0,
+        "require_valid_citation": true
+      },
+      "reject": {
+        "forbidden_terms": []
+      },
+      "verification_note": "2007_p0021, 2007_p0023 supply the 3 claims (60% of Marmon; virtually all of the balance; Marmon Group).",
+      "ft_context_overlap": false
+    },
+    {
+      "qid": "hv6a_16",
+      "question_type": "company",
+      "answerable": true,
+      "years": [
+        2011
+      ],
+      "query": "How did Rose Blumkin start Nebraska Furniture Mart, and how long did she keep working after selling to Berkshire?",
+      "gold_passage_ids": [
+        "2011_p0089",
+        "2011_p0090"
+      ],
+      "relevant_ids": [
+        "2011_p0089",
+        "2011_p0090"
+      ],
+      "gold_claims": [
+        {
+          "claim": "Rose Blumkin started the company in 1937 with $500 and a dream.",
+          "required_terms": [
+            "started the company in 1937",
+            "$500"
+          ],
+          "gold_passage_ids": [
+            "2011_p0089"
+          ],
+          "verification_note": "2011 letter (2011_p0089); unit=figure; definition=Rose Blumkin started the company in 1937 with $500 and a dream."
+        },
+        {
+          "claim": "She sold Berkshire its interest when she was 89 and worked until she was 103.",
+          "required_terms": [
+            "when she was 89",
+            "worked until she was 103"
+          ],
+          "gold_passage_ids": [
+            "2011_p0089"
+          ],
+          "verification_note": "2011 letter (2011_p0089); unit=figure; definition=She sold Berkshire its interest when she was 89 and worked until she was 103."
+        },
+        {
+          "claim": "Her grandsons Ron and Irv took the company to new heights, first opening the Kansas City store.",
+          "required_terms": [
+            "Ron and Irv",
+            "Kansas City store"
+          ],
+          "gold_passage_ids": [
+            "2011_p0090"
+          ],
+          "verification_note": "2011 letter (2011_p0090); unit=qualitative statement; definition=Her grandsons Ron and Irv took the company to new heights, first opening the Kansas Cit..."
+        }
+      ],
+      "multi_part": true,
+      "accept": {
+        "min_claim_coverage": 1.0,
+        "require_valid_citation": true
+      },
+      "reject": {
+        "forbidden_terms": []
+      },
+      "verification_note": "2011_p0089, 2011_p0090 supply the 3 claims (started the company in 1937; when she was 89; Ron and Irv).",
+      "ft_context_overlap": true
+    },
+    {
+      "qid": "hv6a_17",
+      "question_type": "company",
+      "answerable": true,
+      "years": [
+        1981
+      ],
+      "query": "What did Buffett say about managers who think their kiss will transform an acquired company, and which managers did he single out as true superstars?",
+      "gold_passage_ids": [
+        "1981_p0008",
+        "1981_p0012"
+      ],
+      "relevant_ids": [
+        "1981_p0008",
+        "1981_p0012"
+      ],
+      "gold_claims": [
+        {
+          "claim": "Many managements were overexposed in childhood to the story of the toad released by a kiss, so they are certain their managerial kiss will do wonders for the profitability of Company T(arget).",
+          "required_terms": [
+            "managerial kiss",
+            "Company T(arget)"
+          ],
+          "gold_passage_ids": [
+            "1981_p0008"
+          ],
+          "verification_note": "1981 letter (1981_p0008); unit=qualitative statement; definition=Many managements were overexposed in childhood to the story of the toad released by a k..."
+        },
+        {
+          "claim": "Without that optimism, shareholders of the acquiring company would rather own the target at the X market price than at the 2X takeover cost.",
+          "required_terms": [
+            "2X takeover cost",
+            "X market price"
+          ],
+          "gold_passage_ids": [
+            "1981_p0008"
+          ],
+          "verification_note": "1981 letter (1981_p0008); unit=figure; definition=Without that optimism, shareholders of the acquiring company would rather own the targe..."
+        },
+        {
+          "claim": "The managerial superstars he salutes include Henry Singleton and, especially, Tom Murphy of Capital Cities Communications.",
+          "required_terms": [
+            "Henry Singleton",
+            "Tom Murphy"
+          ],
+          "gold_passage_ids": [
+            "1981_p0012"
+          ],
+          "verification_note": "1981 letter (1981_p0012); unit=qualitative statement; definition=The managerial superstars he salutes include Henry Singleton and, especially, Tom Murph..."
+        }
+      ],
+      "multi_part": true,
+      "accept": {
+        "min_claim_coverage": 1.0,
+        "require_valid_citation": true
+      },
+      "reject": {
+        "forbidden_terms": []
+      },
+      "verification_note": "1981_p0008, 1981_p0012 supply the 3 claims (managerial kiss; 2X takeover cost; Henry Singleton).",
+      "ft_context_overlap": true
+    },
+    {
+      "qid": "hv6a_18",
+      "question_type": "fact_number",
+      "answerable": true,
+      "years": [
+        1991
+      ],
+      "query": "What annual intrinsic-value growth goal did Buffett and Munger set in 1991, how much must Berkshire earn over the next decade to keep pace, and which stocks drove that year's outsized gain?",
+      "gold_passage_ids": [
+        "1991_p0002"
+      ],
+      "relevant_ids": [
+        "1991_p0002"
+      ],
+      "gold_claims": [
+        {
+          "claim": "They set a goal of a 15% average annual increase in intrinsic value.",
+          "required_terms": [
+            "15% average annual increase",
+            "intrinsic value"
+          ],
+          "gold_passage_ids": [
+            "1991_p0002"
+          ],
+          "verification_note": "1991 letter (1991_p0002); unit=figure; definition=They set a goal of a 15% average annual increase in intrinsic value."
+        },
+        {
+          "claim": "To keep book value growing at a 15% pace, Berkshire must earn $22 billion during the next decade.",
+          "required_terms": [
+            "$22 billion",
+            "next decade"
+          ],
+          "gold_passage_ids": [
+            "1991_p0002"
+          ],
+          "verification_note": "1991 letter (1991_p0002); unit=figure; definition=To keep book value growing at a 15% pace, Berkshire must earn $22 billion during the ne..."
+        },
+        {
+          "claim": "Coca-Cola and Gillette accounted for nearly $1.6 billion of the $2.1 billion growth in net worth that year.",
+          "required_terms": [
+            "$1.6 billion",
+            "$2.1 billion"
+          ],
+          "gold_passage_ids": [
+            "1991_p0002"
+          ],
+          "verification_note": "1991 letter (1991_p0002); unit=figure; definition=Coca-Cola and Gillette accounted for nearly $1.6 billion of the $2.1 billion growth in..."
+        }
+      ],
+      "multi_part": true,
+      "accept": {
+        "min_claim_coverage": 1.0,
+        "require_valid_citation": true
+      },
+      "reject": {
+        "forbidden_terms": []
+      },
+      "verification_note": "1991_p0002 supply the 3 claims (15% average annual increase; $22 billion; $1.6 billion).",
+      "ft_context_overlap": true
+    },
+    {
+      "qid": "hv6a_19",
+      "question_type": "fact_number",
+      "answerable": true,
+      "years": [
+        2007
+      ],
+      "query": "In his 2007 confessions, what price limit nearly made Buffett miss See's, and what was he offered the Dallas-Fort Worth TV station for?",
+      "gold_passage_ids": [
+        "2007_p0045"
+      ],
+      "relevant_ids": [
+        "2007_p0045"
+      ],
+      "gold_claims": [
+        {
+          "claim": "The seller of See's asked $30 million while Buffett was adamant about not going above $25 million.",
+          "required_terms": [
+            "$30 million",
+            "$25 million"
+          ],
+          "gold_passage_ids": [
+            "2007_p0045"
+          ],
+          "verification_note": "2007 letter (2007_p0045); unit=figure; definition=The seller of See's asked $30 million while Buffett was adamant about not going above $..."
+        },
+        {
+          "claim": "Had he balked, the $1.35 billion that See's has since produced would have gone to somebody else.",
+          "required_terms": [
+            "$1.35 billion",
+            "gone to somebody else"
+          ],
+          "gold_passage_ids": [
+            "2007_p0045"
+          ],
+          "verification_note": "2007 letter (2007_p0045); unit=figure; definition=Had he balked, the $1.35 billion that See's has since produced would have gone to someb..."
+        },
+        {
+          "claim": "Tom Murphy offered him the Dallas-Fort Worth NBC station for $35 million.",
+          "required_terms": [
+            "Dallas-Fort Worth NBC station",
+            "$35 million"
+          ],
+          "gold_passage_ids": [
+            "2007_p0045"
+          ],
+          "verification_note": "2007 letter (2007_p0045); unit=figure; definition=Tom Murphy offered him the Dallas-Fort Worth NBC station for $35 million."
+        }
+      ],
+      "multi_part": true,
+      "accept": {
+        "min_claim_coverage": 1.0,
+        "require_valid_citation": true
+      },
+      "reject": {
+        "forbidden_terms": []
+      },
+      "verification_note": "2007_p0045 supply the 3 claims ($30 million; $1.35 billion; Dallas-Fort Worth NBC station).",
+      "ft_context_overlap": true
+    },
+    {
+      "qid": "hv6a_20",
+      "question_type": "fact_number",
+      "answerable": true,
+      "years": [
+        2013
+      ],
+      "query": "What did Berkshire's Energy Future Holdings bond investment end up costing, counting both the sale price and the interest it collected?",
+      "gold_passage_ids": [
+        "2013_p0092"
+      ],
+      "relevant_ids": [
+        "2013_p0092"
+      ],
+      "gold_claims": [
+        {
+          "claim": "About $2 billion of the debt was purchased by Berkshire, pursuant to a decision made without consulting with Charlie, which Buffett called a big mistake.",
+          "required_terms": [
+            "$2 billion of the debt",
+            "without consulting with Charlie"
+          ],
+          "gold_passage_ids": [
+            "2013_p0092"
+          ],
+          "verification_note": "2013 letter (2013_p0092); unit=figure; definition=About $2 billion of the debt was purchased by Berkshire, pursuant to a decision made wi..."
+        },
+        {
+          "claim": "It sold its holdings for $259 million and had received $837 million in cash interest while owning the bonds.",
+          "required_terms": [
+            "$259 million",
+            "$837 million"
+          ],
+          "gold_passage_ids": [
+            "2013_p0092"
+          ],
+          "verification_note": "2013 letter (2013_p0092); unit=figure; definition=It sold its holdings for $259 million and had received $837 million in cash interest wh..."
+        },
+        {
+          "claim": "Overall Berkshire suffered a pre-tax loss of $873 million.",
+          "required_terms": [
+            "$873 million",
+            "pre-tax loss"
+          ],
+          "gold_passage_ids": [
+            "2013_p0092"
+          ],
+          "verification_note": "2013 letter (2013_p0092); unit=figure; definition=Overall Berkshire suffered a pre-tax loss of $873 million."
+        }
+      ],
+      "multi_part": true,
+      "accept": {
+        "min_claim_coverage": 1.0,
+        "require_valid_citation": true
+      },
+      "reject": {
+        "forbidden_terms": []
+      },
+      "verification_note": "2013_p0092 supply the 3 claims ($2 billion of the debt; $259 million; $873 million).",
+      "ft_context_overlap": false
+    },
+    {
+      "qid": "hv6a_21",
+      "question_type": "fact_number",
+      "answerable": true,
+      "years": [
+        2011
+      ],
+      "query": "For a taxpaying investor who rolled Treasury bills for 47 years, how much of the 5.7% yield did income tax and inflation each take?",
+      "gold_passage_ids": [
+        "2011_p0113"
+      ],
+      "relevant_ids": [
+        "2011_p0113"
+      ],
+      "gold_claims": [
+        {
+          "claim": "Continuous rolling of Treasury bills produced 5.7% annually over the 47-year period.",
+          "required_terms": [
+            "5.7% annually",
+            "47-year"
+          ],
+          "gold_passage_ids": [
+            "2011_p0113"
+          ],
+          "verification_note": "2011 letter (2011_p0113); unit=figure; definition=Continuous rolling of Treasury bills produced 5.7% annually over the 47-year period."
+        },
+        {
+          "claim": "At an average personal tax rate of 25%, income tax stripped 1.4 points of the stated yield.",
+          "required_terms": [
+            "25%",
+            "1.4 points"
+          ],
+          "gold_passage_ids": [
+            "2011_p0113"
+          ],
+          "verification_note": "2011 letter (2011_p0113); unit=figure; definition=At an average personal tax rate of 25%, income tax stripped 1.4 points of the stated yi..."
+        },
+        {
+          "claim": "The invisible inflation tax devoured the remaining 4.3 points, more than triple the explicit income tax.",
+          "required_terms": [
+            "4.3 points",
+            "more than triple"
+          ],
+          "gold_passage_ids": [
+            "2011_p0113"
+          ],
+          "verification_note": "2011 letter (2011_p0113); unit=figure; definition=The invisible inflation tax devoured the remaining 4.3 points, more than triple the exp..."
+        }
+      ],
+      "multi_part": true,
+      "accept": {
+        "min_claim_coverage": 1.0,
+        "require_valid_citation": true
+      },
+      "reject": {
+        "forbidden_terms": []
+      },
+      "verification_note": "2011_p0113 supply the 3 claims (5.7% annually; 25%; 4.3 points).",
+      "ft_context_overlap": true
+    },
+    {
+      "qid": "hv6a_22",
+      "question_type": "fact_number",
+      "answerable": true,
+      "years": [
+        2015
+      ],
+      "query": "What were Berkshire's per-share business earnings in 2015, and how much of that figure came from insurance underwriting?",
+      "gold_passage_ids": [
+        "2015_p0047",
+        "2015_p0048"
+      ],
+      "relevant_ids": [
+        "2015_p0047",
+        "2015_p0048"
+      ],
+      "gold_claims": [
+        {
+          "claim": "Business earnings, now including insurance underwriting income, increased 2.1% to $12,304 per share.",
+          "required_terms": [
+            "2.1%",
+            "$12,304 per share"
+          ],
+          "gold_passage_ids": [
+            "2015_p0047"
+          ],
+          "verification_note": "2015 letter (2015_p0047); unit=figure; definition=Business earnings, now including insurance underwriting income, increased 2.1% to $12,3..."
+        },
+        {
+          "claim": "These earnings are pre-tax: overhead, interest, depreciation, amortization and minority interests are deducted. Income taxes, though, are not deducted.",
+          "required_terms": [
+            "Income taxes, though, are not deducted",
+            "minority interests"
+          ],
+          "gold_passage_ids": [
+            "2015_p0047"
+          ],
+          "verification_note": "2015 letter (2015_p0047); unit=qualitative statement; definition=These earnings are pre-tax: overhead, interest, depreciation, amortization and minority..."
+        },
+        {
+          "claim": "Underwriting income contributed $1,118 per share to the $12,304 per share of earnings.",
+          "required_terms": [
+            "$1,118 per share",
+            "underwriting income"
+          ],
+          "gold_passage_ids": [
+            "2015_p0048"
+          ],
+          "verification_note": "2015 letter (2015_p0048); unit=figure; definition=Underwriting income contributed $1,118 per share to the $12,304 per share of earnings."
+        }
+      ],
+      "multi_part": true,
+      "accept": {
+        "min_claim_coverage": 1.0,
+        "require_valid_citation": true
+      },
+      "reject": {
+        "forbidden_terms": []
+      },
+      "verification_note": "2015_p0047, 2015_p0048 supply the 3 claims (2.1%; Income taxes, though, are not deducted; $1,118 per share).",
+      "ft_context_overlap": true
+    },
+    {
+      "qid": "hv6a_23",
+      "question_type": "fact_number",
+      "answerable": true,
+      "years": [
+        2017
+      ],
+      "query": "How much did the three 2017 hurricanes cost Berkshire relative to other reinsurers, and what annual probability does Buffett put on a $400 billion U.S. mega-catastrophe?",
+      "gold_passage_ids": [
+        "2017_p0040"
+      ],
+      "relevant_ids": [
+        "2017_p0040"
+      ],
+      "gold_claims": [
+        {
+          "claim": "The $2 billion net cost from the three hurricanes reduced Berkshire's GAAP net worth by less than 1%.",
+          "required_terms": [
+            "$2 billion net cost",
+            "less than 1%"
+          ],
+          "gold_passage_ids": [
+            "2017_p0040"
+          ],
+          "verification_note": "2017 letter (2017_p0040); unit=figure; definition=The $2 billion net cost from the three hurricanes reduced Berkshire's GAAP net worth by..."
+        },
+        {
+          "claim": "Elsewhere in the reinsurance industry, many companies suffered net worth losses ranging from 7% to more than 15%.",
+          "required_terms": [
+            "7% to more than 15%",
+            "reinsurance industry"
+          ],
+          "gold_passage_ids": [
+            "2017_p0040"
+          ],
+          "verification_note": "2017 letter (2017_p0040); unit=figure; definition=Elsewhere in the reinsurance industry, many companies suffered net worth losses ranging..."
+        },
+        {
+          "claim": "Berkshire believes the annual probability of a U.S. mega-catastrophe causing $400 billion or more of insured losses is about 2%.",
+          "required_terms": [
+            "$400 billion",
+            "about 2%"
+          ],
+          "gold_passage_ids": [
+            "2017_p0040"
+          ],
+          "verification_note": "2017 letter (2017_p0040); unit=figure; definition=Berkshire believes the annual probability of a U.S. mega-catastrophe causing $400 billi..."
+        }
+      ],
+      "multi_part": true,
+      "accept": {
+        "min_claim_coverage": 1.0,
+        "require_valid_citation": true
+      },
+      "reject": {
+        "forbidden_terms": []
+      },
+      "verification_note": "2017_p0040 supply the 3 claims ($2 billion net cost; 7% to more than 15%; $400 billion).",
+      "ft_context_overlap": false
+    },
+    {
+      "qid": "hv6a_24",
+      "question_type": "fact_number",
+      "answerable": true,
+      "years": [
+        1995
+      ],
+      "query": "When Berkshire traded at $36,000 a share, did Buffett consider it undervalued, and how large would its market capitalization have to grow to triple small stakes quickly?",
+      "gold_passage_ids": [
+        "1995_p0102",
+        "1995_p0105"
+      ],
+      "relevant_ids": [
+        "1995_p0102",
+        "1995_p0105"
+      ],
+      "gold_claims": [
+        {
+          "claim": "With Berkshire stock at $36,000, Charlie and I do not believe it undervalued, Buffett wrote.",
+          "required_terms": [
+            "$36,000",
+            "Charlie and I do not believe it"
+          ],
+          "gold_passage_ids": [
+            "1995_p0102"
+          ],
+          "verification_note": "1995 letter (1995_p0102); unit=figure; definition=With Berkshire stock at $36,000, Charlie and I do not believe it undervalued, Buffett w..."
+        },
+        {
+          "claim": "Berkshire was selling at a price at which Charlie and I would not consider buying it.",
+          "required_terms": [
+            "at a price at which Charlie and I",
+            "would not consider buying it"
+          ],
+          "gold_passage_ids": [
+            "1995_p0102"
+          ],
+          "verification_note": "1995 letter (1995_p0102); unit=qualitative statement; definition=Berkshire was selling at a price at which Charlie and I would not consider buying it."
+        },
+        {
+          "claim": "To quickly triple small stakes, Berkshire's market capitalization would have to grow from $43 billion to $129 billion.",
+          "required_terms": [
+            "$43 billion",
+            "$129 billion"
+          ],
+          "gold_passage_ids": [
+            "1995_p0105"
+          ],
+          "verification_note": "1995 letter (1995_p0105); unit=figure; definition=To quickly triple small stakes, Berkshire's market capitalization would have to grow fr..."
+        },
+        {
+          "claim": "The very best we hope for is to double Berkshire's per-share intrinsic value every five years.",
+          "required_terms": [
+            "per-share intrinsic value every five years",
+            "The very best we hope for"
+          ],
+          "gold_passage_ids": [
+            "1995_p0105"
+          ],
+          "verification_note": "1995 letter (1995_p0105); unit=qualitative statement; definition=The very best we hope for is to double Berkshire's per-share intrinsic value every five..."
+        }
+      ],
+      "multi_part": true,
+      "accept": {
+        "min_claim_coverage": 1.0,
+        "require_valid_citation": true
+      },
+      "reject": {
+        "forbidden_terms": []
+      },
+      "verification_note": "1995_p0102, 1995_p0105 supply the 4 claims ($36,000; at a price at which Charlie and I; $43 billion; per-share intrinsic value every five years).",
+      "ft_context_overlap": true
+    },
+    {
+      "qid": "hv6a_25",
+      "question_type": "fact_number",
+      "answerable": true,
+      "years": [
+        1985
+      ],
+      "query": "How much extra capital has the typical American business needed for each additional dollar of pre-tax earnings, and when should a CEO's earnings growth not earn applause?",
+      "gold_passage_ids": [
+        "1985_p0055",
+        "1985_p0058"
+      ],
+      "relevant_ids": [
+        "1985_p0055",
+        "1985_p0058"
+      ],
+      "gold_claims": [
+        {
+          "claim": "The average American business has required about $5 of additional capital to generate an additional $1 of annual pre-tax earnings.",
+          "required_terms": [
+            "$5 of additional capital",
+            "$1 of annual pre-tax earnings"
+          ],
+          "gold_passage_ids": [
+            "1985_p0055"
+          ],
+          "verification_note": "1985 letter (1985_p0055); unit=figure; definition=The average American business has required about $5 of additional capital to generate a..."
+        },
+        {
+          "claim": "A savings account in which interest was reinvested, at only 8% interest, would quadruple its annual earnings in 18 years.",
+          "required_terms": [
+            "8% interest",
+            "quadruple its annual earnings"
+          ],
+          "gold_passage_ids": [
+            "1985_p0058"
+          ],
+          "verification_note": "1985 letter (1985_p0058); unit=figure; definition=A savings account in which interest was reinvested, at only 8% interest, would quadrupl..."
+        },
+        {
+          "claim": "Applause should be withheld if return on capital was lackluster and capital employed increased in pace with earnings.",
+          "required_terms": [
+            "return on capital was lackluster",
+            "increased in pace with earnings"
+          ],
+          "gold_passage_ids": [
+            "1985_p0058"
+          ],
+          "verification_note": "1985 letter (1985_p0058); unit=qualitative statement; definition=Applause should be withheld if return on capital was lackluster and capital employed in..."
+        }
+      ],
+      "multi_part": true,
+      "accept": {
+        "min_claim_coverage": 1.0,
+        "require_valid_citation": true
+      },
+      "reject": {
+        "forbidden_terms": []
+      },
+      "verification_note": "1985_p0055, 1985_p0058 supply the 3 claims ($5 of additional capital; 8% interest; return on capital was lackluster).",
+      "ft_context_overlap": true
+    },
+    {
+      "qid": "hv6a_26",
+      "question_type": "fact_number",
+      "answerable": true,
+      "years": [
+        1983
+      ],
+      "query": "Why does Berkshire track book value, and how did book value at the 1965 takeover compare with intrinsic value then?",
+      "gold_passage_ids": [
+        "1983_p0023",
+        "1983_p0025"
+      ],
+      "relevant_ids": [
+        "1983_p0023",
+        "1983_p0025"
+      ],
+      "gold_claims": [
+        {
+          "claim": "Book value is used because it is a conservative but reasonably adequate proxy for growth in intrinsic business value, the measure that really counts.",
+          "required_terms": [
+            "conservative but reasonably adequate proxy",
+            "intrinsic business value"
+          ],
+          "gold_passage_ids": [
+            "1983_p0023"
+          ],
+          "verification_note": "1983 letter (1983_p0023); unit=qualitative statement; definition=Book value is used because it is a conservative but reasonably adequate proxy for growt..."
+        },
+        {
+          "claim": "Book value's virtue as a score-keeping measure is that it is easy to calculate and doesn't involve the subjective (but important) judgments of intrinsic business value.",
+          "required_terms": [
+            "score-keeping measure",
+            "subjective (but important)"
+          ],
+          "gold_passage_ids": [
+            "1983_p0023"
+          ],
+          "verification_note": "1983 letter (1983_p0023); unit=qualitative statement; definition=Book value's virtue as a score-keeping measure is that it is easy to calculate and does..."
+        },
+        {
+          "claim": "At the start of fiscal 1965 the $19.46 per share book value considerably overstated intrinsic business value because it consisted of textile assets.",
+          "required_terms": [
+            "$19.46 per share",
+            "considerably overstated intrinsic business value"
+          ],
+          "gold_passage_ids": [
+            "1983_p0025"
+          ],
+          "verification_note": "1983 letter (1983_p0025); unit=figure; definition=At the start of fiscal 1965 the $19.46 per share book value considerably overstated int..."
+        }
+      ],
+      "multi_part": true,
+      "accept": {
+        "min_claim_coverage": 1.0,
+        "require_valid_citation": true
+      },
+      "reject": {
+        "forbidden_terms": []
+      },
+      "verification_note": "1983_p0023, 1983_p0025 supply the 3 claims (conservative but reasonably adequate proxy; score-keeping measure; $19.46 per share).",
+      "ft_context_overlap": false
+    },
+    {
+      "qid": "hv6a_27",
+      "question_type": "temporal_comparison",
+      "answerable": true,
+      "years": [
+        1977,
+        1979
+      ],
+      "query": "How did Buffett's assessment of the textile business change between his 1977 and 1979 letters?",
+      "gold_passage_ids": [
+        "1977_p0005",
+        "1979_p0023"
+      ],
+      "relevant_ids": [
+        "1977_p0005",
+        "1979_p0023"
+      ],
+      "gold_claims": [
+        {
+          "claim": "In 1977 textile again had a very poor year, and Berkshire had mistakenly predicted better results in each of the last two years.",
+          "required_terms": [
+            "very poor year",
+            "mistakenly predicted better results"
+          ],
+          "gold_passage_ids": [
+            "1977_p0005"
+          ],
+          "verification_note": "1977 letter (1977_p0005); unit=qualitative statement; definition=In 1977 textile again had a very poor year, and Berkshire had mistakenly predicted bett..."
+        },
+        {
+          "claim": "Despite strenuous efforts, problems in marketing and manufacturing have persisted.",
+          "required_terms": [
+            "problems in marketing and manufacturing",
+            "have persisted"
+          ],
+          "gold_passage_ids": [
+            "1977_p0005"
+          ],
+          "verification_note": "1977 letter (1977_p0005); unit=qualitative statement; definition=Despite strenuous efforts, problems in marketing and manufacturing have persisted."
+        },
+        {
+          "claim": "In 1979 textile continued to produce some cash, but at a low rate compared to capital employed.",
+          "required_terms": [
+            "some cash",
+            "low rate compared to capital employed"
+          ],
+          "gold_passage_ids": [
+            "1979_p0023"
+          ],
+          "verification_note": "1979 letter (1979_p0023); unit=qualitative statement; definition=In 1979 textile continued to produce some cash, but at a low rate compared to capital e..."
+        },
+        {
+          "claim": "This is not a reflection on the managers, but rather on the industry in which they operate.",
+          "required_terms": [
+            "reflection on the managers",
+            "on the industry in which"
+          ],
+          "gold_passage_ids": [
+            "1979_p0023"
+          ],
+          "verification_note": "1979 letter (1979_p0023); unit=qualitative statement; definition=This is not a reflection on the managers, but rather on the industry in which they oper..."
+        }
+      ],
+      "multi_part": true,
+      "accept": {
+        "min_claim_coverage": 1.0,
+        "require_valid_citation": true
+      },
+      "reject": {
+        "forbidden_terms": []
+      },
+      "verification_note": "1977_p0005, 1979_p0023 supply the 4 claims (very poor year; problems in marketing and manufacturing; some cash; reflection on the managers).",
+      "ft_context_overlap": false
+    },
+    {
+      "qid": "hv6a_28",
+      "question_type": "temporal_comparison",
+      "answerable": true,
+      "years": [
+        1987,
+        1989
+      ],
+      "query": "How did Buffett's description of the Buffalo News differ between the 1987 and 1989 letters?",
+      "gold_passage_ids": [
+        "1987_p0031",
+        "1989_p0040"
+      ],
+      "relevant_ids": [
+        "1987_p0031",
+        "1989_p0040"
+      ],
+      "gold_claims": [
+        {
+          "claim": "In 1987 revenues had grown only moderately, but Stan Lipsey's superb management produced excellent profit growth.",
+          "required_terms": [
+            "Stan Lipsey",
+            "excellent profit growth"
+          ],
+          "gold_passage_ids": [
+            "1987_p0031"
+          ],
+          "verification_note": "1987 letter (1987_p0031); unit=qualitative statement; definition=In 1987 revenues had grown only moderately, but Stan Lipsey's superb management produce..."
+        },
+        {
+          "claim": "Buffett predicted margins would shrink in 1988 and profit might fall, mainly because of skyrocketing newsprint costs.",
+          "required_terms": [
+            "shrink in 1988",
+            "newsprint costs"
+          ],
+          "gold_passage_ids": [
+            "1987_p0031"
+          ],
+          "verification_note": "1987 letter (1987_p0031); unit=figure; definition=Buffett predicted margins would shrink in 1988 and profit might fall, mainly because of..."
+        },
+        {
+          "claim": "In news hole, the paper stood at 50.1% in 1989 vs. 49.5% in 1988.",
+          "required_terms": [
+            "50.1% in 1989",
+            "49.5% in 1988"
+          ],
+          "gold_passage_ids": [
+            "1989_p0040"
+          ],
+          "verification_note": "1989 letter (1989_p0040); unit=figure; definition=In news hole, the paper stood at 50.1% in 1989 vs. 49.5% in 1988."
+        },
+        {
+          "claim": "The News set its seventh consecutive profit record and led major papers in household penetration.",
+          "required_terms": [
+            "seventh consecutive profit record",
+            "household penetration"
+          ],
+          "gold_passage_ids": [
+            "1989_p0040"
+          ],
+          "verification_note": "1989 letter (1989_p0040); unit=qualitative statement; definition=The News set its seventh consecutive profit record and led major papers in household pe..."
+        }
+      ],
+      "multi_part": true,
+      "accept": {
+        "min_claim_coverage": 1.0,
+        "require_valid_citation": true
+      },
+      "reject": {
+        "forbidden_terms": []
+      },
+      "verification_note": "1987_p0031, 1989_p0040 supply the 4 claims (Stan Lipsey; shrink in 1988; 50.1% in 1989; seventh consecutive profit record).",
+      "ft_context_overlap": true
+    },
+    {
+      "qid": "hv6a_29",
+      "question_type": "temporal_comparison",
+      "answerable": true,
+      "years": [
+        2001,
+        2003
+      ],
+      "query": "How did the Berkadia guarantee for FINOVA look in Buffett's 2001 letter compared with his 2003 letter?",
+      "gold_passage_ids": [
+        "2001_p0098",
+        "2003_p0093"
+      ],
+      "relevant_ids": [
+        "2001_p0098",
+        "2003_p0093"
+      ],
+      "gold_claims": [
+        {
+          "claim": "In 2001 Berkadia, formed by Leucadia and Berkshire, borrowed $5.6 billion through FleetBoston to fund FINOVA's distribution.",
+          "required_terms": [
+            "Berkadia",
+            "$5.6 billion"
+          ],
+          "gold_passage_ids": [
+            "2001_p0098"
+          ],
+          "verification_note": "2001 letter (2001_p0098); unit=figure; definition=In 2001 Berkadia, formed by Leucadia and Berkshire, borrowed $5.6 billion through Fleet..."
+        },
+        {
+          "claim": "Berkshire guaranteed 90% of the Berkadia borrowing and held a secondary guarantee on the 10% Leucadia was primarily responsible for.",
+          "required_terms": [
+            "guaranteed 90%",
+            "secondary guarantee"
+          ],
+          "gold_passage_ids": [
+            "2001_p0098"
+          ],
+          "verification_note": "2001 letter (2001_p0098); unit=figure; definition=Berkshire guaranteed 90% of the Berkadia borrowing and held a secondary guarantee on th..."
+        },
+        {
+          "claim": "By 2003 the $5.6 billion guarantee Berkshire had taken on has been extinguished because Joe Steinberg and Ian Cumming did such a fine job liquidating Finova's portfolio.",
+          "required_terms": [
+            "has been extinguished",
+            "Joe Steinberg and Ian Cumming"
+          ],
+          "gold_passage_ids": [
+            "2003_p0093"
+          ],
+          "verification_note": "2003 letter (2003_p0093); unit=qualitative statement; definition=By 2003 the $5.6 billion guarantee Berkshire had taken on has been extinguished because..."
+        },
+        {
+          "claim": "The unfortunate byproduct of this fast payoff is that our future income will be much reduced.",
+          "required_terms": [
+            "fast payoff",
+            "our future income will be much reduced"
+          ],
+          "gold_passage_ids": [
+            "2003_p0093"
+          ],
+          "verification_note": "2003 letter (2003_p0093); unit=qualitative statement; definition=The unfortunate byproduct of this fast payoff is that our future income will be much re..."
+        }
+      ],
+      "multi_part": true,
+      "accept": {
+        "min_claim_coverage": 1.0,
+        "require_valid_citation": true
+      },
+      "reject": {
+        "forbidden_terms": []
+      },
+      "verification_note": "2001_p0098, 2003_p0093 supply the 4 claims (Berkadia; guaranteed 90%; has been extinguished; fast payoff).",
+      "ft_context_overlap": true
+    },
+    {
+      "qid": "hv6a_30",
+      "question_type": "temporal_comparison",
+      "answerable": true,
+      "years": [
+        2003,
+        2009
+      ],
+      "query": "How did McLane's size and profit margins compare in Buffett's 2003 and 2009 letters?",
+      "gold_passage_ids": [
+        "2003_p0029",
+        "2009_p0059"
+      ],
+      "relevant_ids": [
+        "2003_p0029",
+        "2009_p0059"
+      ],
+      "gold_claims": [
+        {
+          "claim": "In 2003 McLane had sales of about $23 billion but paper-thin margins of about 1% pre-tax.",
+          "required_terms": [
+            "$23 billion",
+            "1% pre-tax"
+          ],
+          "gold_passage_ids": [
+            "2003_p0029"
+          ],
+          "verification_note": "2003 letter (2003_p0029); unit=figure; definition=In 2003 McLane had sales of about $23 billion but paper-thin margins of about 1% pre-tax."
+        },
+        {
+          "claim": "McLane distributes groceries and nonfood items to convenience stores, drug stores, wholesale clubs and others.",
+          "required_terms": [
+            "groceries and nonfood items",
+            "wholesale clubs"
+          ],
+          "gold_passage_ids": [
+            "2003_p0029"
+          ],
+          "verification_note": "2003 letter (2003_p0029); unit=qualitative statement; definition=McLane distributes groceries and nonfood items to convenience stores, drug stores, whol..."
+        },
+        {
+          "claim": "In 2009 McLane earned record pre-tax earnings of $344 million on sales of $31.2 billion.",
+          "required_terms": [
+            "$344 million",
+            "$31.2 billion"
+          ],
+          "gold_passage_ids": [
+            "2009_p0059"
+          ],
+          "verification_note": "2009 letter (2009_p0059); unit=figure; definition=In 2009 McLane earned record pre-tax earnings of $344 million on sales of $31.2 billion."
+        },
+        {
+          "claim": "McLane owned 3,242 trailers, 2,309 tractors and 55 distribution centers.",
+          "required_terms": [
+            "3,242 trailers",
+            "55 distribution centers"
+          ],
+          "gold_passage_ids": [
+            "2009_p0059"
+          ],
+          "verification_note": "2009 letter (2009_p0059); unit=figure; definition=McLane owned 3,242 trailers, 2,309 tractors and 55 distribution centers."
+        }
+      ],
+      "multi_part": true,
+      "accept": {
+        "min_claim_coverage": 1.0,
+        "require_valid_citation": true
+      },
+      "reject": {
+        "forbidden_terms": []
+      },
+      "verification_note": "2003_p0029, 2009_p0059 supply the 4 claims ($23 billion; groceries and nonfood items; $344 million; 3,242 trailers).",
+      "ft_context_overlap": true
+    },
+    {
+      "qid": "hv6a_31",
+      "question_type": "temporal_comparison",
+      "answerable": true,
+      "years": [
+        2015,
+        2017
+      ],
+      "query": "How did the size of Berkshire's federal income tax return and its number of state filings differ between the 2015 and 2017 letters?",
+      "gold_passage_ids": [
+        "2015_p0174",
+        "2017_p0095"
+      ],
+      "relevant_ids": [
+        "2015_p0174",
+        "2017_p0095"
+      ],
+      "gold_claims": [
+        {
+          "claim": "In 2015 headquarters files a 30,400-page Federal income tax return, up 6,000 pages from the prior year.",
+          "required_terms": [
+            "30,400-page",
+            "6,000 pages"
+          ],
+          "gold_passage_ids": [
+            "2015_p0174"
+          ],
+          "verification_note": "2015 letter (2015_p0174); unit=figure; definition=In 2015 headquarters files a 30,400-page Federal income tax return, up 6,000 pages from..."
+        },
+        {
+          "claim": "In 2015 headquarters oversees the filing of 3,530 state tax returns.",
+          "required_terms": [
+            "3,530 state tax returns",
+            "oversees the filing"
+          ],
+          "gold_passage_ids": [
+            "2015_p0174"
+          ],
+          "verification_note": "2015 letter (2015_p0174); unit=figure; definition=In 2015 headquarters oversees the filing of 3,530 state tax returns."
+        },
+        {
+          "claim": "In 2017 headquarters files a 32,700-page Federal income tax return.",
+          "required_terms": [
+            "32,700-page",
+            "Federal income tax return"
+          ],
+          "gold_passage_ids": [
+            "2017_p0095"
+          ],
+          "verification_note": "2017 letter (2017_p0095); unit=figure; definition=In 2017 headquarters files a 32,700-page Federal income tax return."
+        },
+        {
+          "claim": "In 2017 headquarters oversees the filing of 3,935 state tax returns and responds to countless shareholder and media inquiries.",
+          "required_terms": [
+            "oversees the filing of 3,935",
+            "responds to countless shareholder"
+          ],
+          "gold_passage_ids": [
+            "2017_p0095"
+          ],
+          "verification_note": "2017 letter (2017_p0095); unit=figure; definition=In 2017 headquarters oversees the filing of 3,935 state tax returns and responds to cou..."
+        }
+      ],
+      "multi_part": true,
+      "accept": {
+        "min_claim_coverage": 1.0,
+        "require_valid_citation": true
+      },
+      "reject": {
+        "forbidden_terms": []
+      },
+      "verification_note": "2015_p0174, 2017_p0095 supply the 4 claims (30,400-page; 3,530 state tax returns; 32,700-page; oversees the filing of 3,935).",
+      "ft_context_overlap": true
+    },
+    {
+      "qid": "hv6a_32",
+      "question_type": "temporal_comparison",
+      "answerable": true,
+      "years": [
+        2023,
+        2031
+      ],
+      "query": "How did Buffett's statement of Berkshire's basic goal in his 2023 letter compare with his 2031 letter?",
+      "gold_passage_ids": [
+        "2023_p0013"
+      ],
+      "relevant_ids": [
+        "2023_p0013"
+      ],
+      "gold_claims": [
+        {
+          "claim": "In 2023 the goal is to own either all or a portion of businesses that enjoy good economics that are fundamental and enduring.",
+          "required_terms": [
+            "own either all or a portion of businesses",
+            "fundamental and enduring"
+          ],
+          "gold_passage_ids": [
+            "2023_p0013"
+          ],
+          "verification_note": "2023 letter (2023_p0013); unit=qualitative statement; definition=In 2023 the goal is to own either all or a portion of businesses that enjoy good econom..."
+        },
+        {
+          "claim": "Those who say they know which businesses will be winners are usually either self-delusional or snake-oil salesmen.",
+          "required_terms": [
+            "self-delusional",
+            "snake-oil salesmen"
+          ],
+          "gold_passage_ids": [
+            "2023_p0013"
+          ],
+          "verification_note": "2023 letter (2023_p0013); unit=qualitative statement; definition=Those who say they know which businesses will be winners are usually either self-delusi..."
+        },
+        {
+          "claim": "Ben Graham taught that in the short run the market acts as a voting machine and in the long run it becomes a weighing machine.",
+          "required_terms": [
+            "the market acts as a voting",
+            "weighing machine"
+          ],
+          "gold_passage_ids": [
+            "2023_p0013"
+          ],
+          "verification_note": "2023 letter (2023_p0013); unit=qualitative statement; definition=Ben Graham taught that in the short run the market acts as a voting machine and in the..."
+        }
+      ],
+      "multi_part": true,
+      "accept": {
+        "min_claim_coverage": 1.0,
+        "require_valid_citation": true
+      },
+      "reject": {
+        "forbidden_terms": []
+      },
+      "expected_coverage_note": "The 2031 letter is missing from the corpus, so only the 2023 side can be answered.",
+      "verification_note": "2023_p0013 supply the 3 claims (own either all or a portion of businesses; self-delusional; the market acts as a voting).",
+      "ft_context_overlap": false
+    },
+    {
+      "qid": "hv6a_33",
+      "question_type": "follow_up",
+      "answerable": true,
+      "years": [
+        1997
+      ],
+      "history": [
+        {
+          "role": "user",
+          "content": "In the 1997 letter, how did Buffett end up keeping his American Express stake?"
+        },
+        {
+          "role": "assistant",
+          "content": "He had been deciding whether to sell it, but a casual conversation during a round of golf changed his mind."
+        }
+      ],
+      "query": "Who was he playing with, and how big did Berkshire's position become afterwards?",
+      "gold_passage_ids": [
+        "1997_p0101"
+      ],
+      "relevant_ids": [
+        "1997_p0101"
+      ],
+      "gold_claims": [
+        {
+          "claim": "He was playing golf with Frank Olson, CEO of Hertz, who convinced him Amex's corporate card was a terrific franchise.",
+          "required_terms": [
+            "Frank Olson",
+            "CEO of Hertz"
+          ],
+          "gold_passage_ids": [
+            "1997_p0101"
+          ],
+          "verification_note": "1997 letter (1997_p0101); unit=qualitative statement; definition=He was playing golf with Frank Olson, CEO of Hertz, who convinced him Amex's corporate..."
+        },
+        {
+          "claim": "Berkshire then came to own 10% of the company and now has a $3 billion gain.",
+          "required_terms": [
+            "10% of the company",
+            "$3 billion gain"
+          ],
+          "gold_passage_ids": [
+            "1997_p0101"
+          ],
+          "verification_note": "1997 letter (1997_p0101); unit=figure; definition=Berkshire then came to own 10% of the company and now has a $3 billion gain."
+        }
+      ],
+      "multi_part": true,
+      "accept": {
+        "min_claim_coverage": 1.0,
+        "require_valid_citation": true
+      },
+      "reject": {
+        "forbidden_terms": []
+      },
+      "verification_note": "1997_p0101 supply the 2 claims (Frank Olson; 10% of the company).",
+      "ft_context_overlap": true
+    },
+    {
+      "qid": "hv6a_34",
+      "question_type": "follow_up",
+      "answerable": true,
+      "years": [
+        2007
+      ],
+      "history": [
+        {
+          "role": "user",
+          "content": "What was planned for the Sunday of the 2007 shareholder weekend near Borsheims?"
+        },
+        {
+          "role": "assistant",
+          "content": "There were several attractions in and around a tent outside the jewelry store."
+        }
+      ],
+      "query": "Who was playing chess there, and what other acts were mentioned?",
+      "gold_passage_ids": [
+        "2007_p0131"
+      ],
+      "relevant_ids": [
+        "2007_p0131"
+      ],
+      "gold_claims": [
+        {
+          "claim": "Patrick Wolff, twice U.S. chess champion, played blindfolded against all comers in groups of six.",
+          "required_terms": [
+            "Patrick Wolff",
+            "twice U.S. chess"
+          ],
+          "gold_passage_ids": [
+            "2007_p0131"
+          ],
+          "verification_note": "2007 letter (2007_p0131); unit=qualitative statement; definition=Patrick Wolff, twice U.S. chess champion, played blindfolded against all comers in grou..."
+        },
+        {
+          "claim": "Norman Beck, a remarkable magician from Dallas, also performed nearby.",
+          "required_terms": [
+            "Norman Beck",
+            "magician from Dallas"
+          ],
+          "gold_passage_ids": [
+            "2007_p0131"
+          ],
+          "verification_note": "2007 letter (2007_p0131); unit=qualitative statement; definition=Norman Beck, a remarkable magician from Dallas, also performed nearby."
+        },
+        {
+          "claim": "Bob Hamman and Sharon Osberg, two of the world's top bridge experts, played bridge with shareholders on Sunday afternoon.",
+          "required_terms": [
+            "Bob Hamman and Sharon Osberg",
+            "Sunday afternoon"
+          ],
+          "gold_passage_ids": [
+            "2007_p0131"
+          ],
+          "verification_note": "2007 letter (2007_p0131); unit=qualitative statement; definition=Bob Hamman and Sharon Osberg, two of the world's top bridge experts, played bridge with..."
+        }
+      ],
+      "multi_part": true,
+      "accept": {
+        "min_claim_coverage": 1.0,
+        "require_valid_citation": true
+      },
+      "reject": {
+        "forbidden_terms": []
+      },
+      "verification_note": "2007_p0131 supply the 3 claims (Patrick Wolff; Norman Beck; Bob Hamman and Sharon Osberg).",
+      "ft_context_overlap": false
+    },
+    {
+      "qid": "hv6a_35",
+      "question_type": "follow_up",
+      "answerable": true,
+      "years": [
+        2005
+      ],
+      "history": [
+        {
+          "role": "user",
+          "content": "What did the 2005 letter say about Borsheim's during the annual meeting weekend?"
+        },
+        {
+          "role": "assistant",
+          "content": "That it would hold special events for shareholders and offer discounted prices."
+        }
+      ],
+      "query": "When were the two events held, and how long did the shareholder prices last?",
+      "gold_passage_ids": [
+        "2005_p0143"
+      ],
+      "relevant_ids": [
+        "2005_p0143"
+      ],
+      "gold_claims": [
+        {
+          "claim": "A cocktail reception ran from 6 p.m. to 10 p.m. on Friday, May 5.",
+          "required_terms": [
+            "6 p.m. to 10 p.m.",
+            "Friday, May 5"
+          ],
+          "gold_passage_ids": [
+            "2005_p0143"
+          ],
+          "verification_note": "2005 letter (2005_p0143); unit=figure; definition=A cocktail reception ran from 6 p.m. to 10 p.m. on Friday, May 5."
+        },
+        {
+          "claim": "The main gala ran from 9 a.m. to 4 p.m. on Sunday, May 7.",
+          "required_terms": [
+            "9 a.m. to 4 p.m.",
+            "Sunday, May 7"
+          ],
+          "gold_passage_ids": [
+            "2005_p0143"
+          ],
+          "verification_note": "2005 letter (2005_p0143); unit=figure; definition=The main gala ran from 9 a.m. to 4 p.m. on Sunday, May 7."
+        },
+        {
+          "claim": "Shareholder prices were available from Monday, May 1 through Saturday, May 13.",
+          "required_terms": [
+            "Monday, May 1",
+            "Saturday, May 13"
+          ],
+          "gold_passage_ids": [
+            "2005_p0143"
+          ],
+          "verification_note": "2005 letter (2005_p0143); unit=figure; definition=Shareholder prices were available from Monday, May 1 through Saturday, May 13."
+        }
+      ],
+      "multi_part": true,
+      "accept": {
+        "min_claim_coverage": 1.0,
+        "require_valid_citation": true
+      },
+      "reject": {
+        "forbidden_terms": []
+      },
+      "verification_note": "2005_p0143 supply the 3 claims (6 p.m. to 10 p.m.; 9 a.m. to 4 p.m.; Monday, May 1).",
+      "ft_context_overlap": true
+    },
+    {
+      "qid": "hv6a_36",
+      "question_type": "follow_up",
+      "answerable": true,
+      "years": [
+        2011
+      ],
+      "history": [
+        {
+          "role": "user",
+          "content": "How did the 2011 letter say the annual meeting question period would work?"
+        },
+        {
+          "role": "assistant",
+          "content": "Journalists would choose the best questions that shareholders emailed, and audience members would ask some too."
+        }
+      ],
+      "query": "Was anyone else added to the panel, and how many questions in total were expected?",
+      "gold_passage_ids": [
+        "2011_p0140",
+        "2011_p0142"
+      ],
+      "relevant_ids": [
+        "2011_p0140",
+        "2011_p0142"
+      ],
+      "gold_claims": [
+        {
+          "claim": "A second panel of three financial analysts who follow Berkshire was added, including Jay Gelb of Barclays Capital.",
+          "required_terms": [
+            "second panel of three financial analysts",
+            "Jay Gelb of Barclays Capital"
+          ],
+          "gold_passage_ids": [
+            "2011_p0140"
+          ],
+          "verification_note": "2011 letter (2011_p0140); unit=qualitative statement; definition=A second panel of three financial analysts who follow Berkshire was added, including Ja..."
+        },
+        {
+          "claim": "The expectation was at least 54 questions, with six from each analyst and journalist and 18 from the audience.",
+          "required_terms": [
+            "least 54 questions",
+            "18 from the audience"
+          ],
+          "gold_passage_ids": [
+            "2011_p0142"
+          ],
+          "verification_note": "2011 letter (2011_p0142); unit=figure; definition=The expectation was at least 54 questions, with six from each analyst and journalist an..."
+        }
+      ],
+      "multi_part": true,
+      "accept": {
+        "min_claim_coverage": 1.0,
+        "require_valid_citation": true
+      },
+      "reject": {
+        "forbidden_terms": []
+      },
+      "verification_note": "2011_p0140, 2011_p0142 supply the 2 claims (second panel of three financial analysts; least 54 questions).",
+      "ft_context_overlap": true
+    },
+    {
+      "qid": "hv6a_37",
+      "question_type": "follow_up",
+      "answerable": true,
+      "years": [
+        2009
+      ],
+      "history": [
+        {
+          "role": "user",
+          "content": "How could shareholders get a question into the 2009 annual meeting?"
+        },
+        {
+          "role": "assistant",
+          "content": "They could email their questions ahead of time, and a few would be selected for the meeting."
+        }
+      ],
+      "query": "Which journalists were taking those, how many questions per email did they ask for, and how could shareholders ask in person instead?",
+      "gold_passage_ids": [
+        "2009_p0116",
+        "2009_p0117"
+      ],
+      "relevant_ids": [
+        "2009_p0116",
+        "2009_p0117"
+      ],
+      "gold_claims": [
+        {
+          "claim": "The journalists were Carol Loomis of Fortune, Becky Quick of CNBC and Andrew Ross Sorkin of The New York Times.",
+          "required_terms": [
+            "Carol Loomis",
+            "Becky Quick",
+            "The New York Times"
+          ],
+          "gold_passage_ids": [
+            "2009_p0116"
+          ],
+          "verification_note": "2009 letter (2009_p0116); unit=qualitative statement; definition=The journalists were Carol Loomis of Fortune, Becky Quick of CNBC and Andrew Ross Sorki..."
+        },
+        {
+          "claim": "A question has the best chance if you keep it concise and include no more than two questions in any e-mail.",
+          "required_terms": [
+            "keep it concise",
+            "no more than two questions"
+          ],
+          "gold_passage_ids": [
+            "2009_p0116"
+          ],
+          "verification_note": "2009 letter (2009_p0116); unit=qualitative statement; definition=A question has the best chance if you keep it concise and include no more than two ques..."
+        },
+        {
+          "claim": "Shareholders could ask directly through a drawing at 8:15 on Saturday at each of 13 microphones.",
+          "required_terms": [
+            "8:15 on Saturday",
+            "13 microphones"
+          ],
+          "gold_passage_ids": [
+            "2009_p0117"
+          ],
+          "verification_note": "2009 letter (2009_p0117); unit=figure; definition=Shareholders could ask directly through a drawing at 8:15 on Saturday at each of 13 mic..."
+        }
+      ],
+      "multi_part": true,
+      "accept": {
+        "min_claim_coverage": 1.0,
+        "require_valid_citation": true
+      },
+      "reject": {
+        "forbidden_terms": []
+      },
+      "verification_note": "2009_p0116, 2009_p0117 supply the 3 claims (Carol Loomis; keep it concise; 8:15 on Saturday).",
+      "ft_context_overlap": true
+    },
+    {
+      "qid": "hv6a_38",
+      "question_type": "follow_up",
+      "answerable": true,
+      "years": [
+        1991
+      ],
+      "history": [
+        {
+          "role": "user",
+          "content": "What was Borsheim's doing for shareholders in the 1991 letter?"
+        },
+        {
+          "role": "assistant",
+          "content": "It was opening on a Sunday just for shareholders and guests, with a special party the evening before."
+        }
+      ],
+      "query": "What was on display at that party, and what was the centerpiece?",
+      "gold_passage_ids": [
+        "1991_p0098"
+      ],
+      "relevant_ids": [
+        "1991_p0098"
+      ],
+      "gold_claims": [
+        {
+          "claim": "The display was a 150-year retrospective of exceptional timepieces by Patek Philippe, including watches once owned by Queen Victoria and Albert Einstein.",
+          "required_terms": [
+            "150-year retrospective",
+            "Queen Victoria"
+          ],
+          "gold_passage_ids": [
+            "1991_p0098"
+          ],
+          "verification_note": "1991 letter (1991_p0098); unit=figure; definition=The display was a 150-year retrospective of exceptional timepieces by Patek Philippe, i..."
+        },
+        {
+          "claim": "The centerpiece was a $5 million watch whose design and manufacture required nine years of labor by Patek Philippe craftsmen.",
+          "required_terms": [
+            "$5 million watch",
+            "manufacture required nine"
+          ],
+          "gold_passage_ids": [
+            "1991_p0098"
+          ],
+          "verification_note": "1991 letter (1991_p0098); unit=figure; definition=The centerpiece was a $5 million watch whose design and manufacture required nine years..."
+        }
+      ],
+      "multi_part": true,
+      "accept": {
+        "min_claim_coverage": 1.0,
+        "require_valid_citation": true
+      },
+      "reject": {
+        "forbidden_terms": []
+      },
+      "verification_note": "1991_p0098 supply the 2 claims (150-year retrospective; $5 million watch).",
+      "ft_context_overlap": true
+    },
+    {
+      "qid": "hv6a_39",
+      "question_type": "unanswerable",
+      "answerable": false,
+      "refusal_category": "unsupported_figure",
+      "years": [],
+      "query": "What was the total dollar amount Berkshire had invested in Tesla by the end of 2021?",
+      "gold_passage_ids": [],
+      "relevant_ids": [],
+      "gold_claims": [],
+      "expected_answer": "The retrieved passages do not provide enough evidence to answer this question.",
+      "accept": {
+        "min_claim_coverage": 1.0,
+        "require_exact_refusal": true,
+        "require_valid_citation": false
+      },
+      "reject": {
+        "forbidden_terms": []
+      },
+      "absence_search_patterns": [
+        "Tesla"
+      ],
+      "verification_note": "Whole-corpus case-insensitive searches for Tesla have zero matches; no gold support exists.",
+      "ft_context_overlap": false
+    },
+    {
+      "qid": "hv6a_40",
+      "question_type": "unanswerable",
+      "answerable": false,
+      "refusal_category": "future_absent_year",
+      "years": [],
+      "query": "What did Buffett say in his 2032 letter about Berkshire's cash pile?",
+      "gold_passage_ids": [],
+      "relevant_ids": [],
+      "gold_claims": [],
+      "expected_answer": "The retrieved passages do not provide enough evidence to answer this question.",
+      "accept": {
+        "min_claim_coverage": 1.0,
+        "require_exact_refusal": true,
+        "require_valid_citation": false
+      },
+      "reject": {
+        "forbidden_terms": []
+      },
+      "absence_search_patterns": [
+        "2032"
+      ],
+      "verification_note": "Whole-corpus case-insensitive searches for 2032 have zero matches; no gold support exists.",
+      "ft_context_overlap": false
+    },
+    {
+      "qid": "hv6a_41",
+      "question_type": "unanswerable",
+      "answerable": false,
+      "refusal_category": "false_premise",
+      "years": [],
+      "query": "Why did Buffett decide to move Berkshire's headquarters from Omaha to New York City?",
+      "gold_passage_ids": [],
+      "relevant_ids": [],
+      "gold_claims": [],
+      "expected_answer": "The retrieved passages do not provide enough evidence to answer this question.",
+      "accept": {
+        "min_claim_coverage": 1.0,
+        "require_exact_refusal": true,
+        "require_valid_citation": false
+      },
+      "reject": {
+        "forbidden_terms": []
+      },
+      "absence_search_patterns": [
+        "headquarters.{0,60}New York City"
+      ],
+      "verification_note": "Whole-corpus case-insensitive searches for headquarters.{0,60}New York City have zero matches; no gold support exists.",
+      "ft_context_overlap": false
+    },
+    {
+      "qid": "hv6a_42",
+      "question_type": "unanswerable",
+      "answerable": false,
+      "refusal_category": "both_sides_unsupported",
+      "years": [],
+      "query": "How did Berkshire's returns on its Bitcoin holdings compare with its returns on its Netflix stake?",
+      "gold_passage_ids": [],
+      "relevant_ids": [],
+      "gold_claims": [],
+      "expected_answer": "The retrieved passages do not provide enough evidence to answer this question.",
+      "accept": {
+        "min_claim_coverage": 1.0,
+        "require_exact_refusal": true,
+        "require_valid_citation": false
+      },
+      "reject": {
+        "forbidden_terms": []
+      },
+      "absence_search_patterns": [
+        "bitcoin",
+        "netflix"
+      ],
+      "unsupported_sides": [
+        "Bitcoin",
+        "Netflix"
+      ],
+      "side_patterns": {
+        "Bitcoin": "bitcoin",
+        "Netflix": "netflix"
+      },
+      "verification_note": "Whole-corpus case-insensitive searches for bitcoin, netflix have zero matches; no gold support exists.",
+      "ft_context_overlap": false
+    },
+    {
+      "qid": "hv6a_43",
+      "question_type": "unanswerable",
+      "answerable": false,
+      "refusal_category": "unsupported_figure",
+      "years": [],
+      "query": "How much money did Berkshire pay for its stake in Nvidia?",
+      "gold_passage_ids": [],
+      "relevant_ids": [],
+      "gold_claims": [],
+      "expected_answer": "The retrieved passages do not provide enough evidence to answer this question.",
+      "accept": {
+        "min_claim_coverage": 1.0,
+        "require_exact_refusal": true,
+        "require_valid_citation": false
+      },
+      "reject": {
+        "forbidden_terms": []
+      },
+      "absence_search_patterns": [
+        "Nvidia"
+      ],
+      "verification_note": "Whole-corpus case-insensitive searches for Nvidia have zero matches; no gold support exists.",
+      "ft_context_overlap": false
+    },
+    {
+      "qid": "hv6a_44",
+      "question_type": "unanswerable",
+      "answerable": false,
+      "refusal_category": "false_premise",
+      "years": [],
+      "query": "Why did Berkshire carry out a three-for-one split of its Class A shares?",
+      "gold_passage_ids": [],
+      "relevant_ids": [],
+      "gold_claims": [],
+      "expected_answer": "The retrieved passages do not provide enough evidence to answer this question.",
+      "accept": {
+        "min_claim_coverage": 1.0,
+        "require_exact_refusal": true,
+        "require_valid_citation": false
+      },
+      "reject": {
+        "forbidden_terms": []
+      },
+      "absence_search_patterns": [
+        "three-for-one",
+        "3-for-1"
+      ],
+      "verification_note": "Whole-corpus case-insensitive searches for three-for-one, 3-for-1 have zero matches; no gold support exists.",
+      "ft_context_overlap": false
+    },
+    {
+      "qid": "hv6a_45",
+      "question_type": "unanswerable",
+      "answerable": false,
+      "refusal_category": "out_of_domain",
+      "years": [],
+      "query": "What is the proper way to season a new cast-iron skillet?",
+      "gold_passage_ids": [],
+      "relevant_ids": [],
+      "gold_claims": [],
+      "expected_answer": "The retrieved passages do not provide enough evidence to answer this question.",
+      "accept": {
+        "min_claim_coverage": 1.0,
+        "require_exact_refusal": true,
+        "require_valid_citation": false
+      },
+      "reject": {
+        "forbidden_terms": []
+      },
+      "absence_search_patterns": [
+        "skillet",
+        "cast[- ]iron"
+      ],
+      "verification_note": "Whole-corpus case-insensitive searches for skillet, cast[- ]iron have zero matches; no gold support exists.",
+      "ft_context_overlap": false
+    },
+    {
+      "qid": "hv6a_46",
+      "question_type": "unanswerable",
+      "answerable": false,
+      "refusal_category": "out_of_domain",
+      "years": [],
+      "query": "Which programming language should a complete beginner learn first?",
+      "gold_passage_ids": [],
+      "relevant_ids": [],
+      "gold_claims": [],
+      "expected_answer": "The retrieved passages do not provide enough evidence to answer this question.",
+      "accept": {
+        "min_claim_coverage": 1.0,
+        "require_exact_refusal": true,
+        "require_valid_citation": false
+      },
+      "reject": {
+        "forbidden_terms": []
+      },
+      "absence_search_patterns": [
+        "programming language"
+      ],
+      "verification_note": "Whole-corpus case-insensitive searches for programming language have zero matches; no gold support exists.",
+      "ft_context_overlap": false
+    }
+  ]
+}
