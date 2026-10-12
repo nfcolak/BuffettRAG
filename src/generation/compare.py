@@ -63,7 +63,7 @@ def period_focused_query(query: str, period: Dict[str, Any], periods: Sequence[D
 
 
 def _soft_gate() -> bool:
-    return os.environ.get("EVIDENCE_GATE_SOFT", "") == "1"
+    return os.environ.get("EVIDENCE_GATE_SOFT") != "0"
 
 
 def _join_part(part: str) -> str:

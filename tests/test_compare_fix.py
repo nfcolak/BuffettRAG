@@ -72,7 +72,7 @@ def _hv30_style(monkeypatch, soft):
     if soft:
         monkeypatch.setenv("EVIDENCE_GATE_SOFT", "1")
     else:
-        monkeypatch.delenv("EVIDENCE_GATE_SOFT", raising=False)
+        monkeypatch.setenv("EVIDENCE_GATE_SOFT", "0")
     return question, context, Llm
 
 
@@ -84,6 +84,12 @@ def test_hv30_style_gate_blocks_by_default_and_soft_gate_calls_model(monkeypatch
     soft = generate_comparison_answer(Llm(), question, context, max_new_tokens=100)
     assert "In 2002: NetJets held a 38 percent share of fractional ownership programs." in soft.answer
     assert Llm.calls == 2
+
+
+def test_unset_soft_gate_is_on(monkeypatch):
+    from src.generation.compare import _soft_gate
+    monkeypatch.delenv("EVIDENCE_GATE_SOFT", raising=False)
+    assert _soft_gate() is True
 
 
 def test_soft_gate_still_refuses_when_model_refuses(monkeypatch):

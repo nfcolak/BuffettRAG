@@ -113,6 +113,7 @@ Everything is set through environment variables, read in `config.py`.
 | `EMBEDDING_DEVICE` | auto | `cuda` when available, otherwise `cpu` |
 | `RERANK_CANDIDATES` | `15` | Max candidates sent to the cross-encoder |
 | `EXPANSION_MODE` | `off` | `auto`, `always`, or `off` for the LLM query-expansion call |
+| `EVIDENCE_GATE_SOFT` | on | Default on; `0` restores the strict word-overlap gate. Measured on heldout_v6 (95 blind questions): 72 vs 70 strict claims, correct refusals 16/16 both |
 
 For shared or public deployments there are separate hardening knobs.
 

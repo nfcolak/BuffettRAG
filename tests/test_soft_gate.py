@@ -16,10 +16,7 @@ class FakeLLM:
 
 
 def _run(monkeypatch, overlap, flag):
-    if flag:
-        monkeypatch.setenv("EVIDENCE_GATE_SOFT", "1")
-    else:
-        monkeypatch.delenv("EVIDENCE_GATE_SOFT", raising=False)
+    monkeypatch.setenv("EVIDENCE_GATE_SOFT", "1" if flag else "0")
     monkeypatch.setattr(ask_flow, "is_grounded", lambda llm: False)
     monkeypatch.setattr(
         ask_flow, "assess_evidence",
@@ -28,6 +25,18 @@ def _run(monkeypatch, overlap, flag):
     llm = FakeLLM()
     answer, _ = ask_flow._generate_answer(llm, "p", [], 64, query="What does Buffett say about floats?")
     return llm.calls, answer
+
+
+def test_unset_means_on(monkeypatch):
+    monkeypatch.delenv("EVIDENCE_GATE_SOFT", raising=False)
+    monkeypatch.setattr(ask_flow, "is_grounded", lambda llm: False)
+    monkeypatch.setattr(
+        ask_flow, "assess_evidence",
+        lambda *a, **k: SimpleNamespace(sufficient=False, best_overlap=0.27),
+    )
+    llm = FakeLLM()
+    ask_flow._generate_answer(llm, "p", [], 64, query="What does Buffett say about floats?")
+    assert llm.calls == 1
 
 
 @pytest.mark.parametrize("overlap,flag,calls", [(0.27, False, 0), (0.27, True, 1), (0.10, True, 0)])
