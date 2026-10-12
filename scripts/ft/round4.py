@@ -30,7 +30,7 @@ from config import (
     LLM_PASSAGE_MAX_CHARS, RETRIEVAL_FETCH_K,
 )
 from src.evaluation.claim_validator import _split_original, validate_and_filter_answer
-from src.generation.compare import comparison_periods, period_label, prepare_answer_context
+from src.generation.compare import comparison_periods, period_label, period_question, prepare_answer_context
 from src.generation.evidence_gate import assess_evidence
 from src.generation.prompt import REFUSAL_LINE, parse_citations
 from src.retrieval.bm25 import BM25Retriever, _meta_matches
@@ -131,7 +131,7 @@ def with_sources(anchors, needed, lookup):
 def serving_prompts(query, anchors, lookup, history=None):
     """Every model prompt /ask would send for `query` given retrieved `anchors`.
 
-    One prompt for an ordinary question; one per period (focus suffix, only that
+    One prompt for an ordinary question; one per period (compare.period_question, only that
     period's passages) for a temporal comparison, exactly as generate_comparison_answer.
     """
     history = list(history or [])
@@ -148,7 +148,7 @@ def serving_prompts(query, anchors, lookup, history=None):
     for period in periods:
         label = period_label(period)
         subset = [hit for hit in context if _meta_matches(hit.metadata, period)]
-        focus = f'{query} (focus: {label})'
+        focus = period_question(query, period, periods)
         prompts.append({'period': label, 'query': focus, 'hits': subset, 'messages': examples.chat_messages(focus, subset, history),
                         'gate': assess_evidence(query, subset, extra_queries=extras).sufficient})
     return prompts

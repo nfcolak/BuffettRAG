@@ -14,7 +14,7 @@ import round4  # noqa: E402
 os.environ.clear()
 os.environ.update(_env)
 
-from src.generation.compare import generate_comparison_answer  # noqa: E402
+from src.generation.compare import comparison_periods, generate_comparison_answer, period_question  # noqa: E402
 from src.generation.prompt import REFUSAL_LINE  # noqa: E402
 from src.retrieval.bm25 import BM25Retriever  # noqa: E402
 from src.services import ask_flow  # noqa: E402
@@ -72,10 +72,12 @@ def test_temporal_job_yields_one_prompt_per_period_like_generate_comparison_answ
             return 'Float is discussed. [1]'
 
     generate_comparison_answer(Capture(), query, context, history=[], max_new_tokens=900)
+    periods = comparison_periods(query)
     assert [p['period'] for p in prompts] == ['1990', '1995']
     assert all(p['gate'] for p in prompts), 'pick a query whose periods both pass the evidence gate'
     assert sent == [joined(p) for p in prompts]
-    assert all(f'{query} (focus: {p["period"]})' in joined(p) for p in prompts)
+    assert all(period_question(query, period, periods) in joined(p)
+               for p, period in zip(prompts, periods))
     for prompt in prompts:   # only that period's passages
         assert {h.metadata['year'] for h in prompt['hits']} == {int(prompt['period'])}
 
