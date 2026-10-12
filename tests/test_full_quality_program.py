@@ -76,13 +76,13 @@ def test_v3_bm25_ranks_every_curated_passage_ahead_of_its_decoy():
     assert failed == []
 
 
-def test_runtime_defaults_to_v3_corpus():
+def test_runtime_defaults_to_v5_pl_corpus():
     from config import CHUNKS_V3_FILE, FAISS_DIR
     from src.pipeline import PipelineConfig
     from src.services.ask_flow import _resolve_chunks_path
 
-    assert CHUNKS_V3_FILE.name == "chunks_v3_paragraph.jsonl"
-    assert FAISS_DIR.name == "faiss_v3"
+    assert CHUNKS_V3_FILE.name == "chunks_v5_pl.jsonl"
+    assert FAISS_DIR.name == "faiss_v5_pl"
     assert PipelineConfig().chunks_file == CHUNKS_V3_FILE
     assert _resolve_chunks_path() == CHUNKS_V3_FILE
 
@@ -541,7 +541,7 @@ def test_live_runner_smoke_uses_backend_ask_and_restores_state(monkeypatch):
         def generate(self, *_args, **_kwargs):
             return "Insurance float is described in the retrieved letters. [1]"
     monkeypatch.setattr("scripts.eval.run_live_benchmark.create_llm_provider", lambda **_kw: StubProvider())
-    result = run(provider="llama", retrieval="bm25", max_cases=1)
+    result = run(corpus=ROOT / "data/processed/chunks_v3_paragraph.jsonl", provider="llama", retrieval="bm25", max_cases=1)
     assert len(calls) == 1 and not hasattr(calls[0], "llm_provider")
     assert ask_flow._state is old_state
     assert result["summary"]["cases_run"] == 1
@@ -577,7 +577,7 @@ def test_live_runner_separates_provider_failure_without_leaking_error(monkeypatc
         def generate(self, *_args, **_kwargs):
             raise RuntimeError("provider body containing a secret must not be persisted")
     monkeypatch.setattr(runner, "create_llm_provider", lambda **_kw: FailingProvider())
-    result = runner.run(provider="llama", retrieval="bm25", max_cases=1)
+    result = runner.run(corpus=ROOT / "data/processed/chunks_v3_paragraph.jsonl", provider="llama", retrieval="bm25", max_cases=1)
     assert result["summary"]["provider_failures"] == 1
     assert result["summary"]["scored_answers"] == 0
     assert result["summary"]["acceptance_rate"] is None
@@ -598,6 +598,6 @@ def test_live_runner_temperature_goes_through_config(monkeypatch):
             seen["t"] = config.LLM_TEMPERATURE
             raise RuntimeError("x")
     monkeypatch.setattr(runner, "create_llm_provider", lambda **_k: Stub())
-    result = runner.run(provider="llama", retrieval="bm25", max_cases=1, temperature=0.3)
+    result = runner.run(corpus=ROOT / "data/processed/chunks_v3_paragraph.jsonl", provider="llama", retrieval="bm25", max_cases=1, temperature=0.3)
     assert seen["t"] == 0.3
     assert result["answer_engine"]["temperature"] == 0.3

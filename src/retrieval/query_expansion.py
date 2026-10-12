@@ -135,7 +135,7 @@ def expand_query_structured(query: str, llm, history_text: str = "") -> Optional
     generated_entities = [str(x).strip() for x in parsed.get("entities", []) if isinstance(x, str)]
     entities = list(dict.fromkeys(original_entities + [x for x in generated_entities if x and len(x) <= _MAX_KEYWORD_CHARS]))
     original_years = [int(y) for y in _YEAR_RE.findall(query)]
-    generated_years = [int(y) for y in parsed.get("years", []) if isinstance(y, int) and 1977 <= y <= 2024]
+    generated_years = [int(y) for y in parsed.get("years", []) if isinstance(y, int) and 1957 <= y <= 2024]
     years = list(dict.fromkeys(original_years + generated_years))
     additions = list(dict.fromkeys(terms + entities + [str(year) for year in years]))[:_MAX_KEYWORDS + 8]
     return StructuredExpansion(terms=terms, entities=entities, years=years,
