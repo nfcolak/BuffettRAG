@@ -32,7 +32,7 @@ import re
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, Sequence
 
-from config import DEFAULT_TOP_K, RERANK_CANDIDATES, RETRIEVAL_FETCH_K, RRF_K
+from config import DEFAULT_TOP_K, RETRIEVAL_FETCH_K, retrieval_setting
 from src.retrieval.bm25 import BM25Retriever, _meta_matches
 from src.storage import SearchHit, StoredDoc
 
@@ -156,15 +156,24 @@ def detect_temporal_comparison(
 
 def reserve_period_hits(
     hits: Sequence[SearchHit], periods: Sequence[Dict[str, Any]], top_k: int,
+    per_period: Optional[int] = None,
 ) -> List[SearchHit]:
-    """Reserve each nonempty period's best hit before the global relevance cut."""
+    """Reserve each nonempty period's best hit(s) before the global relevance cut.
+
+    ``per_period`` defaults to the RETRIEVAL_PERIOD_RESERVE setting (1).
+    """
+    per_period = max(1, per_period if per_period is not None else retrieval_setting("RETRIEVAL_PERIOD_RESERVE"))
     reserved: List[SearchHit] = []
     seen = set()
     for period in periods:
-        best = next((hit for hit in hits if _meta_matches(hit.metadata, period)), None)
-        if best is not None and best.id not in seen:
-            reserved.append(best)
-            seen.add(best.id)
+        taken = 0
+        for hit in hits:
+            if taken >= per_period:
+                break
+            if hit.id not in seen and _meta_matches(hit.metadata, period):
+                reserved.append(hit)
+                seen.add(hit.id)
+                taken += 1
     limit = max(top_k, len(reserved))
     for hit in hits:
         if len(reserved) >= limit:
@@ -206,15 +215,20 @@ def detect_year_filter(query: str) -> Optional[Dict[str, Any]]:
 
 def reciprocal_rank_fusion(
     rankings: Sequence[Sequence[SearchHit]],
-    k: int = RRF_K,
+    k: Optional[int] = None,
     top_k: int = DEFAULT_TOP_K,
+    weights: Optional[Sequence[float]] = None,
 ) -> List[SearchHit]:
+    """Weighted reciprocal-rank fusion; ``k`` defaults to the RRF_K setting (60)."""
+    if k is None:
+        k = retrieval_setting("RRF_K")
     fused: Dict[str, float] = {}
     by_id: Dict[str, SearchHit] = {}
 
-    for ranking in rankings:
+    for index, ranking in enumerate(rankings):
+        weight = 1.0 if weights is None else weights[index]
         for rank, hit in enumerate(ranking):
-            fused[hit.id] = fused.get(hit.id, 0.0) + 1.0 / (k + rank + 1)
+            fused[hit.id] = fused.get(hit.id, 0.0) + weight / (k + rank + 1)
             by_id.setdefault(hit.id, hit)
 
     ranked_ids = sorted(fused.keys(), key=lambda i: fused[i], reverse=True)[:top_k]
@@ -265,6 +279,26 @@ def deduplicate_hits(hits: Sequence[SearchHit]) -> List[SearchHit]:
     return kept
 
 
+def mmr_select(hits: Sequence[SearchHit], top_k: int, lam: float) -> List[SearchHit]:
+    """Maximal marginal relevance over reranked hits: lam * relevance - (1 - lam) * max token-Jaccard to picked.
+
+    Relevance is the reranker's min-max score (kept on ``hit.score``); the best hit is always first.
+    """
+    pool = list(hits)
+    if not pool:
+        return []
+    tokens = {hit.id: set(_DEDUP_TOKEN_RE.findall(hit.text.lower())) for hit in pool}
+    picked: List[SearchHit] = [pool.pop(0)]
+    while pool and len(picked) < top_k:
+        def gain(hit: SearchHit) -> float:
+            sim = max(len(tokens[hit.id] & tokens[p.id]) / (len(tokens[hit.id] | tokens[p.id]) or 1) for p in picked)
+            return lam * hit.score - (1.0 - lam) * sim
+        best = max(pool, key=gain)
+        pool.remove(best)
+        picked.append(best)
+    return picked
+
+
 class Retriever:
     def __init__(
         self,
@@ -304,7 +338,8 @@ class Retriever:
         """Single hybrid (vector + BM25 → RRF) pass with a specific filter."""
         vec = self._vector_search(query, top_k=fetch_k, where=where)
         bm = self._bm25_search(query, top_k=fetch_k, where=where)
-        return reciprocal_rank_fusion([vec, bm], top_k=fetch_k)
+        weights = (retrieval_setting("HYBRID_VECTOR_WEIGHT"), retrieval_setting("HYBRID_BM25_WEIGHT"))
+        return reciprocal_rank_fusion([vec, bm], top_k=fetch_k, weights=None if weights == (1.0, 1.0) else weights)
 
     def _multi_subquery_search(
         self,
@@ -333,7 +368,8 @@ class Retriever:
         )
         reranked = False
         if rerank and self.reranker is not None and candidates:
-            per_period = max(RERANK_CANDIDATES // max(len(subquery_filters), 1), 4)
+            depth = retrieval_setting("RERANK_CANDIDATES")
+            per_period = max(depth // max(len(subquery_filters), 1), 4)
             pool: List[SearchHit] = []
             pooled = set()
             for filt in subquery_filters:
@@ -342,7 +378,7 @@ class Retriever:
                     if h.id not in pooled:
                         pooled.add(h.id)
                         pool.append(h)
-            pool = pool or candidates[:RERANK_CANDIDATES]
+            pool = pool or candidates[:depth]
             candidates = self.reranker.rerank(query, pool, top_k=len(pool))
             reranked = True
 
@@ -364,6 +400,76 @@ class Retriever:
             reranked=reranked,
         )
 
+    def _append_neighbor_anchors(self, hits: List[SearchHit]) -> List[SearchHit]:
+        """Append the previous/next chunk of the top-N hits as passages of their own.
+
+        RETRIEVAL_NEIGHBOR_ANCHORS = N (default 0 = off). Same letter only; ids already in the list are skipped.
+        """
+        count = retrieval_setting("RETRIEVAL_NEIGHBOR_ANCHORS")
+        if count <= 0 or not hits:
+            return hits
+        if getattr(self, "_docs_by_id", None) is None:
+            self._docs_by_id = {doc.id: doc for doc in self.bm25.docs}
+        seen = {hit.id for hit in hits}
+        extra: List[SearchHit] = []
+        for hit in hits[:count]:
+            doc = self._docs_by_id.get(hit.id)
+            if doc is None:
+                continue
+            for field in ("previous_chunk_id", "next_chunk_id"):
+                neighbour = self._docs_by_id.get(str(doc.metadata.get(field) or ""))
+                if (neighbour is None or neighbour.id in seen
+                        or neighbour.metadata.get("year") != doc.metadata.get("year")
+                        or neighbour.metadata.get("source_file") != doc.metadata.get("source_file")):
+                    continue
+                seen.add(neighbour.id)
+                extra.append(SearchHit(neighbour.id, neighbour.text, neighbour.metadata, hit.score))
+        return [*hits, *extra]
+
+    def _multipart_search(
+        self, query: str, strategy: str, top_k: int, fetch_k: int, rerank: bool, auto_year_filter: bool,
+        retrieval_query: Optional[str], history: Optional[Sequence[Dict[str, Any]]],
+    ) -> Optional["RetrievalResult"]:
+        """Split a multi-part question; each part keeps RETRIEVAL_PART_SLOTS reserved slots.
+
+        Returns None when the question does not split into 2+ parts. The whole-question ranking
+        fills the remaining slots; part hits not in it are appended in part order.
+        """
+        from src.generation.decompose import split_question
+
+        parts = split_question(query)
+        if len(parts) < 2:
+            return None
+        common = dict(strategy=strategy, top_k=top_k, fetch_k=fetch_k, rerank=rerank,
+                      auto_year_filter=auto_year_filter, history=history, _split_parts=False)
+        base = self.search(query, retrieval_query=retrieval_query, **common)
+        slots = max(1, retrieval_setting("RETRIEVAL_PART_SLOTS"))
+        reserved: List[SearchHit] = []
+        reserved_ids = set()
+        for part in parts:
+            taken = 0
+            for hit in self.search(part, **common).hits:
+                if taken >= slots:
+                    break
+                if hit.id not in reserved_ids:
+                    reserved.append(hit)
+                    reserved_ids.add(hit.id)
+                    taken += 1
+        reserved = reserved[:top_k]
+        reserved_ids = {hit.id for hit in reserved}
+        chosen = list(reserved)
+        chosen_ids = set(reserved_ids)
+        for hit in base.hits:
+            if len(chosen) >= top_k:
+                break
+            if hit.id not in chosen_ids:
+                chosen.append(hit)
+                chosen_ids.add(hit.id)
+        rank = {hit.id: i for i, hit in enumerate(base.hits)}
+        chosen.sort(key=lambda hit: rank.get(hit.id, len(rank)))  # stable: part-only hits keep part order last
+        return RetrievalResult(query=query, strategy=strategy, hits=chosen, used_filter=base.used_filter,
+                               reranked=base.reranked)
+
     def search(
         self,
         query: str,
@@ -375,6 +481,7 @@ class Retriever:
         auto_year_filter: bool = True,
         retrieval_query: Optional[str] = None,
         history: Optional[Sequence[Dict[str, Any]]] = None,
+        _split_parts: bool = True,
     ) -> "RetrievalResult":
         applied_filter: Optional[Dict[str, Any]] = dict(where) if where else None
 
@@ -385,6 +492,13 @@ class Retriever:
                 return self._multi_subquery_search(
                     query, subquery_filters, top_k, fetch_k, rerank, retrieval_query, strategy
                 )
+
+        if (_split_parts and not where and strategy in ("hybrid", "hybrid_multi", "bm25")
+                and retrieval_setting("RETRIEVAL_MULTIPART")):
+            merged = self._multipart_search(query, strategy, top_k, fetch_k, rerank, auto_year_filter,
+                                            retrieval_query, history)
+            if merged is not None:
+                return merged
 
         auto_applied = False
         if strategy in ("metadata", "hybrid", "vector", "bm25") and auto_year_filter and not where:
@@ -424,14 +538,17 @@ class Retriever:
 
         reranked = False
         if rerank and self.reranker is not None and candidates:
-            to_rerank = candidates[:RERANK_CANDIDATES]
+            to_rerank = candidates[:retrieval_setting("RERANK_CANDIDATES")]
             rerank_pool = self.reranker.rerank(
                 query, to_rerank, top_k=min(len(to_rerank), max(top_k * 2, top_k + 4))
             )
-            candidates = deduplicate_hits(rerank_pool)[:top_k]
+            deduped = deduplicate_hits(rerank_pool)
+            lam = retrieval_setting("RETRIEVAL_MMR_LAMBDA")
+            candidates = mmr_select(deduped, top_k, lam) if lam < 1.0 else deduped[:top_k]
             reranked = True
         else:
             candidates = deduplicate_hits(candidates)[:top_k]
+        candidates = self._append_neighbor_anchors(candidates)
 
         return RetrievalResult(
             query=query,

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import Dict, Iterable, List, Optional, Sequence
 
+from config import retrieval_setting
 from src.storage import SearchHit, StoredDoc
 
 
@@ -198,7 +199,7 @@ def _shifted(span: Optional[tuple], offset: int) -> Optional[tuple]:
     return None if span is None else (span[0] + offset, span[1] + offset)
 
 
-_CHARS_PER_TOKEN = 4  # rough estimate used for the prompt budget
+_CHARS_PER_TOKEN = 4  # default of the LLM_CHARS_PER_TOKEN setting: rough estimate used for the prompt budget
 
 
 def truncate_around_anchor(text: str, anchor: str, max_chars: int) -> str:
@@ -251,7 +252,7 @@ def fit_context_to_llm(
 
     Keeps the first ``max_passages`` passages, truncates each around its anchor
     chunk and drops trailing passages until the prompt fits
-    ``n_ctx - max_new_tokens`` (4 chars/token). Passage order is preserved, so
+    ``n_ctx - max_new_tokens`` (LLM_CHARS_PER_TOKEN chars/token, default 4). Passage order is preserved, so
     the [n] numbering of the returned list is the numbering the model sees.
     """
     from src.generation.prompt import build_cited_prompt
@@ -267,7 +268,7 @@ def fit_context_to_llm(
         kept.append(SearchHit(id=hit.id, text=text, metadata=_trim_merged(hit.metadata, hit.text, text),
                               score=hit.score))
 
-    budget_chars = max(0, n_ctx - max_new_tokens) * _CHARS_PER_TOKEN
+    budget_chars = int(max(0, n_ctx - max_new_tokens) * retrieval_setting("LLM_CHARS_PER_TOKEN"))
     while kept and len(build_cited_prompt(query, kept, history)) > budget_chars:
         drop = next((i for i in reversed(range(len(kept))) if kept[i].id not in protected), None)
         if len(kept) > max(1, len(protected)) and drop is not None:

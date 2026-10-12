@@ -8,15 +8,15 @@ from typing import Any, Dict, List, Optional
 
 from config import (
     ANSWER_CONTEXT_MAX_CHARS,
-    ANSWER_CONTEXT_NEIGHBORS,
     CHUNKS_FILE,
     CHUNKS_V2_FILE,
     CHUNKS_V3_FILE,
     EXPANSION_MODE,
     EXPOSE_DEBUG_STATUS,
-    LLM_CONTEXT_PASSAGES,
     LLM_N_CTX,
     LLM_PASSAGE_MAX_CHARS,
+    llm_context_passages,
+    retrieval_setting,
 )
 from src.generation.prompt import (
     REFUSAL_LINE,
@@ -72,10 +72,15 @@ def _do_search(req: SearchRequest, retrieval_query: Optional[str] = None):
     retriever: Retriever = _state["retriever"]
     history = [turn.model_dump() for turn in req.history] if isinstance(req, AskRequest) else []
     resolved = build_followup_retrieval_query(req.query, history)
+    top_k = req.top_k
+    if isinstance(req, AskRequest):
+        # The prompt takes up to LLM_CONTEXT_PASSAGES passages; retrieve at least that many (plus the
+        # neighbour anchors appended after the ranked hits), never fewer than the request asked for.
+        top_k = max(top_k, min(20, llm_context_passages() - 2 * retrieval_setting("RETRIEVAL_NEIGHBOR_ANCHORS")))
     result = retriever.search(
         query=resolved,
         strategy=req.strategy,
-        top_k=req.top_k,
+        top_k=top_k,
         fetch_k=req.fetch_k,
         rerank=req.rerank,
         where=req.where,
@@ -163,9 +168,9 @@ def _prepare_ask_steps(req: AskRequest):
         context_hits = prepare_answer_context(
             llm, hits, _state.get("docs_by_id", {}), req.query, history=history_dicts,
             followup=build_followup_retrieval_query(req.query, history_dicts) != req.query,
-            neighbors=ANSWER_CONTEXT_NEIGHBORS, max_chars=ANSWER_CONTEXT_MAX_CHARS,
+            neighbors=retrieval_setting("ANSWER_CONTEXT_NEIGHBORS"), max_chars=ANSWER_CONTEXT_MAX_CHARS,
             max_new_tokens=req.max_new_tokens, n_ctx=LLM_N_CTX,
-            max_passages=LLM_CONTEXT_PASSAGES, passage_max_chars=LLM_PASSAGE_MAX_CHARS,
+            max_passages=llm_context_passages(), passage_max_chars=LLM_PASSAGE_MAX_CHARS,
         )
         prompt = build_cited_prompt(query=req.query, hits=context_hits, history=history_dicts)
 

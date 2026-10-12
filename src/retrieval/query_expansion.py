@@ -15,6 +15,7 @@ import re
 from dataclasses import dataclass
 from typing import Dict, List, Optional, Sequence
 
+from config import retrieval_setting
 from src.retrieval.bm25 import _SEARCH_STOPWORDS, tokenize
 
 
@@ -30,10 +31,13 @@ def build_followup_retrieval_query(query: str, history: Optional[Sequence[Dict[s
     An explicit period in the follow-up supersedes periods in the earlier turn.
     """
     content = [word for word in tokenize(query) if word not in _HISTORY_STOPWORDS]
-    if not history or (len(content) >= 6 and not _REFERENTIAL_RE.search(query)):
+    always = bool(retrieval_setting("RETRIEVAL_FOLLOWUP_ALWAYS"))
+    if not history or (not always and len(content) >= 6 and not _REFERENTIAL_RE.search(query)):
         return query
-    previous = next((str(turn.get("content", "")) for turn in reversed(history)
-                     if turn.get("role") == "user"), "")
+    # RETRIEVAL_FOLLOWUP_TURNS user turns (default 1: the last one), newest first.
+    turns = max(1, retrieval_setting("RETRIEVAL_FOLLOWUP_TURNS"))
+    previous = " ".join([str(turn.get("content", "")) for turn in reversed(history)
+                         if turn.get("role") == "user"][:turns])
     words = [word for word in tokenize(previous) if word not in _HISTORY_STOPWORDS]
     if re.search(r"\b(?:19|20)\d{2}s?\b", query):
         words = [word for word in words if not re.fullmatch(r"(?:19|20)\d{2}s?", word)]

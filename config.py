@@ -153,6 +153,43 @@ _DEFAULT_CONTEXT_PASSAGES = "8" if "7b" in LLM_MODEL_PATH.name.lower() else "5"
 LLM_CONTEXT_PASSAGES = int(os.getenv("LLM_CONTEXT_PASSAGES", _DEFAULT_CONTEXT_PASSAGES))
 LLM_PASSAGE_MAX_CHARS = int(os.getenv("LLM_PASSAGE_MAX_CHARS", "1800"))
 
+# -----------------------------------------------------------------------------
+# Retrieval / served-context settings, read from the environment AT CALL TIME
+# (data/evaluation/retrieval_dev_v7/comparison.md documents the measurement).
+# The module constants above stay for import compatibility; serving code calls
+# retrieval_setting() / llm_context_passages() so an env var set later still applies.
+# -----------------------------------------------------------------------------
+RETRIEVAL_DEFAULTS: dict = {
+    "RERANK_CANDIDATES": 15,          # candidates sent to the cross-encoder
+    "RRF_K": 60,                      # reciprocal-rank-fusion constant
+    "HYBRID_VECTOR_WEIGHT": 1.0,      # dense ranking weight in the hybrid fusion
+    "HYBRID_BM25_WEIGHT": 1.0,        # BM25 ranking weight in the hybrid fusion
+    "ANSWER_CONTEXT_NEIGHBORS": 1,    # neighbour chunks merged into each served passage
+    "RETRIEVAL_MULTIPART": 1,         # 1: split a multi-part question, retrieve per part (+2.1pp served recall)
+    "RETRIEVAL_PART_SLOTS": 2,        # reserved slots per question part (multipart only)
+    "RETRIEVAL_FOLLOWUP_TURNS": 1,    # prior user turns whose terms extend a follow-up query
+    "RETRIEVAL_FOLLOWUP_ALWAYS": 0,   # 1: extend every query that has history, not only short/referential ones
+    "RETRIEVAL_PERIOD_RESERVE": 1,    # reserved hits per period in a temporal comparison
+    "RETRIEVAL_NEIGHBOR_ANCHORS": 0,  # neighbours of the top-N hits appended as own passages
+    "RETRIEVAL_MMR_LAMBDA": 1.0,      # <1: MMR diversity over the reranked pool (1 = off)
+    "LLM_CHARS_PER_TOKEN": 4.0,       # prompt-budget estimate used to drop passages that would not fit n_ctx
+}
+
+
+def retrieval_setting(name: str):
+    """Typed value of a retrieval setting; the environment wins, read on every call."""
+    default = RETRIEVAL_DEFAULTS[name]
+    raw = os.environ.get(name)
+    if raw is None or not raw.strip():
+        return default
+    return type(default)(float(raw)) if isinstance(default, int) else float(raw)
+
+
+def llm_context_passages() -> int:
+    """LLM_CONTEXT_PASSAGES at call time (default: 8 for 7B GGUF models, else 5)."""
+    raw = os.environ.get("LLM_CONTEXT_PASSAGES")
+    return int(raw) if raw and raw.strip() else int(_DEFAULT_CONTEXT_PASSAGES)
+
 # Grounded provider (DEFAULT_LLM_PROVIDER=grounded). Knob names, ranges and built-in
 # defaults live in src/generation/grounded/settings.py (GroundedSettings); this block
 # only (a) lets calibrated values be committed as defaults without code changes
