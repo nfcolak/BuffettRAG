@@ -1,0 +1,226 @@
+{
+  "by_kind": {
+    "follow_up": {
+      "attempted": 262,
+      "keep_rate": 0.317,
+      "kept": 83,
+      "reasons": {
+        "bad_sentence": 9,
+        "claim_validator_rejects": 2,
+        "dependent_start": 86,
+        "duplicate_question": 3,
+        "followup_pronoun": 9,
+        "followup_same_sentences": 23,
+        "partnership_in_context": 12,
+        "question_copies_passage": 26,
+        "question_refers_to_passage": 3,
+        "sentence_too_short": 6
+      },
+      "sentences_per_target": 2.34,
+      "teacher_seconds": 167.9
+    },
+    "multipart": {
+      "attempted": 1432,
+      "keep_rate": 0.252,
+      "kept": 361,
+      "reasons": {
+        "bad_sentence": 189,
+        "claim_validator_rejects": 10,
+        "comparison_path_question": 14,
+        "dependent_start": 222,
+        "duplicate_question": 13,
+        "duplicate_sentence": 5,
+        "non_adjacent": 2,
+        "partnership_in_context": 82,
+        "question_copies_passage": 262,
+        "sentence_too_short": 64,
+        "trimmed_time_budget": 208
+      },
+      "sentences_per_target": 4.05,
+      "teacher_seconds": 2391.8
+    },
+    "refusal": {
+      "attempted": 392,
+      "keep_rate": 0.48,
+      "kept": 188,
+      "reasons": {
+        "bad_part": 2,
+        "no_context": 14,
+        "question_refers_to_passage": 1,
+        "refusal_terms_present_in_served": 187
+      },
+      "sentences_per_target": null,
+      "teacher_seconds": 464.0
+    },
+    "single": {
+      "attempted": 262,
+      "keep_rate": 0.511,
+      "kept": 134,
+      "reasons": {
+        "bad_sentence": 27,
+        "claim_validator_rejects": 1,
+        "comparison_path_question": 2,
+        "dependent_start": 46,
+        "duplicate_sentence": 7,
+        "non_adjacent": 1,
+        "partnership_in_context": 13,
+        "parts_count": 1,
+        "question_copies_passage": 18,
+        "question_refers_to_passage": 3,
+        "sentence_too_short": 9
+      },
+      "sentences_per_target": 2.99,
+      "teacher_seconds": 215.1
+    },
+    "temporal": {
+      "attempted": 262,
+      "keep_rate": 0.5,
+      "kept": 131,
+      "reasons": {
+        "bad_sentence": 26,
+        "claim_validator_rejects": 4,
+        "comparison_path_question": 5,
+        "dependent_start": 36,
+        "duplicate_sentence": 1,
+        "question_copies_passage": 49,
+        "sentence_too_short": 10
+      },
+      "sentences_per_target": 3.97,
+      "teacher_seconds": 171.5
+    }
+  },
+  "corpus_sha256": "8263f08958729a77febf0922e7bbc4161bedd5fdb3e9a8b3fc9a64ab681ab5f0",
+  "counts_per_split_kind": {
+    "train": {
+      "follow_up": 77,
+      "multipart": 301,
+      "refusal": 171,
+      "single": 116,
+      "temporal": 115
+    },
+    "valid": {
+      "follow_up": 6,
+      "multipart": 60,
+      "refusal": 17,
+      "single": 18,
+      "temporal": 16
+    }
+  },
+  "exclusion_counts": {
+    "answer_benchmark_v3": 9,
+    "dev_cases": 82,
+    "extra_exclude_ids": 0,
+    "gold_set_py": 695,
+    "hard_negatives_v2": 47,
+    "hard_negatives_v3": 16,
+    "hard_negatives_v4": 85,
+    "heldout_v1": 25,
+    "heldout_v2": 45,
+    "heldout_v3": 44,
+    "heldout_v4": 42,
+    "heldout_v4_checker": 118,
+    "heldout_v5": 137,
+    "heldout_v5_checker": 315,
+    "heldout_v6": 142,
+    "heldout_v6_checker": 378,
+    "ids_not_in_corpus": 6,
+    "union_ids": 1552,
+    "with_neighbours": 2619
+  },
+  "jobs": 2610,
+  "jobs_per_kind": {
+    "follow_up": 262,
+    "multipart": 1432,
+    "refusal": 392,
+    "single": 262,
+    "temporal": 262
+  },
+  "jobs_sha256": "f68d636bcb802522229a163081c013dc46f04626a95e86187b0bb8aef77d816a",
+  "k_histogram": {
+    "12": 304,
+    "16": 283,
+    "8": 310
+  },
+  "max_seq": 12288,
+  "natural_miss_share": 0.041,
+  "partnership_rejected": 107,
+  "passages_mix": [
+    8,
+    12,
+    16
+  ],
+  "plan": {
+    "corpus_sha256": "8263f08958729a77febf0922e7bbc4161bedd5fdb3e9a8b3fc9a64ab681ab5f0",
+    "exclusion_with_neighbours": 2619,
+    "extra_exclude_ids": 0,
+    "n": 2600,
+    "plan_seed": 7,
+    "valid_years": [
+      1988,
+      1993,
+      1995,
+      2018,
+      2020
+    ]
+  },
+  "prompt_version": "v2",
+  "refusal_pass": {
+    "serving_corpus": "chunks_v3_paragraph (faiss_v3, Berkshire only)",
+    "terms_check": "distinctive_terms without month/day names and bare years"
+  },
+  "rejection_reasons": {
+    "bad_part": 2,
+    "bad_sentence": 251,
+    "claim_validator_rejects": 17,
+    "comparison_path_question": 21,
+    "dependent_start": 390,
+    "duplicate_question": 16,
+    "duplicate_sentence": 13,
+    "followup_pronoun": 9,
+    "followup_same_sentences": 23,
+    "no_context": 14,
+    "non_adjacent": 3,
+    "partnership_in_context": 107,
+    "parts_count": 1,
+    "question_copies_passage": 355,
+    "question_refers_to_passage": 7,
+    "refusal_terms_present_in_served": 187,
+    "sentence_too_short": 89,
+    "trimmed_time_budget": 208
+  },
+  "row_counts_per_kind": {
+    "follow_up": 83,
+    "multipart": 361,
+    "refusal": 188,
+    "single": 134,
+    "temporal": 131
+  },
+  "rows_per_minute": 13.901,
+  "seed": 13,
+  "sharded_assemble": {
+    "cross_shard_duplicates": 0,
+    "shards": 1
+  },
+  "spent_set_distractor_rows": 878,
+  "split_counts": {
+    "train": 780,
+    "valid": 117
+  },
+  "strict_context": false,
+  "target_rows": 2610,
+  "teacher": "Qwen/Qwen2.5-32B-Instruct-AWQ",
+  "teacher_jobs_without_output": 0,
+  "teacher_license": "Apache-2.0 (open weights)",
+  "teacher_output_sha256": "c40aed92e499f3b44fb7b35663f855a97e486b511dfbde824ef61757df1650e3",
+  "teacher_records": 2414,
+  "train_cap": 780,
+  "trimmed_multipart_train_rows": 208,
+  "valid_years": [
+    1988,
+    1993,
+    1995,
+    2018,
+    2020
+  ],
+  "wall_seconds": 3871.7
+}
