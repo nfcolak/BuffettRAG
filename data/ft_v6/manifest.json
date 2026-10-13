@@ -2,8 +2,8 @@
   "by_kind": {
     "follow_up": {
       "attempted": 262,
-      "keep_rate": 0.317,
-      "kept": 83,
+      "keep_rate": 0.202,
+      "kept": 53,
       "reasons": {
         "bad_sentence": 9,
         "claim_validator_rejects": 2,
@@ -14,15 +14,16 @@
         "partnership_in_context": 12,
         "question_copies_passage": 26,
         "question_refers_to_passage": 3,
-        "sentence_too_short": 6
+        "sentence_too_short": 6,
+        "trimmed_time_budget": 30
       },
-      "sentences_per_target": 2.34,
+      "sentences_per_target": 2.3,
       "teacher_seconds": 167.9
     },
     "multipart": {
       "attempted": 1432,
-      "keep_rate": 0.397,
-      "kept": 569,
+      "keep_rate": 0.258,
+      "kept": 369,
       "reasons": {
         "bad_sentence": 189,
         "claim_validator_rejects": 10,
@@ -33,28 +34,30 @@
         "non_adjacent": 2,
         "partnership_in_context": 82,
         "question_copies_passage": 262,
-        "sentence_too_short": 64
+        "sentence_too_short": 64,
+        "trimmed_time_budget": 200
       },
-      "sentences_per_target": 4.04,
+      "sentences_per_target": 4.05,
       "teacher_seconds": 2391.8
     },
     "refusal": {
       "attempted": 392,
-      "keep_rate": 0.48,
-      "kept": 188,
+      "keep_rate": 0.309,
+      "kept": 121,
       "reasons": {
         "bad_part": 2,
         "no_context": 14,
         "question_refers_to_passage": 1,
-        "refusal_terms_present_in_served": 187
+        "refusal_terms_present_in_served": 187,
+        "trimmed_time_budget": 67
       },
       "sentences_per_target": null,
       "teacher_seconds": 464.0
     },
     "single": {
       "attempted": 262,
-      "keep_rate": 0.511,
-      "kept": 134,
+      "keep_rate": 0.336,
+      "kept": 88,
       "reasons": {
         "bad_sentence": 27,
         "claim_validator_rejects": 1,
@@ -66,15 +69,16 @@
         "parts_count": 1,
         "question_copies_passage": 18,
         "question_refers_to_passage": 3,
-        "sentence_too_short": 9
+        "sentence_too_short": 9,
+        "trimmed_time_budget": 46
       },
-      "sentences_per_target": 2.99,
+      "sentences_per_target": 2.95,
       "teacher_seconds": 215.1
     },
     "temporal": {
       "attempted": 262,
-      "keep_rate": 0.5,
-      "kept": 131,
+      "keep_rate": 0.328,
+      "kept": 86,
       "reasons": {
         "bad_sentence": 26,
         "claim_validator_rejects": 4,
@@ -82,20 +86,21 @@
         "dependent_start": 36,
         "duplicate_sentence": 1,
         "question_copies_passage": 49,
-        "sentence_too_short": 10
+        "sentence_too_short": 10,
+        "trimmed_time_budget": 45
       },
-      "sentences_per_target": 3.97,
+      "sentences_per_target": 4.07,
       "teacher_seconds": 171.5
     }
   },
   "corpus_sha256": "8263f08958729a77febf0922e7bbc4161bedd5fdb3e9a8b3fc9a64ab681ab5f0",
   "counts_per_split_kind": {
     "train": {
-      "follow_up": 77,
-      "multipart": 509,
-      "refusal": 171,
-      "single": 116,
-      "temporal": 115
+      "follow_up": 47,
+      "multipart": 309,
+      "refusal": 104,
+      "single": 70,
+      "temporal": 70
     },
     "valid": {
       "follow_up": 6,
@@ -136,12 +141,12 @@
   },
   "jobs_sha256": "f68d636bcb802522229a163081c013dc46f04626a95e86187b0bb8aef77d816a",
   "k_histogram": {
-    "12": 368,
-    "16": 360,
-    "8": 377
+    "12": 242,
+    "16": 235,
+    "8": 240
   },
   "max_seq": 12288,
-  "natural_miss_share": 0.045,
+  "natural_miss_share": 0.046,
   "partnership_rejected": 107,
   "passages_mix": [
     8,
@@ -184,24 +189,25 @@
     "question_copies_passage": 355,
     "question_refers_to_passage": 7,
     "refusal_terms_present_in_served": 187,
-    "sentence_too_short": 89
+    "sentence_too_short": 89,
+    "trimmed_time_budget": 388
   },
   "row_counts_per_kind": {
-    "follow_up": 83,
-    "multipart": 569,
-    "refusal": 188,
-    "single": 134,
-    "temporal": 131
+    "follow_up": 53,
+    "multipart": 369,
+    "refusal": 121,
+    "single": 88,
+    "temporal": 86
   },
-  "rows_per_minute": 17.124,
+  "rows_per_minute": 11.111,
   "seed": 13,
   "sharded_assemble": {
     "cross_shard_duplicates": 0,
     "shards": 1
   },
-  "spent_set_distractor_rows": 1084,
+  "spent_set_distractor_rows": 703,
   "split_counts": {
-    "train": 988,
+    "train": 600,
     "valid": 117
   },
   "strict_context": false,
@@ -211,8 +217,8 @@
   "teacher_license": "Apache-2.0 (open weights)",
   "teacher_output_sha256": "c40aed92e499f3b44fb7b35663f855a97e486b511dfbde824ef61757df1650e3",
   "teacher_records": 2414,
-  "train_cap": null,
-  "trimmed_multipart_train_rows": 0,
+  "train_cap": 600,
+  "trimmed_train_rows": 388,
   "valid_years": [
     1988,
     1993,
