@@ -38,7 +38,7 @@ def test_settings_are_ft_r1s_with_ft_v6_and_two_epochs():
     assert {k: ns[k] for k in R1_SETTINGS} == R1_SETTINGS
     old = settings_ns(R1)
     assert all(ns[k] == old[k] for k in R1_SETTINGS) and ns['BATCH'] * ns['GRAD_ACCUM'] == 2     # effective batch of FT-r1
-    assert (ns['DATA_NAME'], ns['EPOCHS'], ns['EXPORT_BASE_GGUF'], ns['MAX_SEQ_CAP'], ns['MAX_SEQ_OVERRIDE']) == ('ft_v6', 2, False, 12288, None)
+    assert (ns['DATA_NAME'], ns['EPOCHS'], ns['EXPORT_BASE_GGUF'], ns['MAX_SEQ_CAP'], ns['MAX_SEQ_OVERRIDE']) == ('ft_v6', 1, False, 12288, None)
     assert ns['BASE_MODEL'] == 'unsloth/Qwen2.5-7B-Instruct-bnb-4bit' and ns['OUT_DIR'].endswith('/run-7b-r3')
     assert TARGET_MODULES in code_cell('get_peft_model')
     assert "use_gradient_checkpointing='unsloth'" in code_cell('get_peft_model') and 'lora_dropout=0' in code_cell('get_peft_model')

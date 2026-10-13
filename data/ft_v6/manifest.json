@@ -21,8 +21,8 @@
     },
     "multipart": {
       "attempted": 1432,
-      "keep_rate": 0.252,
-      "kept": 361,
+      "keep_rate": 0.397,
+      "kept": 569,
       "reasons": {
         "bad_sentence": 189,
         "claim_validator_rejects": 10,
@@ -33,10 +33,9 @@
         "non_adjacent": 2,
         "partnership_in_context": 82,
         "question_copies_passage": 262,
-        "sentence_too_short": 64,
-        "trimmed_time_budget": 208
+        "sentence_too_short": 64
       },
-      "sentences_per_target": 4.05,
+      "sentences_per_target": 4.04,
       "teacher_seconds": 2391.8
     },
     "refusal": {
@@ -93,7 +92,7 @@
   "counts_per_split_kind": {
     "train": {
       "follow_up": 77,
-      "multipart": 301,
+      "multipart": 509,
       "refusal": 171,
       "single": 116,
       "temporal": 115
@@ -137,12 +136,12 @@
   },
   "jobs_sha256": "f68d636bcb802522229a163081c013dc46f04626a95e86187b0bb8aef77d816a",
   "k_histogram": {
-    "12": 304,
-    "16": 283,
-    "8": 310
+    "12": 368,
+    "16": 360,
+    "8": 377
   },
   "max_seq": 12288,
-  "natural_miss_share": 0.041,
+  "natural_miss_share": 0.045,
   "partnership_rejected": 107,
   "passages_mix": [
     8,
@@ -185,25 +184,24 @@
     "question_copies_passage": 355,
     "question_refers_to_passage": 7,
     "refusal_terms_present_in_served": 187,
-    "sentence_too_short": 89,
-    "trimmed_time_budget": 208
+    "sentence_too_short": 89
   },
   "row_counts_per_kind": {
     "follow_up": 83,
-    "multipart": 361,
+    "multipart": 569,
     "refusal": 188,
     "single": 134,
     "temporal": 131
   },
-  "rows_per_minute": 13.901,
+  "rows_per_minute": 17.124,
   "seed": 13,
   "sharded_assemble": {
     "cross_shard_duplicates": 0,
     "shards": 1
   },
-  "spent_set_distractor_rows": 878,
+  "spent_set_distractor_rows": 1084,
   "split_counts": {
-    "train": 780,
+    "train": 988,
     "valid": 117
   },
   "strict_context": false,
@@ -213,8 +211,8 @@
   "teacher_license": "Apache-2.0 (open weights)",
   "teacher_output_sha256": "c40aed92e499f3b44fb7b35663f855a97e486b511dfbde824ef61757df1650e3",
   "teacher_records": 2414,
-  "train_cap": 780,
-  "trimmed_multipart_train_rows": 208,
+  "train_cap": null,
+  "trimmed_multipart_train_rows": 0,
   "valid_years": [
     1988,
     1993,
