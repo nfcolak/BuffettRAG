@@ -8,7 +8,7 @@ TARGET="${2:?target examples}"
 MAXMIN="${3:?max generation minutes}"
 ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 cd "$ROOT"
-PY="${PY:-/Users/necatifurkancolak/AI-Workplace/Projects/done/BuffettRAG/.venv/bin/python}"
+PY="${PY:-/Users/necatifurkancolak/AI-Workplace/Projects/current/BuffettRAG/.venv/bin/python}"
 run() { env -u PYTHONPATH PYTHON_DOTENV_DISABLED=1 HF_HUB_OFFLINE=1 PYTHONUNBUFFERED=1 "$PY" "$@"; }
 log() { printf '[%s] %s\n' "$(date '+%F %T')" "$*"; }
 case "$ROUND" in

@@ -27,7 +27,7 @@ import numpy as np
 os.environ.setdefault("PYTHON_DOTENV_DISABLED", "1")
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
-MAIN = Path(os.getenv("BUFFETTRAG_MAIN", "/Users/necatifurkancolak/AI-Workplace/Projects/done/BuffettRAG"))
+MAIN = Path(os.getenv("BUFFETTRAG_MAIN", "/Users/necatifurkancolak/AI-Workplace/Projects/current/BuffettRAG"))
 OUT_DIR = ROOT / "data/evaluation/retrieval_compare_v4"
 TOP_K, FETCH_K = 8, 30
 CORPUS_FILES = {"v3": "data/processed/chunks_v3_paragraph.jsonl", "v4": "data/processed/chunks_v4_layout.jsonl"}

@@ -45,7 +45,7 @@ from src.storage import SearchHit
 REVISION = 1
 HELDOUT_V3 = 'data/evaluation/heldout_v3/answer_benchmark_heldout_v3.json'
 HELDOUT_V4_CHECKER = common.ROOT / 'scripts/eval/check_heldout_v4.py'
-DEFAULT_TEACHER = '/Users/necatifurkancolak/AI-Workplace/Projects/done/BuffettRAG/models/teacher-qwen2.5-14b-mlx4'
+DEFAULT_TEACHER = '/Users/necatifurkancolak/AI-Workplace/Projects/current/BuffettRAG/models/teacher-qwen2.5-14b-mlx4'
 PILOT_DIR = 'models/ft/round4_pilot'
 FINAL_DIR = 'data/ft_v4'
 SERVING_PASSAGES = LLM_CONTEXT_PASSAGES  # serving value from config (7B default)

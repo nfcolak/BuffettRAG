@@ -30,7 +30,7 @@ os.environ.setdefault("PYTHON_DOTENV_DISABLED", "1")
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 
-MAIN_CHECKOUT = Path(os.environ.get("BUFFETTRAG_MAIN", "/Users/necatifurkancolak/AI-Workplace/Projects/done/BuffettRAG"))
+MAIN_CHECKOUT = Path(os.environ.get("BUFFETTRAG_MAIN", "/Users/necatifurkancolak/AI-Workplace/Projects/current/BuffettRAG"))
 ARTIFACTS = Path("/Users/necatifurkancolak/AI-Workplace/Artifacts/BuffettRAG")
 DEFAULT_CORPUS = "data/processed/chunks_v3_paragraph.jsonl"
 MAX_NEW_TOKENS = 900  # AskRequest default, which run_live_benchmark uses

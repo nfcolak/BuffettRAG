@@ -204,7 +204,7 @@ if __name__ == "__main__":
 
 
 _FT_V4_VALID = Path(
-    "/Users/necatifurkancolak/AI-Workplace/Projects/done/BuffettRAG/data/ft_v4/valid.jsonl"
+    "/Users/necatifurkancolak/AI-Workplace/Projects/current/BuffettRAG/data/ft_v4/valid.jsonl"
 )
 
 

@@ -5,7 +5,7 @@ set -u
 ROUND="${1:?usage: train_lora.sh <round> [iters]}"
 ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 cd "$ROOT"
-PY="${PY:-/Users/necatifurkancolak/AI-Workplace/Projects/done/BuffettRAG/.venv/bin/python}"
+PY="${PY:-/Users/necatifurkancolak/AI-Workplace/Projects/current/BuffettRAG/.venv/bin/python}"
 BATCH=2
 OUT="models/ft/round${ROUND}"
 DATA_DIR="${DATA_DIR:-data/ft}"

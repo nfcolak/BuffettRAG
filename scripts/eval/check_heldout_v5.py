@@ -20,7 +20,7 @@ import re
 import sys
 
 ROOT = Path(__file__).resolve().parents[2]
-MAIN_CHECKOUT = Path("/Users/necatifurkancolak/AI-Workplace/Projects/done/BuffettRAG")
+MAIN_CHECKOUT = Path("/Users/necatifurkancolak/AI-Workplace/Projects/current/BuffettRAG")
 PART_PATHS = {
     "a": ROOT / "data/evaluation/heldout_v5/answer_benchmark_heldout_v5_a.json",
     "b": ROOT / "data/evaluation/heldout_v5/answer_benchmark_heldout_v5_b.json",

@@ -34,7 +34,7 @@ os.environ.setdefault("HF_HUB_OFFLINE", "1")
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 
-MAIN = Path("/Users/necatifurkancolak/AI-Workplace/Projects/done/BuffettRAG")  # git-ignored data lives here
+MAIN = Path("/Users/necatifurkancolak/AI-Workplace/Projects/current/BuffettRAG")  # git-ignored data lives here
 EVAL = ROOT / "data" / "evaluation"
 CASE_FILES = {
     "heldout_v3": "heldout_v3/answer_benchmark_heldout_v3.json",

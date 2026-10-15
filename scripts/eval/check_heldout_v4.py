@@ -16,7 +16,7 @@ import re
 import sys
 
 ROOT = Path(__file__).resolve().parents[2]
-MAIN_CHECKOUT = Path("/Users/necatifurkancolak/AI-Workplace/Projects/done/BuffettRAG")
+MAIN_CHECKOUT = Path("/Users/necatifurkancolak/AI-Workplace/Projects/current/BuffettRAG")
 CASES_PATH = ROOT / "data/evaluation/heldout_v4/answer_benchmark_heldout_v4.json"
 CORPUS_PATH = "data/processed/chunks_v3_paragraph.jsonl"
 CORPUS_SHA256 = "8263f08958729a77febf0922e7bbc4161bedd5fdb3e9a8b3fc9a64ab681ab5f0"

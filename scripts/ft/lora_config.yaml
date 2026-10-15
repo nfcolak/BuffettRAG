@@ -1,5 +1,5 @@
 # mlx_lm LoRA config; iters/adapter-path/resume are set by scripts/ft/train_lora.sh
-model: /Users/necatifurkancolak/AI-Workplace/Projects/done/BuffettRAG/models/student-qwen2.5-1.5b-hf
+model: /Users/necatifurkancolak/AI-Workplace/Projects/current/BuffettRAG/models/student-qwen2.5-1.5b-hf
 train: true
 data: data/ft
 fine_tune_type: lora

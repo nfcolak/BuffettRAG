@@ -24,7 +24,7 @@ import re
 import sys
 
 ROOT = Path(__file__).resolve().parents[2]
-MAIN_CHECKOUT = Path("/Users/necatifurkancolak/AI-Workplace/Projects/done/BuffettRAG")
+MAIN_CHECKOUT = Path("/Users/necatifurkancolak/AI-Workplace/Projects/current/BuffettRAG")
 CORPUS_PATH = "data/processed/chunks_v5_pl.jsonl"
 CORPUS_SHA256 = "42478c6a7327cc139f34678c7abd2884447f1f109de285474a6fbb7799740c7c"
 SET_PATHS = {

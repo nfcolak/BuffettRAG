@@ -8,8 +8,8 @@ set -euo pipefail
 ROUND="${1:?usage: export_and_eval.sh <round>}"
 ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 cd "$ROOT"
-PY="${PY:-/Users/necatifurkancolak/AI-Workplace/Projects/done/BuffettRAG/.venv/bin/python}"
-M=/Users/necatifurkancolak/AI-Workplace/Projects/done/BuffettRAG/models
+PY="${PY:-/Users/necatifurkancolak/AI-Workplace/Projects/current/BuffettRAG/.venv/bin/python}"
+M=/Users/necatifurkancolak/AI-Workplace/Projects/current/BuffettRAG/models
 STUDENT="$M/student-qwen2.5-1.5b-hf"
 CONVERT="$M/llama.cpp-src/convert_hf_to_gguf.py"
 QUANT=/opt/homebrew/bin/llama-quantize
