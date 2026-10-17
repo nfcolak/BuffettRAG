@@ -4,7 +4,8 @@ Runs the exact /ask path up to prompt assembly (ask_flow._prepare_ask: retrieval
 neighbour expansion, caps, fit to the llama window) with a stub LLM that is never called, on corpus v3 + FAISS,
 for every answerable case of the spent dev pool, and records the passage ids placed in the prompt.
 
-  run     python scripts/eval/served_context_recall.py run --out DIR --config NAME[:KEY=VAL,KEY=VAL] ...
+  run     python scripts/eval/served_context_recall.py run --out DIR [--baseline legacy|current]
+              [--config NAME[:KEY=VAL,KEY=VAL] ...] [--arms-file PATH]
   report  python scripts/eval/served_context_recall.py report --out DIR --final NAME
 
 Metric (primary): claim-level served recall = share of gold claims whose claim ``gold_passage_ids`` intersect the
@@ -54,6 +55,8 @@ LONG_CTX_ANSWER_TOKENS = 1024  # configs that set MAX_NEW_TOKENS keep this many 
 # defaults in config.py change (retrieval_dev_v8 moved them).
 BASELINE_ENV = {"LLM_CONTEXT_PASSAGES": "8", "LLM_N_CTX": "8192", "RERANK_CANDIDATES": "15",
                 "RETRIEVAL_QUERY_STRIP": "0", "RETRIEVAL_YEAR_FILTER_MIN": "1970"}
+TRAIN_MAX_SEQ = 12288  # FT-r4 training MAX_SEQ (pv8-nb): prompt + answer must fit this to be trainable
+TRAIN_ANSWER_TOKENS = 1024  # answer room reserved for the training-fit check
 HARNESS_KEYS = ("MAX_NEW_TOKENS",)  # per-config keys that are request fields, not environment variables
 SPLIT_CORPUS = ("chunks_v3_paragraph.jsonl", "faiss_v3")  # active corpus of main (Berkshire letters 1977-2024)
 RANK_DEPTH = 200
@@ -231,6 +234,18 @@ class _Env:
                 os.environ[key] = old
 
 
+def fits_train(tokens: int) -> bool:
+    return tokens + TRAIN_ANSWER_TOKENS <= TRAIN_MAX_SEQ
+
+
+def percentile(values: List[float], q: float) -> Optional[float]:
+    """Nearest-rank percentile (no interpolation: a reported token count is a real prompt)."""
+    if not values:
+        return None
+    ordered = sorted(values)
+    return ordered[max(0, -(-len(ordered) * q // 100) - 1)]
+
+
 def _tokenizer():
     from transformers import AutoTokenizer
     return AutoTokenizer.from_pretrained(str(TOKENIZER_DIR), local_files_only=True)
@@ -248,31 +263,43 @@ def prompt_tokens(tok, prompt: str) -> int:
 
 def serve_one(ask_flow, cache: _Cache, tok, query: str, history: List[Dict[str, str]],
               max_new_tokens: Optional[int] = None) -> Dict[str, Any]:
+    from config import llm_n_ctx
+
     extra = {"max_new_tokens": int(max_new_tokens)} if max_new_tokens else {}
     req = ask_flow.AskRequest(query=query, history=history, strategy="hybrid", rerank=True, **extra)
     cache.hits_embed = cache.hits_pairs = 0
     start = time.perf_counter()
     _, hits, used_filter, reranked, context_hits, prompt, _ = ask_flow._prepare_ask(req)
     wall = time.perf_counter() - start
+    tokens = prompt_tokens(tok, prompt) if prompt else 0
     effective = wall + cache.hits_embed * cache.mean_embed_s() + cache.hits_pairs * cache.mean_pair_s()
     return {
         "passage_ids": [h.id for h in context_hits],
         "merged_ids": sorted({i for h in context_hits for i in (h.metadata.get("merged_ids") or [h.id])}),
         "retrieved_ids": [h.id for h in hits],
         "prompt_chars": len(prompt),
-        "prompt_tokens": prompt_tokens(tok, prompt) if prompt else 0,
+        "prompt_tokens": tokens,
+        "fits_train": fits_train(tokens),
         "wall_ms": round(wall * 1000, 2),
         "latency_ms": round(effective * 1000, 2),
         "used_filter": used_filter,
-        "n_ctx": int(os.environ.get("LLM_N_CTX") or 8192),
+        "n_ctx": llm_n_ctx(),  # call-time window: 8192 under the legacy pin, 16384 under the current defaults
     }
 
 
-def _is_default(key: str, value: str) -> bool:
+def reject_validator_keys(overrides: Dict[str, str]) -> None:
+    """VALIDATOR_* settings act on the generated answer, which this harness never produces."""
+    for key in overrides:
+        if key.startswith("VALIDATOR_"):
+            raise ValueError(f"{key} is a validator setting, not a served-context harness key: measure it with "
+                             "scripts/eval/replay_validator.py on stored runs")
+
+
+def _is_default(key: str, value: str, pins: Dict[str, str] = BASELINE_ENV) -> bool:
     import config
 
-    if key in BASELINE_ENV:
-        return str(value) == BASELINE_ENV[key]
+    if key in pins:
+        return str(value) == pins[key]
     default = config.RETRIEVAL_DEFAULTS.get(key)
     try:
         return default is not None and float(value) == float(default)
@@ -280,7 +307,15 @@ def _is_default(key: str, value: str) -> bool:
         return False
 
 
-def _scope_predicate(overrides: Dict[str, str]):
+def _temporal_under(query: str, history, routing_v2: str) -> bool:
+    from src.retrieval.query_expansion import build_followup_retrieval_query
+    from src.retrieval.retriever import detect_temporal_comparison
+
+    with _Env({"COMPARE_ROUTING_V2": routing_v2}):
+        return bool(detect_temporal_comparison(build_followup_retrieval_query(query, history)))
+
+
+def _scope_predicate(overrides: Dict[str, str], pins: Dict[str, str] = BASELINE_ENV):
     """(query, history) -> can this configuration change the result of that case?
 
     Settings that act on a subset of questions (follow-ups, multi-part, temporal comparisons, questions that name a
@@ -292,17 +327,22 @@ def _scope_predicate(overrides: Dict[str, str]):
     from src.retrieval.query_expansion import build_followup_retrieval_query
     from src.retrieval.retriever import detect_temporal_comparison
 
+    reject_validator_keys(overrides)
     scopes = []
     for key in overrides:
-        if key in HARNESS_KEYS or _is_default(key, overrides[key]):
+        if key in HARNESS_KEYS or _is_default(key, overrides[key], pins):
             continue
         if key.startswith("RETRIEVAL_FOLLOWUP"):
             scopes.append(lambda q, h: bool(h))
         elif key in ("RETRIEVAL_MULTIPART", "RETRIEVAL_PART_SLOTS"):
             scopes.append(lambda q, h: len(split_question(build_followup_retrieval_query(q, h))) >= 2)
-        elif key == "RETRIEVAL_PERIOD_RESERVE":
+        elif key in ("RETRIEVAL_PERIOD_RESERVE", "RETRIEVAL_PERIOD_POOL", "RETRIEVAL_PERIOD_FOCUS_RERANK"):
             scopes.append(lambda q, h: bool(detect_temporal_comparison(build_followup_retrieval_query(q, h))))
-        elif key in ("RETRIEVAL_YEAR_FILTER_MIN", "RETRIEVAL_YEAR_FILTER_WEIGHT"):
+        elif key == "COMPARE_ROUTING_V2":
+            # the rules decide which questions become comparisons: a question either routing sends there can change
+            scopes.append(lambda q, h: _temporal_under(q, h, "0") or _temporal_under(q, h, "1"))
+        elif key in ("RETRIEVAL_YEAR_FILTER_MIN", "RETRIEVAL_YEAR_FILTER_WEIGHT", "RETRIEVAL_YEAR_FILTER_KEEP",
+                     "RETRIEVAL_YEAR_REF_SKIP"):
             scopes.append(lambda q, h: bool(re.search(r"\b(19[5-9]\d|20[0-2]\d)\b", build_followup_retrieval_query(q, h))))
         else:
             return lambda q, h: True
@@ -312,15 +352,20 @@ def _scope_predicate(overrides: Dict[str, str]):
 
 
 def run_config(name: str, overrides: Dict[str, str], ask_flow, cache: _Cache, tok, pool, hard, out: Path,
-               limit: Optional[int]) -> None:
+               limit: Optional[int], baseline: str = "legacy") -> None:
     rows, hn_rows = [], []
     base_path = out / "served_baseline.json"
     base = json.loads(base_path.read_text(encoding="utf-8")) if name != "baseline" and base_path.exists() else None
+    if base and base.get("baseline_mode", "legacy") != baseline:  # result files that predate the field are legacy
+        raise ValueError(f"{base_path} was measured with --baseline {base.get('baseline_mode', 'legacy')}, "
+                         f"this run uses --baseline {baseline}: rerun the baseline or use another --out")
+    pins = BASELINE_ENV if baseline == "legacy" else {}
     base_rows = {r["qid"]: r for r in base["rows"]} if base else {}
     base_hn = {r["qid"]: r for r in base["hard_negatives"]} if base else {}
-    in_scope = _scope_predicate(overrides) if base else (lambda q, h: True)
-    if overrides.get("LLM_N_CTX") not in (None, "8192") or overrides.get("MAX_NEW_TOKENS"):
-        in_scope = lambda q, h: True  # the window changes every case
+    in_scope = _scope_predicate(overrides, pins) if base else (lambda q, h: True)
+    base_over = base["overrides"] if base else {}
+    if any(overrides.get(k) != base_over.get(k) for k in ("LLM_N_CTX", "MAX_NEW_TOKENS")):
+        in_scope = lambda q, h: True  # a different window or answer room changes every case
     reused = 0
     with _Env(overrides):
         for i, case in enumerate(pool[:limit]):
@@ -344,20 +389,29 @@ def run_config(name: str, overrides: Dict[str, str], ask_flow, cache: _Cache, to
     print(f"[{name}] baseline rows reused for {reused} out-of-scope cases", flush=True)
     cache.save()
     (out / f"served_{name}.json").write_text(json.dumps(
-        {"name": name, "overrides": overrides, "rows": rows, "hard_negatives": hn_rows}, ensure_ascii=False) + "\n",
+        {"name": name, "overrides": overrides, "baseline_mode": baseline, "rows": rows, "hard_negatives": hn_rows},
+        ensure_ascii=False) + "\n",
         encoding="utf-8")
     print(f"[{name}] done: {len(rows)} cases, {len(hn_rows)} hard negatives", flush=True)
 
 
-def parse_config(text: str):
+def parse_config(text: str, baseline: str = "legacy"):
+    """``legacy`` pins the old serving defaults (BASELINE_ENV); ``current`` leaves today's defaults in force."""
     name, _, rest = text.partition(":")
-    overrides = dict(BASELINE_ENV)
+    overrides = dict(BASELINE_ENV) if baseline == "legacy" else {}
     for item in filter(None, rest.split(",")):
         key, _, value = item.partition("=")
         overrides[key.strip()] = value.strip()
+    reject_validator_keys(overrides)
     if overrides.get("LLM_N_CTX") != "8192" and "MAX_NEW_TOKENS" not in overrides:
         overrides["MAX_NEW_TOKENS"] = str(LONG_CTX_ANSWER_TOKENS)  # long-window configs keep 1024 tokens for the answer
     return name.strip(), overrides
+
+
+def read_arms_file(path: Path) -> List[str]:
+    """One ``--config`` value per line; blank lines and ``#`` comments are skipped."""
+    lines = (line.strip() for line in path.read_text(encoding="utf-8").splitlines())
+    return [line for line in lines if line and not line.startswith("#")]
 
 
 # ----------------------------------------------------------------------------- scoring / report
@@ -397,6 +451,9 @@ def summarize(result: Dict[str, Any]) -> Dict[str, Any]:
         "wall_p50_ms": statistics.median(r["wall_ms"] for r in rows) if rows else None,
         "prompt_tokens_max": max(toks) if toks else None,
         "prompt_tokens_p50": statistics.median(toks) if toks else None,
+        "prompt_tokens_p95": percentile(toks, 95),
+        "fits_train_all": all(fits_train(t) for t in toks),
+        "fits_train_failures": sum(not fits_train(t) for t in toks),
         "passages_p50": statistics.median(len(r["passage_ids"]) for r in rows) if rows else None,
         "n_ctx_ok": all(r.get("n_ctx", 8192) - r["prompt_tokens"] >= int(result["overrides"].get("MAX_NEW_TOKENS") or MIN_ANSWER_TOKENS)
                         for r in rows) if rows else True,
@@ -467,6 +524,7 @@ def report(out: Path, final: str, base_name: str = "baseline", notes: str = "", 
             "hard_negatives_not_lower": c["hard_negatives_passed"] >= b["hard_negatives_passed"],
             "no_type_drop_gt_0.02": all(d >= -0.02 for d in type_drops.values()),
             "prompt_fits_n_ctx": c["n_ctx_ok"],
+            "fits_train": c["fits_train_all"],
         }
         comp["gate"]["all"] = all(comp["gate"].values())
         comps[name] = comp
@@ -521,15 +579,35 @@ def render_markdown(p: Dict[str, Any]) -> str:
               "|" + "---|" * (len(s[base]["per_type"]) + 1)]
     for n in names:
         lines.append(f"| {n} | " + " | ".join(_pct(s[n]["per_type"][k]["claim_recall"]) for k in s[base]["per_type"]) + " |")
+    lines += ["", "## Per question type: served recall and delta vs baseline", "",
+              "Cell: claim recall % (delta pp vs baseline, delta in claims served).", "",
+              "| type [claims] | " + " | ".join(names) + " |", "|" + "---|" * (len(names) + 1)]
+    for t in s[base]["per_type"]:
+        b = s[base]["per_type"][t]
+        cells = []
+        for n in names:
+            a = s[n]["per_type"].get(t)
+            if a is None:
+                cells.append("n/a")
+            elif n == base:
+                cells.append(_pct(a["claim_recall"]))
+            else:
+                cells.append(f"{_pct(a['claim_recall'])} ({100 * (a['claim_recall'] - b['claim_recall']):+.1f}pp "
+                             f"({a['claims_served'] - b['claims_served']:+d}))")
+        lines.append(f"| {t} [{b['claims']}] | " + " | ".join(cells) + " |")
     lines += ["", "## Latency and prompt size", "",
               "Latency = wall time of retrieval + rerank + context assembly plus the measured cost of cached model "
               "calls (machine shared with other jobs: indicative only). Tokens: Qwen2.5 tokenizer of the served FT "
-              "model on the chat-templated request; n_ctx 8192, 768 tokens reserved for the answer.", "",
-              "| config | p50 ms | wall p50 ms | passages p50 | tokens p50 | tokens max | fits n_ctx-768 |", "|" + "---|" * 7]
+              "model on the chat-templated request; n_ctx as served (8192 legacy pin, 16384 current), answer room 768 "
+              "(legacy) or the config's MAX_NEW_TOKENS.", "",
+              "`fits train` = prompt tokens + 1024 <= 12288 (FT-r4 MAX_SEQ) on every row; the count is the rows over.",
+              "", "| config | p50 ms | wall p50 ms | passages p50 | tokens p50 | tokens p95 | tokens max | fits n_ctx | "
+              "fits train |", "|" + "---|" * 9]
     for n in names:
         a = s[n]
         lines.append(f"| {n} | {a['latency_p50_ms']:.0f} | {a['wall_p50_ms']:.0f} | {a['passages_p50']} | "
-                     f"{a['prompt_tokens_p50']} | {a['prompt_tokens_max']} | {a['n_ctx_ok']} |")
+                     f"{a['prompt_tokens_p50']} | {a['prompt_tokens_p95']} | {a['prompt_tokens_max']} | {a['n_ctx_ok']} | "
+                     f"{a['fits_train_all']} ({a['fits_train_failures']} over) |")
     if p.get("causes"):
         names_c = list(p["causes"])
         lines += ["", "## Cause of the unserved claims (miss analysis, claims)", "",
@@ -696,6 +774,9 @@ def main() -> int:
     r = sub.add_parser("run")
     r.add_argument("--out", type=Path, required=True)
     r.add_argument("--config", action="append", help="NAME[:KEY=VAL,KEY=VAL]")
+    r.add_argument("--arms-file", type=Path, default=None, help="file with one --config value per line")
+    r.add_argument("--baseline", choices=("legacy", "current"), default="legacy",
+                   help="legacy: pin the old serving defaults (BASELINE_ENV); current: today's defaults")
     r.add_argument("--limit", type=int, default=None)
     r.add_argument("--determinism-extra", action="store_true",
                    help="also serve the heldout_v6 unanswerable cases under the baseline env (determinism check)")
@@ -719,6 +800,11 @@ def main() -> int:
         name, overrides = parse_config(args.config)
         run_misses(args.out, name, args.dest)
         return 0
+    configs = [*(args.config or []), *(read_arms_file(args.arms_file) if args.arms_file else [])]
+    try:  # a bad config line fails before the models load
+        parsed = [parse_config(text, args.baseline) for text in configs]
+    except ValueError as exc:
+        ap.error(str(exc))
     cache = _Cache(args.out / "model_cache.pkl")
     ask_flow = build_environment(cache)
     tok = _tokenizer()
@@ -731,9 +817,8 @@ def main() -> int:
                      for c in load_hv6_unanswerable()]
         (args.out / "determinism_extra.json").write_text(json.dumps(extra) + "\n", encoding="utf-8")
         print(f"determinism extra: {len(extra)} unanswerable hv6 cases", flush=True)
-    for text in args.config or []:
-        name, overrides = parse_config(text)
-        run_config(name, overrides, ask_flow, cache, tok, pool, hard, args.out, args.limit)
+    for name, overrides in parsed:
+        run_config(name, overrides, ask_flow, cache, tok, pool, hard, args.out, args.limit, args.baseline)
     return 0
 
 
