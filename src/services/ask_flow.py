@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import os
+import random
 import re
 from pathlib import Path
 from typing import Any, Dict, List, Optional
@@ -134,6 +135,23 @@ def _extra_queries(req: AskRequest, expanded: Optional[str]) -> List[str]:
     return extras
 
 
+def order_passages(hits):
+    """Served passage order (LLM_PASSAGE_ORDER, read at call time): natural | reverse | shuffle:<seed>.
+
+    Applied to the served list itself, so [n] markers, validation and citations all follow the new order.
+    """
+    order = (os.environ.get("LLM_PASSAGE_ORDER") or "natural").strip().lower()
+    if order == "natural":
+        return hits
+    if order == "reverse":
+        return list(reversed(hits))
+    if order.startswith("shuffle:") and order[8:].lstrip("-").isdigit():
+        shuffled = list(hits)
+        random.Random(int(order[8:])).shuffle(shuffled)
+        return shuffled
+    raise ValueError(f"LLM_PASSAGE_ORDER={order!r}; expected natural, reverse or shuffle:<seed>")
+
+
 def _prepare_ask_steps(req: AskRequest):
     """Generator: yields stage names, returns the prepared tuple (via StopIteration.value)."""
     llm = _server_llm()
@@ -173,6 +191,7 @@ def _prepare_ask_steps(req: AskRequest):
             max_new_tokens=req.max_new_tokens, n_ctx=llm_n_ctx(),
             max_passages=llm_context_passages(), passage_max_chars=LLM_PASSAGE_MAX_CHARS,
         )
+        context_hits = order_passages(context_hits)
         prompt = build_cited_prompt(query=req.query, hits=context_hits, history=history_dicts)
 
     return llm, hits, used_filter, reranked, context_hits, prompt, expanded

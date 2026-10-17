@@ -4,10 +4,11 @@ The 7B quotes one sentence per cited passage while most questions need the sente
 For every kept answer sentence that is a verbatim span of its cited passage, add up to N following
 and M preceding sentences of the same passage, in passage order, with the same citation marker.
 Only text found in the passage is ever added; each added sentence must also pass the existing
-claim validator on its own. The whole answer is capped at ANSWER_MAX_SENTENCES.
+claim validator on its own. Two caps: a model answer that already has ANSWER_MAX_SENTENCES sentences is not expanded, and the
+expanded answer is capped at ANSWER_EXPANDED_MAX_SENTENCES (0 = max(ANSWER_MAX_SENTENCES, 4 x the raw sentences)).
 
 Settings (environment, read at call time; defaults in config.py): ANSWER_NEIGHBOR_AFTER,
-ANSWER_NEIGHBOR_BEFORE, ANSWER_MAX_SENTENCES.
+ANSWER_NEIGHBOR_BEFORE, ANSWER_MAX_SENTENCES, ANSWER_EXPANDED_MAX_SENTENCES.
 """
 from __future__ import annotations
 
@@ -116,11 +117,16 @@ def _passes_validator(sentence: str, hits: Sequence[Any]) -> bool:
 
 
 def expand_answer(answer: str, hits: Sequence[Any], *, after: Optional[int] = None, before: Optional[int] = None,
-                  max_sentences: Optional[int] = None) -> str:
-    """Return `answer` with passage neighbours added to verbatim-located sentences (unchanged if none apply)."""
+                  max_sentences: Optional[int] = None, expanded_max_sentences: Optional[int] = None) -> str:
+    """Return `answer` with passage neighbours added to verbatim-located sentences (unchanged if none apply).
+
+    `max_sentences` is the model-answer cap and, when `expanded_max_sentences` is not given, the expanded cap too.
+    """
     after = _setting("ANSWER_NEIGHBOR_AFTER") if after is None else max(0, after)
     before = _setting("ANSWER_NEIGHBOR_BEFORE") if before is None else max(0, before)
     cap = _setting("ANSWER_MAX_SENTENCES") if max_sentences is None else max_sentences
+    if expanded_max_sentences is None:
+        expanded_max_sentences = cap if max_sentences is not None else _setting("ANSWER_EXPANDED_MAX_SENTENCES")
     if (after == 0 and before == 0) or not answer or not hits:
         return answer
 
@@ -141,7 +147,9 @@ def expand_answer(answer: str, hits: Sequence[Any], *, after: Optional[int] = No
             items.append({"label": label, "text": sentence[len(label):].strip(), "before": [], "after": []})
         total += len(items)
         lines.append({"blank": False, "prefix": prefix.group(0) if prefix else "", "items": items})
-    budget = cap - total
+    if total >= cap:
+        return answer
+    budget = (expanded_max_sentences or max(cap, 4 * total)) - total
     if budget <= 0:
         return answer
 

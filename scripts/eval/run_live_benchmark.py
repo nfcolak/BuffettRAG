@@ -32,7 +32,7 @@ from src.evaluation.answer_benchmark import (
 )
 from src.generation.providers import create_llm_provider
 from src.generation.decompose import split_question
-from src.generation.prompt import REFUSAL_LINE
+from src.generation.prompt import REFUSAL_LINE, check_prompt_matches_model, expected_prompt_version, prompt_version
 from src.retrieval.context import build_doc_lookup
 from src.retrieval.retriever import Retriever
 from src.storage import SearchHit, load_chunks_as_docs
@@ -187,6 +187,67 @@ def _model_fingerprint(path: Optional[Path]) -> Optional[Dict[str, Any]]:
         if size < 1 << 20:
             digest.update(item.read_bytes())
     return {"path": str(path), "kind": "dir", "sha256": digest.hexdigest()}
+
+
+def _sha256_of_file(path: Path) -> str:
+    digest = hashlib.sha256()
+    with Path(path).open("rb") as fh:
+        for block in iter(lambda: fh.read(1 << 22), b""):
+            digest.update(block)
+    return digest.hexdigest()
+
+
+def _model_sha256(path: Path) -> Optional[str]:
+    """sha256 of a model file, cached on disk by (path, size, mtime) so a 4.7 GB gguf is hashed once."""
+    path = Path(path)
+    if not path.is_file():
+        return None
+    cache_file = Path(os.environ.get("BUFFETT_SHA_CACHE") or Path.home() / ".cache/buffettrag/sha256_cache.json")
+    stat = path.stat()
+    key = f"{path.resolve()}|{stat.st_size}|{stat.st_mtime_ns}"
+    try:
+        cache = json.loads(cache_file.read_text(encoding="utf-8"))
+    except Exception:
+        cache = {}
+    if key not in cache:
+        cache[key] = _sha256_of_file(path)
+        try:
+            cache_file.parent.mkdir(parents=True, exist_ok=True)
+            cache_file.write_text(json.dumps(cache, indent=1), encoding="utf-8")
+        except OSError:
+            pass
+    return cache[key]
+
+
+def _run_settings(*, corpus: Path, provider: str, model_path: Optional[Path], temperature: float) -> Dict[str, Any]:
+    """What was actually served: every setting that changes the answer, at the moment the run starts."""
+    import config
+    from src.generation.answer_expand import _setting as expansion_setting
+
+    if model_path is None and provider == "llama":
+        model_path = Path(os.environ.get("LLM_MODEL_PATH") or config.LLM_MODEL_PATH)
+    explicit = (os.environ.get("PROMPT_VERSION") or "").strip()
+    version = prompt_version() if explicit or model_path is None else (
+        expected_prompt_version(model_path) or prompt_version())
+    corpus = Path(corpus)
+    return {
+        "prompt_version": version,
+        "model": {"path": str(model_path) if model_path else None,
+                  "sha256": _model_sha256(model_path) if model_path else None},
+        "LLM_CONTEXT_PASSAGES": config.llm_context_passages(),
+        "n_ctx": config.llm_n_ctx(),
+        "temperature": temperature,
+        "ANSWER_NEIGHBOR_BEFORE": expansion_setting("ANSWER_NEIGHBOR_BEFORE"),
+        "ANSWER_NEIGHBOR_AFTER": expansion_setting("ANSWER_NEIGHBOR_AFTER"),
+        "ANSWER_MAX_SENTENCES": expansion_setting("ANSWER_MAX_SENTENCES"),
+        "ANSWER_EXPANDED_MAX_SENTENCES": expansion_setting("ANSWER_EXPANDED_MAX_SENTENCES"),
+        "ANSWER_REFUSAL_RETRY": os.environ.get("ANSWER_REFUSAL_RETRY", str(config.ANSWER_REFUSAL_RETRY)),
+        "COMPARE_ROUTING_V2": config.retrieval_setting("COMPARE_ROUTING_V2"),
+        "LLM_PASSAGE_ORDER": (os.environ.get("LLM_PASSAGE_ORDER") or "natural").strip().lower(),
+        "corpus": {"file": str(corpus), "sha256": hashlib.sha256(corpus.read_bytes()).hexdigest()},
+        "faiss_index_name": config.FAISS_DIR.name,
+        "git_commit": _git("rev-parse", "HEAD"),
+    }
 
 
 def _library_versions() -> Dict[str, Optional[str]]:
@@ -355,6 +416,10 @@ def run(
 
     from src.services import backend_app as backend, ask_flow
 
+    # PROMPT_VERSION must not contradict the model's training prompt (raises; ALLOW_PROMPT_MISMATCH=1 overrides).
+    import config as _config
+    check_prompt_matches_model(model_path if model_path is not None and (composer or provider) == "llama"
+                               else _config.LLM_MODEL_PATH if provider == "llama" else "")
     llm = None
     initialization_failure = None
     setup_start = time.perf_counter()
@@ -500,6 +565,7 @@ def run(
                           "temperature_applies": provider == "llama" or (grounded_run and composer != "template"),
                           **({"composer": composer, "model_path": str(model_path) if model_path else None,
                               "temperature_asserted": llm is not None and getattr(llm._provider, "temperature", None) == temperature} if grounded_run else {})},
+        "settings": _run_settings(corpus=corpus, provider=provider, model_path=model_path, temperature=temperature),
         "retrieval": retrieval, "setup_latency_ms": round(setup_latency_ms, 3),
         "fixture_validation": fixture_check,
         "summary": {"fixture_cases": len(cases), "cases_run": len(rows),
@@ -550,7 +616,7 @@ def main() -> int:
         print(f"Benchmark validation failed: {exc}", file=sys.stderr)
         return 2
     except ValueError as exc:
-        if getattr(exc, "args", None) and str(exc).startswith("--"):
+        if getattr(exc, "args", None) and str(exc).startswith(("--", "PROMPT_VERSION")):
             print(f"Benchmark arguments invalid: {exc}", file=sys.stderr)
             return 2
         print(f"Benchmark could not complete ({type(exc).__name__}); no answer-quality result claimed.", file=sys.stderr)
