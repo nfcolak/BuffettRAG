@@ -34,15 +34,14 @@ OUTPUT_DIR = DATA_DIR / "processed"
 CHUNKS_FILE = OUTPUT_DIR / "chunks.jsonl"
 CHUNKS_V2_FILE = OUTPUT_DIR / "chunks_v2.jsonl"  # historical compatibility corpus
 CHUNKS_V3_PARAGRAPH_FILE = OUTPUT_DIR / "chunks_v3_paragraph.jsonl"  # v3: Berkshire letters 1977-2024 only
-CHUNKS_V5_PL_FILE = OUTPUT_DIR / "chunks_v5_pl.jsonl"  # v5_pl: v3 rows + Buffett Partnership letters 1957-1970
-# Legacy name kept for every consumer that imports it: it now names the ACTIVE corpus (v5_pl).
-CHUNKS_V3_FILE = CHUNKS_V5_PL_FILE
+# Legacy name kept for every consumer that imports it: it names the ACTIVE corpus (v3, Berkshire letters only).
+CHUNKS_V3_FILE = CHUNKS_V3_PARAGRAPH_FILE
 METADATA_FILE = OUTPUT_DIR / "metadata.json"
 METADATA_V2_FILE = OUTPUT_DIR / "metadata_v2.json"
 
 INDEX_DIR = DATA_DIR / "indices"
 CHROMA_DIR = INDEX_DIR / "chroma"
-FAISS_DIR = INDEX_DIR / os.getenv("FAISS_INDEX_NAME", "faiss_v5_pl")
+FAISS_DIR = INDEX_DIR / os.getenv("FAISS_INDEX_NAME", "faiss_v3")
 
 EVAL_DIR = DATA_DIR / "evaluation"
 
@@ -66,7 +65,7 @@ CHUNK_SIZE_V2 = 800
 CHUNK_OVERLAP_V2 = 120
 CHUNK_MIN_CHARS_V2 = 160
 
-START_YEAR = 1957
+START_YEAR = 1977
 END_YEAR = 2024
 TOTAL_LETTERS = END_YEAR - START_YEAR + 1
 
@@ -139,7 +138,8 @@ RERANK_TOP_K = 8
 # Generation
 # -----------------------------------------------------------------------------
 LLM_MAX_NEW_TOKENS = 900
-# Serving prompt version (src/generation/prompt.py): v1 = text FT-r1 was trained on, v2 = coverage prompt. Env wins at call time.
+# Serving prompt version (src/generation/prompt.py): v1 = text FT-r1 was trained on, v2 = coverage prompt (FT-r3),
+# v3 = v2 for the Berkshire-only corpus (FT-r4 training data). Env wins at call time.
 PROMPT_VERSION = os.getenv("PROMPT_VERSION", "v1")
 # Providers: "llama" (embedded llama.cpp GGUF model) | "mlx" | "grounded". The extractive engine was removed.
 # No external API is used anywhere.
@@ -186,7 +186,7 @@ RETRIEVAL_DEFAULTS: dict = {
     "RETRIEVAL_MMR_LAMBDA": 1.0,      # <1: MMR diversity over the reranked pool (1 = off)
     "LLM_CHARS_PER_TOKEN": 4.0,       # prompt-budget estimate used to drop passages that would not fit n_ctx
     "RETRIEVAL_QUERY_STRIP": 0,       # 1: add a candidate ranking from the query without question scaffolding
-    "RETRIEVAL_YEAR_FILTER_MIN": 1970,  # earliest year the auto year filter recognises (1957 = partnership years too)
+    "RETRIEVAL_YEAR_FILTER_MIN": 1970,  # earliest year the auto year filter recognises
     "RETRIEVAL_YEAR_FILTER_WEIGHT": 2,  # weight of the year-filtered ranking against the unfiltered one in the boost
     "RETRIEVAL_DEDUP": 1,             # 0: no near-duplicate removal of the reranked pool
     "RETRIEVAL_RERANK_FETCH": 0,      # 1: fetch at least RERANK_CANDIDATES candidates (deeper rerank pool than fetch_k)

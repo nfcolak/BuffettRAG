@@ -76,13 +76,15 @@ def test_v3_bm25_ranks_every_curated_passage_ahead_of_its_decoy():
     assert failed == []
 
 
-def test_runtime_defaults_to_v5_pl_corpus():
-    from config import CHUNKS_V3_FILE, FAISS_DIR
+def test_runtime_defaults_to_berkshire_only_v3_corpus():
+    from config import CHUNKS_V3_FILE, FAISS_DIR, START_YEAR
     from src.pipeline import PipelineConfig
+    from src.retrieval.retriever import CORPUS_YEAR_MIN, CORPUS_YEAR_MAX
     from src.services.ask_flow import _resolve_chunks_path
 
-    assert CHUNKS_V3_FILE.name == "chunks_v5_pl.jsonl"
-    assert FAISS_DIR.name == "faiss_v5_pl"
+    assert CHUNKS_V3_FILE.name == "chunks_v3_paragraph.jsonl"
+    assert FAISS_DIR.name == "faiss_v3"
+    assert (START_YEAR, CORPUS_YEAR_MIN, CORPUS_YEAR_MAX) == (1977, 1977, 2024)
     assert PipelineConfig().chunks_file == CHUNKS_V3_FILE
     assert _resolve_chunks_path() == CHUNKS_V3_FILE
 

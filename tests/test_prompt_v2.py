@@ -63,3 +63,14 @@ def test_split_prompt_uses_the_active_version_and_matches_training_rows(monkeypa
     assert prompt.startswith(system + "\n\n") and prompt[len(system) + 2:].strip() == user
     other = "v1" if version == "v2" else "v2"
     assert system != P.system_prompt(other)
+
+
+def test_v3_is_v2_with_the_berkshire_only_corpus_line():
+    v1, v2, v3 = P.SYSTEM_PROMPT, P.SYSTEM_PROMPT_V2, P.SYSTEM_PROMPT_V3
+    assert "Partnership" not in v3 and "1957" not in v3
+    assert "Warren Buffett's annual Berkshire Hathaway shareholder letters (1977-2024)" in v3
+    assert "Answer every part of the question" in v3 and "Concise: one solid sentence" not in v3
+    a, b, c = v1.splitlines(), v2.splitlines(), v3.splitlines()
+    assert len(c) == len(b) and sum(x != y for x, y in zip(b, c)) == 1   # only the corpus line differs from v2
+    assert sum(x != y for x, y in zip(a, c)) == 2                         # coverage and tone lines differ from v1
+    assert P.system_prompt("v3") == v3

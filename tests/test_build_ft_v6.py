@@ -19,8 +19,8 @@ from src.storage import SearchHit  # noqa: E402
 
 
 @pytest.fixture(autouse=True)
-def v2_prompt(monkeypatch):
-    monkeypatch.setenv('PROMPT_VERSION', 'v2')
+def training_prompt(monkeypatch):
+    monkeypatch.setenv('PROMPT_VERSION', B.PROMPT_VERSION)
 
 
 S = [
@@ -150,7 +150,8 @@ def test_check_row_rejects_paraphrase_wrong_slot_missing_marker_and_excluded_sou
     assert 'source_excluded' in B.check_row(row, excluded={'1995_p0001'})
     assert 'partnership_passage' in B.check_row(dict(row, served_ids=['bpl1960_p0001']))
     v1 = dict(row, messages=[{'role': 'system', 'content': 'old'}] + row['messages'][1:])
-    assert 'system_prompt_not_v2' in B.check_row(v1)
+    assert 'system_prompt_mismatch' in B.check_row(v1)
+    assert 'system_prompt_mismatch' in B.check_row(dict(row, prompt_version='v2'))   # a v3 prompt stored as a v2 row
 
 
 def test_check_row_token_budget():
@@ -239,11 +240,11 @@ def test_training_rows_equal_the_serving_split_of_the_same_prompt(monkeypatch):
     from src.generation.prompt import build_cited_prompt
     from src.generation.providers.llama_provider import split_prompt
     hits = [hit('1995_p0001', S)]
-    for version in ('v1', 'v2'):
+    for version in ('v1', B.PROMPT_VERSION):
         monkeypatch.setenv('PROMPT_VERSION', version)
         prompt = build_cited_prompt('What happened in 1995?', hits)
         system, user = split_prompt(prompt)
-        if version == 'v2':
+        if version == B.PROMPT_VERSION:
             rows = B.chat_messages('What happened in 1995?', hits)
             assert (system, user) == (rows[0]['content'], rows[1]['content'])
         else:
@@ -319,3 +320,36 @@ def test_assemble_flags_parse(monkeypatch):
     monkeypatch.setattr(B, 'assemble_command', lambda args: seen.setdefault('a', args))
     B.main(['assemble', '--jobs', 'j.jsonl', '--teacher', 't.jsonl', '--passages-mix', '8,12,16'])
     assert seen['a'].passages_mix == '8,12,16' and seen['a'].max_seq is None
+
+
+# ------------------------------------------------------------------ pv8: refusal term check, out-dir guard, refusal share
+def test_refusal_terms_drop_bare_years_and_months_but_keep_entities():
+    q = 'What was the closing price of Ethereum on March 3, 2025?'
+    assert {'2025', 'March'} <= B.distinctive_terms(q)
+    assert B.refusal_terms(q) == B.distinctive_terms(q) - {'2025', 'March'}
+    assert 'Ethereum' in B.refusal_terms(q)
+
+
+def test_template_refusal_uses_the_relaxed_terms():
+    import inspect
+    assert "sorted(refusal_terms(job['template']))" in inspect.getsource(B)
+
+
+def test_refusal_share_check():
+    rows = [{'kind': 'refusal'}] * 2 + [{'kind': 'single'}] * 8
+    B.check_refusal_share(rows, 0.12)
+    with pytest.raises(SystemExit):
+        B.check_refusal_share(rows, 0.25)
+    B.check_refusal_share([], 0)
+
+
+def test_assemble_refuses_to_overwrite_an_existing_out_dir(tmp_path):
+    (tmp_path / 'train.jsonl').write_text('{}\n')
+    args = SimpleNamespace(passages_mix=None, max_seq=None, jobs=str(tmp_path / 'j.jsonl'), teacher=str(tmp_path / 't.jsonl'),
+                           out_dir=str(tmp_path), force=False)
+    with pytest.raises(SystemExit, match='exists'):
+        B.assemble_command(args)
+
+
+def test_default_out_dir_is_not_the_ft_r3_training_data():
+    assert B.OUT_DIR != 'data/ft_v6'

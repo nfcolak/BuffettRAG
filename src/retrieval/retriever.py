@@ -79,7 +79,7 @@ _TEMPORAL_COMPARISON_RE = re.compile(
 )
 
 
-CORPUS_YEAR_MIN, CORPUS_YEAR_MAX = 1957, 2024
+CORPUS_YEAR_MIN, CORPUS_YEAR_MAX = 1977, 2024
 _PERIOD_RE = re.compile(
     r"\b(?:((?:19|20)\d0)s|((?:19|20)\d{2})|(seventies|eighties|nineties))\b", re.IGNORECASE
 )
@@ -100,7 +100,7 @@ _LETTER_OF_YEAR_RE = re.compile(r"\bletters?\s+(?:of|for|from)\s+(?:19|20)\d{2}\
 def explicit_periods(text: str) -> List[Dict[str, Any]]:
     """Distinct in-corpus periods named in ``text``, in order, with no cue rule.
 
-    Years and decades wholly outside 1957-2024 are not letter periods.
+    Years and decades wholly outside 1977-2024 are not letter periods.
     """
     periods: List[Dict[str, Any]] = []
     for match in _PERIOD_RE.finditer(text):
@@ -137,7 +137,7 @@ def detect_temporal_comparison(
 
     Years and decades are kept distinct; aliases of the same decade collapse.
     The caller isolates retrieval and answer generation for every period.
-    Years outside the corpus (1957-2024) are ignored, a comparison cue or two
+    Years outside the corpus (1977-2024) are ignored, a comparison cue or two
     "YYYY letter" mentions is required, and a follow-up whose history already
     pins a letter is never split: its years are event years, not letters.
     """

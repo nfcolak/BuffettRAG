@@ -11,7 +11,7 @@ Three stages (VECTOR_BACKEND=faiss HF_HUB_OFFLINE=1 PYTHON_DOTENV_DISABLED=1, LL
 Design (differs from round5, whose teacher WROTE the answer and lost 60-75% of its rows to validator/paraphrase rejects):
   * The 14B teacher only WRITES THE QUESTION and says which passage sentences answer each part (3-5 parts; 1-2 adjacent sentences each).
   * The target is built deterministically: those sentences verbatim, one part after another, each sentence ending with its [n],
-    numbered against the SERVING context (real hybrid retrieval, 8 passages, prompt version v2). A source passage the retrieval did
+    numbered against the SERVING context (real hybrid retrieval, 8 passages, prompt version PROMPT_VERSION). A source passage the retrieval did
     not serve is put into a random slot replacing a served passage; this is recorded in `injected`.
   * Jobs come from Berkshire passages (corpus v3) that are not gold/relevant (+-1 neighbour) in any spent evaluation set; partnership
     passages (bpl*) are never used as sources and a row whose SERVED context holds one is rejected (counted in the manifest).
@@ -44,8 +44,9 @@ from src.retrieval.context import truncate_around_anchor  # noqa: E402
 from src.storage import SearchHit  # noqa: E402
 
 ROOT = common.ROOT
-PROMPT_VERSION = 'v2'
-OUT_DIR = 'data/ft_v6'
+PROMPT_VERSION = 'v3'                # ft_v7 / FT-r4 (Berkshire-only corpus); ft_v6 rows carry 'v2' in their prompt_version field
+OUT_DIR = 'data/ft_v7'
+MIN_REFUSAL_SHARE = 0.12             # ft_v6 had 121/717 (17%); repo assemble once kept 19 (2%) because of a too-strict term check
 DEFAULT_TEACHER = round4.DEFAULT_TEACHER
 MAX_SEQ = 6144                       # colab/train_7b_lora.ipynb (8-passage rows)
 DEFAULT_PASSAGES = 8                 # served context size of the default (no --passages-mix) rows
@@ -463,6 +464,19 @@ def distinctive_terms(question):
     return terms
 
 
+MONTHS_DAYS = {'january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november',
+               'december', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'}
+
+
+def refusal_terms(question):
+    """distinctive_terms without month/day names and bare years, for the refusal check on served text.
+
+    A 2024 letter says '2025' and 'March' without answering 'the closing price of Ethereum in March 2025'; with the full
+    term set 98 of 105 template refusals were rejected. Entity names stay and still reject a row whose served text holds them.
+    (Ported from the out-of-repo pv7/ftv6-assemble/shard_assemble.py that actually built ft_v6.)"""
+    return {t for t in distinctive_terms(question) if t.lower() not in MONTHS_DAYS and not re.fullmatch(r'\d{4}', t)}
+
+
 def bad_sentence(text):
     """Layout debris, not a fact: very long run-ons, '* * *' separators, a start that is not a capital/digit/quote."""
     return len(text.split()) > 70 or '* *' in text or not re.match(r'[A-Z0-9"“‘(]', text)
@@ -478,7 +492,7 @@ def chat_messages(question, hits, history=None):
     prompt = build_cited_prompt(question, hits, history)
     system = system_prompt(PROMPT_VERSION)
     prefix = system + '\n\n'
-    assert prompt.startswith(prefix), 'PROMPT_VERSION is not v2 in this process'
+    assert prompt.startswith(prefix), f'PROMPT_VERSION is not {PROMPT_VERSION} in this process'
     return [{'role': 'system', 'content': system}, {'role': 'user', 'content': prompt[len(prefix):]}]
 
 
@@ -554,8 +568,8 @@ def check_row(row, *, excluded=None, count_tokens=None):
     if [m.get('role') for m in messages] != ['system', 'user', 'assistant']:
         return ['messages_shape']
     system, user, target = (m['content'] for m in messages)
-    if system != system_prompt(PROMPT_VERSION):
-        problems.append('system_prompt_not_v2')
+    if system != system_prompt(row.get('prompt_version') or PROMPT_VERSION):
+        problems.append('system_prompt_mismatch')
     passages = parse_prompt_passages(user)
     if not 1 <= len(passages) <= max(DEFAULT_PASSAGES, row.get('k') or 0) or sorted(passages) != list(range(1, len(passages) + 1)):
         return problems + ['passage_slots']
@@ -692,7 +706,7 @@ class Generator:
 
     def _refusal(self, job, docs, record):
         if job['variant'] == 'template':
-            question, terms = job['template'], sorted(distinctive_terms(job['template']))
+            question, terms = job['template'], sorted(refusal_terms(job['template']))
         else:
             def validate(obj):
                 if obj is None:
@@ -955,6 +969,8 @@ class RecordedGenerator(Generator):
 
 
 def assemble_command(args):
+    if (Path(args.out_dir) / 'train.jsonl').exists() and not args.force:   # data/ft_v6 is what FT-r3 was trained on: never overwrite
+        raise SystemExit(f'{args.out_dir}/train.jsonl exists; pick a new --out-dir or pass --force')
     os.environ['PROMPT_VERSION'] = PROMPT_VERSION
     mix = parse_passages_mix(args.passages_mix)       # every row serves with its own LLM_CONTEXT_PASSAGES (no flag: 8, as before)
     max_seq = args.max_seq or (MAX_SEQ_MIX if args.passages_mix else MAX_SEQ)
@@ -1001,6 +1017,15 @@ def assemble_command(args):
     print('kept rows per kind: ' + ' '.join(f'{k}={kept[k]}' for k in KINDS) + f' total={sum(kept.values())} of jobs={len(jobs)}')
     print(f'rejected: {reasons}')
     print(f'partnership_rejected={manifest["partnership_rejected"]} spent_set_distractor_rows={manifest["spent_set_distractor_rows"]} -> {out}/{{train,valid}}.jsonl, manifest.json')
+    check_refusal_share(generator.rows, args.min_refusal_share)
+
+
+def check_refusal_share(rows, minimum):
+    """Fail loudly when refusals collapse (a too-strict term check once cut them from 17% to 2% without any error)."""
+    share = sum(r['kind'] == 'refusal' for r in rows) / max(len(rows), 1)
+    print(f'refusal share {share:.3f} (minimum {minimum})')
+    if share < minimum:
+        raise SystemExit(f'refusal share {share:.3f} is below {minimum}; check the refusal term filter before training')
 
 
 # ------------------------------------------------------------------ run / verify
@@ -1149,6 +1174,9 @@ def main(argv=None):
     a.add_argument('--exclude-ids', help='file of extra passage ids that must not be sources (spent sets not on this branch)')
     a.add_argument('--strict-context', action='store_true', help='also reject rows whose served context holds an excluded (spent-set) passage')
     a.add_argument('--passages-mix', help='served context sizes, e.g. 8,12,16: each row picks one by a hash of its job id (default: 8 for every row)')
+    a.add_argument('--force', action='store_true', help='overwrite an existing --out-dir')
+    a.add_argument('--min-refusal-share', type=float, default=MIN_REFUSAL_SHARE,
+                   help=f'exit non-zero when refusal rows are below this share of kept rows (default {MIN_REFUSAL_SHARE}; 0 = off)')
     a.add_argument('--max-seq', type=int, help=f'reject rows longer than this many tokens (default {MAX_SEQ}; {MAX_SEQ_MIX} with --passages-mix)')
 
     v = sub.add_parser('verify', help='offline re-check of every row of a generated jsonl')
