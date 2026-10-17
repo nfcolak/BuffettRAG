@@ -97,10 +97,11 @@ _LETTER_YEARS_RE = re.compile(
 _LETTER_OF_YEAR_RE = re.compile(r"\bletters?\s+(?:of|for|from)\s+(?:19|20)\d{2}\b", re.IGNORECASE)
 
 
-def explicit_periods(text: str) -> List[Dict[str, Any]]:
+def explicit_periods(text: str, keep_out_of_corpus: bool = False) -> List[Dict[str, Any]]:
     """Distinct in-corpus periods named in ``text``, in order, with no cue rule.
 
-    Years and decades wholly outside 1977-2024 are not letter periods.
+    Years and decades wholly outside 1977-2024 are not letter periods, unless
+    ``keep_out_of_corpus`` keeps single years (COMPARE_ROUTING_V2: an unanswerable half).
     """
     periods: List[Dict[str, Any]] = []
     for match in _PERIOD_RE.finditer(text):
@@ -115,7 +116,8 @@ def explicit_periods(text: str) -> List[Dict[str, Any]]:
             start = end = int(year)
             filt = {"year": start}
         if end < CORPUS_YEAR_MIN or start > CORPUS_YEAR_MAX:
-            continue
+            if not (keep_out_of_corpus and year and 1900 <= start <= 2099):
+                continue
         if filt not in periods:
             periods.append(filt)
     return periods
@@ -143,6 +145,8 @@ def detect_temporal_comparison(
     """
     if history_pins_letter(history):
         return None
+    if compare_routing_v2():
+        return _detect_temporal_comparison_v2(query)
     periods = explicit_periods(query)
     if len(periods) < 2:
         return None
@@ -150,6 +154,45 @@ def detect_temporal_comparison(
         y for m in _LETTER_YEARS_RE.finditer(query) for y in re.findall(r"(?:19|20)\d{2}", m.group(1))
     }
     if not _COMPARISON_CUE_RE.search(query) and len(letter_years) < 2:
+        return None
+    return periods
+
+
+def compare_routing_v2() -> bool:
+    """COMPARE_ROUTING_V2 at call time (default off): the pv8 routing rules."""
+    return bool(retrieval_setting("COMPARE_ROUTING_V2"))
+
+
+# Years that are rows of a table or a reference point, not letters: "each of 2001, 2002 and 2003", "since 2005".
+_YEAR_LIST_RE = re.compile(
+    r"\b(?:(?:19|20)\d{2}\s*,\s*){2,}(?:and\s+)?(?:19|20)\d{2}\b"
+    r"|\b(?:19|20)\d{2}\s*,\s*(?:19|20)\d{2}\s*,?\s+(?:and|&)\s+(?:19|20)\d{2}\b"
+    r"|\beach of\s+(?:19|20)\d{2}\b[^?]*",
+    re.IGNORECASE,
+)
+_SINCE_YEAR_RE = re.compile(r"\b(?:since|as of|starting in|starting from)\s+(?:19|20)\d{2}\b(?!\s+(?:annual\s+)?letters?)", re.IGNORECASE)
+# "in 1990 and in 1996", "in 1996 and a year later in 1997" (two event years in one fact question are no cue).
+_EXTRA_CUE_RE = re.compile(
+    r"\b(?:\w+\s+)?years?\s+later\b|\bin\s+(?:19|20)\d{2}\s*(?:,|\band\b|\bor\b)\s*(?:again\s+|then\s+)?in\s+(?:19|20)\d{2}\b",
+    re.IGNORECASE,
+)
+
+
+def _detect_temporal_comparison_v2(query: str) -> Optional[List[Dict[str, Any]]]:
+    """Routing rules behind COMPARE_ROUTING_V2.
+
+    Table-row year lists and "since Y" reference years are not letter periods; a year outside the
+    corpus stays as a period (the answer path reports it as not covered); "in A and in B" and
+    "a year later" count as comparison cues. At least one period must be an in-corpus letter.
+    """
+    masked = _SINCE_YEAR_RE.sub(" ", _YEAR_LIST_RE.sub(" ", query))
+    periods = explicit_periods(masked, keep_out_of_corpus=True)
+    if len(periods) < 2 or not explicit_periods(masked):
+        return None
+    letter_years = {
+        y for m in _LETTER_YEARS_RE.finditer(masked) for y in re.findall(r"(?:19|20)\d{2}", m.group(1))
+    }
+    if not (_COMPARISON_CUE_RE.search(masked) or len(letter_years) >= 2 or _EXTRA_CUE_RE.search(masked)):
         return None
     return periods
 

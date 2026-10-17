@@ -14,7 +14,7 @@ from src.generation.prompt import (
 from src.retrieval.bm25 import _meta_matches
 from src.retrieval.context import expand_hits_with_neighbors, fit_context_to_llm
 from src.generation.text_relevance import content_words
-from src.retrieval.retriever import detect_temporal_comparison, explicit_periods
+from src.retrieval.retriever import compare_routing_v2, detect_temporal_comparison, explicit_periods
 from src.storage import SearchHit
 
 _CITATIONS = re.compile(r"\[(\d+(?:\s*,\s*\d+)*)\]")
@@ -71,7 +71,7 @@ def period_focused_query(query: str, period: Dict[str, Any], periods: Sequence[D
     own = period["year"]
     text, adjacent = "", True
     for clause, sep in clauses:
-        named = explicit_periods(clause)
+        named = explicit_periods(clause, keep_out_of_corpus=compare_routing_v2())
         if named and period not in named:
             adjacent = False
             continue

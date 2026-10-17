@@ -189,6 +189,7 @@ RETRIEVAL_DEFAULTS: dict = {
     "RETRIEVAL_YEAR_FILTER_MIN": 1970,  # earliest year the auto year filter recognises
     "RETRIEVAL_YEAR_FILTER_WEIGHT": 2,  # weight of the year-filtered ranking against the unfiltered one in the boost
     "RETRIEVAL_DEDUP": 1,             # 0: no near-duplicate removal of the reranked pool
+    "COMPARE_ROUTING_V2": 0,          # 1: pv8 comparison routing (more true comparisons, fewer fact questions routed)
     "RETRIEVAL_RERANK_FETCH": 0,      # 1: fetch at least RERANK_CANDIDATES candidates (deeper rerank pool than fetch_k)
 }
 
