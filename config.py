@@ -193,6 +193,14 @@ RETRIEVAL_DEFAULTS: dict = {
     "RETRIEVAL_DEDUP": 1,             # 0: no near-duplicate removal of the reranked pool
     "COMPARE_ROUTING_V2": 0,          # 1: pv8 comparison routing (more true comparisons, fewer fact questions routed)
     "RETRIEVAL_RERANK_FETCH": 0,      # 1: fetch at least RERANK_CANDIDATES candidates (deeper rerank pool than fetch_k)
+    # pv8-retrieval-validator (why-v7 RT-02/03/04, TEMPORAL-01/02); every default keeps the old behaviour.
+    "RETRIEVAL_PERIOD_POOL": 0,       # >0: candidates per period sent to the reranker (total cap 60); 0: max(depth // n, 4)
+    "RETRIEVAL_PERIOD_FOCUS_RERANK": 0,  # 1: rerank each period's pool against its period-focused query
+    "RETRIEVAL_YEAR_FILTER_KEEP": 0,  # K>0: top-K unfiltered hits stay inside the rerank window under the auto year filter
+    "RETRIEVAL_YEAR_REF_SKIP": 0,     # 1: reference years ("since 1990", "end of 2001") do not set the auto year filter
+    "VALIDATOR_SPLIT_V2": 0,          # 1: split_claims makes no part under 3 content tokens
+    "VALIDATOR_VERBATIM_KEEP": 0,     # 1: keep a sentence that is a verbatim span (>= 6 tokens) of its cited passage
+    "LLM_PASSAGE_MAX_CHARS": LLM_PASSAGE_MAX_CHARS,  # per-passage char cap of the served context (call-time copy)
 }
 
 
