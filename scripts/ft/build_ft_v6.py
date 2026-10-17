@@ -1,21 +1,26 @@
-"""ft_v6 generator: completeness training data (many-obligation questions, verbatim multi-sentence targets) for a retrained 7B.
+"""ft_v6 / ft_v7 generator: completeness training data (many-obligation questions, verbatim multi-sentence targets) for a retrained 7B.
 
 Three stages (VECTOR_BACKEND=faiss HF_HUB_OFFLINE=1 PYTHON_DOTENV_DISABLED=1, LLM_MODEL_PATH / LLM_CONTEXT_PASSAGES unset):
-  PY scripts/ft/build_ft_v6.py plan --n 2600 --seed 7 --out data/ft_v6/jobs.jsonl         # no LLM: sample jobs + the exact teacher messages
+  PY scripts/ft/build_ft_v6.py plan --n 2600 --seed 7 --out data/ft_v7/jobs.jsonl [--exclude-ids-file heldout_v9_ids.json]   # no LLM: jobs + the exact teacher messages
   (teacher: Kaggle kernel reads jobs.jsonl, writes teacher_out.jsonl -- see the pv7/kaggle-teacher kit)
-  PY scripts/ft/build_ft_v6.py assemble --jobs data/ft_v6/jobs.jsonl --teacher teacher_out.jsonl   # no LLM: rows, checks, splits, manifest
+  PY scripts/ft/build_ft_v6.py assemble --jobs data/ft_v7/jobs.jsonl --teacher teacher_out.jsonl --passages-mix 8,12,16,16,16,16 \
+     --position-mix natural,serving,uniform=0.5,0.3,0.2 --strict-context --exclude-ids-file heldout_v9_ids.json                # no LLM: rows, checks, splits, manifest
   PY scripts/ft/build_ft_v6.py teach-local --pilot 20 [--kinds multipart,refusal] [--max-minutes M]   # today's MLX path (small smoke runs)
-  PY scripts/ft/build_ft_v6.py teach-local [--target 1760] [--max-minutes M]                          # resumable local run -> data/ft_v6/{train,valid}.jsonl
-  PY scripts/ft/build_ft_v6.py verify data/ft_v6/pilot.jsonl                                           # offline re-check of every row (old `--verify` still works)
+  PY scripts/ft/build_ft_v6.py verify data/ft_v7/train.jsonl                                           # offline re-check of every row (old `--verify` still works)
+  PY scripts/ft/ft_v7_audit.py --dir data/ft_v6                                                         # how many rows of a set each ft_v7 rule would drop
 
 Design (differs from round5, whose teacher WROTE the answer and lost 60-75% of its rows to validator/paraphrase rejects):
-  * The 14B teacher only WRITES THE QUESTION and says which passage sentences answer each part (3-5 parts; 1-2 adjacent sentences each).
-  * The target is built deterministically: those sentences verbatim, one part after another, each sentence ending with its [n],
-    numbered against the SERVING context (real hybrid retrieval, 8 passages, prompt version PROMPT_VERSION). A source passage the retrieval did
-    not serve is put into a random slot replacing a served passage; this is recorded in `injected`.
-  * Jobs come from Berkshire passages (corpus v3) that are not gold/relevant (+-1 neighbour) in any spent evaluation set; partnership
-    passages (bpl*) are never used as sources and a row whose SERVED context holds one is rejected (counted in the manifest).
-    Spent-set passages may still appear in the served context as distractors (only sources are excluded; --strict-context rejects them).
+  * The 32B teacher only WRITES THE QUESTION and says which passage sentences answer each part; the target is built deterministically: those
+    sentences verbatim, one part after another, each ending with its [n]. [n] is the LOWEST-numbered served passage of which the sentence is a
+    complete sentence (ft_v7_checks.lowest_holder); a source the retrieval did not serve is injected into a random slot (`injected`).
+  * ft_v7 kinds: multipart (EXACTLY 4 or 5 parts), cross_letter (4-5 parts, two letters), single, follow_up, temporal (one year), comparison
+    (two letters; ONE ROW PER PERIOD CALL, built with compare.period_question exactly as /ask serves it), refusal (templates + teacher
+    'adjacent'), refusal_near (the subject is in the letters, the asked detail is not), partial (verbatim answered parts + ONE gap line).
+  * Every target must survive /ask's postprocess: complete sentence of its cited passage, understandable alone, `validate_and_filter_answer`
+    drops nothing, answer_expand can locate it (check_row; the audit script counts what that does to an existing set).
+  * Jobs come from Berkshire passages (corpus v3) that are not gold/relevant (+-1 neighbour) in any spent evaluation set, so are the extra
+    --exclude-ids(-file) ids; all letters of a job lie on one side of the train/valid split. A row whose SERVED context holds a partnership
+    passage (bpl*) is rejected; --strict-context also rejects served spent-set passages (every kind).
 """
 from __future__ import annotations
 

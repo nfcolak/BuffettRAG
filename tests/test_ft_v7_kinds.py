@@ -441,3 +441,27 @@ def test_comparison_rows_have_their_own_ids_and_sources_and_cite_every_line(tmp_
     for row in rows:
         target = row['messages'][2]['content']
         assert target.count('\n') == 1 and all(line.endswith(']') for line in target.split('\n'))
+
+
+# ------------------------------------------------------------------ exact-N multipart and cross_letter assemble into rows that pass check_row
+def test_exact_n_multipart_and_cross_letter_jobs_assemble_into_valid_rows(tmp_path):
+    d5, obj5 = numbered(5)
+    gen = generator({'1995_p0001': d5}, tmp_path, recorded={'v7:multipart:train:0001': {'raw': json.dumps(obj5), 'calls': 1}})
+    job = {'id': 'v7:multipart:train:0001', 'kind': 'multipart', 'split': 'train', 'source_ids': ['1995_p0001'], 'parts_range': [5, 5]}
+    row, reason = gen._attempt(job, {'k': 8, 'teacher_calls': 0})
+    assert reason is None, reason
+    assert len(row['obligations']) == 5 and row['messages'][2]['content'].count('\n') == 4 and B.check_row(row) == []
+    wrong = generator({'1995_p0001': d5}, tmp_path / 'w', recorded={'v7:multipart:train:0001': {'raw': json.dumps(obj5), 'calls': 1}})
+    assert wrong._attempt(dict(job, parts_range=[4, 4]), {'k': 8, 'teacher_calls': 0})[1] == 'parts_count'
+
+    a = doc('1990_p0001', [f'Berkshire reported distinct fact number {i} about its insurance business in 1990 clearly.' for i in range(1, 5)], 1990)
+    b = doc('1995_p0001', [f'Berkshire reported distinct fact number {i} about its shoe business in 1995 clearly.' for i in range(1, 5)], 1995)
+    question = 'What did Berkshire report about insurance business facts, about shoe business facts, and about the other distinct results it kept?'
+    raw = {'question': question, 'parts': [{'ask': 'a', 'passage': 1, 'sentences': [1]}, {'ask': 'b', 'passage': 1, 'sentences': [3]},
+                                           {'ask': 'c', 'passage': 2, 'sentences': [1]}, {'ask': 'd', 'passage': 2, 'sentences': [3]}]}
+    gen = generator({'1990_p0001': a, '1995_p0001': b}, tmp_path / 'x', recorded={'v7:cross_letter:train:0001': {'raw': json.dumps(raw), 'calls': 1}})
+    cross = {'id': 'v7:cross_letter:train:0001', 'kind': 'cross_letter', 'split': 'train', 'source_ids': ['1990_p0001', '1995_p0001'], 'parts_range': [4, 4]}
+    row, reason = gen._attempt(cross, {'k': 8, 'teacher_calls': 0})
+    assert reason is None, reason
+    assert {p['year'] for p in row['parts']} == {1990, 1995} and len(row['injected']) == 2 and B.check_row(row) == []
+    assert B.split_problem(dict(row, split='train'), {1990}) == 'split_straddle'
