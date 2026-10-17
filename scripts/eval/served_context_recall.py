@@ -44,7 +44,6 @@ CASE_FILES = {
     "heldout_v6a": "heldout_v6/answer_benchmark_heldout_v6_a.json",
     "heldout_v6b": "heldout_v6/answer_benchmark_heldout_v6_b.json",
     "dev_cases": "grounded_dev_v1/confirm/dev_cases.json",
-    "devpl": "devpl/devpl.json",  # partnership letters 1957-1970 (corpus v5_pl)
 }
 HARD_NEGATIVES = "hard_negatives_v4/hard_negatives_v4.json"
 STORED_V6 = Path("/Users/necatifurkancolak/AI-Workplace/Artifacts/BuffettRAG/fix-v6/runs")
@@ -56,7 +55,7 @@ LONG_CTX_ANSWER_TOKENS = 1024  # configs that set MAX_NEW_TOKENS keep this many 
 BASELINE_ENV = {"LLM_CONTEXT_PASSAGES": "8", "LLM_N_CTX": "8192", "RERANK_CANDIDATES": "15",
                 "RETRIEVAL_QUERY_STRIP": "0", "RETRIEVAL_YEAR_FILTER_MIN": "1970"}
 HARNESS_KEYS = ("MAX_NEW_TOKENS",)  # per-config keys that are request fields, not environment variables
-SPLIT_CORPUS = ("chunks_v5_pl.jsonl", "faiss_v5_pl")  # active corpus of main (v3 + partnership letters)
+SPLIT_CORPUS = ("chunks_v3_paragraph.jsonl", "faiss_v3")  # active corpus of main (Berkshire letters 1977-2024)
 RANK_DEPTH = 200
 RERANK_DIAG_DEPTH = 50  # fused candidates re-ranked by the cross-encoder in the miss analysis
 
@@ -460,16 +459,12 @@ def report(out: Path, final: str, base_name: str = "baseline", notes: str = "", 
             continue
         comp = paired_bootstrap(base["rows"], res["rows"])
         comp["merged"] = paired_bootstrap(base["rows"], res["rows"], "merged_ids")
-        dev = [i for i, r in enumerate(base["rows"]) if r["set"] == "devpl"]
-        comp["devpl"] = paired_bootstrap([base["rows"][i] for i in dev], [res["rows"][i] for i in dev]) if dev else None
         b, c = summary[base_name], summary[name]
         type_drops = {t: c["per_type"][t]["claim_recall"] - b["per_type"][t]["claim_recall"] for t in b["per_type"]}
         comp["type_deltas"] = type_drops
         comp["gate"] = {
             "ci_lower_gt_0": comp["ci95"][0] > 0,
             "hard_negatives_not_lower": c["hard_negatives_passed"] >= b["hard_negatives_passed"],
-            "devpl_not_lower": (c["per_set"].get("devpl", {}).get("claim_recall") or 0)
-            >= (b["per_set"].get("devpl", {}).get("claim_recall") or 0),
             "no_type_drop_gt_0.02": all(d >= -0.02 for d in type_drops.values()),
             "prompt_fits_n_ctx": c["n_ctx_ok"],
         }
@@ -493,7 +488,7 @@ def _pct(x: Optional[float]) -> str:
 def render_markdown(p: Dict[str, Any]) -> str:
     s, comps, base = p["summary"], p["vs_baseline"], p["baseline"]
     names = list(s)
-    lines = ["# Retrieval dev v8: served-context recall (corpus v5_pl, pool incl. devpl)", "",
+    lines = ["# Served-context recall (corpus v3, Berkshire letters 1977-2024)", "",
              "Claim-level served recall = share of gold claims whose `gold_passage_ids` hit the ids of the passages "
              "placed in the 7B prompt (the `hits` list of /ask). Pool: answerable cases of heldout_v3..v6 and "
              "dev_cases (all spent). Secondary column: ids merged into a served passage as neighbour text.", ""]
@@ -517,16 +512,6 @@ def render_markdown(p: Dict[str, Any]) -> str:
                      f"{_pct(a['claim_recall_merged'])} | {_pct(a['case_any_gold'])} | "
                      f"{s[n]['hard_negatives_passed']}/{s[n]['hard_negatives_n']} | {s[n]['latency_p50_ms']:.0f} | "
                      f"{s[n]['prompt_tokens_max']} | {gate} |")
-    lines += ["", "## devpl only (claim recall, paired bootstrap on the devpl claims)", "",
-              "| config | claims served | claim recall % | delta pp | CI95 pp |", "|---|---|---|---|---|"]
-    for n in names:
-        a = s[n]["per_set"].get("devpl")
-        if not a:
-            continue
-        c = (comps.get(n) or {}).get("devpl")
-        lines.append(f"| {n} | {a['claims_served']}/{a['claims']} | {_pct(a['claim_recall'])} | "
-                     + ("" if c is None else f"{100 * c['delta']:+.2f} | [{100 * c['ci95'][0]:+.2f}, {100 * c['ci95'][1]:+.2f}]") + " |"
-                     + ("" if c is not None else " |"))
     lines += ["", "## Per set (claim recall %)", "", "| config | " + " | ".join(s[base]["per_set"]) + " |",
               "|" + "---|" * (len(s[base]["per_set"]) + 1)]
     for n in names:

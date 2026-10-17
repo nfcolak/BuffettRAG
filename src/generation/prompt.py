@@ -124,7 +124,11 @@ def _make_system_prompt_v2() -> str:
 
 
 SYSTEM_PROMPT_V2 = _make_system_prompt_v2()
-PROMPT_VERSIONS = {"v1": SYSTEM_PROMPT, "v2": SYSTEM_PROMPT_V2}
+# Prompt version v3 (ft_v7 / FT-r4): v2 for the Berkshire-only corpus. The Buffett Partnership letters were removed
+# from the project, so the corpus line goes back to the v1 wording; coverage and tone lines stay as in v2.
+assert _V2_CORPUS in SYSTEM_PROMPT_V2
+SYSTEM_PROMPT_V3 = SYSTEM_PROMPT_V2.replace(_V2_CORPUS, _V1_CORPUS, 1)
+PROMPT_VERSIONS = {"v1": SYSTEM_PROMPT, "v2": SYSTEM_PROMPT_V2, "v3": SYSTEM_PROMPT_V3}
 
 
 def prompt_version() -> str:
