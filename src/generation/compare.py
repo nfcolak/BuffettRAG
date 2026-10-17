@@ -23,7 +23,9 @@ PERIOD_PASSAGES = 12
 SOFT_GATE_FLOOR = 0.15
 # A period whose call refused although its passages pass the evidence gate is asked once more with this many.
 RETRY_PASSAGES = 3
-_CLAUSE_SPLIT_RE = re.compile(r"[,;:?]|\s+(?:and|with|versus|vs\.?)\s+", re.IGNORECASE)
+# Sub-asks are split at punctuation or "and <wh-word>"; a bare "and" between years is never a boundary.
+_CLAUSE_SPLIT_RE = re.compile(r"[,;:?]|\s+and\s+(?=(?:how|what|why|which|when|where|who)\b)", re.IGNORECASE)
+_LINK = r"(?:compared?\s+(?:with|to|against)|and|or|versus|vs\.?|with|to|than|against)"
 # Closing quote + citation marker ends a sentence even without . ! ?
 _QUOTE_CITE_END_RE = re.compile(r"([\"\u201d\u2019']\s*(?:\[\d+(?:\s*,\s*\d+)*\])+)[ \t]+(?=[A-Z0-9\"\u201c(])")
 
@@ -32,36 +34,72 @@ def comparison_periods(query: str, history=None) -> List[Dict[str, Any]]:
     return detect_temporal_comparison(query, history) or []
 
 
+def _drop_year(text: str, year: int, own: int) -> str:
+    """Remove another period's year and the words that tie it to ``own`` ("compared with his 2003 letter")."""
+    y = str(year)
+    text = re.sub(rf"\s+{_LINK}\s+(?:in\s+)?(?:his|her|the|its|[A-Z]\w+'s)\s+{y}(?:\s+letters?)?\b", "", text)
+    text = re.sub(rf"\s+{_LINK}\s+(?:in\s+)?{y}\b", "", text)
+    text = re.sub(rf"\b{y}(?:\s+letters?)?\s*,?\s*{_LINK}\s+(?:(?:in|his|her|the|its)\s+)*(?={own}\b)", "", text)
+    return re.sub(rf"\b{y}\b", " ", text)
+
+
 def period_focused_query(query: str, period: Dict[str, Any], periods: Sequence[Dict[str, Any]]) -> str:
     """The question minus the sub-ask and year tokens that belong to the OTHER periods.
 
-    The query is cut into clauses; a clause that names only other periods is
-    dropped. A clause with no content words of its own ("... 2008 and 2020")
-    stays attached to the previous clause, so a shared stem is never lost.
+    The query is cut into sub-asks (punctuation, "and how/what ..."); a sub-ask that names only other
+    periods is dropped. A piece with no content words of its own ("... 2008 and 2020") stays attached
+    to the previous clause, so a shared stem is never lost. Kept sub-asks are re-joined with their
+    original separators (", and" where one between them was dropped), the other periods' years go
+    together with the link words that tie them in ("compared with his 2003 letter"), and the result
+    is still a full question.
     """
-    pieces, last = [], 0
+    pieces, seps, last = [], [], 0
     for match in _CLAUSE_SPLIT_RE.finditer(query):
         pieces.append(query[last:match.start()])
+        seps.append(match.group())
         last = match.end()
     pieces.append(query[last:])
-    clauses: List[str] = []
-    for piece in pieces:
-        if clauses and not content_words(re.sub(r"\b(?:19|20)\d{2}s?\b", " ", piece)):
-            clauses[-1] += " " + piece
+    seps.append("")
+    clauses: List[List[str]] = []  # [text, separator before it]
+    before = ""
+    for index, piece in enumerate(pieces):
+        if clauses and piece.strip() and not content_words(re.sub(r"\b(?:19|20)\d{2}s?\b", " ", piece)):
+            clauses[-1][0] += before + piece
         elif piece.strip():
-            clauses.append(piece)
-    kept = []
-    for clause in clauses:
+            clauses.append([piece, before])
+        before = (before + seps[index]) if not piece.strip() else seps[index]
+    own = period["year"]
+    text, adjacent = "", True
+    for clause, sep in clauses:
         named = explicit_periods(clause)
         if named and period not in named:
+            adjacent = False
             continue
-        kept.append(clause)
-    others = [p for p in periods if p != period]
-    text = " ".join(kept)
-    for other in others:
-        if isinstance(other["year"], int):
-            text = re.sub(rf"\b{other['year']}\b", " ", text)
-    return re.sub(r"\s+", " ", text).strip() or query
+        if text:
+            if not adjacent:
+                sep = ", and" if re.search(r"\band\b", sep, re.IGNORECASE) else ","
+            sep = sep.strip() or ","
+            text += (sep if sep[0] in ",;:" else " " + sep) + " "
+        text += clause.strip()
+        adjacent = True
+    for other in periods:
+        if other != period and isinstance(other["year"], int):
+            text = _drop_year(text, other["year"], own) if isinstance(own, int) else re.sub(
+                rf"\b{other['year']}\b", " ", text)
+    text = re.sub(r"\bbetween\s+((?:the|his|her|its)\s+)?(?=(?:19|20)\d{2}\b)", r"in \1", text)
+    if len(content_words(text)) < 3 <= len(content_words(query)):
+        text = query  # the kept sub-ask is a stub (a table-row list of years): keep the whole ask, other years removed
+        for other in periods:
+            if other != period and isinstance(other["year"], int):
+                text = _drop_year(text, other["year"], own) if isinstance(own, int) else text
+    text = re.sub(r"\s+", " ", text).strip()
+    text = re.sub(r"^compare\s+", "", text, flags=re.IGNORECASE)
+    text = re.sub(r"\b(?:in|since|from|and|with|versus|vs|to|than)\s*(?=[,;:?]|$)", "", text)
+    text = re.sub(r"\s+([,;:?])", r"\1", text).strip(" ,;:?")
+    if not text:
+        return query
+    text = text[0].upper() + text[1:]
+    return text + "?" if query.rstrip().endswith("?") else text
 
 
 def _soft_gate() -> bool:
