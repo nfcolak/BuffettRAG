@@ -1229,9 +1229,25 @@ def k_histogram(rows):
     return {str(k): n for k, n in sorted(Counter(r.get('k') or DEFAULT_PASSAGES for r in rows).items())}
 
 
-def manifest_for(out, rows, attempts, counts, identity, seconds, target, max_seq=MAX_SEQ, mix=None):
+def rank_histogram(rows):
+    """Where the first cited passage of an answerable row sits in its prompt (PD-01 serving: 1 = 52.6%, 2-3 = 29%, 4-8 = 11.5%, 9+ = 6.7%)."""
+    out = Counter()
+    for row in rows:
+        slots = [n for used in row.get('slots') or [] for n in used]
+        if slots:
+            first = min(slots)
+            out['1' if first == 1 else '2-3' if first <= 3 else '4-8' if first <= 8 else '9+'] += 1
+    total = sum(out.values())
+    return {k: {'rows': out[k], 'share': round(out[k] / total, 3)} for k in ('1', '2-3', '4-8', '9+') if out[k]}
+
+
+def manifest_for(out, rows, attempts, counts, identity, seconds, target, max_seq=MAX_SEQ, mix=None, position_mix=None):
     by_kind, kept_total = summarize(attempts, rows, seconds)
+    answered = [r for r in rows if r['type'] == 'answerable']
     return {**identity, 'prompt_version': PROMPT_VERSION, 'max_seq': max_seq, 'passages_mix': list(mix or [DEFAULT_PASSAGES]), 'k_histogram': k_histogram(rows),
+            'position_mix': position_mix, 'position_modes': dict(Counter(r['position_mode'] for r in rows if r.get('position_mode'))),
+            'source_rank_histogram': rank_histogram(rows),
+            'parts_per_row': {str(n): c for n, c in sorted(Counter(len(r['obligations']) for r in answered).items())},
             'target_rows': target, 'exclusion_counts': counts,
             'row_counts_per_kind': {k: sum(r['kind'] == k for r in rows) for k in KINDS},
             'counts_per_split_kind': {s: dict(Counter(r['kind'] for r in rows if r['split'] == s)) for s in ('train', 'valid')},
@@ -1272,6 +1288,20 @@ def read_id_file(path):
     except json.JSONDecodeError:
         pass
     return {line.strip() for line in text.splitlines() if line.strip() and not line.startswith('#')}
+
+
+def raw_exclusion_ids(args):
+    """Ids from --exclude-ids (a comma-separated list, or a file path as before) and --exclude-ids-file (a JSON list or one id per line)."""
+    ids = set()
+    value = getattr(args, 'exclude_ids', None)
+    if value:
+        ids |= read_id_file(value) if os.path.isfile(value) else C.parse_id_list(value)
+    return ids | read_id_file(getattr(args, 'exclude_ids_file', None))
+
+
+def extra_exclusions(args, full):
+    """The extra excluded ids with their +-1 chunk neighbours, exactly like the built-in evaluation sets (ASM-07, B15)."""
+    return C.with_neighbours(raw_exclusion_ids(args), full)
 
 
 def teacher_messages(job, docs):
@@ -1333,7 +1363,7 @@ def smoke_jobs(jobs, per_kind=6):
 
 
 def plan_command(args):
-    jobs, counts = plan_jobs(args.n, args.seed, read_id_file(args.exclude_ids))
+    jobs, counts = plan_jobs(args.n, args.seed, raw_exclusion_ids(args))
     write_jsonl_file(args.out, jobs)
     by_kind = Counter(j['kind'] for j in jobs)
     tokens = [j['prompt_tokens'] for j in jobs if j['prompt_tokens']]
@@ -1379,13 +1409,18 @@ class RecordedGenerator(Generator):
 def assemble_command(args):
     if (Path(args.out_dir) / 'train.jsonl').exists() and not args.force:   # data/ft_v6 is what FT-r3 was trained on: never overwrite
         raise SystemExit(f'{args.out_dir}/train.jsonl exists; pick a new --out-dir or pass --force')
+    global QUESTION_OVERLAP_MAX
     os.environ['PROMPT_VERSION'] = PROMPT_VERSION
     mix = parse_passages_mix(args.passages_mix)       # every row serves with its own LLM_CONTEXT_PASSAGES (no flag: 8, as before)
+    position_mix = C.parse_position_mix(args.position_mix)
     max_seq = args.max_seq or (MAX_SEQ_MIX if args.passages_mix else MAX_SEQ)
+    if getattr(args, 'question_overlap_max', None) is not None:
+        QUESTION_OVERLAP_MAX = args.question_overlap_max
     jobs_path, teacher_path = Path(args.jobs), Path(args.teacher)
     jobs, recorded = read_jsonl_file(jobs_path), read_teacher_output(teacher_path)
+    require_known_kinds(jobs)                          # a kind this builder does not know used to be skipped without a trace
     full, excluded, counts, valid_years, identity = load_inputs(KAGGLE_TEACHER)
-    extra = read_id_file(args.exclude_ids)
+    extra = extra_exclusions(args, full)
     excluded = excluded | extra
     counts.update(extra_exclude_ids=len(extra), with_neighbours=len(excluded))
     wrong = {j['identity']['corpus_sha256'] for j in jobs if j.get('identity')} - {identity['corpus_sha256']}
@@ -1399,33 +1434,51 @@ def assemble_command(args):
     for name in ('examples.jsonl', 'example_attempts.jsonl'):        # assemble is a pure function of its inputs: no resume state
         (work / name).unlink(missing_ok=True)
     _, count_tokens = round4.token_counter(DEFAULT_TEACHER)
-    generator = RecordedGenerator(recorded, round5.load_serving(), full, excluded, work, count_tokens, max_seq, args.strict_context, mix)
+    generator = RecordedGenerator(recorded, round5.load_serving(), full, excluded, work, count_tokens, max_seq, args.strict_context, mix,
+                                  position_mix, valid_years)
     quotas = quotas_for(args.target) if args.target else None
     started = time.monotonic()
     for index, job in enumerate(jobs, 1):
         key = (job['kind'], job['split'])
-        if job['kind'] not in KINDS:
-            continue
         if quotas is not None and sum(1 for a in generator.attempts if a['kept'] and (a['kind'], a['split']) == key) >= quotas[key]:
             continue
         generator.attempt(job)
         if index % 100 == 0:
             print(f'assembled {index}/{len(jobs)} kept={len(generator.rows)}', flush=True)
+    dropped = check_over_length(generator.attempts, getattr(args, 'allow_drops', False))      # before anything is written: a short run must not look finished
     materialize(out, generator.rows)
     seconds = time.monotonic() - started
-    manifest = manifest_for(out, generator.rows, generator.attempts, counts, identity, seconds, args.target or len(jobs), max_seq, mix)
+    manifest = manifest_for(out, generator.rows, generator.attempts, counts, identity, seconds, args.target or len(jobs), max_seq, mix, position_mix)
     reasons = manifest['rejection_reasons']
     manifest.update(jobs=len(jobs), jobs_per_kind=dict(Counter(j['kind'] for j in jobs)), teacher_records=len(recorded),
                     teacher_jobs_without_output=sum(1 for j in jobs if j.get('needs_teacher') and j['id'] not in recorded),
                     partnership_rejected=sum(reasons.get(r, 0) for r in PARTNERSHIP_REASONS),
                     spent_set_distractor_rows=sum(1 for r in generator.rows if set(r['context_passage_ids']) & excluded),
-                    strict_context=bool(args.strict_context))
+                    strict_context=bool(args.strict_context), over_length_drops=dropped, question_overlap_max=QUESTION_OVERLAP_MAX,
+                    quota_shortfalls=quota_shortfalls(manifest, quotas, jobs))
     common.atomic_json(out / 'manifest.json', manifest)
     kept = manifest['row_counts_per_kind']
     print('kept rows per kind: ' + ' '.join(f'{k}={kept[k]}' for k in KINDS) + f' total={sum(kept.values())} of jobs={len(jobs)}')
     print(f'rejected: {reasons}')
+    print(f'parts per row: {manifest["parts_per_row"]} source rank: {manifest["source_rank_histogram"]} position modes: {manifest["position_modes"]}')
     print(f'partnership_rejected={manifest["partnership_rejected"]} spent_set_distractor_rows={manifest["spent_set_distractor_rows"]} -> {out}/{{train,valid}}.jsonl, manifest.json')
+    if manifest['quota_shortfalls']:
+        print(f"WARNING kinds below 80% of their job quota: {manifest['quota_shortfalls']}")
     check_refusal_share(generator.rows, args.min_refusal_share)
+    check_partial_share(generator.rows, getattr(args, 'min_partial_share', 0))
+
+
+def quota_shortfalls(manifest, quotas, jobs):
+    """{kind: [kept jobs, quota]} for every kind in the jobs file that kept under 80% of its quota (ASM-04)."""
+    if quotas is None:
+        return {}
+    present = {j['kind'] for j in jobs}
+    out = {}
+    for kind in KINDS:
+        need = quotas[(kind, 'train')] + quotas[(kind, 'valid')]
+        if kind in present and manifest['by_kind'][kind]['kept'] < .8 * need:
+            out[kind] = [manifest['by_kind'][kind]['kept'], need]
+    return out
 
 
 def check_over_length(attempts, allow):
@@ -1440,11 +1493,19 @@ def check_over_length(attempts, allow):
 
 
 def check_refusal_share(rows, minimum):
-    """Fail loudly when refusals collapse (a too-strict term check once cut them from 17% to 2% without any error)."""
-    share = sum(r['kind'] == 'refusal' for r in rows) / max(len(rows), 1)
+    """Fail loudly when refusals collapse (a too-strict term check once cut them from 17% to 2% without any error). refusal + refusal_near."""
+    share = sum(r['kind'] in ('refusal', 'refusal_near') for r in rows) / max(len(rows), 1)
     print(f'refusal share {share:.3f} (minimum {minimum})')
     if share < minimum:
         raise SystemExit(f'refusal share {share:.3f} is below {minimum}; check the refusal term filter before training')
+
+
+def check_partial_share(rows, minimum):
+    """The partial rows are the only examples of a gap line (SHARE asks for ~5%); too few means the model never learns it."""
+    share = sum(r['kind'] == 'partial' for r in rows) / max(len(rows), 1)
+    print(f'partial share {share:.3f} (minimum {minimum})')
+    if share < minimum:
+        raise SystemExit(f'partial share {share:.3f} is below {minimum}; check the partial jobs before training')
 
 
 # ------------------------------------------------------------------ run / verify
@@ -1452,10 +1513,11 @@ def verify(path):
     rows = [json.loads(line) for line in Path(path).read_text().splitlines() if line.strip()]
     full = {d.id: d for d in common.load_chunks_as_docs(common.CORPUS)}
     excluded, _ = exclusion_sets(full)
+    valid_years = valid_years_of(full.values())
     _, counter = round4.token_counter(DEFAULT_TEACHER)
     bad = []
     for row in rows:
-        problems = check_row(row, excluded=excluded, count_tokens=counter)
+        problems = check_row(row, excluded=excluded, count_tokens=counter, valid_years=valid_years)
         if row.get('kind') not in KINDS:
             problems.append('unknown_kind')
         if problems:
@@ -1467,12 +1529,17 @@ def verify(path):
     print(f'OK rows={len(rows)}')
 
 
+def valid_years_of(docs):
+    """The 5 letter years of the valid split (seeded sample of the Berkshire letter years)."""
+    years = sorted({int(d.metadata['year']) for d in docs if BERKSHIRE_ID.match(d.id)})
+    return set(random.Random(common.SEED).sample(years, 5))
+
+
 def load_inputs(teacher_path):
     docs = common.load_chunks_as_docs(common.CORPUS)
     full = {d.id: d for d in docs}
     excluded, counts = exclusion_sets(full)
-    years = sorted({int(d.metadata['year']) for d in docs if BERKSHIRE_ID.match(d.id)})
-    valid_years = set(random.Random(common.SEED).sample(years, 5))
+    valid_years = valid_years_of(docs)
     identity = {'corpus_sha256': common.sha(common.CORPUS.read_bytes()), 'teacher': str(teacher_path), 'teacher_license': 'Apache-2.0 (open weights)',
                 'seed': common.SEED, 'valid_years': sorted(valid_years)}
     return full, excluded, counts, valid_years, identity
@@ -1574,7 +1641,8 @@ def main(argv=None):
     p.add_argument('--out', required=True, help='jobs file (.jsonl or .jsonl.gz)')
     p.add_argument('--smoke-out', help='also write a small smoke file (first --smoke-per-kind teacher jobs of each kind)')
     p.add_argument('--smoke-per-kind', type=int, default=6)
-    p.add_argument('--exclude-ids', help='file of extra passage ids (JSON list or one per line) that must not be sources')
+    p.add_argument('--exclude-ids', help='extra passage ids that must not be sources: comma-separated (or a file path, as before); +-1 neighbours are excluded too')
+    p.add_argument('--exclude-ids-file', help='file of extra passage ids (a JSON list or one id per line), e.g. the heldout_v9 gold/relevant ids; +-1 neighbours too')
 
     t = sub.add_parser('teach-local', help="today's MLX teacher path (pilot / small runs)")
     t.add_argument('--pilot', type=int, metavar='N', help='attempt N jobs per kind into data/ft_v6/pilot_run (+ pilot.jsonl, pilot_manifest.json)')
@@ -1590,12 +1658,18 @@ def main(argv=None):
     a.add_argument('--teacher', required=True, help='teacher_out.jsonl written by the Kaggle kernel')
     a.add_argument('--out-dir', default=OUT_DIR, help=f'writes train.jsonl, valid.jsonl, split_metadata.jsonl, manifest.json here (default {OUT_DIR})')
     a.add_argument('--target', type=int, help='cap kept rows per (kind, split) at the quotas of this total (default: keep all)')
-    a.add_argument('--exclude-ids', help='file of extra passage ids that must not be sources (spent sets not on this branch)')
+    a.add_argument('--exclude-ids', help='extra passage ids that must not be sources: comma-separated (or a file path, as before); +-1 neighbours are excluded too')
+    a.add_argument('--exclude-ids-file', help='file of extra passage ids (a JSON list or one id per line), e.g. the heldout_v9 ids; +-1 neighbours too')
+    a.add_argument('--position-mix', help='source position per row, e.g. natural,serving,uniform=0.5,0.3,0.2 (natural: retrieval order; serving: the measured gold-rank '
+                                          'distribution; uniform: any slot); default: natural for every row')
+    a.add_argument('--allow-drops', action='store_true', help='do not fail when rows are dropped for exceeding --max-seq (they are listed either way)')
+    a.add_argument('--question-overlap-max', type=float, help=f'reject a question sharing more than this fraction of its content words with the source passages (default {QUESTION_OVERLAP_MAX})')
+    a.add_argument('--min-partial-share', type=float, default=MIN_PARTIAL_SHARE, help=f'exit non-zero when partial rows are below this share of kept rows (default {MIN_PARTIAL_SHARE}; 0 = off)')
     a.add_argument('--strict-context', action='store_true', help='also reject rows whose served context holds an excluded (spent-set) passage')
     a.add_argument('--passages-mix', help='served context sizes, e.g. 8,12,16: each row picks one by a hash of its job id (default: 8 for every row)')
     a.add_argument('--force', action='store_true', help='overwrite an existing --out-dir')
     a.add_argument('--min-refusal-share', type=float, default=MIN_REFUSAL_SHARE,
-                   help=f'exit non-zero when refusal rows are below this share of kept rows (default {MIN_REFUSAL_SHARE}; 0 = off)')
+                   help=f'exit non-zero when refusal + refusal_near rows are below this share of kept rows (default {MIN_REFUSAL_SHARE}; 0 = off)')
     a.add_argument('--max-seq', type=int, help=f'reject rows longer than this many tokens (default {MAX_SEQ}; {MAX_SEQ_MIX} with --passages-mix)')
 
     v = sub.add_parser('verify', help='offline re-check of every row of a generated jsonl')
