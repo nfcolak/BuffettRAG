@@ -161,7 +161,9 @@ LLM_PASSAGE_MAX_CHARS = int(os.getenv("LLM_PASSAGE_MAX_CHARS", "1800"))
 # answer sentence that is a verbatim span of its cited passage. 0/0 = off. Read from the environment at call time.
 ANSWER_NEIGHBOR_AFTER = int(os.getenv("ANSWER_NEIGHBOR_AFTER", "0"))
 ANSWER_NEIGHBOR_BEFORE = int(os.getenv("ANSWER_NEIGHBOR_BEFORE", "0"))
-ANSWER_MAX_SENTENCES = int(os.getenv("ANSWER_MAX_SENTENCES", "12"))
+ANSWER_MAX_SENTENCES = int(os.getenv("ANSWER_MAX_SENTENCES", "12"))  # a model answer this long is not expanded
+# Cap on the expanded answer (a separate budget, so a long cited answer does not starve the later parts); 0 = max(12, 4 x raw sentences).
+ANSWER_EXPANDED_MAX_SENTENCES = int(os.getenv("ANSWER_EXPANDED_MAX_SENTENCES", "12"))
 # Retry once with the top 3 passages when the soft evidence gate let evidence through and the model still refused.
 ANSWER_REFUSAL_RETRY = os.getenv("ANSWER_REFUSAL_RETRY", "1")
 
