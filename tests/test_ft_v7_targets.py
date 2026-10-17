@@ -51,7 +51,7 @@ def plan_obj(**over):
 def make_row(target=None, passages=None, kind='multipart', obligations=None):
     source = doc('1995_p0001', S)
     hits = passages or [hit('1990_p0001', ['Unrelated words fill this other passage for the test.']), hit('1995_p0001', S)]
-    plan = B.validate_plan(plan_obj(), 'multipart', [source])[1]
+    plan = B.validate_plan(plan_obj(), 'temporal', [source])[1]
     target = target or B.build_target(plan['obligations'], hits)[0]
     messages = B.chat_messages(plan['question'], hits) + [{'role': 'assistant', 'content': target}]
     obligations = obligations or [{k: o[k] for k in ('ask', 'source_id', 'sentence_numbers', 'sentences')} for o in plan['obligations']]
@@ -78,7 +78,7 @@ def test_connective_first_sentence_is_rejected_when_nothing_precedes_it():
     sentences = ['Therefore, the buyback was funded from retained earnings of the insurance operations.'] + S[1:]
     d = doc('1995_p0001', sentences)
     obj = plan_obj(parts=[{'ask': 'a', 'passage': 1, 'sentences': [1]}, {'ask': 'b', 'passage': 1, 'sentences': [4]}, {'ask': 'c', 'passage': 1, 'sentences': [5]}])
-    assert B.validate_plan(obj, 'multipart', [d])[0] == 'dependent_start'
+    assert B.validate_plan(obj, 'temporal', [d])[0] == 'dependent_start'
 
 
 def test_fragment_without_terminal_punctuation_is_bad():
@@ -92,18 +92,18 @@ def test_obligation_must_have_eight_words():
     short = ['Berkshire repurchased shares quickly.', 'Float reached 3.4 billion dollars at year end.']   # 4 words
     d = doc('1995_p0001', short + S[1:])
     obj = plan_obj(parts=[{'ask': 'a', 'passage': 1, 'sentences': [1]}, {'ask': 'b', 'passage': 1, 'sentences': [2]}, {'ask': 'c', 'passage': 1, 'sentences': [4]}])
-    reason, _ = B.validate_plan(obj, 'multipart', [d])
+    reason, _ = B.validate_plan(obj, 'temporal', [d])
     assert reason == 'sentence_too_short' or reason == 'obligation_too_short'
     five = ['Float reached 3.4 billion dollars.'] + S[1:]            # five words, passes the per-sentence minimum but not the 8 words per obligation
     d = doc('1995_p0001', five)
     obj = plan_obj(parts=[{'ask': 'a', 'passage': 1, 'sentences': [1]}, {'ask': 'b', 'passage': 1, 'sentences': [2]}, {'ask': 'c', 'passage': 1, 'sentences': [4]}])
-    assert B.validate_plan(obj, 'multipart', [d])[0] == 'obligation_too_short'
+    assert B.validate_plan(obj, 'temporal', [d])[0] == 'obligation_too_short'
 
 
 def test_check_row_requires_the_target_sentence_to_be_a_whole_sentence_of_the_cited_passage():
     served = [hit('1990_p0001', ['Unrelated words fill this other passage for the test.']),
               hit('1995_p0001', ['Management said that ' + S[0]] + S[1:])]
-    plan = B.validate_plan(plan_obj(), 'multipart', [doc('1995_p0001', S)])[1]
+    plan = B.validate_plan(plan_obj(), 'temporal', [doc('1995_p0001', S)])[1]
     target = B.build_target(plan['obligations'], [hit('1990_p0001', ['x']), hit('1995_p0001', S)])[0]
     row = make_row(target=target, passages=served)    # in the prompt S[0] is only a substring of the first served sentence now
     problems = B.check_row(row)
@@ -115,7 +115,7 @@ def test_place_sources_injects_the_source_when_the_served_sentence_is_a_fragment
     source = doc('1995_p0001', S)
     served = [hit('1990_p0001', ['Management said that ' + S[0]] + S[1:])] + \
         [hit(f'1991_p{i:04d}', [f'Filler passage number {i} talks about nothing relevant at all here.']) for i in range(7)]
-    plan = B.validate_plan(plan_obj(), 'multipart', [source])[1]
+    plan = B.validate_plan(plan_obj(), 'temporal', [source])[1]
     import random
     placed, injected, error = B.place_sources(served, plan['obligations'], {'1995_p0001': source}, random.Random(1))
     assert error is None and [i['passage_id'] for i in injected] == ['1995_p0001']
@@ -158,7 +158,7 @@ def overlap_passages():
 
 def test_citation_is_the_lowest_numbered_passage_holding_the_whole_sentence():
     source = doc('1995_p0001', S)
-    plan = B.validate_plan(plan_obj(), 'multipart', [source])[1]
+    plan = B.validate_plan(plan_obj(), 'temporal', [source])[1]
     target, slots = B.build_target(plan['obligations'], overlap_passages())
     lines = target.split('\n')
     assert lines[0].endswith('[2]') and lines[1] == f'{S[3]} [1]' and lines[2] == f'{S[4]} [1]' and slots == [[2, 2], [1], [1]]

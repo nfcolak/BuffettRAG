@@ -98,7 +98,7 @@ def question_overlap(question, texts):
 MONTHS_DAYS = {'january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november',
                'december', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'}
 _NOT_NAMES = {'the', 'what', 'which', 'how', 'who', 'when', 'why', 'where', 'did', 'does', 'was', 'were', 'is', 'are', 'in', 'of',
-              'berkshire', 'buffett', 'hathaway', 'us', 'a', 'an'}
+              'berkshire', 'buffett', 'hathaway', 'us', 'a', 'an', 'ceo', 'cfo', 'coo', 'cio', 'gaap', 'sec', 'usa', 'inc', 'corp', 'chairman', 'president'}
 FUTURE_YEAR = re.compile(r'\b20(?:2[5-9]|[3-9]\d)\b')
 PRICE_TALK = re.compile(r'\b(?:crypto\w*|bitcoin|ethereum|dogecoin|solana|nft|closing price|stock price|share price|price per share|'
                         r'trading price|market price|ticker)\b', re.I)

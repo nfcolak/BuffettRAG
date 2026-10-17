@@ -40,6 +40,7 @@ import ft_v7_checks as C  # noqa: E402
 import round4  # noqa: E402
 import round5  # noqa: E402
 from src.evaluation.claim_validator import _split_original, evidence_sentences, validate_and_filter_answer  # noqa: E402
+from src.generation.compare import comparison_periods, period_label, period_question  # noqa: E402
 from src.generation.prompt import REFUSAL_LINE, build_cited_prompt, parse_citations, system_prompt  # noqa: E402
 from src.retrieval.context import truncate_around_anchor  # noqa: E402
 from src.storage import SearchHit  # noqa: E402
@@ -47,16 +48,28 @@ from src.storage import SearchHit  # noqa: E402
 ROOT = common.ROOT
 PROMPT_VERSION = 'v3'                # ft_v7 / FT-r4 (Berkshire-only corpus); ft_v6 rows carry 'v2' in their prompt_version field
 OUT_DIR = 'data/ft_v7'
-MIN_REFUSAL_SHARE = 0.12             # ft_v6 had 121/717 (17%); repo assemble once kept 19 (2%) because of a too-strict term check
+MIN_REFUSAL_SHARE = 0.15             # refusal + refusal_near share of kept rows (ft_v6 had 17%; a too-strict term check once left 2%)
+MIN_PARTIAL_SHARE = 0.03             # SHARE asks for 5%
 DEFAULT_TEACHER = round4.DEFAULT_TEACHER
 MAX_SEQ = 6144                       # colab/train_7b_lora.ipynb (8-passage rows)
 DEFAULT_PASSAGES = 8                 # served context size of the default (no --passages-mix) rows
-MAX_SEQ_MIX = 12288                  # row length cap with --passages-mix (colab/train_7b_lora_r3.ipynb cap)
-KINDS = ('multipart', 'single', 'follow_up', 'temporal', 'refusal')
-SHARE = {'multipart': .55, 'single': .10, 'follow_up': .10, 'temporal': .10, 'refusal': .15}
-PARTS = {'multipart': (3, 5), 'single': (2, 3), 'follow_up': (2, 3), 'temporal': (3, 5)}
-RUN_LEN = {'multipart': (2, 3), 'single': (1, 2), 'follow_up': (1, 2), 'temporal': (2, 3), 'refusal': (1, 1)}
-MIN_SENTENCES = {'multipart': 7, 'single': 3, 'follow_up': 5, 'temporal': 7}
+MAX_SEQ_MIX = 12288                  # row length cap with --passages-mix (colab/train_7b_lora_r3.ipynb cap); nothing may be dropped below it
+KINDS = ('multipart', 'cross_letter', 'single', 'follow_up', 'temporal', 'comparison', 'refusal', 'refusal_near', 'partial')
+# Share of the KEPT ROWS. multipart is exact-N 4-5 parts (readiness: a minority, ~300 jobs with cross_letter at keep ~20%, DS-05);
+# comparison gives two rows per job (one per period call); refusal + refusal_near >= 15%, partial ~5% (REFUSAL-01/05, DS-07).
+SHARE = {'multipart': .06, 'cross_letter': .02, 'single': .17, 'follow_up': .15, 'temporal': .15, 'comparison': .19, 'refusal': .09,
+         'refusal_near': .12, 'partial': .05}
+ROWS_PER_JOB = {'comparison': 2}
+# expected share of jobs that survive the teacher + checks (ft_v6 measured: multipart .26, single .34, follow_up .20, temporal .33, refusal .31;
+# the ft_v7 rules cut multipart and the new kinds lower). Only used to size the plan.
+KEEP_GUESS = {'multipart': .20, 'cross_letter': .15, 'single': .34, 'follow_up': .20, 'temporal': .33, 'comparison': .20, 'refusal': .30,
+              'refusal_near': .25, 'partial': .25}
+PARTS = {'multipart': (4, 5), 'cross_letter': (4, 5), 'single': (2, 3), 'follow_up': (2, 3), 'temporal': (3, 5), 'comparison': (2, 6),
+         'partial': (1, 3)}     # a job may carry its own parts_range (multipart/cross_letter: exactly 4 or 5; ft_v6 jobs: [3, 5])
+RUN_LEN = {'multipart': (2, 3), 'cross_letter': (1, 2), 'single': (1, 2), 'follow_up': (1, 2), 'temporal': (2, 3), 'comparison': (1, 2),
+           'refusal': (1, 1), 'refusal_near': (1, 2), 'partial': (1, 2)}      # cross_letter / comparison: passages per letter
+MIN_SENTENCES = {'multipart': 8, 'cross_letter': 8, 'single': 3, 'follow_up': 5, 'temporal': 7, 'comparison': 5, 'partial': 5}
+TWO_LETTER_KINDS = ('cross_letter', 'comparison')
 BERKSHIRE_ID = re.compile(r'^(?:19|20)\d{2}_p\d{4}$')
 ID_TEXT = re.compile(r'\b(?:19|20)\d{2}_p\d{4}\b')
 OLD_ID_TEXT = re.compile(r'\b(?:19|20)\d{2}_\d+\b')
@@ -71,7 +84,8 @@ WORD = re.compile(r'[a-z0-9]+')
 MAX_TEACHER_TOKENS = 700
 TEMPERATURE = .1
 KAGGLE_TEACHER = 'Qwen/Qwen2.5-32B-Instruct-AWQ'
-EXPECT = {'multipart': 'plan', 'temporal': 'plan', 'single': 'plan', 'follow_up': 'follow_up', 'refusal': 'refusal'}   # teacher JSON shape per kind
+EXPECT = {'multipart': 'plan', 'cross_letter': 'plan', 'temporal': 'plan', 'single': 'plan', 'comparison': 'plan', 'follow_up': 'follow_up',
+          'refusal': 'refusal', 'refusal_near': 'refusal_near', 'partial': 'partial'}   # teacher JSON shape per kind
 PARTNERSHIP_REASONS = ('partnership_in_context', 'partnership_passage')
 _PLAN_EXAMPLE = (
     'WORKED EXAMPLE (other passages). Sentences: P1.S1 "Berkshire repurchased 120,000 shares during 1995." P1.S2 "The buyback was funded from retained earnings." '
@@ -219,6 +233,25 @@ def eligible(doc, excluded):
     return len([s for s in sentences_of(doc) if len(s.split()) >= 5]) >= 2
 
 
+def grow_run(docs_by_id, excluded, start, want, used, overlap):
+    """`start` plus consecutive eligible neighbours of its letter (next first, then previous) up to `want` passages."""
+    run = [start]
+    for step in ('next_chunk_id', 'previous_chunk_id'):
+        cursor = start
+        while len(run) < want:
+            neighbour = docs_by_id[cursor].metadata.get(step)
+            if not neighbour or neighbour not in docs_by_id or (not overlap and neighbour in used) or neighbour in run \
+                    or not eligible(docs_by_id[neighbour], excluded):
+                break
+            run = run + [neighbour] if step == 'next_chunk_id' else [neighbour] + run
+            cursor = neighbour
+    return run
+
+
+def good_sentences(docs_by_id, ids):
+    return sum(len([s for s in sentences_of(docs_by_id[i]) if len(s.split()) >= 5]) for i in ids)
+
+
 def build_runs(docs_by_id, excluded, valid_years, kind, split, count, used, rng):
     """`count` runs of 1-3 consecutive eligible passages of one letter for (kind, split); `used` is shared across kinds."""
     pool = sorted(d.id for d in docs_by_id.values() if eligible(d, excluded)
@@ -232,17 +265,8 @@ def build_runs(docs_by_id, excluded, valid_years, kind, split, count, used, rng)
                 break
             if start in starts or (not overlap and start in used):
                 continue
-            want, run = rng.randint(lo, hi), [start]
-            for step in ('next_chunk_id', 'previous_chunk_id'):
-                cursor = start
-                while len(run) < want:
-                    neighbour = docs_by_id[cursor].metadata.get(step)
-                    if not neighbour or neighbour not in docs_by_id or (not overlap and neighbour in used) or neighbour in run \
-                            or not eligible(docs_by_id[neighbour], excluded):
-                        break
-                    run = run + [neighbour] if step == 'next_chunk_id' else [neighbour] + run
-                    cursor = neighbour
-            if kind != 'refusal' and sum(len([s for s in sentences_of(docs_by_id[i]) if len(s.split()) >= 5]) for i in run) < MIN_SENTENCES[kind]:
+            run = grow_run(docs_by_id, excluded, start, rng.randint(lo, hi), used, overlap)
+            if kind != 'refusal' and good_sentences(docs_by_id, run) < MIN_SENTENCES.get(kind, 0):
                 continue
             used.update(run)
             starts.add(start)
@@ -250,32 +274,87 @@ def build_runs(docs_by_id, excluded, valid_years, kind, split, count, used, rng)
     return runs
 
 
+def build_cross_runs(docs_by_id, excluded, valid_years, kind, split, count, used, rng, candidates=40):
+    """`count` jobs of two runs from two DIFFERENT letters, both letters on the same side of the train/valid split (ASM-05, MPR-01, MPR-05).
+
+    The second letter is the most similar (shared content words) of `candidates` random passages of other letters, so the two runs are about
+    related subjects; the job lists the older letter first, the order a comparison is served in."""
+    pool = sorted(d.id for d in docs_by_id.values() if eligible(d, excluded)
+                  and (int(d.metadata['year']) in valid_years) == (split == 'valid'))
+    rng.shuffle(pool)
+    lo, hi = RUN_LEN[kind]
+    year_of = lambda i: int(docs_by_id[i].metadata['year'])   # noqa: E731
+    vocab = {}
+
+    def words_of(ids):
+        key = tuple(ids)
+        if key not in vocab:
+            vocab[key] = C.relevance_words(' '.join(docs_by_id[i].text for i in ids))
+        return vocab[key]
+
+    runs = []
+    for start in pool:
+        if len(runs) >= count:
+            break
+        if start in used:
+            continue
+        first = grow_run(docs_by_id, excluded, start, rng.randint(lo, hi), used, False)
+        others = [i for i in pool if i not in used and year_of(i) != year_of(start)]
+        if not others:
+            continue
+        mine = words_of(first)
+        scored = []
+        for i in rng.sample(others, min(candidates, len(others))):
+            theirs = words_of([i])
+            scored.append((len(mine & theirs) / max(1, len(mine | theirs)), i))
+        second = grow_run(docs_by_id, excluded, max(scored)[1], rng.randint(lo, hi), used | set(first), False)
+        run = first + second if year_of(first[0]) < year_of(second[0]) else second + first
+        if good_sentences(docs_by_id, run) < MIN_SENTENCES.get(kind, 0):
+            continue
+        used.update(run)
+        runs.append(run)
+    return runs
+
+
 def quotas_for(target):
-    """{(kind, split): n}; valid is 1/11 of every kind (160 of 1760)."""
+    """{(kind, split): n}: kept JOBS per kind for `target` kept rows (SHARE is a share of rows, a comparison job gives ROWS_PER_JOB rows);
+    valid is 1/11 of every kind."""
     out = {}
     for kind in KINDS:
-        total = round(target * SHARE[kind])
+        total = round(target * SHARE[kind] / ROWS_PER_JOB.get(kind, 1))
         valid = round(total / 11)
         out[(kind, 'valid')], out[(kind, 'train')] = valid, total - valid
     return out
 
 
+def plan_sizing(n):
+    """(kept-row target, {kind: jobs per kept job}) so that the whole plan holds about n jobs at the KEEP_GUESS rates."""
+    per_row = sum(SHARE[k] / ROWS_PER_JOB.get(k, 1) / KEEP_GUESS[k] for k in KINDS)
+    return max(1, round(n / per_row)), {k: 1 / KEEP_GUESS[k] for k in KINDS}
+
+
 def build_plan(docs_by_id, excluded, valid_years, quotas, oversample, identity, rng_seed):
+    """`oversample`: one factor for every kind, or {kind: factor}. Job ids are v7:<kind>:<split>:<index>."""
     rng, jobs = random.Random(rng_seed), []
     templates = round5.unavailable_templates()
     rng.shuffle(templates)
-    for kind in ('temporal', 'multipart', 'follow_up', 'single', 'refusal'):    # scarcest sources first
+    factor = oversample if isinstance(oversample, dict) else {k: oversample for k in KINDS}
+    for kind in ('temporal', 'multipart', 'cross_letter', 'comparison', 'partial', 'follow_up', 'single', 'refusal_near', 'refusal'):    # scarcest sources first
         for split in ('train', 'valid'):
-            count = int(quotas[(kind, split)] * oversample) + 1
-            runs = build_runs(docs_by_id, excluded, valid_years, kind, split, count, set(), rng)   # passages are reused across kinds, not within one
+            count = int(quotas[(kind, split)] * factor[kind]) + 1
+            builder = build_cross_runs if kind in TWO_LETTER_KINDS else build_runs
+            runs = builder(docs_by_id, excluded, valid_years, kind, split, count, set(), rng)   # passages are reused across kinds, not within one
             for index, run in enumerate(runs):
-                job = {'id': f'v6:{kind}:{split}:{index:04d}', 'kind': kind, 'split': split, 'source_ids': run}
+                job = {'id': f'v7:{kind}:{split}:{index:04d}', 'kind': kind, 'split': split, 'source_ids': run}
+                if kind in ('multipart', 'cross_letter'):
+                    n = 5 if index % 5 in (1, 3) else 4         # exactly 4 or 5 parts per job, 60/40 (the ft_v6 teacher wrote 3 whatever was asked)
+                    job['parts_range'] = [n, n]
                 if kind == 'refusal':
                     job['variant'] = 'template' if index % 2 == 0 and templates else 'adjacent'
                     if job['variant'] == 'template':
                         job['template'] = templates.pop()
                 jobs.append(job)
-    return {'identity': identity, 'oversample': oversample, 'quotas': {f'{k}:{s}': n for (k, s), n in quotas.items()},
+    return {'identity': identity, 'oversample': factor, 'quotas': {f'{k}:{s}': n for (k, s), n in quotas.items()},
             'counts': dict(Counter(f"{j['kind']}:{j['split']}" for j in jobs)), 'jobs': jobs}
 
 
@@ -304,13 +383,53 @@ RULES += STYLE
 SHAPE = '{"question": "...?", "parts": [{"ask": "short phrase", "passage": 1, "sentences": [3]}, {"ask": "short phrase", "passage": 2, "sentences": [1, 2]}]}'
 
 
+_EXAMPLE_SENTENCES = ('P1.S1 "Berkshire repurchased 120,000 shares during 1995." P1.S2 "The buyback was funded from retained earnings." '
+                      'P1.S3 "This explains why float grew." P1.S4 "Float reached $3.4 billion." P1.S5 "GEICO added 400,000 policyholders." '
+                      'P1.S6 "GEICO\'s combined ratio improved to 96 in 1995." P1.S7 "Charlie and I paid $50 million for Dexter Shoe in 1993." ')
+_EXAMPLE_PARTS = (('shares repurchased', 1), ('float', 4), ('GEICO policyholders', 5), ('combined ratio', 6), ('Dexter price', 7))
+_EXAMPLE_QUESTION = {4: 'How many shares did Berkshire repurchase, how big did float get, how many policyholders did GEICO add and how did its combined ratio move?',
+                     5: 'How many shares did Berkshire repurchase, how big did float get, how many policyholders did GEICO add, how did its combined ratio '
+                        'move and what did Charlie and I pay for Dexter Shoe?'}
+
+
+def plan_example(n):
+    """A worked example with exactly n parts (the ft_v6 teacher wrote 3 parts for 1432 of 1432 multipart jobs, whatever the range said)."""
+    parts = ', '.join('{"ask": "%s", "passage": 1, "sentences": [%d]}' % (ask, number) for ask, number in _EXAMPLE_PARTS[:n])
+    return (f'WORKED EXAMPLE ({n}-part question, other passages). Sentences: {_EXAMPLE_SENTENCES}'
+            f'Good: {{"question": "{_EXAMPLE_QUESTION[n]}", "parts": [{parts}]}}. Bad: a part with sentences [3] (it starts with "This" and needs S2), '
+            f'and {n - 1} parts or {n + 1} parts. Count your parts before you answer: the question MUST have EXACTLY {n} parts, no more and no fewer.\n')
+
+
+def parts_text(lo, hi):
+    return f'EXACTLY {lo} parts' if lo == hi else f'{lo}-{hi} distinct parts'
+
+
 def teacher_prompt(job, docs, history_first=None):
     kind, year = job['kind'], docs[0].metadata['year']
-    lo, hi = PARTS.get(kind, (0, 0))
-    head = f'Below are {len(docs)} consecutive passage(s) from the {year} Berkshire Hathaway shareholder letter. Sentences are numbered Pn.Sm.\n\n{passages_block(docs)}'
+    lo, hi = job.get('parts_range') or PARTS.get(kind, (0, 0))
+    years = sorted({d.metadata['year'] for d in docs})
+    if kind == 'partial':
+        return partial_prompt(job, docs)
+    if kind == 'refusal_near':
+        return refusal_near_prompt(docs)
+    if kind in TWO_LETTER_KINDS:
+        head = (f'Below are {len(docs)} passages from {len(years)} different Berkshire Hathaway shareholder letters (each passage names its letter year). '
+                f'Sentences are numbered Pn.Sm.\n\n{passages_block(docs)}')
+    else:
+        head = f'Below are {len(docs)} consecutive passage(s) from the {year} Berkshire Hathaway shareholder letter. Sentences are numbered Pn.Sm.\n\n{passages_block(docs)}'
     if kind == 'multipart':
-        task = (f'Write ONE natural question with {lo}-{hi} distinct parts (joined naturally: "what ..., how ... and why ..."), each part answered by the passages.\n'
+        task = (f'Write ONE natural question with {parts_text(lo, hi)} (joined naturally: "what ..., how ... and why ..."), each part answered by the passages.\n'
                 f'{RULES}- The question may mention the letter year ({year}) if natural.\nReturn ONLY JSON: {SHAPE}')
+    elif kind == 'cross_letter':
+        task = (f'Write ONE natural question with {parts_text(lo, hi)} (joined naturally), answered by BOTH letters: at least one part is answered by each letter. '
+                'Do not name a letter year, do not ask for a comparison between years and do not say that something changed; ask about the subjects themselves.\n'
+                f'{RULES}Return ONLY JSON: {SHAPE}')
+    elif kind == 'comparison':
+        task = (f'Write ONE natural question that COMPARES the {years[0]} letter with the {years[-1]} letter on a subject both passages cover, for example '
+                f'"How did X in {years[0]} compare with {years[-1]}?". Name each of the two years exactly once and no other year. Then list the parts that answer it '
+                f'({lo}-{hi} parts in total, at least one answered by each letter, at most three per letter); each part is a fact stated in ONE letter, '
+                'and no part may claim a change or difference that the sentences themselves do not state.\n'
+                f'{RULES}Return ONLY JSON: {SHAPE}')
     elif kind == 'temporal':
         task = (f'Write ONE natural question about the {year} letter with {lo}-{hi} distinct parts, each answered by the passages. '
                 f'The question MUST contain the year {year} literally (e.g. "In {year}, what ... and how ...?") and must not ask for a comparison with another year.\n'
@@ -324,9 +443,24 @@ def teacher_prompt(job, docs, history_first=None):
                 'answered by DIFFERENT sentences than the first question. The follow-up must refer to the subject only with it, they, that, this, their or those, and must not name the subject.\n'
                 f'{RULES}Return ONLY JSON: {{"first_question": "...?", "first_part": {{"passage": 1, "sentences": [2]}}, "question": "...?", "parts": [{{"ask": "short phrase", "passage": 1, "sentences": [4]}}]}}')
     else:
-        raise ValueError(kind)
-    example = WORKED_EXAMPLES.get(kind, '')
+        raise ValueError(f'unknown job kind {kind!r}')
+    example = plan_example(lo) if lo == hi and lo in (4, 5) else WORKED_EXAMPLES.get(kind, '')
     return f'{head}\nTASK: {task}\n{example}'
+
+
+def partial_prompt(job, docs):
+    """ONE of 2-4 parts asks for a detail the passages do not give; the others are answered as usual."""
+    year = docs[0].metadata['year']
+    head = f'Below are {len(docs)} consecutive passage(s) from the {year} Berkshire Hathaway shareholder letter. Sentences are numbered Pn.Sm.\n\n{passages_block(docs)}'
+    task = ('Write ONE natural question with 2-4 parts joined naturally. Exactly ONE part must ask for a specific detail the passages do NOT give '
+            '(a figure or date of another year, a named person or company the passages do not mention, a number that is not stated); that detail must appear in your question as a '
+            'distinctive word or number (a capitalized name, a year or a number) that does NOT occur in the passages. The other 1-3 parts must each be answered by the passages.\n'
+            f'{RULES}"parts" lists ONLY the answered parts (1-3). "absent" describes the part the passages cannot answer: "ask" is a short noun phrase that completes the '
+            'sentence "The retrieved passages do not cover ___." (for example "the price Berkshire paid for Fechheimer"), "missing" lists 1-2 distinctive words or numbers '
+            'that are in your question and NOT in the passages.\n'
+            'Return ONLY JSON: {"question": "...?", "parts": [{"ask": "short phrase", "passage": 1, "sentences": [3]}], '
+            '"absent": {"ask": "the price Berkshire paid for X", "missing": ["X"]}}')
+    return f'{head}\nTASK: {task}\n'
 
 
 def refusal_prompt(docs):
@@ -335,6 +469,18 @@ def refusal_prompt(docs):
             'that this passage CANNOT answer, because it asks for a specific detail the passage does not give (another year\'s figure, a named person or company the passage does not mention, '
             'a number or date that is absent). The question must contain the missing detail itself as a distinctive word or number (a year, a number, or a capitalized name).\n'
             'Return ONLY JSON: {"question": "...?", "missing": ["distinctive word or number that is in your question and NOT in the passage"]}')
+
+
+def refusal_near_prompt(docs):
+    """A question about something that IS in the letters, asking for a detail that is not (the cue-free refusal, REFUSAL-01)."""
+    passage = passages_block(docs)
+    return (f'Below is a passage from a Berkshire Hathaway shareholder letter.\n\n{passage}\nTASK: Write ONE natural question about a company, person, business or event that IS '
+            'discussed in this passage, but that asks for a specific detail the passage does NOT give: a figure, date, name or reason that is not stated, or a false premise '
+            '(something that did not happen in the passage). The question must stay inside the period of the letters: never use a year after 2024 (2025 and later) and never ask for a stock, share, '
+            'crypto or other market price. The question must contain, as distinctive words or numbers (a capitalized name, a year or a number), both the subject that IS in the passage '
+            'and the detail that is NOT in the passage.\n'
+            'Return ONLY JSON: {"question": "...?", "present": ["capitalized name or number from your question that IS in the passage"], '
+            '"missing": ["capitalized name or number from your question that is NOT in the passage"]}')
 
 
 RETRY = {
@@ -355,6 +501,10 @@ RETRY = {
     'question_refers_to_passage': 'never mention the passage, the text or what the letter says',
     'followup_pronoun': 'the follow-up question must refer to its subject with it, they, that, this, their or those',
     'followup_same_sentences': 'the follow-up parts must use different sentences than the first question',
+    'single_letter_parts': 'at least one part must be answered by each of the two letters',
+    'not_comparison_question': 'the question must compare the two letters: name each of the two years once, e.g. "How did X in 1995 compare with 2010?"',
+    'comparison_period_missing': 'each of the two letters needs at least one and at most three parts',
+    'refusal_near_cue': 'no year after 2024 and no stock, share or crypto price in the question',
 }
 
 
@@ -440,6 +590,11 @@ def validate_plan(obj, kind, docs, parts_range=None):
     reason = check_question(obj.get('question'), kind, docs)
     if reason:
         return reason, None
+    if kind == 'comparison':
+        years = sorted({int(d.metadata['year']) for d in docs})
+        named = sorted(p['year'] for p in comparison_periods(obj['question']) if isinstance(p['year'], int))
+        if len(years) != 2 or named != years:       # it must take the per-period path of generate_comparison_answer for exactly these two letters
+            return 'not_comparison_question', None
     history = None
     forbidden = ()
     if kind == 'follow_up':
@@ -466,7 +621,57 @@ def validate_plan(obj, kind, docs, parts_range=None):
     reason, obligations = check_parts(obj.get('parts'), kind, docs, sentence_lists, forbidden, parts_range)
     if reason:
         return ('followup_same_sentences' if reason == 'duplicate_sentence' and kind == 'follow_up' else reason), None
+    letters = Counter(int(docs[o['passage'] - 1].metadata['year']) for o in obligations)
+    if kind == 'cross_letter' and len(letters) < 2:
+        return 'single_letter_parts', None
+    if kind == 'comparison' and (len(letters) != 2 or max(letters.values()) > 3):
+        return 'comparison_period_missing', None
     return None, {'question': obj['question'].strip(), 'obligations': obligations, 'history': history}
+
+
+def validate_partial(obj, docs, parts_range=None):
+    """Teacher JSON of a partial job -> (reason or None, plan): the answered parts plus {'gap': {'ask', 'missing'}} for the absent one."""
+    if obj is None:
+        return 'json_invalid', None
+    reason = check_question(obj.get('question'), 'partial', docs)
+    if reason:
+        return reason, None
+    absent = obj.get('absent')
+    if not isinstance(absent, dict) or not isinstance(absent.get('ask'), str) or not isinstance(absent.get('missing'), list):
+        return 'bad_part', None
+    ask, missing = norm(absent['ask']).rstrip('.?! '), absent['missing']
+    if not 6 <= len(ask) <= 100 or not 1 <= len(missing) <= 2 or not all(isinstance(m, str) for m in missing):
+        return 'bad_part', None
+    missing = [m.strip() for m in missing]
+    texts = [d.text for d in docs]
+    if not all(C.distinctive_missing(m) and term_present(m, [obj['question']]) and not term_present(m, texts) for m in missing):
+        return 'bad_part', None       # the asked-for detail must be IN the question and NOT in the passages, or the gap is not a gap
+    reason, obligations = check_parts(obj.get('parts'), 'partial', docs, [sentences_of(d) for d in docs], parts_range=parts_range or PARTS['partial'])
+    if reason:
+        return reason, None
+    return None, {'question': obj['question'].strip(), 'obligations': obligations, 'history': None, 'gap': {'ask': ask, 'missing': missing}}
+
+
+def validate_refusal_near(obj, docs):
+    """Teacher JSON of a refusal_near job -> (reason or None, (question, present terms, missing terms))."""
+    if obj is None:
+        return 'json_invalid', None
+    question, present, missing = obj.get('question'), obj.get('present'), obj.get('missing')
+    if not isinstance(question, str) or not 20 <= len(question) <= 400 or not question.strip().endswith('?'):
+        return 'bad_question', None
+    if not all(isinstance(v, list) and 1 <= len(v) <= 3 and all(isinstance(t, str) and t.strip() for t in v) for v in (present, missing)):
+        return 'bad_part', None
+    if PASSAGE_TALK.search(question):
+        return 'question_refers_to_passage', None
+    if C.FUTURE_YEAR.search(question) or C.PRICE_TALK.search(question):
+        return 'refusal_near_cue', None    # a year after 2024 or a market price is the shortcut the old template refusals taught
+    present, missing = [t.strip() for t in present], [t.strip() for t in missing]
+    texts = [d.text for d in docs]
+    if not all(C.distinctive_missing(t) and term_present(t, [question]) for t in present + missing):
+        return 'bad_part', None
+    if not all(term_present(t, texts) for t in present) or any(term_present(t, texts) for t in missing):
+        return 'bad_part', None             # the subject must be in the passage, the asked detail must not be
+    return None, (question.strip(), present, missing)
 
 
 def distinctive_terms(question):
@@ -496,6 +701,22 @@ def refusal_terms(question):
 def bad_sentence(text):
     """Layout debris, not a fact: very long run-ons, '* * *' separators, a start that is not a capital/digit/quote, a cut-off end."""
     return len(text.split()) > 70 or '* *' in text or not re.match(r'[A-Z0-9"“‘(]', text) or not C.ends_like_a_sentence(text)
+
+
+def split_problem(row, valid_years):
+    """All letters of a row lie on the side of the split the row is on (a train row quoting a valid-year letter leaks the valid set)."""
+    years = {int(p['year']) for p in row.get('parts') or []} or ({int(row['source_year'])} if row.get('source_year') else set())
+    inside = {y in valid_years for y in years}
+    if inside and (len(inside) > 1 or inside != {row.get('split') == 'valid'}):
+        return 'split_straddle'
+    return None
+
+
+def require_known_kinds(jobs):
+    """A job kind this builder does not know used to be skipped without a trace (ASM-04): fail loudly instead."""
+    unknown = sorted({j.get('kind') for j in jobs} - set(KINDS))
+    if unknown:
+        raise SystemExit(f'unknown job kind(s) {unknown} in the jobs file; known: {list(KINDS)}')
 
 
 def term_present(term, texts):
@@ -575,7 +796,7 @@ def parse_prompt_passages(user):
     return out
 
 
-def check_row(row, *, excluded=None, count_tokens=None):
+def check_row(row, *, excluded=None, count_tokens=None, strict_context=False, valid_years=None):
     """Offline checks of one stored row (the same function runs at generation and under --verify). -> list of problems."""
     problems = []
     messages = row.get('messages') or []
@@ -592,25 +813,53 @@ def check_row(row, *, excluded=None, count_tokens=None):
         problems.append('partnership_passage')
     if excluded and set(row.get('source_ids') or []) & set(excluded):
         problems.append('source_excluded')
+    if strict_context and excluded and set(row.get('context_passage_ids') or []) & set(excluded):
+        problems.append('excluded_passage_in_context')
+    if valid_years is not None and split_problem(row, valid_years):
+        problems.append('split_straddle')
+    if row.get('kind') == 'comparison':
+        period = row.get('period')
+        if not period or '(focus: ' not in (row.get('question') or '') or f"Question: {row['question']}" not in user:
+            problems.append('comparison_not_per_period')           # a comparison row is one period call: '(focus: YYYY)' question, that letter's passages
+        elif {str(y) for y, _, _ in passages.values()} != {str(period)}:
+            problems.append('comparison_passages_not_one_period')
+    texts = [passages[i][2] for i in sorted(passages)]
     if row.get('type') == 'unanswerable':
         if target != REFUSAL_LINE:
             problems.append('refusal_target_not_exact')
         terms = row.get('absent_terms') or []
-        if not terms or any(term_present(t, [p[2] for p in passages.values()]) for t in terms):
+        if not terms or any(term_present(t, texts) for t in terms):
             problems.append('refusal_terms_not_absent')
+        if (row.get('variant') == 'adjacent' or row.get('kind') == 'refusal_near') and not all(C.distinctive_missing(t) for t in terms):
+            problems.append('refusal_term_not_distinctive')       # 'specific companies' never occurs verbatim: the absence check was vacuous (RL-02)
+        if row.get('kind') == 'refusal_near':
+            question = row.get('question') or ''
+            if C.FUTURE_YEAR.search(question) or C.PRICE_TALK.search(question):
+                problems.append('refusal_near_cue')
+            if not any(term_present(t, texts) for t in row.get('present_terms') or []):
+                problems.append('refusal_near_topic_absent')
         return problems
     lines = target.split('\n')
     obligations = row.get('obligations') or []
+    gap = row.get('gap')
+    if gap:      # a partial row: the cited lines, then ONE uncited gap line that /ask's validator removes on purpose
+        expected_gap = C.gap_line(gap.get('ask', ''))
+        if len(lines) == len(obligations) + 1 and lines[-1] != expected_gap:
+            problems.append('gap_line_mismatch')
+        if not gap.get('missing') or any(term_present(t, texts) for t in gap['missing']):
+            problems.append('partial_gap_term_present')
+        gap_lines, cited = [lines[-1]] if len(lines) == len(obligations) + 1 else [], lines[:len(obligations)]
+    else:
+        gap_lines, cited = [], lines
     if any(bad_sentence(t) for ob in obligations for t in ob['sentences']):
         problems.append('bad_sentence')
     if any(DEPENDENT_START.match(ob['sentences'][0]) for ob in obligations if ob['sentences']):
         problems.append('dependent_start')
     if any(sum(len(t.split()) for t in ob['sentences']) < MIN_OBLIGATION_WORDS for ob in obligations):
         problems.append('obligation_too_short')
-    if not 1 <= len(obligations) <= 5 or len(lines) != len(obligations):
+    if not 1 <= len(obligations) <= 5 or len(cited) != len(obligations) or len(lines) != len(obligations) + (1 if gap else 0):
         return problems + ['obligation_count']
-    texts = [passages[i][2] for i in sorted(passages)]
-    for line, ob in zip(lines, obligations):
+    for line, ob in zip(cited, obligations):
         rest = line
         for sentence in ob['sentences']:
             want = norm(sentence)
@@ -640,10 +889,10 @@ def check_row(row, *, excluded=None, count_tokens=None):
             if rest.strip():
                 problems.append('target_extra_text')
     hits = [SearchHit(id=f'slot{i}', text=passages[i][2], metadata={'year': passages[i][0]}, score=0.) for i in sorted(passages)]
-    citations = parse_citations(target, hits)
+    citations = parse_citations('\n'.join(cited), hits)
     if not citations or any(c['invalid_numbers'] for c in citations):
         problems.append('invalid_citation')
-    if C.serving_changes(target, [(passages[i][0], passages[i][2]) for i in sorted(passages)]):
+    if C.serving_changes(target, [(passages[i][0], passages[i][2]) for i in sorted(passages)], gap_lines):
         problems.append('serving_validator_drops_sentence')         # /ask would not show the target as written (POSTPROCESS-01/02)
     if count_tokens is not None:
         if count_tokens(messages[:2]) + count_tokens([messages[2]]) + 8 > row.get('max_seq', MAX_SEQ):
@@ -660,24 +909,51 @@ def append(path, row):
         os.fsync(handle.fileno())
 
 
+def source_group_index(hits, obligations):
+    """Positions in `hits` of the passages that carry the cited sentences, one per source letter-chunk (the units a position mix moves)."""
+    texts = [norm(h.text) for h in hits]
+    index = []
+    for ident in dict.fromkeys(o['source_id'] for o in obligations):
+        own = [i for i, h in enumerate(hits) if h.id == ident or ident in (h.metadata.get('merged_ids') or ())]
+        if not own:       # only an overlapping neighbour holds the sentence: it is the source for the position mix
+            slot = C.lowest_holder(next(o['sentences'][0] for o in obligations if o['source_id'] == ident), texts)
+            own = [slot - 1] if slot else []
+        if own and own[0] not in index:
+            index.append(own[0])
+    return index
+
+
+def history_turns(history, hits):
+    """The first turn of a follow-up as the prompt shows it: its answer cites the slot where the sentences really sit now (ASM-08)."""
+    texts = [norm(h.text) for h in hits]
+    parts = []
+    for sentence in history['sentences']:
+        slot = C.lowest_holder(sentence, texts)
+        parts.append(f'{norm(sentence)} [{slot}]' if slot else norm(sentence))
+    return [{'role': 'user', 'content': history['first_question']}, {'role': 'assistant', 'content': ' '.join(parts)}]
+
+
 class Generator:
-    def __init__(self, teacher, serving, full, excluded, out, count_tokens, max_seq=MAX_SEQ, strict_context=False, passages_mix=None):
+    def __init__(self, teacher, serving, full, excluded, out, count_tokens, max_seq=MAX_SEQ, strict_context=False, passages_mix=None,
+                 position_mix=None, valid_years=None):
         self.teacher, self.serving, self.full, self.excluded, self.out = teacher, serving, full, excluded, Path(out)
         self.count_tokens, self.max_seq, self.strict_context = count_tokens, max_seq, strict_context
         self.mix = parse_passages_mix(passages_mix) if not isinstance(passages_mix, list) else list(passages_mix)
+        self.position_mix = position_mix if isinstance(position_mix, dict) or not position_mix else C.parse_position_mix(position_mix)
+        self.valid_years = set(valid_years) if valid_years is not None else None
         self.rows = common.read_jsonl(self.out / 'examples.jsonl')
         self.attempts = common.read_jsonl(self.out / 'example_attempts.jsonl')
         self.done = {a['id'] for a in self.attempts}
-        self.known = {norm(r['question']).lower() for r in self.rows}
+        self.known = {norm(r.get('job_question') or r['question']).lower() for r in self.rows}
 
     def attempt(self, job):
-        """One job -> attempt record (and an examples row when kept). Never raises for data problems."""
+        """One job -> attempt record (and its examples row(s) when kept: a comparison job gives one row per period call). Never raises for data problems."""
         started = time.monotonic()
         record = {'id': job['id'], 'kind': job['kind'], 'split': job['split'], 'k': pick_k(job['id'], self.mix), 'kept': False, 'reason': None,
                   'teacher_calls': 0}
-        row = None
+        rows = None
         try:
-            row, reason = self._attempt(job, record)
+            rows, reason = self._attempt(job, record)
         except Exception as error:   # noqa: BLE001 - a bad job must not stop a resumable run
             if 'METAL' in str(error):
                 raise            # out of GPU memory is not a property of the job: stop, the run resumes later
@@ -686,12 +962,15 @@ class Generator:
         if reason == 'budget':
             return None
         record.update(reason=reason, kept=reason is None, seconds=round(time.monotonic() - started, 2))
-        if row is not None and reason is None:
-            if row['obligations']:
-                record.update(sentences=sum(len(o['sentences']) for o in row['obligations']), obligations=len(row['obligations']))
-            append(self.out / 'examples.jsonl', row)
-            self.rows.append(row)
-            self.known.add(norm(row['question']).lower())
+        if rows is not None and reason is None:
+            rows = rows if isinstance(rows, list) else [rows]
+            answered = [o for row in rows for o in row['obligations']]
+            if answered:
+                record.update(sentences=sum(len(o['sentences']) for o in answered), obligations=len(answered))
+            for row in rows:
+                append(self.out / 'examples.jsonl', row)
+                self.rows.append(row)
+            self.known.add(norm(rows[0].get('job_question') or rows[0]['question']).lower())
         append(self.out / 'example_attempts.jsonl', record)
         self.attempts.append(record)
         self.done.add(job['id'])
@@ -715,11 +994,19 @@ class Generator:
         return None, reason
 
     def _attempt(self, job, record):
-        docs = [self.full[i] for i in job['source_ids']]
         kind = job['kind']
+        if kind not in KINDS:
+            raise ValueError(f'unknown job kind {kind!r}; known: {list(KINDS)}')
+        docs = [self.full[i] for i in job['source_ids']]
         if kind == 'refusal':
             return self._refusal(job, docs, record)
-        plan, reason = self.ask_teacher(job, teacher_prompt(job, docs), record, lambda obj: validate_plan(obj, kind, docs))
+        if kind == 'refusal_near':
+            return self._refusal_near(job, docs, record)
+        if kind == 'partial':
+            return self._partial(job, docs, record)
+        if kind == 'comparison':
+            return self._comparison(job, docs, record)
+        plan, reason = self.ask_teacher(job, teacher_prompt(job, docs), record, lambda obj: validate_plan(obj, kind, docs, job.get('parts_range')))
         if reason:
             return None, reason
         if norm(plan['question']).lower() in self.known:
@@ -730,6 +1017,14 @@ class Generator:
             history = [{'role': 'user', 'content': first['first_question']},
                        {'role': 'assistant', 'content': ' '.join(f'{norm(s)} [1]' for s in first['sentences'])}]
         return self._finish(job, docs, plan, history, record)
+
+    def _partial(self, job, docs, record):
+        plan, reason = self.ask_teacher(job, partial_prompt(job, docs), record, lambda obj: validate_partial(obj, docs, job.get('parts_range')))
+        if reason:
+            return None, reason
+        if norm(plan['question']).lower() in self.known:
+            return None, 'duplicate_question'
+        return self._finish(job, docs, plan, None, record)
 
     def _refusal(self, job, docs, record):
         if job['variant'] == 'template':
@@ -743,8 +1038,8 @@ class Generator:
                     return 'bad_question', None
                 if not isinstance(missing, list) or not 1 <= len(missing) <= 3 or not all(isinstance(m, str) and m.strip() for m in missing):
                     return 'bad_part', None
-                if not all(term_present(m, [question]) for m in missing):
-                    return 'bad_part', None
+                if not all(term_present(m, [question]) and C.distinctive_missing(m) for m in missing):
+                    return 'bad_part', None       # a generic 'missing' term never occurs verbatim: the absence check below would test nothing
                 if PASSAGE_TALK.search(question):
                     return 'question_refers_to_passage', None
                 return None, (question.strip(), [m.strip() for m in missing])
@@ -752,6 +1047,16 @@ class Generator:
             if reason:
                 return None, reason
             question, terms = value
+        return self._refusal_row(job, docs, record, question, terms, {})
+
+    def _refusal_near(self, job, docs, record):
+        value, reason = self.ask_teacher(job, refusal_near_prompt(docs), record, lambda obj: validate_refusal_near(obj, docs))
+        if reason:
+            return None, reason
+        question, present, missing = value
+        return self._refusal_row(job, docs, record, question, missing, {'present_terms': present})
+
+    def _refusal_row(self, job, docs, record, question, terms, extra):
         if norm(question).lower() in self.known:
             return None, 'duplicate_question'
         with serving_passages(record['k']):
@@ -761,14 +1066,77 @@ class Generator:
         hits = prompts[0]['hits']
         if served_has_partnership(hits):      # partnership passages are evaluation-only: never in a training prompt (also with --strict-context off)
             return None, 'partnership_in_context'
+        if self.strict_context and round5.context_ids(hits, self.full) & self.excluded:
+            return None, 'excluded_passage_in_context'
         if any(term_present(t, [h.text for h in hits]) for t in terms):
             return None, 'refusal_terms_present_in_served'
+        if extra.get('present_terms') and not any(term_present(t, [h.text for h in hits]) for t in extra['present_terms']):
+            return None, 'refusal_near_topic_not_served'      # a near miss needs passages about the subject in the prompt
         messages = chat_messages(question, hits) + [{'role': 'assistant', 'content': REFUSAL_LINE}]
-        row = self.row(job, docs, question, [], hits, messages, None, [], prompts[0], {'absent_terms': terms, 'k': record['k']})
+        row = self.row(job, docs, question, [], hits, messages, None, [], prompts[0], {'absent_terms': terms, 'k': record['k'], **extra})
         return self.finalize(row)
 
-    def _finish(self, job, docs, plan, history, record):
+    def arrange(self, job_id, label, hits, obligations):
+        """place_sources, then the optional source-position mix. -> (hits, injected, error, mode).
+
+        Injection keeps its ft_v6 rng stream; positions get their own (ASM-09) and run between place_sources and build_target, so every
+        [n] is derived from the final order and `injected[].slot` is recomputed (ASM-08, PD-04)."""
+        rng = random.Random(common.sha(f'{common.SEED}:{job_id}{label}'.encode())[:12])
+        hits, injected, error = place_sources(hits, obligations, self.full, rng)
+        mode = 'natural'
+        if error or not self.position_mix:
+            return hits, injected, error, mode
+        prng = random.Random(common.sha(f'{common.SEED}:pos:{job_id}{label}'.encode())[:12])
+        mode = C.pick_mode(self.position_mix, prng)
+        hits = C.reposition(hits, source_group_index(hits, obligations), mode, prng)
+        injected = [{'passage_id': i['passage_id'], 'slot': next(n for n, h in enumerate(hits, 1) if h.id == i['passage_id'])} for i in injected]
+        return hits, injected, None, mode
+
+    def _comparison(self, job, docs, record):
+        plan, reason = self.ask_teacher(job, teacher_prompt(job, docs), record, lambda obj: validate_plan(obj, 'comparison', docs))
+        if reason:
+            return None, reason
         question = plan['question']
+        if norm(question).lower() in self.known:
+            return None, 'duplicate_question'
+        with serving_passages(record['k']):
+            prompts = self.serving.prompts(question)
+        periods = comparison_periods(question)
+        by_label = {p['period']: p for p in prompts}
+        if len(periods) != 2 or len(prompts) != 2 or any(period_label(p) not in by_label for p in periods):
+            return None, 'not_comparison_path'
+        rows = []
+        for period in periods:
+            label = period_label(period)
+            prompt = by_label[label]
+            # the exact question a period's call is asked at serving (compare.period_question), never the helper's own focus string (PW-02)
+            asked = period_question(question, period, periods)
+            obligations = [o for o in plan['obligations'] if int(self.full[o['source_id']].metadata['year']) == period['year']]
+            if not prompt['hits']:
+                return None, 'no_context'
+            if served_has_partnership(prompt['hits']):
+                return None, 'partnership_in_context'
+            hits, injected, error, mode = self.arrange(job['id'], f':{label}', prompt['hits'], obligations)
+            if error:
+                return None, error
+            if self.strict_context and round5.context_ids(hits, self.full) & self.excluded:
+                return None, 'excluded_passage_in_context'
+            target, slots = build_target(obligations, hits)
+            if target is None:
+                return None, 'sentence_not_servable'
+            ids = [i for i in job['source_ids'] if int(self.full[i].metadata['year']) == period['year']]
+            part = {**job, 'id': f"{job['id']}:{label}", 'source_ids': ids}
+            messages = chat_messages(asked, hits) + [{'role': 'assistant', 'content': target}]
+            row = self.row(part, [self.full[i] for i in ids], asked, obligations, hits, messages, None, injected, prompt,
+                           {'slots': slots, 'k': record['k'], 'position_mode': mode, 'period': label, 'job_question': question})
+            row, reason = self.finalize(row)
+            if reason:
+                return None, reason
+            rows.append(row)
+        return rows, None
+
+    def _finish(self, job, docs, plan, history, record):
+        question, gap = plan['question'], plan.get('gap')
         with serving_passages(record['k']):
             prompts = self.serving.prompts(question, history)
         if len(prompts) != 1 or prompts[0]['period'] is not None:
@@ -778,25 +1146,33 @@ class Generator:
             return None, 'no_context'
         if served_has_partnership(prompt['hits']):
             return None, 'partnership_in_context'
-        if self.strict_context and round5.context_ids(prompt['hits'], self.full) & self.excluded:
-            return None, 'excluded_passage_in_context'
-        rng = random.Random(common.sha(f'{common.SEED}:{job["id"]}'.encode())[:12])
-        hits, injected, error = place_sources(prompt['hits'], plan['obligations'], self.full, rng)
+        if gap and any(term_present(t, [h.text for h in prompt['hits']]) for t in gap['missing']):
+            return None, 'partial_gap_present_in_served'     # the 'absent' part would be answerable from the prompt
+        hits, injected, error, mode = self.arrange(job['id'], '', prompt['hits'], plan['obligations'])
         if error:
             return None, error
+        if self.strict_context and round5.context_ids(hits, self.full) & self.excluded:
+            return None, 'excluded_passage_in_context'
         target, slots = build_target(plan['obligations'], hits)
         if target is None:
             return None, 'sentence_not_servable'
+        extra = {'slots': slots, 'k': record['k'], 'position_mode': mode}
+        if gap:
+            line = C.gap_line(gap['ask'])
+            target += '\n' + line
+            extra.update(gap={**gap, 'line': line}, absent_terms=gap['missing'])
+        if plan.get('history'):
+            history = history_turns(plan['history'], hits)
         messages = chat_messages(question, hits, history) + [{'role': 'assistant', 'content': target}]
-        row = self.row(job, docs, question, plan['obligations'], hits, messages, history, injected, prompt, {'slots': slots, 'k': record['k']})
+        row = self.row(job, docs, question, plan['obligations'], hits, messages, history, injected, prompt, extra)
         return self.finalize(row)
 
     def row(self, job, docs, question, obligations, hits, messages, history, injected, prompt, extra):
         served = round5.served_ids(hits)
         answerable = bool(obligations)
         row = {'id': job['id'], 'kind': job['kind'], 'split': job['split'], 'type': 'answerable' if answerable else 'unanswerable',
-               'source_id': job['source_ids'][0], 'source_ids': job['source_ids'], 'variant': job.get('variant', 'v6'), 'question': question,
-               'style': 'v6', 'origin': 'v6_new', 'prompt_version': PROMPT_VERSION,
+               'source_id': job['source_ids'][0], 'source_ids': job['source_ids'], 'variant': job.get('variant', 'v7'), 'question': question,
+               'style': 'v7', 'origin': 'v7_new', 'prompt_version': PROMPT_VERSION,
                'parts': [{'id': f'P{i}', 'ask': o['ask'], 'source_id': o['source_id'], 'sentence_numbers': o['sentence_numbers'],
                           'year': int(self.full[o['source_id']].metadata['year'])} for i, o in enumerate(obligations, 1)],
                'obligations': [{k: o[k] for k in ('ask', 'source_id', 'sentence_numbers', 'sentences')} for o in obligations],
@@ -811,7 +1187,8 @@ class Generator:
         return row
 
     def finalize(self, row):
-        problems = check_row(row, excluded=self.excluded, count_tokens=self.count_tokens)
+        problems = check_row(row, excluded=self.excluded, count_tokens=self.count_tokens, strict_context=self.strict_context,
+                             valid_years=self.valid_years)
         if row['type'] == 'answerable':
             row['sentences_in_target'] = sum(len(o['sentences']) for o in row['obligations'])
         return (row, None) if not problems else (None, problems[0])
@@ -910,11 +1287,14 @@ def teacher_messages(job, docs):
 
 def job_record(job, full, identity, count_tokens=None):
     """One self-contained line of jobs.jsonl: the sampled job plus everything the Kaggle teacher and the shape check need."""
+    if job['kind'] not in KINDS:
+        raise ValueError(f"unknown job kind {job['kind']!r}; known: {list(KINDS)}")
     docs = [full[i] for i in job['source_ids']]
     messages = teacher_messages(job, docs)
-    lo, hi = PARTS.get(job['kind'], (0, 0))
+    lo, hi = job.get('parts_range') or PARTS.get(job['kind'], (0, 0))
     seed = int(common.sha(f'{common.SEED}:{job["id"]}:v6:0'.encode())[:8], 16)
-    return {**job, 'year': int(docs[0].metadata['year']), 'expect': EXPECT[job['kind']], 'needs_teacher': messages is not None,
+    years = sorted({int(d.metadata['year']) for d in docs})
+    return {**job, 'year': int(docs[0].metadata['year']), 'years': years, 'expect': EXPECT[job['kind']], 'needs_teacher': messages is not None,
             'n_passages': len(docs), 'sentence_counts': [len(sentences_of(d)) for d in docs], 'parts_range': [lo, hi] if lo else None,
             'sampling': {'temperature': TEMPERATURE, 'max_tokens': MAX_TEACHER_TOKENS, 'seed': seed},
             'messages': messages, 'prompt_tokens': count_tokens(messages) if messages and count_tokens else None, 'identity': identity}
@@ -933,13 +1313,14 @@ def order_jobs(jobs):
 
 
 def plan_jobs(n, seed, exclude_ids=()):
-    """n jobs in total, kind mix and splits as quotas_for(n); sampling is build_plan with rng seed `seed` (exclusions as always)."""
+    """About n jobs in total (kind mix: SHARE of kept rows, sized with KEEP_GUESS; 1/11 of each kind valid); build_plan with rng seed `seed`."""
     full, excluded, counts, valid_years, identity = load_inputs(KAGGLE_TEACHER)
-    extra = set(exclude_ids)
+    extra = C.with_neighbours(set(exclude_ids), full)      # +-1 chunk, like every built-in exclusion (ASM-07)
     excluded = excluded | extra
     identity = {'corpus_sha256': identity['corpus_sha256'], 'plan_seed': seed, 'n': n, 'valid_years': identity['valid_years'],
                 'exclusion_with_neighbours': len(excluded), 'extra_exclude_ids': len(extra)}
-    plan = build_plan(full, excluded, valid_years, quotas_for(n), 1.0, identity, seed)
+    target, oversample = plan_sizing(n)
+    plan = build_plan(full, excluded, valid_years, quotas_for(target), oversample, identity, seed)
     _, count_tokens = round4.token_counter(DEFAULT_TEACHER)      # the Qwen2.5 tokenizer is shared by 14B and 32B
     return [job_record(job, full, identity, count_tokens) for job in order_jobs(plan['jobs'])], counts
 
