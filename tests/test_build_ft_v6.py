@@ -56,7 +56,7 @@ def test_sentence_list_is_what_the_7b_sees():
 
 def test_validate_plan_accepts_adjacent_pair_and_builds_obligations():
     d = doc('1995_p0001', S)
-    reason, plan = B.validate_plan(plan_obj(), 'multipart', [d])
+    reason, plan = B.validate_plan(plan_obj(), 'temporal', [d])
     assert reason is None and [o['sentence_numbers'] for o in plan['obligations']] == [[1, 2], [4], [5]]
     assert plan['obligations'][0]['sentences'] == S[:2]
 
@@ -71,13 +71,13 @@ def test_validate_plan_accepts_adjacent_pair_and_builds_obligations():
     ({'question': 'What does the passage say about the buyback of shares and the float growth in the year?'}, 'question_refers_to_passage'),
 ])
 def test_validate_plan_rejects(change, expected):
-    reason, _ = B.validate_plan(plan_obj(**change), 'multipart', [doc('1995_p0001', S)])
+    reason, _ = B.validate_plan(plan_obj(**change), 'temporal', [doc('1995_p0001', S)])
     assert reason == expected
 
 
 def test_dependent_sentence_is_repaired_with_its_predecessor():
     parts = [{'ask': 'a', 'passage': 1, 'sentences': [1]}, {'ask': 'b', 'passage': 1, 'sentences': [3]}, {'ask': 'c', 'passage': 1, 'sentences': [5]}]
-    reason, plan = B.validate_plan(plan_obj(parts=parts), 'multipart', [doc('1995_p0001', S)])
+    reason, plan = B.validate_plan(plan_obj(parts=parts), 'temporal', [doc('1995_p0001', S)])
     assert reason is None and plan['obligations'][1]['sentence_numbers'] == [2, 3]
 
 
@@ -108,7 +108,7 @@ def test_follow_up_needs_pronoun_and_new_sentences():
 def test_unserved_source_goes_to_a_random_slot_and_target_is_numbered_against_served_context():
     source = doc('1995_p0001', S)
     hits = [hit(f'1990_p{i:04d}', [f'Other passage number {i} says something else entirely about nothing.']) for i in range(8)]
-    plan = B.validate_plan(plan_obj(), 'multipart', [source])[1]
+    plan = B.validate_plan(plan_obj(), 'temporal', [source])[1]
     placed, injected, error = B.place_sources(hits, plan['obligations'], {'1995_p0001': source}, random.Random(3))
     assert error is None and len(placed) == 8 and len(injected) == 1 and placed[injected[0]['slot'] - 1].id == '1995_p0001'
     target, slots = B.build_target(plan['obligations'], placed)
@@ -119,7 +119,7 @@ def test_unserved_source_goes_to_a_random_slot_and_target_is_numbered_against_se
 def test_served_source_keeps_its_slot_and_is_not_injected():
     source = doc('1995_p0001', S)
     hits = [hit('1990_p0001', ['Unrelated words fill this other passage for the test.']), hit('1995_p0001', S)]
-    plan = B.validate_plan(plan_obj(), 'multipart', [source])[1]
+    plan = B.validate_plan(plan_obj(), 'temporal', [source])[1]
     placed, injected, error = B.place_sources(hits, plan['obligations'], {'1995_p0001': source}, random.Random(3))
     assert (error, injected) == (None, []) and B.build_target(plan['obligations'], placed)[0].endswith('[2]')
 
@@ -127,7 +127,7 @@ def test_served_source_keeps_its_slot_and_is_not_injected():
 def make_row(target=None, passages=None, kind='multipart'):
     source = doc('1995_p0001', S)
     hits = passages or [hit('1990_p0001', ['Unrelated words fill this other passage for the test.']), hit('1995_p0001', S)]
-    plan = B.validate_plan(plan_obj(), 'multipart', [source])[1]
+    plan = B.validate_plan(plan_obj(), 'temporal', [source])[1]
     target = target or B.build_target(plan['obligations'], hits)[0]
     messages = B.chat_messages(plan['question'], hits) + [{'role': 'assistant', 'content': target}]
     obligations = [{k: o[k] for k in ('ask', 'source_id', 'sentence_numbers', 'sentences')} for o in plan['obligations']]
@@ -172,8 +172,9 @@ def test_refusal_row_needs_exact_line_and_absent_terms():
 def test_distinctive_terms_and_quota_shape():
     assert B.distinctive_terms("What was Apple's exact audited revenue for fiscal year 2025?") == {'Apple', '2025'}
     quotas = B.quotas_for(1760)
-    assert sum(quotas.values()) == 1760 and sum(n for (_, s), n in quotas.items() if s == 'valid') == 160
-    assert quotas[('multipart', 'train')] + quotas[('multipart', 'valid')] == 968
+    rows = sum(n * B.ROWS_PER_JOB.get(k, 1) for (k, _), n in quotas.items())       # a comparison job is two rows
+    assert abs(rows - 1760) <= 6 and abs(sum(n * B.ROWS_PER_JOB.get(k, 1) for (k, s), n in quotas.items() if s == 'valid') - 1760 / 11) < 12
+    assert quotas[('single', 'train')] + quotas[('single', 'valid')] == round(1760 * B.SHARE['single'])
 
 
 # ------------------------------------------------------------------ plan / assemble split
@@ -198,7 +199,7 @@ def test_job_record_holds_the_exact_teacher_messages_and_shape_info():
     rec = B.job_record(job, {'1995_p0001': d}, {'corpus_sha256': 'x'}, lambda messages: 123)
     assert rec['messages'] == [{'role': 'system', 'content': B.SYSTEM}, {'role': 'user', 'content': B.teacher_prompt(job, [d])}]
     assert (rec['needs_teacher'], rec['expect'], rec['n_passages'], rec['sentence_counts'], rec['parts_range'], rec['prompt_tokens']) == \
-        (True, 'plan', 1, [5], [3, 5], 123)
+        (True, 'plan', 1, [5], [4, 5], 123)      # ft_v7: multipart asks for 4-5 parts (an ft_v6 job file carries its own [3, 5])
     assert rec['sampling']['temperature'] == B.TEMPERATURE and rec['sampling']['max_tokens'] == B.MAX_TEACHER_TOKENS
     template = B.job_record({'id': 'r', 'kind': 'refusal', 'split': 'train', 'source_ids': ['1995_p0001'], 'variant': 'template', 'template': 'Q?'},
                             {'1995_p0001': d}, {}, None)
@@ -215,10 +216,10 @@ def test_order_jobs_interleaves_kinds_and_keeps_every_job():
 def test_recorded_generator_validates_the_recorded_json_like_the_local_teacher():
     d = doc('1995_p0001', S)
     gen = B.RecordedGenerator({'a': {'raw': 'Sure: ' + __import__('json').dumps(plan_obj()), 'calls': 2}, 'b': {'raw': 'not json'}}, None, {}, set(), '.', None)
-    value, reason = gen.ask_teacher({'id': 'a'}, '', {}, lambda obj: B.validate_plan(obj, 'multipart', [d]))
+    value, reason = gen.ask_teacher({'id': 'a'}, '', {}, lambda obj: B.validate_plan(obj, 'temporal', [d]))
     assert reason is None and len(value['obligations']) == 3
     record = {}
-    assert gen.ask_teacher({'id': 'b'}, '', record, lambda obj: B.validate_plan(obj, 'multipart', [d]))[1] == 'json_invalid'
+    assert gen.ask_teacher({'id': 'b'}, '', record, lambda obj: B.validate_plan(obj, 'temporal', [d]))[1] == 'json_invalid'
     assert gen.ask_teacher({'id': 'missing'}, '', {}, lambda obj: (None, obj))[1] == 'no_teacher_output'
 
 
@@ -300,7 +301,7 @@ def test_generator_serves_each_row_with_its_own_k_and_gold_sources_stay_inside(t
     source = doc('1995_p0001', S)
     serving = FakeServing()
     gen = B.Generator(None, serving, {'1995_p0001': source}, set(), tmp_path, None, B.MAX_SEQ_MIX, False, [8, 12, 16])
-    plan = B.validate_plan(plan_obj(), 'multipart', [source])[1]
+    plan = B.validate_plan(plan_obj(), 'temporal', [source])[1]
     rows = []
     for index in range(30):
         job = {'id': f'v6:multipart:train:{index:04d}', 'kind': 'multipart', 'split': 'train', 'source_ids': ['1995_p0001']}

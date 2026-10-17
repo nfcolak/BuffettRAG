@@ -37,7 +37,7 @@ import round3
 import round4
 from make_questions import TOPIC_WORDS, _json_object, unavailable_templates
 from src.evaluation.claim_validator import _split_original, evidence_sentences, validate_and_filter_answer
-from src.generation.compare import comparison_periods, period_label
+from src.generation.compare import comparison_periods, period_label, period_question
 from src.generation.evidence_gate import assess_evidence
 from src.generation.prompt import REFUSAL_LINE, build_cited_prompt, format_answer_markdown, parse_citations, strip_chat_artifacts
 from src.generation.providers.llama_provider import split_prompt
@@ -200,7 +200,7 @@ class Serving:
         for period in periods:
             label = period_label(period)
             subset = [hit for hit in context if _meta_matches(hit.metadata, period)]
-            focus = f'{request.query} (focus: {label})'
+            focus = period_question(request.query, period, periods)     # the live per-period question (generate_comparison_answer), byte for byte
             gate = bool(subset) and assess_evidence(request.query, subset, extra_queries=extras).sufficient
             prompts.append({**base, 'period': label, 'query': focus, 'hits': subset, 'gate': gate,
                             'messages': messages_from(build_cited_prompt(focus, subset, history=history)) if subset else []})
