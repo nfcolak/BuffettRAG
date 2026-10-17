@@ -11,6 +11,7 @@ from dataclasses import dataclass
 from decimal import Decimal
 from typing import Any, Callable, List, Sequence
 
+from config import retrieval_setting
 from src.evaluation.citation_faithfulness import lexical_support_score
 
 _CITATION_RE = re.compile(r"\[(\d+(?:\s*,\s*\d+)*)\]")
@@ -203,8 +204,31 @@ def _extra_units(sentence: str) -> List[str]:
     return [e for e in extras if e]
 
 
+def _content_tokens(text: str) -> int:
+    return sum(1 for t in _TOKEN_RE.findall(text) if t.lower() not in _STOPWORDS and t.lower() not in _IGNORE)
+
+
+def _split_claims_v2(clean: str) -> List[str]:
+    """Split at and/but/; but never leave a part under 3 content tokens: a fragment ("on" from "goes on and
+    on") has nothing to be supported by, so it stays joined (with its connector) to its neighbour."""
+    pieces = re.split(r"(\s+(?:and|but)\s+|;)", clean, flags=re.I)
+    parts, seps = pieces[0::2], pieces[1::2]
+    while len(parts) > 1:
+        short = [i for i, p in enumerate(parts) if _content_tokens(p) < 3]
+        if not short:
+            break
+        i = short[0]
+        j = i - 1 if i else 0  # merge into the previous part, or the next one for the first part
+        parts[j:j + 2] = [parts[j] + seps[j] + parts[j + 1]]
+        del seps[j]
+    return [p.strip(" ,.;") for p in parts if p.strip(" ,.;")]
+
+
 def split_claims(text: str) -> List[str]:
     clean = _CITATION_RE.sub("", text).strip().rstrip(".!?")
+    if retrieval_setting("VALIDATOR_SPLIT_V2"):
+        parts = _split_claims_v2(clean)
+        return [clean.strip(" ,.;")] if len(parts) > 1 and len(_TOKEN_RE.findall(parts[0])) <= 2 else parts
     parts = [part.strip(" ,.;") for part in re.split(r"\s+(?:and|but)\s+|;", clean, flags=re.I)
              if part.strip(" ,.;")]
     # A conjunction between subjects is not a standalone attribution claim.
@@ -270,6 +294,20 @@ def _deterministic_agreement(claim: str, passage: str, context_year: int | None 
     return False, best_score
 
 
+def _span_norm(text: str) -> str:
+    """Verbatim-comparison form: typography, whitespace and citation markers normalised, case kept."""
+    text = unicodedata.normalize("NFKC", text).translate(str.maketrans({
+        "’": "'", "‘": "'", "“": '"', "”": '"', "−": "-", "–": "-", "—": "-",
+    }))
+    return re.sub(r"\s+", " ", _CITATION_RE.sub("", text)).strip()
+
+
+def _verbatim_span(body: str, passages: Sequence[str]) -> bool:
+    """True when the sentence is a contiguous span (>= 6 tokens) of one of the cited passages."""
+    sentence = _span_norm(body).rstrip(".!?").strip()
+    return len(_TOKEN_RE.findall(sentence)) >= 6 and any(sentence in _span_norm(p) for p in passages)
+
+
 def validate_and_filter_answer(answer: str, hits: Sequence[Any], *, nli_scorer: Callable[[str, str], float] | None = None,
                                threshold: float = 0.2) -> ClaimValidationResult:
     """Drop unsupported sentences individually; supported sentences stay verbatim."""
@@ -293,6 +331,12 @@ def validate_and_filter_answer(answer: str, hits: Sequence[Any], *, nli_scorer: 
             # different source sentences/periods. Check the unsplit relation too.
             if len(claims) > 1 and len(_quantities(body)) > 1:
                 claims.append(_CITATION_RE.sub("", body).strip().rstrip(".!?"))
+            if valid and retrieval_setting("VALIDATOR_VERBATIM_KEEP") and _verbatim_span(body, [hits[i].text for i in valid]):
+                # The sentence is the cited passage's own text: nothing to check, and a split must not drop it.
+                validations.append({"claim": _CITATION_RE.sub("", body).strip(), "cited_indexes": valid, "support": 1.0,
+                                    "method": "verbatim_span", "supported": True})
+                kept.append(sentence.strip())
+                continue
             for claim in claims:
                 scores, agreements = [], []
                 for index in valid:

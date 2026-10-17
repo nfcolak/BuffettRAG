@@ -51,6 +51,12 @@ class RetrievalResult:
 
 
 _YEAR_RE = re.compile(r"\b(19[5-9]\d|20[0-2]\d)\b")  # RETRIEVAL_YEAR_FILTER_MIN (1970) picks the earliest year used
+# Cue directly before a year; "from 1980 through 1990" keeps its end year (a range, not a reference).
+_YEAR_REF_BEFORE_RE = re.compile(
+    r"(?<!\bfrom\s(?:19|20)\d{2}\s)(?<!\bbetween\s(?:19|20)\d{2}\s)"
+    r"\b(?:since|end\s+of|as\s+of|through|same\b[^.?!,;]{0,40}?\bas(?:\s+in)?)\s+(?:the\s+)?(?:year\s+)?$",
+    re.IGNORECASE,
+)
 _DECADE_WORD_RE = re.compile(
     r"\b(1970s|1980s|1990s|2000s|2010s|2020s|seventies|eighties|nineties)\b",
     re.IGNORECASE,
@@ -247,7 +253,12 @@ def detect_year_filter(query: str) -> Optional[Dict[str, Any]]:
         return {"year": {"$gte": a, "$lte": b}}
 
     first_year = retrieval_setting("RETRIEVAL_YEAR_FILTER_MIN")
-    years = [y for y in _YEAR_RE.findall(q) if int(y) >= first_year]
+    if retrieval_setting("RETRIEVAL_YEAR_REF_SKIP"):
+        # "since 1990", "end of 2001": a reference point, not the asked letter.
+        years = [m.group() for m in _YEAR_RE.finditer(q)
+                 if int(m.group()) >= first_year and not _YEAR_REF_BEFORE_RE.search(q[:m.start()])]
+    else:
+        years = [y for y in _YEAR_RE.findall(q) if int(y) >= first_year]
     if len(years) == 1:
         return {"year": int(years[0])}
     if len(years) >= 2:
@@ -413,17 +424,35 @@ class Retriever:
         reranked = False
         if rerank and self.reranker is not None and candidates:
             depth = retrieval_setting("RERANK_CANDIDATES")
-            per_period = max(depth // max(len(subquery_filters), 1), 4)
+            n_periods = max(len(subquery_filters), 1)
+            per_period = max(depth // n_periods, 4)
+            pool_size = retrieval_setting("RETRIEVAL_PERIOD_POOL")
+            if pool_size > 0:  # wider per-period pool; the total stays <= 60 (rerank cost)
+                per_period = min(pool_size, max(60 // n_periods, 4))
             pool: List[SearchHit] = []
+            period_pools: List[List[SearchHit]] = []
             pooled = set()
             for filt in subquery_filters:
                 matching = [h for h in candidates if _meta_matches(h.metadata, filt)]
+                period_pools.append([])
                 for h in matching[:per_period]:
                     if h.id not in pooled:
                         pooled.add(h.id)
                         pool.append(h)
-            pool = pool or candidates[:depth]
-            candidates = self.reranker.rerank(query, pool, top_k=len(pool))
+                        period_pools[-1].append(h)
+            if pool and retrieval_setting("RETRIEVAL_PERIOD_FOCUS_RERANK"):
+                # Each period is judged against its own sub-question; reranker scores of different
+                # queries are not comparable, so the lists are interleaved by per-period rank.
+                from src.generation.compare import period_focused_query  # compare imports this module
+
+                ranked = [self.reranker.rerank(period_focused_query(query, filt, subquery_filters), part,
+                                               top_k=len(part)) if part else []
+                          for filt, part in zip(subquery_filters, period_pools)]
+                candidates = [lst[rank] for rank in range(max(len(lst) for lst in ranked))
+                              for lst in ranked if rank < len(lst)]
+            else:
+                pool = pool or candidates[:depth]
+                candidates = self.reranker.rerank(query, pool, top_k=len(pool))
             reranked = True
 
         # Reserve the best supported candidate per nonempty period; fill the
@@ -585,6 +614,18 @@ class Retriever:
                 candidates = reciprocal_rank_fusion(
                     [*([candidates] * weight), unfiltered], top_k=fetch_k
                 )
+                keep = retrieval_setting("RETRIEVAL_YEAR_FILTER_KEEP")
+                if keep > 0:
+                    # A wrong year guess can push the unfiltered top hits out of the rerank window: pin
+                    # the top-K of them at the end of it, the lowest merged candidates move down.
+                    window = retrieval_setting("RERANK_CANDIDATES")
+                    in_window = {h.id for h in candidates[:window]}
+                    pinned = [h for h in unfiltered[:keep] if h.id not in in_window]
+                    if pinned:
+                        pinned_ids = {h.id for h in pinned}
+                        rest = [h for h in candidates if h.id not in pinned_ids]
+                        cut = max(window - len(pinned), 0)
+                        candidates = [*rest[:cut], *pinned, *rest[cut:]]
         else:
             raise ValueError(f"Unknown strategy: {strategy}")
 

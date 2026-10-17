@@ -223,7 +223,7 @@ def exclusion_sets(full, *, with_checkers=True):
 # ------------------------------------------------------------------ plan
 def sentences_of(doc, cap=None):
     """Numbered source sentences of a passage as the 7B will see them (first `cap` chars; a cut last sentence is dropped)."""
-    cap = cap or round4.LLM_PASSAGE_MAX_CHARS
+    cap = cap or round4.passage_max_chars()
     sentences = evidence_sentences(doc.text[:cap])
     if len(doc.text) > cap and sentences:
         sentences = sentences[:-1]
@@ -760,7 +760,7 @@ def place_sources(hits, obligations, docs_by_id, rng):
                      for s in o['sentences'] for slot in [locate(s, texts())] if slot}
         free = [i for i in range(len(hits)) if (i + 1) not in protected]
         doc = docs_by_id[ident]
-        fresh = SearchHit(id=doc.id, text=truncate_around_anchor(doc.text, '', round4.LLM_PASSAGE_MAX_CHARS), metadata=dict(doc.metadata), score=0.)
+        fresh = SearchHit(id=doc.id, text=truncate_around_anchor(doc.text, '', round4.passage_max_chars()), metadata=dict(doc.metadata), score=0.)
         if free:
             slot = rng.choice(free)
             hits[slot] = fresh

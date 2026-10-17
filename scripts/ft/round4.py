@@ -27,7 +27,7 @@ import round3
 from make_questions import TOPIC_WORDS, _json_object, unavailable_templates
 from config import (
     ANSWER_CONTEXT_MAX_CHARS, ANSWER_CONTEXT_NEIGHBORS, LLM_CONTEXT_PASSAGES, LLM_N_CTX,
-    LLM_PASSAGE_MAX_CHARS, RETRIEVAL_FETCH_K,
+    LLM_PASSAGE_MAX_CHARS, RETRIEVAL_FETCH_K, llm_context_passages, llm_n_ctx, retrieval_setting,
 )
 from src.evaluation.claim_validator import _split_original, validate_and_filter_answer
 from src.generation.compare import comparison_periods, period_label, period_question, prepare_answer_context
@@ -76,10 +76,16 @@ class LlamaStub:
     provider_name = 'llama'
 
 
+def passage_max_chars():
+    """Per-passage char cap /ask uses (call-time, env wins), so builders follow a flipped serving default."""
+    return retrieval_setting('LLM_PASSAGE_MAX_CHARS')
+
+
 def serving_settings():
-    return {'neighbors': ANSWER_CONTEXT_NEIGHBORS, 'max_chars': ANSWER_CONTEXT_MAX_CHARS,
-            'max_new_tokens': AskRequest(query='x').max_new_tokens, 'n_ctx': LLM_N_CTX,
-            'max_passages': LLM_CONTEXT_PASSAGES, 'passage_max_chars': LLM_PASSAGE_MAX_CHARS}
+    # call-time values, exactly what ask_flow passes to prepare_answer_context
+    return {'neighbors': retrieval_setting('ANSWER_CONTEXT_NEIGHBORS'), 'max_chars': ANSWER_CONTEXT_MAX_CHARS,
+            'max_new_tokens': AskRequest(query='x').max_new_tokens, 'n_ctx': llm_n_ctx(),
+            'max_passages': llm_context_passages(), 'passage_max_chars': passage_max_chars()}
 
 
 def retrieve(bm25, query, history=None, *, top_k=8, fetch_k=None, drop_ids=()):

@@ -14,7 +14,6 @@ from config import (
     CHUNKS_V3_FILE,
     EXPANSION_MODE,
     EXPOSE_DEBUG_STATUS,
-    LLM_PASSAGE_MAX_CHARS,
     llm_context_passages,
     llm_n_ctx,
     retrieval_setting,
@@ -189,7 +188,7 @@ def _prepare_ask_steps(req: AskRequest):
             followup=build_followup_retrieval_query(req.query, history_dicts) != req.query,
             neighbors=retrieval_setting("ANSWER_CONTEXT_NEIGHBORS"), max_chars=ANSWER_CONTEXT_MAX_CHARS,
             max_new_tokens=req.max_new_tokens, n_ctx=llm_n_ctx(),
-            max_passages=llm_context_passages(), passage_max_chars=LLM_PASSAGE_MAX_CHARS,
+            max_passages=llm_context_passages(), passage_max_chars=retrieval_setting("LLM_PASSAGE_MAX_CHARS"),
         )
         context_hits = order_passages(context_hits)
         prompt = build_cited_prompt(query=req.query, hits=context_hits, history=history_dicts)
