@@ -15,7 +15,7 @@ from config import (
     LLM_N_THREADS,
     LLM_TEMPERATURE,
 )
-from src.generation.prompt import system_prompt
+from src.generation.prompt import check_prompt_matches_model, system_prompt
 
 _SEED = 42
 _USER_MARKERS = ("BEGIN RECENT CONVERSATION", "BEGIN UNTRUSTED PASSAGES")
@@ -87,6 +87,7 @@ class LlamaCppProvider:
         n_gpu_layers: int = LLM_GPU_LAYERS,
         temperature: float = LLM_TEMPERATURE,
     ) -> None:
+        check_prompt_matches_model(model_path)  # PROMPT_VERSION must not contradict the model's training prompt
         self.model_path = Path(model_path)
         self._n_ctx = n_ctx  # None: LLM_N_CTX read at call time
         self.n_threads = n_threads

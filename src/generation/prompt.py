@@ -131,9 +131,52 @@ SYSTEM_PROMPT_V3 = SYSTEM_PROMPT_V2.replace(_V2_CORPUS, _V1_CORPUS, 1)
 PROMPT_VERSIONS = {"v1": SYSTEM_PROMPT, "v2": SYSTEM_PROMPT_V2, "v3": SYSTEM_PROMPT_V3}
 
 
+# Which prompt text each fine-tuned model was trained on (PW-01): the sha256 of the gguf wins over its file name.
+MODEL_SHA256_PROMPT_VERSION = {
+    "ec41100e1457ffc88289d42c9c56de5bddb648c511db693cb75fd2d628182ec1": "v1",  # FT-r1
+    "b1bc1584a0cc4b029e6217f37feb1657a80215dac6500c8a73322946374c6fd0": "v2",  # FT-r3
+}
+_FT_ROUND_PROMPT_VERSION = {"1": "v1", "3": "v2", "4": "v3"}  # buffett-qwen2.5-7b-ft-r<N>-*.gguf
+_FT_ROUND_RE = re.compile(r"-ft-r(\d+)(?:[-_.]|$)")
+
+
+def expected_prompt_version(model_path, sha256: Optional[str] = None) -> Optional[str]:
+    """Prompt version the model was trained on (None for a model the registry does not know)."""
+    if sha256 and sha256.lower() in MODEL_SHA256_PROMPT_VERSION:
+        return MODEL_SHA256_PROMPT_VERSION[sha256.lower()]
+    match = _FT_ROUND_RE.search(os.path.basename(str(model_path)))
+    return _FT_ROUND_PROMPT_VERSION.get(match.group(1)) if match else None
+
+
+def _active_model_path() -> str:
+    import config
+
+    return os.environ.get("LLM_MODEL_PATH") or str(config.LLM_MODEL_PATH)
+
+
+def check_prompt_matches_model(model_path=None) -> None:
+    """Raise when env PROMPT_VERSION contradicts the prompt the model was trained on (ALLOW_PROMPT_MISMATCH=1 overrides)."""
+    explicit = (os.environ.get("PROMPT_VERSION") or "").strip().lower()
+    expected = expected_prompt_version(model_path or _active_model_path())
+    if not explicit or expected is None or explicit == expected:
+        return
+    if os.environ.get("ALLOW_PROMPT_MISMATCH", "").strip() == "1":
+        return
+    raise ValueError(
+        f"PROMPT_VERSION={explicit} contradicts the model {os.path.basename(str(model_path or _active_model_path()))} "
+        f"(trained on {expected}); unset PROMPT_VERSION or set ALLOW_PROMPT_MISMATCH=1 for an experiment"
+    )
+
+
 def prompt_version() -> str:
-    """Active prompt version, read at call time: env PROMPT_VERSION wins over config.PROMPT_VERSION (default v1)."""
+    """Active prompt version, read at call time.
+
+    env PROMPT_VERSION wins; unset, it follows the model file (LLM_MODEL_PATH, registry above); an unknown model
+    falls back to config.PROMPT_VERSION (default v1).
+    """
     value = os.environ.get("PROMPT_VERSION")
+    if value is None or not value.strip():
+        value = expected_prompt_version(_active_model_path())
     if value is None:
         import config
 
