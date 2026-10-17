@@ -36,6 +36,7 @@ import time
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 import common  # noqa: E402  (sets offline env flags, puts the repo root on sys.path)
+import ft_v7_checks as C  # noqa: E402
 import round4  # noqa: E402
 import round5  # noqa: E402
 from src.evaluation.claim_validator import _split_original, evidence_sentences, validate_and_filter_answer  # noqa: E402
@@ -59,8 +60,9 @@ MIN_SENTENCES = {'multipart': 7, 'single': 3, 'follow_up': 5, 'temporal': 7}
 BERKSHIRE_ID = re.compile(r'^(?:19|20)\d{2}_p\d{4}$')
 ID_TEXT = re.compile(r'\b(?:19|20)\d{2}_p\d{4}\b')
 OLD_ID_TEXT = re.compile(r'\b(?:19|20)\d{2}_\d+\b')
-DEPENDENT_START = re.compile(r'^(?:This|That|These|Those|It|They|He|She|Such|However|But|And|Also|Thus|Hence|Moreover|Furthermore|Yet|So|Then|Still|'
-                             r'Instead|Both|Here|There|Its|Their|His|Her)\b')
+DEPENDENT_START = C.DEPENDENT_START      # ft_v6 openers + the connectives of target-audit a12.py (Again, Clearly, Therefore, Consequently, ...)
+QUESTION_OVERLAP_MAX = C.QUESTION_OVERLAP_MAX
+MIN_OBLIGATION_WORDS = C.MIN_OBLIGATION_WORDS
 PASSAGE_TALK = round5.PASSAGE_TALK
 PRONOUN = round5.PRONOUN
 CITATION_END = re.compile(r'\s*\[(\d+(?:\s*,\s*\d+)*)\]\s*$')
@@ -296,6 +298,9 @@ RULES = ('- Ask as a normal reader would: never mention "the passage", "the text
          '- Choose sentences that are understandable alone. If a sentence starts with This, That, It, They, These, Such, However, But or And, '
          'use the previous sentence as well (two adjacent sentences) or choose another sentence.\n'
          '- "sentences" lists the sentence numbers (S-numbers) of that passage: one number, or two adjacent numbers like [4, 5].\n')
+STYLE = ('- Write the question the way a curious reader would phrase it, in your own words: vary the opening (How, Why, What did, In the letter for the '
+         'year, Buffett...), and never reuse the passages\' phrases; a natural question shares only its key nouns with the passages.\n')
+RULES += STYLE
 SHAPE = '{"question": "...?", "parts": [{"ask": "short phrase", "passage": 1, "sentences": [3]}, {"ask": "short phrase", "passage": 2, "sentences": [1, 2]}]}'
 
 
@@ -342,6 +347,8 @@ RETRY = {
     'duplicate_sentence': 'every part must use different sentences',
     'dependent_start': 'the first chosen sentence of a part must be understandable alone: add the previous sentence or choose another',
     'sentence_too_short': 'choose complete sentences of at least five words',
+    'obligation_too_short': 'each part needs at least eight words of answer: add the adjacent sentence or choose another',
+    'question_overlaps_passage': 'your question reuses too many words of the passages; ask it the way a curious reader who has not read them would',
     'bad_sentence': 'choose normal sentences (under 70 words, no row of asterisks)',
     'year_missing': 'the question must contain the letter year literally',
     'question_copies_passage': 'your question copied six or more consecutive words of a passage; rewrite it in your own words',
@@ -369,21 +376,25 @@ def has_copy(question, texts, n=6):
     return any(asked & set(zip(*(words(t)[i:] for i in range(n)))) for t in texts)
 
 
-def check_question(question, kind, docs):
+def check_question(question, kind, docs, overlap=True):
     if not isinstance(question, str) or not 20 <= len(question) <= 600 or not question.strip().endswith('?'):
         return 'bad_question'
     if PASSAGE_TALK.search(question):
         return 'question_refers_to_passage'
     if has_copy(question, [d.text for d in docs]):
         return 'question_copies_passage'
+    if overlap and C.question_overlap(question, [d.text for d in docs]) > QUESTION_OVERLAP_MAX:
+        return 'question_overlaps_passage'      # eval questions share 0.50-0.57 of their words with the gold passage, ft_v6 questions 0.75
     if kind == 'temporal' and str(docs[0].metadata['year']) not in question:
         return 'year_missing'
     return None
 
 
-def check_parts(parts, kind, docs, sentence_lists, forbidden=()):
-    """-> (reason or None, obligations). An obligation: {ask, passage(1-based), sentence_numbers, sentences, source_id}."""
-    lo, hi = PARTS[kind]
+def check_parts(parts, kind, docs, sentence_lists, forbidden=(), parts_range=None):
+    """-> (reason or None, obligations). An obligation: {ask, passage(1-based), sentence_numbers, sentences, source_id}.
+
+    `parts_range` is the job's own [lo, hi] (an ft_v7 multipart job asks for EXACTLY 4 or 5 parts; ft_v6 jobs carry [3, 5])."""
+    lo, hi = parts_range or PARTS[kind]
     if not isinstance(parts, list) or not lo <= len(parts) <= hi:
         return 'parts_count', None
     seen, out = set(forbidden), []
@@ -406,10 +417,13 @@ def check_parts(parts, kind, docs, sentence_lists, forbidden=()):
         if DEPENDENT_START.match(texts[0]) and len(numbers) == 1 and numbers[0] > 1:
             # repair instead of reject: a sentence that leans on the one before it is stated together with that sentence
             earlier = sentence_lists[passage - 1][numbers[0] - 2]
-            if (passage, numbers[0] - 1) not in seen and len(earlier.split()) >= 5 and not DEPENDENT_START.match(earlier):
+            if (passage, numbers[0] - 1) not in seen and len(earlier.split()) >= 5 and not DEPENDENT_START.match(earlier) \
+                    and not bad_sentence(earlier):
                 numbers, texts = [numbers[0] - 1, numbers[0]], [earlier] + texts
         if DEPENDENT_START.match(texts[0]):
             return 'dependent_start', None
+        if sum(len(t.split()) for t in texts) < MIN_OBLIGATION_WORDS:
+            return 'obligation_too_short', None
         keys = {(passage, n) for n in numbers}
         if keys & seen:
             return 'duplicate_sentence', None
@@ -418,8 +432,8 @@ def check_parts(parts, kind, docs, sentence_lists, forbidden=()):
     return None, out
 
 
-def validate_plan(obj, kind, docs):
-    """Teacher JSON -> (reason or None, plan dict)."""
+def validate_plan(obj, kind, docs, parts_range=None):
+    """Teacher JSON -> (reason or None, plan dict). `parts_range`: the job's own [lo, hi] number of parts (default PARTS[kind])."""
     if obj is None:
         return 'json_invalid', None
     sentence_lists = [sentences_of(d) for d in docs]
@@ -432,7 +446,7 @@ def validate_plan(obj, kind, docs):
         first = obj.get('first_part')
         if not isinstance(first, dict):
             return 'bad_part', None
-        first_check = check_question(obj.get('first_question'), 'single', docs)
+        first_check = check_question(obj.get('first_question'), 'single', docs, overlap=False)   # one sentence answers it: it echoes that sentence
         if first_check:
             return first_check, None
         passage, numbers = first.get('passage'), first.get('sentences')
@@ -443,11 +457,13 @@ def validate_plan(obj, kind, docs):
         texts = [sentence_lists[passage - 1][n - 1] for n in numbers]
         if any(len(t.split()) < 5 for t in texts) or DEPENDENT_START.match(texts[0]):
             return 'dependent_start', None
+        if any(bad_sentence(t) for t in texts):
+            return 'bad_sentence', None
         if not PRONOUN.search(obj['question']):
             return 'followup_pronoun', None
         forbidden = {(passage, n) for n in numbers}
         history = {'first_question': obj['first_question'].strip(), 'sentences': texts}
-    reason, obligations = check_parts(obj.get('parts'), kind, docs, sentence_lists, forbidden)
+    reason, obligations = check_parts(obj.get('parts'), kind, docs, sentence_lists, forbidden, parts_range)
     if reason:
         return ('followup_same_sentences' if reason == 'duplicate_sentence' and kind == 'follow_up' else reason), None
     return None, {'question': obj['question'].strip(), 'obligations': obligations, 'history': history}
@@ -478,8 +494,8 @@ def refusal_terms(question):
 
 
 def bad_sentence(text):
-    """Layout debris, not a fact: very long run-ons, '* * *' separators, a start that is not a capital/digit/quote."""
-    return len(text.split()) > 70 or '* *' in text or not re.match(r'[A-Z0-9"“‘(]', text)
+    """Layout debris, not a fact: very long run-ons, '* * *' separators, a start that is not a capital/digit/quote, a cut-off end."""
+    return len(text.split()) > 70 or '* *' in text or not re.match(r'[A-Z0-9"“‘(]', text) or not C.ends_like_a_sentence(text)
 
 
 def term_present(term, texts):
@@ -496,14 +512,13 @@ def chat_messages(question, hits, history=None):
     return [{'role': 'system', 'content': system}, {'role': 'user', 'content': prompt[len(prefix):]}]
 
 
-def locate(sentence, hit_texts, prefer=None):
-    """1-based slot of the served passage that holds `sentence` verbatim; `prefer` (a set of slot indices) wins ties."""
-    needle = norm(sentence)
-    slots = [i for i, text in enumerate(hit_texts, 1) if needle in text]
-    for slot in slots:
-        if prefer and slot in prefer:
-            return slot
-    return slots[0] if slots else None
+def locate(sentence, hit_texts):
+    """1-based slot [n] of a target sentence: the lowest-numbered served passage of which it is a COMPLETE sentence.
+
+    This is the citation rule the 7B learns (ft_v7). A passage that only contains the sentence as a substring, or as half of
+    a longer sentence, does not count (SP-01); several passages hold it because neighbour merging makes them overlap, and
+    then the lowest one is the label (TARGET-06, TPC-03), checked again by check_row."""
+    return C.lowest_holder(sentence, hit_texts)
 
 
 def place_sources(hits, obligations, docs_by_id, rng):
@@ -537,10 +552,9 @@ def build_target(obligations, hits):
     texts = [norm(h.text) for h in hits]
     lines, slots = [], []
     for ob in obligations:
-        own = {i for i, h in enumerate(hits, 1) if h.id == ob['source_id'] or ob['source_id'] in (h.metadata.get('merged_ids') or ())}
         parts, used = [], []
         for sentence in ob['sentences']:
-            slot = locate(sentence, texts, own)
+            slot = locate(sentence, texts)
             if slot is None:
                 return None, None
             parts.append(f'{norm(sentence)} [{slot}]')
@@ -589,8 +603,13 @@ def check_row(row, *, excluded=None, count_tokens=None):
     obligations = row.get('obligations') or []
     if any(bad_sentence(t) for ob in obligations for t in ob['sentences']):
         problems.append('bad_sentence')
+    if any(DEPENDENT_START.match(ob['sentences'][0]) for ob in obligations if ob['sentences']):
+        problems.append('dependent_start')
+    if any(sum(len(t.split()) for t in ob['sentences']) < MIN_OBLIGATION_WORDS for ob in obligations):
+        problems.append('obligation_too_short')
     if not 1 <= len(obligations) <= 5 or len(lines) != len(obligations):
         return problems + ['obligation_count']
+    texts = [passages[i][2] for i in sorted(passages)]
     for line, ob in zip(lines, obligations):
         rest = line
         for sentence in ob['sentences']:
@@ -607,6 +626,15 @@ def check_row(row, *, excluded=None, count_tokens=None):
             if slot not in passages or want not in passages[slot][2]:
                 problems.append('sentence_not_in_cited_passage')
                 break
+            if not C.is_aligned(want, passages[slot][2]):
+                problems.append('target_not_sentence_aligned')      # a fragment of a longer served sentence (SP-01)
+                break
+            if C.lowest_holder(want, texts) != slot:
+                problems.append('citation_not_lowest_holder')        # the learned rule: [n] = lowest passage holding the sentence
+                break
+            if not C.locatable(want, passages[slot][2]):
+                problems.append('sentence_not_locatable')            # answer_expand could not find it (EXP-03)
+                break
             rest = rest[match.end():].lstrip()
         else:
             if rest.strip():
@@ -615,9 +643,8 @@ def check_row(row, *, excluded=None, count_tokens=None):
     citations = parse_citations(target, hits)
     if not citations or any(c['invalid_numbers'] for c in citations):
         problems.append('invalid_citation')
-    verdict = validate_and_filter_answer(target, hits)
-    if verdict.blocked_claims or norm(verdict.safe_answer) != norm(target):
-        problems.append('claim_validator_rejects')
+    if C.serving_changes(target, [(passages[i][0], passages[i][2]) for i in sorted(passages)]):
+        problems.append('serving_validator_drops_sentence')         # /ask would not show the target as written (POSTPROCESS-01/02)
     if count_tokens is not None:
         if count_tokens(messages[:2]) + count_tokens([messages[2]]) + 8 > row.get('max_seq', MAX_SEQ):
             problems.append('too_long_for_max_seq')
@@ -1018,6 +1045,17 @@ def assemble_command(args):
     print(f'rejected: {reasons}')
     print(f'partnership_rejected={manifest["partnership_rejected"]} spent_set_distractor_rows={manifest["spent_set_distractor_rows"]} -> {out}/{{train,valid}}.jsonl, manifest.json')
     check_refusal_share(generator.rows, args.min_refusal_share)
+
+
+def check_over_length(attempts, allow):
+    """Rows the token cap dropped are rows the 7B never trains on, and they are the longest ones (TOKEN-02, TRAIN-08, PD-03): print
+    them and exit non-zero unless --allow-drops. -> the dropped ids."""
+    dropped = [a for a in attempts if a.get('reason') == 'too_long_for_max_seq']
+    for a in dropped:
+        print(f"over-length drop {a['id']} kind={a['kind']} k={a.get('k')}")
+    if dropped and not allow:
+        raise SystemExit(f'{len(dropped)} over-length drop(s); raise --max-seq (cap {MAX_SEQ_MIX}) or pass --allow-drops')
+    return [a['id'] for a in dropped]
 
 
 def check_refusal_share(rows, minimum):
