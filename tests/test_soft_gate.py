@@ -17,7 +17,6 @@ class FakeLLM:
 
 def _run(monkeypatch, overlap, flag):
     monkeypatch.setenv("EVIDENCE_GATE_SOFT", "1" if flag else "0")
-    monkeypatch.setattr(ask_flow, "is_grounded", lambda llm: False)
     monkeypatch.setattr(
         ask_flow, "assess_evidence",
         lambda *a, **k: SimpleNamespace(sufficient=overlap >= 0.30, best_overlap=overlap),
@@ -29,7 +28,6 @@ def _run(monkeypatch, overlap, flag):
 
 def test_unset_means_on(monkeypatch):
     monkeypatch.delenv("EVIDENCE_GATE_SOFT", raising=False)
-    monkeypatch.setattr(ask_flow, "is_grounded", lambda llm: False)
     monkeypatch.setattr(
         ask_flow, "assess_evidence",
         lambda *a, **k: SimpleNamespace(sufficient=False, best_overlap=0.27),

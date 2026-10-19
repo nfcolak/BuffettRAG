@@ -34,7 +34,7 @@ def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--chunks", type=Path, default=None,
                     help="Chunks JSONL (defaults to V3, then legacy corpus fallback).")
-    ap.add_argument("--backend", choices=["chroma", "faiss"], default=VECTOR_BACKEND)
+    ap.add_argument("--backend", choices=["faiss"], default=VECTOR_BACKEND)
     ap.add_argument("--embedder", choices=["small", "base"], default="small")
     ap.add_argument("--device", default=EMBEDDING_DEVICE)
     ap.add_argument("--persist-dir", type=Path, default=None,

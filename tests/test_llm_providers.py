@@ -11,7 +11,6 @@ import config
 from src.generation.prompt import REFUSAL_LINE, build_cited_prompt
 from src.generation.providers import LlamaCppProvider, UnavailableProvider, create_llm_provider
 from src.generation.providers import factory
-from src.generation.providers.mlx_provider import MlxProvider
 from src.storage import SearchHit
 
 
@@ -112,7 +111,7 @@ def test_offtopic_incidental_keyword_refuses_before_generation(monkeypatch):
     hits = [SearchHit("p", "We use computer models to estimate the cost of insurance operations.", {}, 1.0)]
     question = "How do I configure a firewall to protect a computer?"
     prompt = build_cited_prompt(question, hits)
-    for name in ("llama", "mlx"):
+    for name in ("llama",):
         provider = mock.Mock(provider_name=name)
         answer, citations = _generate_answer(provider, prompt, hits, 100, query=question)
         assert answer == REFUSAL_LINE
@@ -191,12 +190,6 @@ def test_missing_model_ask_returns_llm_unavailable_message(monkeypatch):
         "/ask", json={"query": "What did Buffett say about derivatives?", "expand_query": False}).json()
     assert body["answer"] == ask_flow._llm_error_message(RuntimeError("x"))
     assert body["citations"] == []
-
-
-
-def test_mlx_provider_uses_model_path_from_environment(tmp_path, monkeypatch):
-    monkeypatch.setenv("GROUNDED_MLX_MODEL", str(tmp_path))
-    assert MlxProvider().model_path == str(tmp_path.resolve())
 
 
 if __name__ == "__main__":

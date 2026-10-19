@@ -16,7 +16,7 @@ Year handling treats detected years as a hint rather than a constraint. When a q
 
 Questions that compare two periods ("How did his view on technology change from the 1990s to the 2020s?") are detected by pattern and decomposed into one search per period. Each sub-search keeps the full original query so the embedding stays on topic while only the year filter changes, and the final selection reserves a top candidate from each nonempty period when at least two passage slots are available. This preserves coverage, but does not itself establish relevance or a change of opinion.
 
-Three vector backends share one interface, and each persists an index identity manifest (corpus, model, dimension) that is checked at startup. pgvector is the production store, Chroma and FAISS remain available for local work and comparison runs, selected with `VECTOR_BACKEND` (see configuration). Metadata filters are validated against a field whitelist and built as parameterized SQL, and the table name is checked against a strict identifier pattern.
+FAISS is the single vector store; it persists an index identity manifest (corpus, model, dimension) that is checked at startup. Metadata filters are validated against a field whitelist.
 
 ## Evaluation
 
@@ -67,7 +67,7 @@ Answers come from a small model that runs inside the backend process through lla
 
 The GGUF is produced by the Kaggle/Colab LoRA notebook under `colab/`, is not downloadable, and is git-ignored; place it at `models/ft/7b_r1/buffett-qwen2.5-7b-ft-r1-q4_k_m.gguf`.
 
-Providers: `llama` (default), `grounded`, `mlx`. If `llama` is selected but the model file is missing or `llama_cpp` cannot be imported, the factory logs one warning and the backend runs without an answer engine: search works, `/ask` returns the "LLM unavailable" message.
+Providers: `llama` (default) and `remote`. If `llama` is selected but the model file is missing or `llama_cpp` cannot be imported, the factory logs one warning and the backend runs without an answer engine: search works, `/ask` returns the "LLM unavailable" message.
 
 Latency: with Metal (`LLM_GPU_LAYERS=-1`) an answer takes a few seconds. On a CPU-only server (`LLM_GPU_LAYERS=0`) expect roughly 10 to 40 seconds per answer depending on cores. To keep the prompt inside what a 1.5B model handles, the prompt uses only the first `LLM_CONTEXT_PASSAGES` expanded passages (5 by default, 8 for 7B GGUF files), each cut around its anchor chunk to `LLM_PASSAGE_MAX_CHARS`, and trailing passages are dropped until the prompt fits `LLM_N_CTX` minus the answer budget (4 chars per token estimate). Citation numbers always match the passages shown.
 
@@ -79,13 +79,7 @@ The teacher, Qwen2.5-7B running in MLX 4-bit, generated cited answers from the c
 
 Round 1 used 193 single-sentence training examples and 13 validation examples, stored in `data/ft/`. Round 2 used answers of 2–4 cited sentences, including comparison, multi-part and follow-up questions; `data/ft_v2/` contains 560 training examples and 70 validation examples. These split counts come from each directory's `manifest.json`. Training records for round 2 are in `data/ft_v2/round2_metrics/`; the held-out table above uses the final comparison, not the earlier metrics snapshot.
 
-The resumable pipeline generates examples, splits and checks leakage, trains LoRA, exports a GGUF model and evaluates it:
-
-```bash
-bash scripts/ft/run_round.sh <round> <target_examples> <max_gen_minutes>
-```
-
-The current runner uses `data/ft_v2/` and stores stage markers and model artifacts under `models/ft/round<round>/`. It needs the local teacher and student weights, MLX/`mlx-lm`, and the llama.cpp conversion and quantization tools; it is not part of the backend quick start.
+Training data is generated locally with the Python generators in `scripts/ft/` (`round3.py`, `round4.py`, `round5.py`, `build_ft_v6.py`), which need the local teacher weights and are not part of the backend quick start. LoRA training and the GGUF export run in the Colab/Kaggle notebooks under `colab/`.
 
 The fine-tuned GGUF files are not published: they are git-ignored under `models/ft/`. To serve a locally generated round-2 model:
 
@@ -99,7 +93,7 @@ Everything is set through environment variables, read in `config.py`.
 
 | Variable | Default | Purpose |
 |---|---|---|
-| `DEFAULT_LLM_PROVIDER` | `llama` | `llama` (embedded GGUF model), `grounded` or `mlx` |
+| `DEFAULT_LLM_PROVIDER` | `llama` | `llama` (embedded GGUF model) or `remote` |
 | `LLM_MODEL_PATH` | `models/ft/7b_r1/buffett-qwen2.5-7b-ft-r1-q4_k_m.gguf` | GGUF file, relative to the repo root |
 | `LLM_N_CTX` | `8192` | Context window |
 | `LLM_N_THREADS` | `0` | CPU threads (0 = auto) |
@@ -107,8 +101,7 @@ Everything is set through environment variables, read in `config.py`.
 | `LLM_GPU_LAYERS` | `-1` | `-1` all layers on Metal/GPU, `0` CPU only |
 | `LLM_CONTEXT_PASSAGES` | `5` (8 for 7B GGUF files) | Passages placed in the prompt for the llama provider |
 | `LLM_PASSAGE_MAX_CHARS` | `1800` | Per-passage character cap for the llama provider |
-| `VECTOR_BACKEND` | `pgvector` | `pgvector`, `chroma`, or `faiss` |
-| `PGHOST`, `PGPORT`, `PGUSER`, `PGPASSWORD`, `PGDATABASE`, `PG_TABLE` | localhost defaults | Postgres connection for pgvector |
+| `VECTOR_BACKEND` | `faiss` | Vector store (`faiss`) |
 | `EMBEDDING_MODEL` | `BAAI/bge-base-en-v1.5` | Embedding model id |
 | `EMBEDDING_DEVICE` | auto | `cuda` when available, otherwise `cpu` |
 | `RERANK_CANDIDATES` | `15` | Max candidates sent to the cross-encoder |

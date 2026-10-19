@@ -72,43 +72,6 @@ class TestIngestion(unittest.TestCase):
         self.assertIn("inflation", tags)
 
 
-class TestPgWhereClause(unittest.TestCase):
-    """Unit-test the pgvector WHERE-clause builder without needing a running DB."""
-
-    def setUp(self) -> None:
-        from src.storage.pgvector_store import _pg_build_where_clause
-        self._build = _pg_build_where_clause
-
-    def test_empty(self) -> None:
-        sql, params = self._build(None)
-        self.assertEqual(sql, "")
-        self.assertEqual(params, [])
-
-    def test_equality(self) -> None:
-        sql, params = self._build({"year": 2008})
-        self.assertEqual(sql, "WHERE year = %s")
-        self.assertEqual(params, [2008])
-
-    def test_range(self) -> None:
-        sql, params = self._build({"year": {"$gte": 2010, "$lte": 2015}})
-        self.assertIn("year >= %s", sql)
-        self.assertIn("year <= %s", sql)
-        self.assertEqual(sorted(params), [2010, 2015])
-
-    def test_in(self) -> None:
-        sql, params = self._build({"year": {"$in": [2008, 2009]}})
-        self.assertIn("year IN (%s,%s)", sql)
-        self.assertEqual(params, [2008, 2009])
-
-    def test_rejects_unknown_field(self) -> None:
-        with self.assertRaises(ValueError):
-            self._build({"year; DROP TABLE buffett_chunks; --": 2008})
-
-    def test_rejects_unknown_operator(self) -> None:
-        with self.assertRaises(ValueError):
-            self._build({"year": {"$ne": 2008}})
-
-
 class TestRetrievalUtilities(unittest.TestCase):
     def test_year_filter_single_year(self) -> None:
         f = detect_year_filter("What did Buffett write in 2008?")

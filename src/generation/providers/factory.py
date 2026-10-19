@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 
 
 def create_llm_provider(provider: Optional[str] = None) -> LLMProvider:
-    """Create the answer provider: ``llama`` (default), ``mlx``, ``grounded`` or ``remote``.
+    """Create the answer provider: ``llama`` (default) or ``remote``.
 
     When the llama model file or ``llama_cpp`` is unavailable an
     ``UnavailableProvider`` is returned: the backend still starts and search works,
@@ -38,8 +38,8 @@ def create_llm_provider(provider: Optional[str] = None) -> LLMProvider:
         return LlamaCppProvider(model_path=path)
 
     if selected in ("local", "extractive"):
-        raise ValueError("The extractive engine was removed; use 'llama', 'mlx' or 'grounded'.")
-    # Factory-local imports: grounded/mlx stay out of the import graph of old providers.
+        raise ValueError("The extractive engine was removed; use 'llama' or 'remote'.")
+    # Factory-local import: the remote provider stays out of the import graph of the others.
     if selected == "remote":
         if not config.remote_llm_url():
             reason = "REMOTE_LLM_URL not set"
@@ -48,15 +48,5 @@ def create_llm_provider(provider: Optional[str] = None) -> LLMProvider:
         from src.generation.providers.remote_provider import RemoteProvider
 
         return RemoteProvider()
-
-    if selected == "grounded":
-        from src.generation.providers.grounded_provider import GroundedProvider
-
-        return GroundedProvider()
-
-    if selected == "mlx":
-        from src.generation.providers.mlx_provider import MlxProvider
-
-        return MlxProvider()
 
     raise ValueError(f"Unsupported LLM provider: {selected}")

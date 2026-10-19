@@ -40,7 +40,6 @@ METADATA_FILE = OUTPUT_DIR / "metadata.json"
 METADATA_V2_FILE = OUTPUT_DIR / "metadata_v2.json"
 
 INDEX_DIR = DATA_DIR / "indices"
-CHROMA_DIR = INDEX_DIR / "chroma"
 FAISS_DIR = INDEX_DIR / os.getenv("FAISS_INDEX_NAME", "faiss_v3")
 
 EVAL_DIR = DATA_DIR / "evaluation"
@@ -49,7 +48,6 @@ DATA_DIR.mkdir(parents=True, exist_ok=True)
 RAW_DATA_DIR.mkdir(parents=True, exist_ok=True)
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 INDEX_DIR.mkdir(parents=True, exist_ok=True)
-CHROMA_DIR.mkdir(parents=True, exist_ok=True)
 FAISS_DIR.mkdir(parents=True, exist_ok=True)
 EVAL_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -101,18 +99,7 @@ EMBEDDING_DEVICE = os.getenv("EMBEDDING_DEVICE", _default_device())
 # -----------------------------------------------------------------------------
 # Vector store
 # -----------------------------------------------------------------------------
-VECTOR_BACKEND = os.getenv("VECTOR_BACKEND", "pgvector")  # 'pgvector' | 'chroma' | 'faiss'
-CHROMA_COLLECTION = "buffett_letters"
-
-# pgvector / Postgres connection (standard libpq env vars, localhost defaults).
-PG_HOST = os.getenv("PGHOST", "localhost")
-PG_PORT = int(os.getenv("PGPORT", "5432"))
-PG_USER = os.getenv("PGUSER", "postgres")
-PG_PASSWORD = os.getenv("PGPASSWORD", "postgres")
-PG_DATABASE = os.getenv("PGDATABASE", "postgres")
-PG_TABLE = os.getenv("PG_TABLE", "buffett_chunks")
-# IVFFlat index list count -- rule of thumb: rows/1000, capped to a few hundred
-PG_IVFFLAT_LISTS = int(os.getenv("PG_IVFFLAT_LISTS", "100"))
+VECTOR_BACKEND = os.getenv("VECTOR_BACKEND", "faiss")
 
 # -----------------------------------------------------------------------------
 # Retrieval
@@ -141,7 +128,7 @@ LLM_MAX_NEW_TOKENS = 900
 # Serving prompt version (src/generation/prompt.py): v1 = text FT-r1 was trained on, v2 = coverage prompt (FT-r3),
 # v3 = v2 for the Berkshire-only corpus (FT-r4 training data). Env wins at call time.
 PROMPT_VERSION = os.getenv("PROMPT_VERSION", "v1")
-# Providers: "llama" (embedded llama.cpp GGUF model) | "mlx" | "grounded". The extractive engine was removed.
+# Providers: "llama" (embedded llama.cpp GGUF model) | "remote". The extractive engine was removed.
 # No external API is used anywhere.
 DEFAULT_LLM_PROVIDER = os.getenv("DEFAULT_LLM_PROVIDER", "llama").strip().lower()
 LLM_MODEL_PATH = Path(os.getenv("LLM_MODEL_PATH", "models/ft/7b_r1/buffett-qwen2.5-7b-ft-r1-q4_k_m.gguf"))
@@ -254,22 +241,6 @@ def remote_llm_retries() -> int:
     """REMOTE_LLM_RETRIES at call time (default 2; connect errors and 502/503/504 only)."""
     raw = os.environ.get("REMOTE_LLM_RETRIES")
     return int(raw) if raw and raw.strip() else 2
-
-# Grounded provider (DEFAULT_LLM_PROVIDER=grounded). Knob names, ranges and built-in
-# defaults live in src/generation/grounded/settings.py (GroundedSettings); this block
-# only (a) lets calibrated values be committed as defaults without code changes
-# (GROUNDED_DEFAULTS, string values, same keys as the environment). The environment,
-# read at call time, always wins over GROUNDED_DEFAULTS.
-GROUNDED_DEFAULTS: dict = {}
-
-
-def load_grounded_settings(environ=None):
-    """Validated GroundedSettings from GROUNDED_DEFAULTS + environment (lazy import)."""
-    from src.generation.grounded.settings import GroundedSettings
-
-    env = os.environ if environ is None else environ
-    merged = {**GROUNDED_DEFAULTS, **{k: v for k, v in env.items() if k.startswith("GROUNDED_")}}
-    return GroundedSettings.from_env(merged)
 
 # -----------------------------------------------------------------------------
 # Service URLs

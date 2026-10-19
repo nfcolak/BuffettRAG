@@ -1,4 +1,4 @@
-"""Unified vector store interface for Chroma, FAISS, and pgvector."""
+"""Vector store interface (FAISS)."""
 
 from __future__ import annotations
 
@@ -6,10 +6,8 @@ import json
 from pathlib import Path
 from typing import List, Optional
 
-from src.storage.chroma_store import ChromaStore
 from src.storage.faiss_store import FaissStore
 from src.storage.filters import validate_where_filter
-from src.storage.pgvector_store import PgVectorStore
 from src.storage.types import SearchHit, StoredDoc
 
 __all__ = [
@@ -21,11 +19,7 @@ __all__ = [
 ]
 
 
-def get_vector_store(backend: str = "pgvector", dim: Optional[int] = None):
-    if backend == "pgvector":
-        return PgVectorStore(dim=dim)
-    if backend == "chroma":
-        return ChromaStore()
+def get_vector_store(backend: str = "faiss", dim: Optional[int] = None):
     if backend == "faiss":
         return FaissStore(dim=dim)
 

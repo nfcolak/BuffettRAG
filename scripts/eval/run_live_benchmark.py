@@ -13,10 +13,8 @@ import json
 import math
 import os
 import sys
-import platform
 import subprocess
 import time
-from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
@@ -37,8 +35,6 @@ from src.retrieval.context import build_doc_lookup
 from src.retrieval.retriever import Retriever
 from src.storage import SearchHit, load_chunks_as_docs
 
-GROUNDED_PROVIDERS = frozenset({"grounded", "mlx"})
-COMPOSERS = ("mlx", "llama", "template")
 DEFAULT_CASES = ROOT / "data/evaluation/heldout_v1/answer_benchmark_heldout_v1.json"
 
 
@@ -81,7 +77,7 @@ def _context_snapshot(context_hits) -> List[Dict[str, Any]]:
 class _TrackedProvider:
     """Capture provider errors even when /ask or query expansion swallows them."""
 
-    def __init__(self, provider, temperature, composer=None):
+    def __init__(self, provider, temperature):
         self._provider = provider
         self.provider_name = provider.provider_name
         self.model = provider.model
@@ -89,60 +85,13 @@ class _TrackedProvider:
         self.requests = []
         self.call_count = 0
         self.temperature = temperature
-        self.composer = composer
         self.raw_outputs = []  # (stage, raw model text) for --save-raw; pre-validation
-        self.grounded_calls = []  # one record per answer_grounded call (grounded/mlx runs)
-        self.notes = []  # non-fatal events, e.g. expansion unavailable with the template composer
-        if hasattr(provider, "answer_grounded"):
-            self.answer_grounded = self._answer_grounded
 
     def __getattr__(self, name):
-        # Forward optional hooks (attach_resources, ...) without exposing answer_grounded early.
-        if name.startswith("_") or name == "answer_grounded":
+        # Forward optional provider hooks.
+        if name.startswith("_"):
             raise AttributeError(name)
         return getattr(self._provider, name)
-
-    def _answer_grounded(self, original_query, context_hits, *, history=(), max_new_tokens=200):
-        self.call_count += 1
-        self.requests.append({"model": self.model, "temperature": self.temperature})
-        snapshot = _context_snapshot(context_hits)
-        try:
-            result = self._provider.answer_grounded(original_query, context_hits, history=history,
-                                                    max_new_tokens=max_new_tokens)
-        except Exception as exc:
-            # Unavailable composer/model: a provider failure, never a silent substitution.
-            self.failures.append({"stage": "grounded", "error_type": type(exc).__name__})
-            self.grounded_calls.append({"composer": self.composer, "model_id": self.model,
-                                        "context": snapshot, "exception_type": type(exc).__name__})
-            raise RuntimeError("Benchmark provider request failed") from None
-        raw = {}
-        for group, item in (getattr(result, "raw_outputs", None) or {}).items():
-            raw[group] = {"raw": getattr(item, "raw", None), "text": getattr(item, "text", None),
-                          "finish_reason": getattr(item, "finish_reason", None),
-                          "tokens_in": getattr(item, "tokens_in", None),
-                          "tokens_out": getattr(item, "tokens_out", None),
-                          "error_type": getattr(item, "error_type", None)}
-            if getattr(item, "error_type", None):
-                self.failures.append({"stage": f"compose:{group}", "error_type": item.error_type})
-        stage_failures = [{"stage": f.stage, "error_type": f.error_type} for f in getattr(result, "failures", [])]
-        for failure in stage_failures:
-            if failure not in self.failures:
-                self.failures.append(dict(failure))
-        groups = getattr(result, "groups", []) or []
-        timings = dict(getattr(result, "timings_ms", {}) or {})
-        plan = getattr(result, "plan", None)
-        self.grounded_calls.append({
-            "composer": getattr(result, "composer", self.composer),
-            "model_id": getattr(result, "model_id", self.model),
-            "raw_outputs": raw, "stage_failures": stage_failures,
-            "fallback_reasons": {g.group: g.fallback_reason for g in groups if getattr(g, "fallback_reason", None)},
-            "trace": getattr(plan, "trace", None),
-            "decision": getattr(plan, "decision", None), "reasons": list(getattr(plan, "reasons", []) or []),
-            "timings_ms": timings,
-            "cold_load_ms": {k: v for k, v in timings.items() if k.startswith("load_")},
-            "inference_ms": {k: v for k, v in timings.items() if not k.startswith("load_")},
-            "context": snapshot})
-        return result
 
     def generate(self, prompt, max_new_tokens=None):
         self.call_count += 1
@@ -153,10 +102,7 @@ class _TrackedProvider:
             self.raw_outputs.append((stage, output))
             return output
         except Exception as exc:
-            if stage == "expanding" and self.composer == "template":
-                self.notes.append({"stage": stage, "error_type": type(exc).__name__, "effect": "no_query_expansion"})
-            else:
-                self.failures.append({"stage": stage, "error_type": type(exc).__name__})
+            self.failures.append({"stage": stage, "error_type": type(exc).__name__})
             # Production debug paths must not accidentally print provider error
             # bodies, headers or API keys; the original exception is not exposed.
             raise RuntimeError("Benchmark provider request failed") from None
@@ -168,25 +114,6 @@ def _git(*args: str) -> Optional[str]:
                               timeout=20, check=True).stdout.strip()
     except Exception:
         return None
-
-
-def _model_fingerprint(path: Optional[Path]) -> Optional[Dict[str, Any]]:
-    """Whole-file sha256 for a file; for a directory, a sha over (relative name, size) + small-file content."""
-    if path is None or not Path(path).exists():
-        return None
-    path = Path(path)
-    digest = hashlib.sha256()
-    if path.is_file():
-        with path.open("rb") as fh:
-            for block in iter(lambda: fh.read(1 << 20), b""):
-                digest.update(block)
-        return {"path": str(path), "kind": "file", "sha256": digest.hexdigest()}
-    for item in sorted(p for p in path.rglob("*") if p.is_file()):
-        size = item.stat().st_size
-        digest.update(f"{item.relative_to(path)}:{size}\n".encode())
-        if size < 1 << 20:
-            digest.update(item.read_bytes())
-    return {"path": str(path), "kind": "dir", "sha256": digest.hexdigest()}
 
 
 def _sha256_of_file(path: Path) -> str:
@@ -250,106 +177,6 @@ def _run_settings(*, corpus: Path, provider: str, model_path: Optional[Path], te
     }
 
 
-def _library_versions() -> Dict[str, Optional[str]]:
-    from importlib import metadata
-
-    out: Dict[str, Optional[str]] = {"python": platform.python_version()}
-    for name in ("mlx", "mlx-lm", "llama-cpp-python", "torch", "transformers", "sentence-transformers"):
-        try:
-            out[name] = metadata.version(name)
-        except Exception:
-            out[name] = None
-    return out
-
-
-def _device() -> Dict[str, Any]:
-    info: Dict[str, Any] = {"machine": platform.machine(), "platform": platform.platform()}
-    try:
-        import torch
-        info["torch_mps"] = bool(torch.backends.mps.is_available())
-    except Exception:
-        info["torch_mps"] = None
-    return info
-
-
-class _Sidecar:
-    """<output>.rows.jsonl (appended per finished row) and <output>.manifest.json; inert when disabled."""
-
-    def __init__(self, output: Optional[Path], enabled: bool):
-        self.enabled = bool(enabled and output is not None)
-        if self.enabled:
-            output = Path(output)
-            output.parent.mkdir(parents=True, exist_ok=True)
-            self.rows_path = output.with_name(output.name + ".rows.jsonl")
-            self.manifest_path = output.with_name(output.name + ".manifest.json")
-        self.manifest: Dict[str, Any] = {}
-
-    def load_resume(self, corpus_hash: str, cases_hash: str) -> Dict[str, Dict[str, Any]]:
-        if not self.manifest_path.exists():
-            raise FixtureValidationError("--resume needs an existing manifest next to the rows file")
-        prior = json.loads(self.manifest_path.read_text(encoding="utf-8"))
-        if prior.get("corpus_sha256") != corpus_hash or prior.get("cases_sha256") != cases_hash:
-            raise FixtureValidationError("--resume identity mismatch (corpus or cases sha256 changed)")
-        self.manifest = prior
-        rows: Dict[str, Dict[str, Any]] = {}
-        if self.rows_path.exists():
-            for line in self.rows_path.read_text(encoding="utf-8").splitlines():
-                if line.strip():
-                    row = json.loads(line)
-                    rows[row["qid"]] = row
-        return rows
-
-    def write_manifest(self, *, resume, started, corpus, corpus_hash, cases_path, cases_hash, provider, composer,
-                       model_path, temperature, retrieval, llm, initialization_failure) -> None:
-        if not self.enabled:
-            return
-        resumes = self.manifest.get("resumes", [])
-        settings: Any = None
-        try:
-            import dataclasses
-            from src.generation.grounded.settings import GroundedSettings
-            settings = {k: (str(v) if isinstance(v, Path) else v)
-                        for k, v in dataclasses.asdict(GroundedSettings.from_env()).items()}
-        except Exception as exc:
-            settings = {"unavailable": type(exc).__name__}
-        status = _git("status", "--porcelain")
-        provider_attr = getattr(llm._provider, "temperature", None) if llm is not None else None
-        paths = {"model_path": model_path}
-        if model_path is None and provider == "grounded" and isinstance(settings, dict):
-            paths = {"model_path": settings.get({"mlx": "MLX_MODEL", "llama": "LLAMA_MODEL"}.get(composer or "", ""))}
-        self.manifest = {
-            "schema_version": 1, "started_utc": self.manifest.get("started_utc", started),
-            "code_sha": _git("rev-parse", "HEAD"), "code_dirty": bool(status) if status is not None else None,
-            "corpus": str(corpus), "corpus_sha256": corpus_hash, "cases": str(cases_path), "cases_sha256": cases_hash,
-            "provider": provider, "composer": composer, "retrieval": retrieval,
-            "model": _model_fingerprint(Path(paths["model_path"])) if paths["model_path"] else None,
-            "effective_settings": settings,
-            "temperature": {"requested": temperature, "asserted_at_provider": llm is not None and (
-                                provider_attr is None or provider_attr == temperature),
-                            "provider_attr": provider_attr},
-            "library_versions": _library_versions(), "device": _device(),
-            "initialization_failure": initialization_failure, "resumes": resumes}
-        self._flush()
-        if not resume and self.rows_path.exists():
-            self.rows_path.unlink()  # a fresh run never inherits rows from an earlier one
-
-    def _flush(self) -> None:
-        self.manifest_path.write_text(json.dumps(self.manifest, indent=2, ensure_ascii=False, default=str) + "\n",
-                                      encoding="utf-8")
-
-    def append_row(self, row: Dict[str, Any]) -> None:
-        if self.enabled:
-            with self.rows_path.open("a", encoding="utf-8") as fh:
-                fh.write(json.dumps(row, ensure_ascii=False, default=str) + "\n")
-
-    def record_resume(self, resumed_qids, new_rows: int) -> None:
-        if self.enabled:
-            self.manifest.setdefault("resumes", []).append({
-                "at_utc": datetime.now(timezone.utc).isoformat(), "skipped_completed_qids": list(resumed_qids),
-                "generated_new": new_rows})
-            self._flush()
-
-
 def _relative_or_absolute(path: Path) -> str:
     try:
         return str(path.relative_to(ROOT))
@@ -366,10 +193,7 @@ def run(
     max_cases: Optional[int] = None,
     retrieval: str = "hybrid",
     save_raw: bool = False,
-    composer: Optional[str] = None,
     model_path: Optional[Path] = None,
-    output: Optional[Path] = None,
-    resume: bool = False,
     qids: Optional[List[str]] = None,
 ) -> Dict[str, Any]:
     """Validate every fixture first, then call backend.ask without HTTP/startup."""
@@ -379,18 +203,11 @@ def run(
         raise ValueError("temperature must be finite and between 0 and 2")
     if max_cases is not None and max_cases < 1:
         raise ValueError("max_cases must be positive")
-    grounded_run = provider in GROUNDED_PROVIDERS
-    if provider == "grounded" and composer not in COMPOSERS:
-        raise ValueError("--composer {mlx,llama,template} is required with the grounded provider (no auto)")
-    if composer is not None and provider != "grounded":
-        raise ValueError("--composer applies only to the grounded provider")
     if model_path is not None:
-        if provider not in {"llama", "mlx", "grounded"} or (provider == "grounded" and composer == "template"):
-            raise ValueError("--model-path applies only to llama, mlx or grounded (mlx/llama composer)")
+        if provider != "llama":
+            raise ValueError("--model-path applies only to the llama provider")
         if not Path(model_path).is_absolute():
             raise ValueError("--model-path must be absolute")
-    if resume and (output is None or not grounded_run):
-        raise ValueError("--resume needs --output and a grounded or mlx provider")
     corpus, cases_path = corpus.resolve(), cases_path.resolve()
     payload = json.loads(cases_path.read_text(encoding="utf-8"))
     cases = payload["cases"]
@@ -409,16 +226,12 @@ def run(
             raise FixtureValidationError(f"--qids not in the cases file: {unknown}")
         selected_cases = [case for case in selected_cases if case["qid"] in set(qids)]
     cases_hash = hashlib.sha256(cases_path.read_bytes()).hexdigest()
-    sidecar = _Sidecar(output, grounded_run)
-    prior_rows: Dict[str, Dict[str, Any]] = {}
-    if resume:
-        prior_rows = sidecar.load_resume(corpus_hash, cases_hash)
 
     from src.services import backend_app as backend, ask_flow
 
     # PROMPT_VERSION must not contradict the model's training prompt (raises; ALLOW_PROMPT_MISMATCH=1 overrides).
     import config as _config
-    check_prompt_matches_model(model_path if model_path is not None and (composer or provider) == "llama"
+    check_prompt_matches_model(model_path if model_path is not None and provider == "llama"
                                else _config.LLM_MODEL_PATH if provider == "llama" else "")
     llm = None
     initialization_failure = None
@@ -426,23 +239,18 @@ def run(
     try:
         # Temperature goes through config LLM_TEMPERATURE (env + attr) before creation.
         os.environ["LLM_TEMPERATURE"] = repr(temperature)
-        if composer:
-            os.environ["GROUNDED_COMPOSER"] = composer
         if model_path is not None:
-            kind = composer or provider
-            os.environ["GROUNDED_LLAMA_MODEL" if kind == "llama" else "GROUNDED_MLX_MODEL"] = str(model_path)
-            if kind == "llama":
-                os.environ["LLM_MODEL_PATH"] = str(model_path)
+            os.environ["LLM_MODEL_PATH"] = str(model_path)
         import config
         config.LLM_TEMPERATURE = temperature
-        if model_path is not None and (composer or provider) == "llama":
+        if model_path is not None:
             config.LLM_MODEL_PATH = Path(model_path)
         created = create_llm_provider(provider=provider)
         if hasattr(created, "temperature"):
             created.temperature = temperature  # default arg was bound at import time
             if created.temperature != temperature:
                 raise RuntimeError("temperature did not reach the provider")
-        llm = _TrackedProvider(created, temperature, composer)
+        llm = _TrackedProvider(created, temperature)
     except Exception as exc:
         initialization_failure = {"stage": "initializing_provider", "error_type": type(exc).__name__}
 
@@ -469,21 +277,8 @@ def run(
     ask_flow._state = {"retriever": retriever, "docs": docs, "docs_by_id": build_doc_lookup(docs), "llm": llm}
     ask_flow.EXPOSE_DEBUG_STATUS = False
     rows = []
-    resumed_qids = []
-    run_started = datetime.now(timezone.utc).isoformat()
-    sidecar.write_manifest(resume=resume, started=run_started, corpus=corpus, corpus_hash=corpus_hash,
-                           cases_path=cases_path, cases_hash=cases_hash, provider=provider, composer=composer,
-                           model_path=model_path, temperature=temperature, retrieval=retrieval,
-                           llm=llm, initialization_failure=initialization_failure)
     try:
         for case in selected_cases:
-            if case["qid"] in prior_rows:
-                resumed = prior_rows[case["qid"]]
-                if os.getenv("ANSWER_DECOMPOSE", "0") == "1":
-                    resumed["decompose_parts"] = split_question(case["query"])
-                rows.append(resumed)
-                resumed_qids.append(case["qid"])
-                continue
             start = time.perf_counter()
             row = {"qid": case["qid"], "query": case["query"],
                    "history": case.get("history", []),
@@ -502,8 +297,6 @@ def run(
                 request_offset = len(llm.requests)
                 call_offset = llm.call_count
                 raw_offset = len(llm.raw_outputs)
-                grounded_offset = len(llm.grounded_calls)
-                note_offset = len(llm.notes)
                 served_context.clear()
                 req = backend.AskRequest(query=case["query"], history=case.get("history", []),
                                          strategy="hybrid", rerank=retrieval == "hybrid")
@@ -515,13 +308,7 @@ def run(
                             "provider_calls": llm.call_count - call_offset,
                             "provider_failures": llm.failures[failure_offset:],
                             "model_requests": llm.requests[request_offset:]})
-                if grounded_run:
-                    row["grounded_calls"] = llm.grounded_calls[grounded_offset:]
-                    row["notes"] = llm.notes[note_offset:]
-                if grounded_run and row["grounded_calls"]:
-                    row["context_snapshot"] = row["grounded_calls"][-1]["context"]
-                else:
-                    row["context_snapshot"] = _context_snapshot(served_context)
+                row["context_snapshot"] = _context_snapshot(served_context)
                 if save_raw:
                     row["raw_answers"] = [text for stage, text in llm.raw_outputs[raw_offset:] if stage == "generating"]
                 if row["provider_failures"] or (response.answer or "").startswith("[LLM unavailable"):
@@ -540,12 +327,9 @@ def run(
                                 "refusal_correct": score["refusal_correct"]})
             row["latency_ms"] = round((time.perf_counter() - start) * 1000, 3)
             rows.append(row)
-            sidecar.append_row(row)
     finally:
         ask_flow._state, ask_flow.EXPOSE_DEBUG_STATUS = old_state, old_debug
         ask_flow._prepare_ask = old_prepare
-    if resume:
-        sidecar.record_resume(resumed_qids, len(rows) - len(resumed_qids))
 
     scored = [row for row in rows if row["status"] == "scored"]
     accepted = sum(row["score"]["accepted"] for row in scored)
@@ -555,16 +339,14 @@ def run(
         "mode": "offline_bm25_embedded_llama" if provider == "llama" and retrieval == "bm25" else "in_process_ask_benchmark",
         "execution_path": "src.services.backend_app.ask (no HTTP server)",
         "live_provider_run": llm is not None and any(row["model_requests"] for row in rows) and (
-            llm.provider_name == "llama" or (grounded_run and composer != "template")),
+            llm.provider_name == "llama"),
         "corpus": _relative_or_absolute(corpus), "corpus_sha256": corpus_hash,
         "cases": _relative_or_absolute(cases_path), "cases_sha256": hashlib.sha256(cases_path.read_bytes()).hexdigest(),
         "frozen": bool(payload.get("frozen", False)),
         "answer_engine": {"provider": provider, "model": llm.model if llm is not None else None,
                           "resolved_provider": llm.provider_name if llm is not None else None,
                           "temperature": temperature,
-                          "temperature_applies": provider == "llama" or (grounded_run and composer != "template"),
-                          **({"composer": composer, "model_path": str(model_path) if model_path else None,
-                              "temperature_asserted": llm is not None and getattr(llm._provider, "temperature", None) == temperature} if grounded_run else {})},
+                          "temperature_applies": provider == "llama"},
         "settings": _run_settings(corpus=corpus, provider=provider, model_path=model_path, temperature=temperature),
         "retrieval": retrieval, "setup_latency_ms": round(setup_latency_ms, 3),
         "fixture_validation": fixture_check,
@@ -590,12 +372,8 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--cases", type=Path, default=DEFAULT_CASES)
     parser.add_argument("--corpus", type=Path, default=CHUNKS_V3_FILE)
-    parser.add_argument("--provider", choices=("llama", "grounded", "mlx"), default=DEFAULT_LLM_PROVIDER)
-    parser.add_argument("--composer", choices=COMPOSERS, default=None,
-                        help="required with --provider grounded; there is no auto")
-    parser.add_argument("--model-path", type=Path, default=None, help="absolute model path (llama/mlx/grounded)")
-    parser.add_argument("--resume", action="store_true",
-                        help="grounded/mlx: skip qids already in <output>.rows.jsonl")
+    parser.add_argument("--provider", choices=("llama",), default=DEFAULT_LLM_PROVIDER)
+    parser.add_argument("--model-path", type=Path, default=None, help="absolute llama model path")
     parser.add_argument("--temperature", type=float, default=0.0)
     parser.add_argument("--max-cases", type=int, default=None)
     parser.add_argument("--qids", default=None, help="comma-separated qids; only these cases are run")
@@ -606,7 +384,7 @@ def main() -> int:
     try:
         result = run(args.corpus, args.cases, provider=args.provider,
                      temperature=args.temperature, max_cases=args.max_cases, retrieval=args.retrieval, save_raw=args.save_raw,
-                     composer=args.composer, model_path=args.model_path, output=args.output, resume=args.resume,
+                     model_path=args.model_path,
                      qids=[q.strip() for q in args.qids.split(",") if q.strip()] if args.qids else None)
         args.output.parent.mkdir(parents=True, exist_ok=True)
         args.output.write_text(json.dumps(result, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
