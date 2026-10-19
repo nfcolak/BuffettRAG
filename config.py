@@ -224,6 +224,37 @@ def llm_context_passages() -> int:
     raw = os.environ.get("LLM_CONTEXT_PASSAGES")
     return int(raw) if raw and raw.strip() else int(_DEFAULT_CONTEXT_PASSAGES)
 
+
+# Remote provider (DEFAULT_LLM_PROVIDER=remote): OpenAI-compatible endpoint, all read at call time.
+REMOTE_LLM_DEFAULT_MODEL = "buffett-qwen2.5-7b-ft-r1-q4_k_m.gguf"
+
+
+def remote_llm_url() -> str:
+    """REMOTE_LLM_URL at call time (base URL; empty when unset)."""
+    return (os.environ.get("REMOTE_LLM_URL") or "").strip()
+
+
+def remote_llm_model() -> str:
+    """REMOTE_LLM_MODEL at call time (default: the FT-r1 GGUF file name)."""
+    return (os.environ.get("REMOTE_LLM_MODEL") or "").strip() or REMOTE_LLM_DEFAULT_MODEL
+
+
+def remote_llm_token() -> str:
+    """REMOTE_LLM_TOKEN at call time (bearer secret; never log it)."""
+    return (os.environ.get("REMOTE_LLM_TOKEN") or "").strip()
+
+
+def remote_llm_timeout_s() -> float:
+    """REMOTE_LLM_TIMEOUT_S at call time (default 300: Modal cold start)."""
+    raw = os.environ.get("REMOTE_LLM_TIMEOUT_S")
+    return float(raw) if raw and raw.strip() else 300.0
+
+
+def remote_llm_retries() -> int:
+    """REMOTE_LLM_RETRIES at call time (default 2; connect errors and 502/503/504 only)."""
+    raw = os.environ.get("REMOTE_LLM_RETRIES")
+    return int(raw) if raw and raw.strip() else 2
+
 # Grounded provider (DEFAULT_LLM_PROVIDER=grounded). Knob names, ranges and built-in
 # defaults live in src/generation/grounded/settings.py (GroundedSettings); this block
 # only (a) lets calibrated values be committed as defaults without code changes

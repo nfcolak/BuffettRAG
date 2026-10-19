@@ -169,9 +169,12 @@ def test_shipped_arms_file_has_the_eleven_design_arms():
         pytest.skip("arms.txt not present")
     arms = harness.read_arms_file(ARMS)
     parsed = [harness.parse_config(a, baseline="current") for a in arms]
-    assert [n for n, _ in parsed] == ["baseline", "nb2", "pool30", "res8", "focus", "pool30focus", "ykeep4", "yref",
-                                      "slots3", "fu", "route2"]
+    # the eleven design arms first; nb2c / nb2fit were added after the smoke run (nb2 prompts exceeded the train window)
+    assert [n for n, _ in parsed][:11] == ["baseline", "nb2", "pool30", "res8", "focus", "pool30focus", "ykeep4", "yref",
+                                           "slots3", "fu", "route2"]
     by_name = dict(parsed)
+    if "nb2fit" in by_name:
+        assert by_name["nb2c"]["ANSWER_CONTEXT_NEIGHBORS"] == "2" and by_name["nb2fit"]["LLM_N_CTX"] == "13312"
     assert by_name["nb2"]["ANSWER_CONTEXT_NEIGHBORS"] == "2" and by_name["nb2"]["LLM_PASSAGE_MAX_CHARS"] == "3000"
     assert by_name["pool30focus"]["RETRIEVAL_PERIOD_POOL"] == "30"
     assert by_name["pool30focus"]["RETRIEVAL_PERIOD_FOCUS_RERANK"] == "1"
