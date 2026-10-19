@@ -5,7 +5,7 @@ Recipe (premortem pilot-gate unit, minus the devpl questions that are gone):
            prompt, balanced over question types (the deep-rank recall that ft_v7 step 3a should lift)
   anchors   4 questions whose claims are all at rank 1-3 and that FT-r3 and FT-r1 both got right on >= 2 claims
   refusals  4 unanswerable questions
-Outputs (default /Users/necatifurkancolak/AI-Workplace/Artifacts/BuffettRAG/pv8/slice/):
+Outputs (default $BUFFETTRAG_ARTIFACTS/pv8/slice/, i.e. <AI-Workplace>/Artifacts/BuffettRAG/pv8/slice/):
   slice.json          qids, groups, claims (required_terms, gold passage ids, rank in the new served prompt)
   slice_prompts.jsonl one record per model call: id, qid, messages exactly as served (prompt v3, current serving
                       settings, real CPU retrieval); a comparison question has one record per period call
@@ -30,8 +30,8 @@ os.environ.setdefault("VECTOR_BACKEND", "faiss")  # the local FAISS index; pgvec
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 
-MAIN = Path(os.environ.get("BUFFETT_MAIN_CHECKOUT", "/Users/necatifurkancolak/AI-Workplace/Projects/current/BuffettRAG"))
-ARTIFACTS = Path("/Users/necatifurkancolak/AI-Workplace/Artifacts/BuffettRAG")
+MAIN = Path(os.environ.get("BUFFETT_MAIN_CHECKOUT", str(ROOT)))
+ARTIFACTS = Path(os.environ.get("BUFFETTRAG_ARTIFACTS", ROOT.parents[2] / "Artifacts" / "BuffettRAG"))
 CASES = [MAIN / f"data/evaluation/heldout_v6/answer_benchmark_heldout_v6_{s}.json" for s in "ab"]
 FTR3 = [ARTIFACTS / f"pv7/runs/ftr3/ftr3_p16_e3_hv6{s}.json" for s in "ab"]
 JUDGE = {"ftr3": ARTIFACTS / "pv7/judge/ftr3_v6/merged/claims_final.csv",

@@ -1,7 +1,7 @@
 # -----------------------------------------------------------------------------
-# BuffettRAG -- Hugging Face Space (CPU) serving requirements
-# torch is installed first from the CPU wheel index in deploy/hf_space/Dockerfile.
-# Left out on purpose: llama-cpp-python, streamlit, chromadb, pgvector/psycopg2, pdf libs.
+# BuffettRAG -- Modal L4 app (deploy/modal/app.py) serving requirements
+# Installed into the llama.cpp CUDA image; the app runs on the GPU, so torch comes from the default (CUDA) wheels.
+# Left out on purpose: llama-cpp-python (llama.cpp runs as its own server), streamlit, chromadb, pgvector/psycopg2, pdf libs.
 # -----------------------------------------------------------------------------
 sentence-transformers>=2.7.0
 torch>=2.1.0

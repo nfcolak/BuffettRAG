@@ -10,7 +10,7 @@ import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
 R3 = ROOT / 'colab/train_7b_lora_r3.ipynb'
-R1 = ROOT / 'colab/train_7b_lora.ipynb'
+R1 = ROOT / 'colab/train_7b_lora_r1.ipynb'
 
 # FT-r1 (run-7b-r1, notebook at 7c522f5): r=16, alpha=32, lr=1e-4, batch 1 x grad-accum 2, all seven projections
 R1_SETTINGS = {'RANK': 16, 'ALPHA': 32, 'LR': 1e-4, 'BATCH': 1, 'GRAD_ACCUM': 2}

@@ -1,0 +1,3658 @@
+{
+ "name": "finance_v1_dev",
+ "created": "2026-10-19",
+ "n": 40,
+ "purpose": "Financial-query test set (user goal 2026-10-19): crises/macro, views, figures, personal-scope refusals, whole-collection questions. Curated from chunks_v3_paragraph without running any retriever or model. Not yet split into dev/test. DEV half: used for search tuning.",
+ "cases": [
+  {
+   "qid": "fin_g1_03",
+   "question_type": "crisis_macro",
+   "answerable": true,
+   "years": [
+    1979,
+    1981,
+    1984,
+    1986
+   ],
+   "query": "In the early-to-mid 1980s, when Volcker was bringing inflation down, did Buffett think the inflation threat was over, and what did that mean for his view of long-term bonds?",
+   "gold_passage_ids": [
+    "1979_p0056",
+    "1981_p0026",
+    "1984_p0107",
+    "1984_p0108",
+    "1984_p0109",
+    "1986_p0080"
+   ],
+   "relevant_ids": [
+    "1979_p0048",
+    "1979_p0054",
+    "1979_p0055",
+    "1979_p0056",
+    "1981_p0026",
+    "1983_p0069",
+    "1984_p0107",
+    "1984_p0108",
+    "1984_p0109",
+    "1986_p0080",
+    "1987_p0100",
+    "1987_p0105"
+   ],
+   "gold_claims": [
+    {
+     "claim": "He applauded Fed Chairman Volcker and the more moderate price increases, but his long-term inflation views stayed as negative as ever: like virginity, a stable price level can be maintained but not restored.",
+     "required_terms": [
+      "Volcker",
+      "Like virginity"
+     ],
+     "gold_passage_ids": [
+      "1981_p0026"
+     ],
+     "verification_note": "1981 letter (1981_p0026); unit=qualitative statement"
+    },
+    {
+     "claim": "In 1984 he said bonds are only as sound as a dollar, that the long-term outlook for dollars is dismal, that substantial inflation lies ahead, and that runaway inflation has a small but real chance.",
+     "required_terms": [
+      "as sound as a dollar",
+      "runaway inflation"
+     ],
+     "gold_passage_ids": [
+      "1984_p0107"
+     ],
+     "verification_note": "1984 letter (1984_p0107); unit=qualitative statement"
+    },
+    {
+     "claim": "Even in 1984, with inflation sharply down, he said the huge-deficit fiscal policy made high inflation delayed (perhaps for a long time) but not avoided, with the potential for a runaway upward spiral.",
+     "required_terms": [
+      "delayed",
+      "not be avoided"
+     ],
+     "gold_passage_ids": [
+      "1984_p0108"
+     ],
+     "verification_note": "1984 letter (1984_p0108); unit=qualitative statement"
+    },
+    {
+     "claim": "Because runaway inflation would hurt existing bonds even more than stocks, an all-bond portfolio carries a small but unacceptable 'wipe out' risk, so any long-bond purchase must clear a special hurdle.",
+     "required_terms": [
+      "wipe out",
+      "special hurdle"
+     ],
+     "gold_passage_ids": [
+      "1984_p0109"
+     ],
+     "verification_note": "1984 letter (1984_p0109); unit=qualitative statement"
+    },
+    {
+     "claim": "In 1986 he still shunned long-term bonds except in very special situations, because he feared much higher rates of inflation within the next decade.",
+     "required_terms": [
+      "long-term bonds",
+      "much higher rates of inflation"
+     ],
+     "gold_passage_ids": [
+      "1986_p0080"
+     ],
+     "verification_note": "1986 letter (1986_p0080); unit=qualitative statement"
+    },
+    {
+     "claim": "Already in 1979 he refused to lock in a price for money decades ahead, following Polonius: 'Neither a short-term borrower nor a long-term lender be.'",
+     "required_terms": [
+      "long-term lender"
+     ],
+     "gold_passage_ids": [
+      "1979_p0056"
+     ],
+     "verification_note": "1979 letter (1979_p0056); unit=qualitative statement"
+    }
+   ],
+   "multi_part": true,
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": true
+   },
+   "reject": {
+    "forbidden_terms": []
+   },
+   "verification_note": "1979_p0056, 1981_p0026, 1984_p0107, 1984_p0108, 1984_p0109, 1986_p0080 supply the 6 claims (Like virginity; as sound as a dollar; not be avoided; wipe out; much higher rates of inflation; long-term lender). 1983_p0069 ('as pessimistic as ever' on inflation) is relevant context.",
+   "group": 1
+  },
+  {
+   "qid": "fin_g1_04",
+   "question_type": "trend_over_years",
+   "answerable": true,
+   "years": [
+    1981,
+    1997,
+    2019,
+    2021
+   ],
+   "query": "How did Buffett think interest rates affect what stocks are worth, from the high-rate early 1980s to the low-rate years around 2020?",
+   "gold_passage_ids": [
+    "1981_p0032",
+    "1981_p0033",
+    "1997_p0088",
+    "1997_p0089",
+    "2019_p0055",
+    "2021_p0043"
+   ],
+   "relevant_ids": [
+    "1981_p0032",
+    "1981_p0033",
+    "1987_p0123",
+    "1994_p0004",
+    "1997_p0088",
+    "1997_p0089",
+    "2019_p0055",
+    "2019_p0056",
+    "2021_p0043",
+    "2021_p0044"
+   ],
+   "gold_claims": [
+    {
+     "claim": "With long-term taxable bonds yielding over 16% in 1981 while American business earned about 14% on equity, a typical American business was no longer worth one hundred cents on the dollar to individual owners.",
+     "required_terms": [
+      "exceeded 16%",
+      "one hundred cents on the dollar"
+     ],
+     "gold_passage_ids": [
+      "1981_p0032",
+      "1981_p0033"
+     ],
+     "verification_note": "1981 letter (1981_p0032, 1981_p0033); unit=qualitative statement with figures"
+    },
+    {
+     "claim": "In the 1997 letter he recalled that at the annual meeting earlier that year, with the Dow at 7,071 and long-term Treasury yields at 6.89%, he and Munger had said the market was not overvalued as long as rates held or fell and companies kept earning high returns on equity; rates had since fallen.",
+     "required_terms": [
+      "7,071",
+      "6.89%"
+     ],
+     "gold_passage_ids": [
+      "1997_p0088"
+     ],
+     "verification_note": "1997 letter (1997_p0088); unit=figure. The letter is dated February 27, 1998 (1997_p0123) and says 'At the annual meeting last year', i.e. the May 1997 meeting (announced for Monday, May 5 in 1996_p0118)."
+    },
+    {
+     "claim": "Lower interest rates make every dollar of earnings more valuable, but late-1990s prices had eroded Graham's margin of safety.",
+     "required_terms": [
+      "every dollar of earnings becomes more valuable",
+      "margin of safety"
+     ],
+     "gold_passage_ids": [
+      "1997_p0089"
+     ],
+     "verification_note": "1997 letter (1997_p0089); unit=qualitative statement"
+    },
+    {
+     "claim": "He never forecasts rates, but in 2019 said that if rates near then-current levels lasted, equities would almost certainly do far better over time than long-term fixed-rate debt.",
+     "required_terms": [
+      "Forecasting interest rates has never been our game",
+      "fixed-rate debt instruments"
+     ],
+     "gold_passage_ids": [
+      "2019_p0055"
+     ],
+     "verification_note": "2019 letter (2019_p0055); unit=qualitative statement"
+    },
+    {
+     "claim": "In 2021 he found little to buy because low long-term interest rates push up the prices of all productive investments, whether stocks, apartments, farms or oil wells.",
+     "required_terms": [
+      "push the prices of all productive investments upward"
+     ],
+     "gold_passage_ids": [
+      "2021_p0043"
+     ],
+     "verification_note": "2021 letter (2021_p0043); unit=qualitative statement"
+    }
+   ],
+   "multi_part": true,
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": true
+   },
+   "reject": {
+    "forbidden_terms": []
+   },
+   "verification_note": "1981_p0032, 1981_p0033, 1997_p0088, 1997_p0089, 2019_p0055, 2021_p0043 supply the 5 claims (exceeded 16%; 6.89%; every dollar of earnings becomes more valuable; fixed-rate debt instruments; push the prices of all productive investments upward).",
+   "group": 1
+  },
+  {
+   "qid": "fin_g1_05",
+   "question_type": "crisis_macro",
+   "answerable": true,
+   "years": [
+    1987,
+    1996
+   ],
+   "query": "What did Buffett say about the October 1987 stock market crash and what caused it?",
+   "gold_passage_ids": [
+    "1987_p0092",
+    "1987_p0093",
+    "1987_p0094",
+    "1987_p0097",
+    "1987_p0098",
+    "1996_p0043"
+   ],
+   "relevant_ids": [
+    "1987_p0092",
+    "1987_p0093",
+    "1987_p0094",
+    "1987_p0095",
+    "1987_p0096",
+    "1987_p0097",
+    "1987_p0098",
+    "1994_p0004",
+    "1996_p0043",
+    "2005_p0128",
+    "2010_p0014"
+   ],
+   "gold_claims": [
+    {
+     "claim": "The Dow ended 1987 up only 2.3% after a roller-coaster year: Mr. Market was on a manic rampage until October and then suffered a sudden, massive seizure.",
+     "required_terms": [
+      "2.3%",
+      "massive seizure"
+     ],
+     "gold_passage_ids": [
+      "1987_p0092"
+     ],
+     "verification_note": "1987 letter (1987_p0092); unit=qualitative statement with figure"
+    },
+    {
+     "claim": "He blamed professional money managers who treat stocks as tokens in a game, above all 'portfolio insurance', a stop-loss strategy that had $60 billion to $90 billion of equities on a hair trigger in mid-October 1987.",
+     "required_terms": [
+      "portfolio insurance",
+      "$60 billion to $90 billion"
+     ],
+     "gold_passage_ids": [
+      "1987_p0093",
+      "1987_p0094"
+     ],
+     "verification_note": "1987 letter (1987_p0093, 1987_p0094); unit=qualitative statement with figure"
+    },
+    {
+     "claim": "It is dead wrong to conclude that small investors have no chance: volatility caused by irrational big money is ideal for true investors, who are hurt only if forced to sell at untoward times.",
+     "required_terms": [
+      "dead wrong",
+      "untoward times"
+     ],
+     "gold_passage_ids": [
+      "1987_p0097"
+     ],
+     "verification_note": "1987 letter (1987_p0097); unit=qualitative statement"
+    },
+    {
+     "claim": "During the October break a few stocks fell to prices that interested Berkshire, but it could not make meaningful purchases before they rebounded.",
+     "required_terms": [
+      "break in October",
+      "before they rebounded"
+     ],
+     "gold_passage_ids": [
+      "1987_p0098"
+     ],
+     "verification_note": "1987 letter (1987_p0098); unit=qualitative statement"
+    },
+    {
+     "claim": "In 1996 he recalled the destructive effects of portfolio insurance in the 1987 market crash, quoting a wag who said it was the computers that should have been jumping out of windows.",
+     "required_terms": [
+      "1987 market crash",
+      "jumping out of windows"
+     ],
+     "gold_passage_ids": [
+      "1996_p0043"
+     ],
+     "verification_note": "1996 letter (1996_p0043); unit=qualitative statement"
+    }
+   ],
+   "multi_part": true,
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": true
+   },
+   "reject": {
+    "forbidden_terms": []
+   },
+   "verification_note": "1987_p0092, 1987_p0093, 1987_p0094, 1987_p0097, 1987_p0098, 1996_p0043 supply the 5 claims (massive seizure; portfolio insurance; dead wrong; break in October; jumping out of windows).",
+   "group": 1
+  },
+  {
+   "qid": "fin_g1_07",
+   "question_type": "crisis_macro",
+   "answerable": true,
+   "years": [
+    2002
+   ],
+   "query": "What did Buffett say about the 1998 collapse of Long-Term Capital Management and what it showed about risk in the financial system?",
+   "gold_passage_ids": [
+    "2002_p0081",
+    "2002_p0082",
+    "2002_p0083",
+    "2002_p0084"
+   ],
+   "relevant_ids": [
+    "2002_p0081",
+    "2002_p0082",
+    "2002_p0083",
+    "2002_p0084",
+    "2002_p0085"
+   ],
+   "gold_claims": [
+    {
+     "claim": "In 1998 the leveraged, derivatives-heavy trading of a single hedge fund, Long-Term Capital Management, alarmed the Federal Reserve so much that it hastily orchestrated a rescue.",
+     "required_terms": [
+      "Long-Term Capital Management",
+      "hastily orchestrated a rescue"
+     ],
+     "gold_passage_ids": [
+      "2002_p0082"
+     ],
+     "verification_note": "2002 letter (2002_p0082); unit=qualitative statement"
+    },
+    {
+     "claim": "Fed officials later testified that LTCM, a firm unknown to the public with only a few hundred employees, could have seriously threatened the stability of American markets.",
+     "required_terms": [
+      "only a few hundred",
+      "stability of American markets"
+     ],
+     "gold_passage_ids": [
+      "2002_p0082",
+      "2002_p0083"
+     ],
+     "verification_note": "2002 letter (2002_p0082, 2002_p0083); unit=qualitative statement"
+    },
+    {
+     "claim": "The affair paralyzed many parts of the fixed-income market for weeks, and it was still far from a worst-case scenario.",
+     "required_terms": [
+      "paralyzed many parts of the fixed-income market",
+      "far from a worst-case scenario"
+     ],
+     "gold_passage_ids": [
+      "2002_p0083"
+     ],
+     "verification_note": "2002 letter (2002_p0083); unit=qualitative statement"
+    },
+    {
+     "claim": "LTCM used total-return swaps, which allow 100% leverage and make a joke of margin requirements.",
+     "required_terms": [
+      "total-return swaps",
+      "joke of margin requirements"
+     ],
+     "gold_passage_ids": [
+      "2002_p0083",
+      "2002_p0084"
+     ],
+     "verification_note": "2002 letter (2002_p0083, 2002_p0084); unit=qualitative statement"
+    },
+    {
+     "claim": "He saw a dangerous macro picture: credit risk concentrated in a few derivatives dealers who trade heavily with each other, so that linkage could let the troubles of one quickly infect the others.",
+     "required_terms": [
+      "relatively few derivatives dealers",
+      "Linkage"
+     ],
+     "gold_passage_ids": [
+      "2002_p0081"
+     ],
+     "verification_note": "2002 letter (2002_p0081); unit=qualitative statement"
+    }
+   ],
+   "multi_part": true,
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": true
+   },
+   "reject": {
+    "forbidden_terms": []
+   },
+   "verification_note": "2002_p0081, 2002_p0082, 2002_p0083, 2002_p0084 supply the 5 claims (Long-Term Capital Management; stability of American markets; far from a worst-case scenario; total-return swaps; Linkage). LTCM is discussed only in the 2002 letter.",
+   "group": 1
+  },
+  {
+   "qid": "fin_g1_11",
+   "question_type": "crisis_macro",
+   "answerable": true,
+   "years": [
+    2008,
+    2009
+   ],
+   "query": "Give me Buffett's insights related to the 2008 crisis.",
+   "gold_passage_ids": [
+    "2008_p0011",
+    "2008_p0012",
+    "2008_p0013",
+    "2008_p0016",
+    "2008_p0022",
+    "2009_p0021"
+   ],
+   "relevant_ids": [
+    "2008_p0010",
+    "2008_p0011",
+    "2008_p0012",
+    "2008_p0013",
+    "2008_p0014",
+    "2008_p0016",
+    "2008_p0017",
+    "2008_p0022",
+    "2008_p0023",
+    "2008_p0024",
+    "2008_p0068",
+    "2008_p0069",
+    "2008_p0090",
+    "2008_p0091",
+    "2009_p0020",
+    "2009_p0021",
+    "2009_p0022",
+    "2009_p0026",
+    "2009_p0027",
+    "2010_p0119",
+    "2010_p0141",
+    "2010_p0142"
+   ],
+   "gold_claims": [
+    {
+     "claim": "As problems at major financial institutions came out in 2008, the credit market became non-functional, and by the fourth quarter the credit crisis plus falling home and stock prices had produced a paralyzing fear and a freefall in business activity.",
+     "required_terms": [
+      "non-functional",
+      "paralyzing fear"
+     ],
+     "gold_passage_ids": [
+      "2008_p0011"
+     ],
+     "verification_note": "2008 letter (2008_p0011); unit=qualitative statement"
+    },
+    {
+     "claim": "The Treasury and the Fed went 'all in'; such once-unthinkable doses would likely bring unwelcome aftereffects such as an onslaught of inflation, but strong, immediate government action was essential to avoid a total breakdown of the financial system.",
+     "required_terms": [
+      "all in",
+      "onslaught of inflation",
+      "total breakdown"
+     ],
+     "gold_passage_ids": [
+      "2008_p0012",
+      "2008_p0013"
+     ],
+     "verification_note": "2008 letter (2008_p0012, 2008_p0013); unit=qualitative statement"
+    },
+    {
+     "claim": "He was certain the economy would be in shambles throughout 2009 and beyond, but said that did not tell him whether the stock market would rise or fall.",
+     "required_terms": [
+      "in shambles throughout 2009"
+     ],
+     "gold_passage_ids": [
+      "2008_p0016"
+     ],
+     "verification_note": "2008 letter (2008_p0016); unit=qualitative statement"
+    },
+    {
+     "claim": "The market disarray helped Berkshire's buying: 'pessimism is your friend, euphoria the enemy', and it made three large investments on terms unavailable in normal markets.",
+     "required_terms": [
+      "pessimism is your friend",
+      "unavailable in normal markets"
+     ],
+     "gold_passage_ids": [
+      "2008_p0022"
+     ],
+     "verification_note": "2008 letter (2008_p0022); unit=qualitative statement"
+    },
+    {
+     "claim": "When the financial system went into cardiac arrest in September 2008, Berkshire was a supplier of liquidity rather than a supplicant, putting $15.5 billion into the business world at the peak of the crisis.",
+     "required_terms": [
+      "supplier of liquidity",
+      "$15.5 billion"
+     ],
+     "gold_passage_ids": [
+      "2009_p0021"
+     ],
+     "verification_note": "2009 letter (2009_p0021); unit=qualitative statement with figure"
+    }
+   ],
+   "multi_part": true,
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": true
+   },
+   "reject": {
+    "forbidden_terms": []
+   },
+   "verification_note": "User example question. 2008_p0011, 2008_p0012, 2008_p0013, 2008_p0016, 2008_p0022 (2008 letter) and 2009_p0021 (2009 letter) supply the 5 claims (paralyzing fear; onslaught of inflation; in shambles throughout 2009; pessimism is your friend; supplier of liquidity).",
+   "group": 1
+  },
+  {
+   "qid": "fin_g1_12",
+   "question_type": "crisis_macro",
+   "answerable": true,
+   "years": [
+    2008,
+    2010,
+    2011
+   ],
+   "query": "According to Buffett, what caused the housing and mortgage bust behind the 2008 crisis?",
+   "gold_passage_ids": [
+    "2008_p0059",
+    "2008_p0060",
+    "2008_p0061",
+    "2008_p0065",
+    "2010_p0097",
+    "2011_p0097"
+   ],
+   "relevant_ids": [
+    "2008_p0059",
+    "2008_p0060",
+    "2008_p0061",
+    "2008_p0062",
+    "2008_p0063",
+    "2008_p0064",
+    "2008_p0065",
+    "2008_p0066",
+    "2010_p0097",
+    "2010_p0099",
+    "2011_p0096",
+    "2011_p0097",
+    "2011_p0098"
+   ],
+   "gold_claims": [
+    {
+     "claim": "He traced the bust to the 1997-2000 manufactured-housing fiasco (borrowers who shouldn't have borrowed financed by lenders who shouldn't have lent, down payments ignored, loans securitized and sold by Wall Street to unsuspecting investors), which should have been a canary-in-the-coal-mine warning but was ignored, so the same mistakes were repeated with conventional homes in 2004-07.",
+     "required_terms": [
+      "lenders who shouldn't have lent",
+      "canary"
+     ],
+     "gold_passage_ids": [
+      "2008_p0059",
+      "2008_p0060"
+     ],
+     "verification_note": "2008 letter (2008_p0059, 2008_p0060); unit=qualitative statement. 2008_p0059 describes the 1997-2000 manufactured-housing practices; 2008_p0060 links them to the 2004-07 conventional-housing bust."
+    },
+    {
+     "claim": "Lenders and borrowers alike counted on house-price appreciation to make otherwise impossible loans work.",
+     "required_terms": [
+      "house-price appreciation"
+     ],
+     "gold_passage_ids": [
+      "2008_p0061"
+     ],
+     "verification_note": "2008 letter (2008_p0061); unit=qualitative statement"
+    },
+    {
+     "claim": "Most foreclosures happen not because a house is worth less than its mortgage ('upside-down' loans) but because borrowers cannot make the monthly payments they agreed to.",
+     "required_terms": [
+      "upside-down",
+      "monthly payments"
+     ],
+     "gold_passage_ids": [
+      "2008_p0065"
+     ],
+     "verification_note": "2008 letter (2008_p0065); unit=qualitative statement"
+    },
+    {
+     "claim": "If home buyers across the country had behaved like Clayton's, with a meaningful down-payment and fixed payments set at a sensible share of income, America would not have had the crisis it did.",
+     "required_terms": [
+      "meaningful down-payment",
+      "sensible percentage of income"
+     ],
+     "gold_passage_ids": [
+      "2010_p0097"
+     ],
+     "verification_note": "2010 letter (2010_p0097); unit=qualitative statement"
+    },
+    {
+     "claim": "Everyone took part, including government, lenders, borrowers, the media and rating agencies, driven by the almost universal belief that house values were certain to rise.",
+     "required_terms": [
+      "rating agencies",
+      "certain to increase"
+     ],
+     "gold_passage_ids": [
+      "2011_p0097"
+     ],
+     "verification_note": "2011 letter (2011_p0097); unit=qualitative statement"
+    }
+   ],
+   "multi_part": true,
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": true
+   },
+   "reject": {
+    "forbidden_terms": []
+   },
+   "verification_note": "2008_p0059, 2008_p0060, 2008_p0061, 2008_p0065, 2010_p0097, 2011_p0097 supply the 5 claims (lenders who shouldn't have lent + canary; house-price appreciation; upside-down; meaningful down-payment; rating agencies).",
+   "group": 1
+  },
+  {
+   "qid": "fin_g1_13",
+   "question_type": "comparison",
+   "answerable": true,
+   "years": [
+    1987,
+    2003,
+    2004,
+    2005,
+    2007
+   ],
+   "query": "Why did Buffett worry about the U.S. trade deficit and the dollar in the late 1980s and again in the 2000s, and what did Berkshire do about it?",
+   "gold_passage_ids": [
+    "1987_p0101",
+    "1987_p0102",
+    "2003_p0119",
+    "2004_p0116",
+    "2005_p0105",
+    "2007_p0092"
+   ],
+   "relevant_ids": [
+    "1987_p0100",
+    "1987_p0101",
+    "1987_p0102",
+    "1987_p0103",
+    "1987_p0104",
+    "2003_p0119",
+    "2003_p0120",
+    "2003_p0121",
+    "2004_p0116",
+    "2004_p0117",
+    "2004_p0118",
+    "2004_p0119",
+    "2005_p0105",
+    "2005_p0106",
+    "2006_p0100",
+    "2006_p0101",
+    "2007_p0092",
+    "2007_p0093",
+    "2007_p0094",
+    "2007_p0095",
+    "2007_p0096"
+   ],
+   "gold_claims": [
+    {
+     "claim": "In 1987 he warned that the huge trade deficit was piling up 'claim checks' such as U.S. bonds and bank deposits in foreign hands, with the government relying, like Blanche DuBois, on the kindness of strangers.",
+     "required_terms": [
+      "claim checks",
+      "kindness of strangers"
+     ],
+     "gold_passage_ids": [
+      "1987_p0101"
+     ],
+     "verification_note": "1987 letter (1987_p0101); unit=qualitative statement"
+    },
+    {
+     "claim": "He feared that a government owing so much in its own currency would be pushed to inflate it away, calling the weapon of inflation the economic equivalent of the 'H' bomb for a debtor government.",
+     "required_terms": [
+      "weapon of inflation"
+     ],
+     "gold_passage_ids": [
+      "1987_p0102"
+     ],
+     "verification_note": "1987 letter (1987_p0102); unit=qualitative statement"
+    },
+    {
+     "claim": "In 2002 he entered the foreign currency market for the first time in his life, and enlarged the position in 2003 as he grew increasingly bearish on the dollar.",
+     "required_terms": [
+      "foreign currency market",
+      "bearish on the dollar"
+     ],
+     "gold_passage_ids": [
+      "2003_p0119"
+     ],
+     "verification_note": "2003 letter (2003_p0119); unit=qualitative statement"
+    },
+    {
+     "claim": "By year-end 2004 Berkshire held about $21.4 billion of foreign-exchange contracts spread among 12 currencies, because trade policies would keep pressing on the dollar for years.",
+     "required_terms": [
+      "$21.4 billion",
+      "12 currencies"
+     ],
+     "gold_passage_ids": [
+      "2004_p0116"
+     ],
+     "verification_note": "2004 letter (2004_p0116); unit=figure"
+    },
+    {
+     "claim": "In 2005 Berkshire reduced its direct currency position and preferred to get non-dollar exposure by owning equities that earn much of their profits abroad, because rising U.S. rates made holding most foreign currencies a negative carry.",
+     "required_terms": [
+      "foreign currencies",
+      "carry"
+     ],
+     "gold_passage_ids": [
+      "2005_p0105"
+     ],
+     "verification_note": "2005 letter (2005_p0105); unit=qualitative statement"
+    },
+    {
+     "claim": "In 2007 he explained that because Americans buy more foreign goods than the world buys from the U.S., the country ships about $2 billion of IOUs and assets abroad every day, which pressures the dollar.",
+     "required_terms": [
+      "$2 billion of IOUs"
+     ],
+     "gold_passage_ids": [
+      "2007_p0092"
+     ],
+     "verification_note": "2007 letter (2007_p0092); unit=figure"
+    }
+   ],
+   "multi_part": true,
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": true
+   },
+   "reject": {
+    "forbidden_terms": []
+   },
+   "verification_note": "1987_p0101, 1987_p0102, 2003_p0119, 2004_p0116, 2005_p0105, 2007_p0092 supply the 6 claims (claim checks; weapon of inflation; bearish on the dollar; $21.4 billion; foreign currencies + carry; $2 billion of IOUs).",
+   "group": 1
+  },
+  {
+   "qid": "fin_g1_15",
+   "question_type": "partial",
+   "answerable": true,
+   "years": [
+    1994,
+    2023
+   ],
+   "query": "Did Buffett say anything about the oil crisis in the 80s, and did he explain how the oil embargo hit the U.S. economy?",
+   "gold_passage_ids": [
+    "1994_p0004",
+    "2023_p0031",
+    "2023_p0032"
+   ],
+   "relevant_ids": [
+    "1979_p0014",
+    "1982_p0042",
+    "1986_p0144",
+    "1994_p0004",
+    "2007_p0095",
+    "2023_p0031",
+    "2023_p0032",
+    "2023_p0033"
+   ],
+   "gold_claims": [
+    {
+     "claim": "In 1994 he listed 'two oil shocks' among the events of the previous 30 years that no one could have foreseen, as a reason to ignore political and economic forecasts.",
+     "required_terms": [
+      "two oil shocks",
+      "ignore political and economic forecasts"
+     ],
+     "gold_passage_ids": [
+      "1994_p0004"
+     ],
+     "verification_note": "1994 letter (1994_p0004); unit=qualitative statement"
+    },
+    {
+     "claim": "Looking back in 2023, he recalled that in 1975 the U.S. was woefully dependent on foreign oil, producing only eight million barrels of oil-equivalent a day, and that the government created the Strategic Petroleum Reserve that year.",
+     "required_terms": [
+      "woefully dependent on foreign oil",
+      "Strategic Petroleum Reserve"
+     ],
+     "gold_passage_ids": [
+      "2023_p0031",
+      "2023_p0032"
+     ],
+     "verification_note": "2023 letter (2023_p0031, 2023_p0032); unit=qualitative statement"
+    },
+    {
+     "claim": "Shale economics ended that dependence after 2011, so that OPEC no longer has the upper hand.",
+     "required_terms": [
+      "OPEC no longer has the upper hand"
+     ],
+     "gold_passage_ids": [
+      "2023_p0032"
+     ],
+     "verification_note": "2023 letter (2023_p0032); unit=qualitative statement"
+    }
+   ],
+   "optional_claims": [
+    {
+     "claim": "In 1979 he noted that Berkshire's 1964 book value bought about half an ounce of gold and still bought about the same 15 years later, and that the same was true of Middle Eastern oil: government can print money but cannot print gold or create oil.",
+     "required_terms": [
+      "Middle Eastern oil",
+      "unable to print gold or create oil"
+     ],
+     "gold_passage_ids": [
+      "1979_p0014"
+     ],
+     "verification_note": "1979 letter (1979_p0014); unit=qualitative statement"
+    }
+   ],
+   "multi_part": true,
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": true
+   },
+   "reject": {
+    "forbidden_terms": []
+   },
+   "absence_search_patterns": [
+    "oil crisis",
+    "oil embargo",
+    "energy crisis"
+   ],
+   "answer_note": "A correct answer says the letters describe no 1980s oil crisis (the embargo was 1973, the second shock 1979) and must not invent one, then gives what the letters do say.",
+   "expected_coverage_note": "User example question. The letters never discuss the oil crisis or the oil embargo directly; they mention oil only in passing ('two oil shocks' in 1994, a 2023 look back at 1975 oil dependence; optionally the 1979 gold/oil comparison). A correct answer reports these passing remarks, says the letters give no analysis of the embargo's effect on the economy, and does not invent one.",
+   "verification_note": "1994_p0004, 2023_p0031, 2023_p0032 supply the 3 gold claims (two oil shocks; woefully dependent on foreign oil; OPEC no longer has the upper hand). The 1979 gold/oil remark (1979_p0014, Middle Eastern oil) is an optional claim, so 1979_p0014 is kept in relevant_ids only. Other passing oil mentions: 1982_p0042 ('OPEC-style' cartelization), 2007_p0095 ('not the fault of OPEC'). Whole-corpus case-insensitive searches for oil crisis, oil embargo, energy crisis have zero matches; no 1980s letter discusses an oil crisis.",
+   "group": 1
+  },
+  {
+   "qid": "fin_g1_18",
+   "question_type": "unanswerable",
+   "answerable": false,
+   "refusal_category": "unsupported_event",
+   "years": [],
+   "query": "How did Buffett react to the 1997 Asian financial crisis, and did it change his view of emerging-market stocks?",
+   "gold_passage_ids": [],
+   "relevant_ids": [],
+   "gold_claims": [],
+   "expected_answer": "The retrieved passages do not provide enough evidence to answer this question.",
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_exact_refusal": true,
+    "require_valid_citation": false
+   },
+   "reject": {
+    "forbidden_terms": []
+   },
+   "absence_search_patterns": [
+    "Asian",
+    "Thailand",
+    "baht"
+   ],
+   "verification_note": "Whole-corpus case-insensitive searches for Asian, Thailand, baht have zero matches; no gold support exists.",
+   "group": 1
+  },
+  {
+   "qid": "fin_g1_20",
+   "question_type": "unanswerable",
+   "answerable": false,
+   "refusal_category": "unsupported_event",
+   "years": [],
+   "query": "How did Buffett assess the 2023 collapse of Silicon Valley Bank and First Republic, and what did it mean for Berkshire's bank stocks?",
+   "gold_passage_ids": [],
+   "relevant_ids": [],
+   "gold_claims": [],
+   "expected_answer": "The retrieved passages do not provide enough evidence to answer this question.",
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_exact_refusal": true,
+    "require_valid_citation": false
+   },
+   "reject": {
+    "forbidden_terms": []
+   },
+   "absence_search_patterns": [
+    "Silicon Valley Bank",
+    "SVB",
+    "First Republic",
+    "bank failures",
+    "regional bank"
+   ],
+   "verification_note": "Whole-corpus case-insensitive searches for Silicon Valley Bank, SVB, First Republic, bank failures, regional bank have zero matches; no gold support exists.",
+   "group": 1
+  },
+  {
+   "qid": "fin_g2_01",
+   "question_type": "sector_view",
+   "answerable": true,
+   "years": [
+    1999
+   ],
+   "query": "In year 1999, does Buffet suggest any sector that have potential to grow substantially?",
+   "gold_passage_ids": [
+    "1999_p0063",
+    "1999_p0090",
+    "1999_p0091",
+    "1999_p0092",
+    "1999_p0093",
+    "1999_p0094",
+    "1999_p0095"
+   ],
+   "relevant_ids": [
+    "1999_p0061",
+    "1999_p0062",
+    "1999_p0063",
+    "1999_p0090",
+    "1999_p0091",
+    "1999_p0092",
+    "1999_p0093",
+    "1999_p0094",
+    "1999_p0095",
+    "1999_p0096",
+    "2013_p0057"
+   ],
+   "gold_claims": [
+    {
+     "claim": "He did not recommend technology: he shared the general view that tech companies' products and services would transform society, but Berkshire owned no tech stocks because he had no insight into which tech companies had a truly durable competitive advantage.",
+     "required_terms": [
+      "transformed by their products and services",
+      "truly durable competitive advantage"
+     ],
+     "gold_passage_ids": [
+      "1999_p0090",
+      "1999_p0091"
+     ],
+     "verification_note": "1999 letter (1999_p0090, 1999_p0091): why Berkshire owns no tech stocks."
+    },
+    {
+     "claim": "Predicting the long-term economics of companies in fast-changing industries is beyond Berkshire's circle of competence, so it sticks with what it understands instead of envying those who claim that skill.",
+     "required_terms": [
+      "fast-changing industries",
+      "circle of competence"
+     ],
+     "gold_passage_ids": [
+      "1999_p0092"
+     ],
+     "verification_note": "1999 letter (1999_p0092): circle of competence and fast-changing industries."
+    },
+    {
+     "claim": "Instead of tipping a growth sector, he warned that equity investors were wildly optimistic about future returns and that the coming market adjustment was apt to be severe, especially in sectors where speculation had been concentrated.",
+     "required_terms": [
+      "wildly optimistic",
+      "sectors in which speculation has been concentrated"
+     ],
+     "gold_passage_ids": [
+      "1999_p0094",
+      "1999_p0095"
+     ],
+     "verification_note": "1999 letter (1999_p0094, 1999_p0095): GDP-linked return math and warning about speculative sectors."
+    },
+    {
+     "claim": "The one field he flagged for possible large new commitments was the electric utility industry (through the MidAmerican deal), despite its regulatory constraints.",
+     "required_terms": [
+      "additional commitments in the field",
+      "amounts involved could be large"
+     ],
+     "gold_passage_ids": [
+      "1999_p0063"
+     ],
+     "verification_note": "1999 letter (1999_p0063): possible further utility commitments."
+    },
+    {
+     "claim": "Even for the fine businesses Berkshire already owned, the stock prices were not attractive, so he felt better about the businesses than their stocks and did not add to those holdings.",
+     "required_terms": [
+      "much better about the businesses than their stocks"
+     ],
+     "gold_passage_ids": [
+      "1999_p0093"
+     ],
+     "verification_note": "1999 letter (1999_p0093): prices of owned businesses not attractive."
+    }
+   ],
+   "multi_part": true,
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": true
+   },
+   "reject": {
+    "forbidden_terms": []
+   },
+   "verification_note": "User's own 1999 sector question (kept verbatim). Honest answer: no growth sector recommended; tech avoided (1999_p0090-p0092), market and speculative sectors judged overpriced (1999_p0093-p0095), only utilities flagged for possible large commitments (1999_p0063).",
+   "group": 2
+  },
+  {
+   "qid": "fin_g2_04",
+   "question_type": "sector_view",
+   "answerable": true,
+   "years": [
+    2010,
+    2013,
+    2015
+   ],
+   "query": "Why did Buffett make a huge bet on railroads after the 2008 financial crisis, and what warning did he give about railroad earnings figures?",
+   "gold_passage_ids": [
+    "2010_p0010",
+    "2010_p0012",
+    "2010_p0013",
+    "2013_p0030",
+    "2015_p0090"
+   ],
+   "relevant_ids": [
+    "2009_p0053",
+    "2009_p0054",
+    "2010_p0010",
+    "2010_p0012",
+    "2010_p0013",
+    "2010_p0083",
+    "2011_p0060",
+    "2011_p0061",
+    "2013_p0030",
+    "2013_p0031",
+    "2014_p0037",
+    "2015_p0016",
+    "2015_p0017",
+    "2015_p0089",
+    "2015_p0090"
+   ],
+   "gold_claims": [
+    {
+     "claim": "He expected owning BNSF to raise Berkshire's normal earning power by nearly 40% pre-tax.",
+     "required_terms": [
+      "nearly 40% pre-tax"
+     ],
+     "gold_passage_ids": [
+      "2010_p0010"
+     ],
+     "verification_note": "2010 letter (2010_p0010): BNSF effect on normal earning power."
+    },
+    {
+     "claim": "Railroads have major cost and environmental advantages over trucking: BNSF moved a ton of freight 500 miles on one gallon of diesel, about three times more fuel-efficient than trucks.",
+     "required_terms": [
+      "three times more fuel-efficient",
+      "500 miles on a single gallon"
+     ],
+     "gold_passage_ids": [
+      "2010_p0012"
+     ],
+     "verification_note": "2010 letter (2010_p0012): rail versus trucking."
+    },
+    {
+     "claim": "U.S. freight movement will grow, the railroad will need massive investment, and Berkshire can supply the funds however slow the economy.",
+     "required_terms": [
+      "invest massively",
+      "our checks will clear"
+     ],
+     "gold_passage_ids": [
+      "2010_p0013"
+     ],
+     "verification_note": "2010 letter (2010_p0013): growth and capital needs of BNSF."
+    },
+    {
+     "claim": "He called the BNSF purchase, agreed amid the gloom of the Great Recession, an all-in wager on the economic future of the United States.",
+     "required_terms": [
+      "all-in wager on the economic future of the United States"
+     ],
+     "gold_passage_ids": [
+      "2013_p0030"
+     ],
+     "verification_note": "2013 letter (2013_p0030): BNSF as a bet on America."
+    },
+    {
+     "claim": "His caveat: a railroad's depreciation charge falls far short of the capital spending needed just to keep it running, so its GAAP earnings are higher than true economic earnings.",
+     "required_terms": [
+      "falls far short of the capital outlays",
+      "higher than true economic earnings"
+     ],
+     "gold_passage_ids": [
+      "2015_p0090"
+     ],
+     "verification_note": "2015 letter (2015_p0090): inadequate railroad depreciation and EBITDA warning."
+    }
+   ],
+   "multi_part": true,
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": true
+   },
+   "reject": {
+    "forbidden_terms": []
+   },
+   "verification_note": "2010_p0010, 2010_p0012, 2010_p0013, 2013_p0030, 2015_p0090 supply the 5 claims (nearly 40% pre-tax; fuel efficiency; invest massively; all-in wager; depreciation shortfall).",
+   "group": 2
+  },
+  {
+   "qid": "fin_g2_07",
+   "question_type": "sector_view",
+   "answerable": true,
+   "years": [
+    1982,
+    1987,
+    2004,
+    2012,
+    2016
+   ],
+   "query": "What does Buffett think of the economics of the property-casualty insurance industry, and why does the industry as a whole earn poor returns?",
+   "gold_passage_ids": [
+    "1982_p0048",
+    "1987_p0045",
+    "1987_p0046",
+    "2004_p0035",
+    "2012_p0040",
+    "2016_p0043",
+    "2016_p0044"
+   ],
+   "relevant_ids": [
+    "1982_p0047",
+    "1982_p0048",
+    "1985_p0086",
+    "1986_p0055",
+    "1987_p0045",
+    "1987_p0046",
+    "1989_p0056",
+    "2001_p0039",
+    "2004_p0035",
+    "2010_p0060",
+    "2010_p0062",
+    "2011_p0045",
+    "2011_p0048",
+    "2012_p0036",
+    "2012_p0040",
+    "2016_p0043",
+    "2016_p0044"
+   ],
+   "gold_claims": [
+    {
+     "claim": "Insurance is a textbook case of an industry facing the deadly combination of excess capacity and a commodity product.",
+     "required_terms": [
+      "textbook case",
+      "excess capacity"
+     ],
+     "gold_passage_ids": [
+      "1982_p0048"
+     ],
+     "verification_note": "1982 letter (1982_p0048): insurance as excess capacity plus commodity product."
+    },
+    {
+     "claim": "The industry has dismal economic characteristics (hundreds of competitors, ease of entry, an undifferentiated product), so only very low-cost operators or protected niches earn high profits.",
+     "required_terms": [
+      "dismal economic characteristics",
+      "ease of entry"
+     ],
+     "gold_passage_ids": [
+      "1987_p0045"
+     ],
+     "verification_note": "1987 letter (1987_p0045): poor long-term outlook for insurers."
+    },
+    {
+     "claim": "Like other commodity businesses it prospers only under shortage conditions, and insurance managers rushed to add capacity when shortages appeared in 1985-87.",
+     "required_terms": [
+      "shortage conditions",
+      "1985-87"
+     ],
+     "gold_passage_ids": [
+      "1987_p0046"
+     ],
+     "verification_note": "1987 letter (1987_p0046): shortages and capacity expansion."
+    },
+    {
+     "claim": "Customers don't care which insurer they buy from, so price competition is usually fierce, like airline seats.",
+     "required_terms": [
+      "commodity-like product",
+      "Think airline seats"
+     ],
+     "gold_passage_ids": [
+      "2004_p0035"
+     ],
+     "verification_note": "2004 letter (2004_p0035): why insurers earn poor returns."
+    },
+    {
+     "claim": "Industry premiums were inadequate to cover claims plus expenses in 37 of the 45 years ending in 2011, so cost-free float is not to be expected for the P/C industry as a whole.",
+     "required_terms": [
+      "37 of the 45 years"
+     ],
+     "gold_passage_ids": [
+      "2012_p0040"
+     ],
+     "verification_note": "2012 letter (2012_p0040): industry underwriting record."
+    },
+    {
+     "claim": "Every insurer's wish for underwriting profit creates intense competition, so despite its float income the industry will keep earning subnormal returns on tangible net worth compared with other American businesses.",
+     "required_terms": [
+      "subnormal returns on tangible net worth"
+     ],
+     "gold_passage_ids": [
+      "2016_p0043",
+      "2016_p0044"
+     ],
+     "verification_note": "2016 letter (2016_p0043, 2016_p0044): competitive dynamics and the industry's returns."
+    }
+   ],
+   "multi_part": true,
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": true
+   },
+   "reject": {
+    "forbidden_terms": []
+   },
+   "verification_note": "1982_p0048, 1987_p0045, 1987_p0046, 2004_p0035, 2012_p0040, 2016_p0043/p0044 supply the 6 claims (textbook case; dismal economic characteristics; shortage conditions; commodity-like product; 37 of the 45 years; subnormal returns). The former 2012+2016 claim is split per letter.",
+   "group": 2
+  },
+  {
+   "qid": "fin_g2_10",
+   "question_type": "trend_over_years",
+   "answerable": true,
+   "years": [
+    1984,
+    1988,
+    2008,
+    2011,
+    2017,
+    2020
+   ],
+   "query": "How has Buffett's opinion of long-term bonds as an investment changed from the 1980s to 2020?",
+   "gold_passage_ids": [
+    "1984_p0107",
+    "1988_p0074",
+    "1988_p0075",
+    "2008_p0094",
+    "2011_p0114",
+    "2011_p0116",
+    "2017_p0073",
+    "2020_p0029"
+   ],
+   "relevant_ids": [
+    "1984_p0107",
+    "1984_p0108",
+    "1986_p0080",
+    "1987_p0105",
+    "1988_p0074",
+    "1988_p0075",
+    "2008_p0094",
+    "2011_p0110",
+    "2011_p0112",
+    "2011_p0113",
+    "2011_p0114",
+    "2011_p0116",
+    "2017_p0073",
+    "2020_p0029",
+    "2020_p0030"
+   ],
+   "gold_claims": [
+    {
+     "claim": "In 1984 he disliked most long-term bonds because they are only as sound as a dollar and he expected substantial inflation ahead.",
+     "required_terms": [
+      "as sound as a dollar",
+      "substantial inflation lies ahead"
+     ],
+     "gold_passage_ids": [
+      "1984_p0107"
+     ],
+     "verification_note": "1984 letter (1984_p0107): dislike of long-term bonds."
+    },
+    {
+     "claim": "He kept his aversion to long-term bonds, the exception being the WPPSS bonds bought when they yielded around 17% after taxes, which worked out about as expected.",
+     "required_terms": [
+      "aversion to long-term bonds",
+      "17% after taxes"
+     ],
+     "gold_passage_ids": [
+      "1988_p0074",
+      "1988_p0075"
+     ],
+     "verification_note": "1988 letter (1988_p0074, 1988_p0075): aversion to bonds and the WPPSS exception."
+    },
+    {
+     "claim": "In late 2008 he said clinging to cash equivalents or long-term government bonds at present yields was almost certainly a terrible policy if continued for long, since their purchasing power would erode.",
+     "required_terms": [
+      "terrible policy"
+     ],
+     "gold_passage_ids": [
+      "2008_p0094"
+     ],
+     "verification_note": "2008 letter (2008_p0094): long-term government bonds at crisis-era yields."
+    },
+    {
+     "claim": "In 2011 he said current rates did not compensate for purchasing-power risk, so bonds should come with a warning label and were priced to deliver return-free risk.",
+     "required_terms": [
+      "warning label",
+      "return-free risk"
+     ],
+     "gold_passage_ids": [
+      "2011_p0114",
+      "2011_p0116"
+     ],
+     "verification_note": "2011 letter (2011_p0114, 2011_p0116): currency-based investments."
+    },
+    {
+     "claim": "In 2017 he argued that purportedly risk-free long-term bonds in 2012 had been a far riskier investment than a long-term investment in common stocks, because even low inflation erodes their purchasing power.",
+     "required_terms": [
+      "far riskier investment"
+     ],
+     "gold_passage_ids": [
+      "2017_p0073"
+     ],
+     "verification_note": "2017 letter (2017_p0073): risk redefined as loss of purchasing power."
+    },
+    {
+     "claim": "In 2020 he said bonds are not the place to be: the 10-year Treasury yield of 0.93% had fallen 94% from 1981, and fixed-income investors face a bleak future.",
+     "required_terms": [
+      "not the place to be",
+      "0.93%",
+      "bleak future"
+     ],
+     "gold_passage_ids": [
+      "2020_p0029"
+     ],
+     "verification_note": "2020 letter (2020_p0029): low bond yields."
+    }
+   ],
+   "multi_part": true,
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": true
+   },
+   "reject": {
+    "forbidden_terms": []
+   },
+   "verification_note": "1984_p0107, 1988_p0074/p0075, 2008_p0094, 2011_p0114/p0116, 2017_p0073, 2020_p0029 supply the 6 claims (sound as a dollar; WPPSS 17%; terrible policy; warning label; far riskier investment; 0.93%).",
+   "group": 2
+  },
+  {
+   "qid": "fin_g2_11",
+   "question_type": "investing_principle",
+   "answerable": true,
+   "years": [
+    2009,
+    2010,
+    2011,
+    2014,
+    2021,
+    2024
+   ],
+   "query": "Why does Berkshire keep such a large cash pile, and does Buffett actually prefer cash to stocks?",
+   "gold_passage_ids": [
+    "2009_p0022",
+    "2010_p0139",
+    "2011_p0123",
+    "2014_p0199",
+    "2014_p0200",
+    "2021_p0040",
+    "2024_p0025",
+    "2024_p0026"
+   ],
+   "relevant_ids": [
+    "2008_p0092",
+    "2009_p0020",
+    "2009_p0022",
+    "2009_p0085",
+    "2010_p0135",
+    "2010_p0139",
+    "2010_p0140",
+    "2011_p0115",
+    "2011_p0123",
+    "2014_p0199",
+    "2014_p0200",
+    "2021_p0040",
+    "2022_p0035",
+    "2023_p0024",
+    "2024_p0025",
+    "2024_p0026"
+   ],
+   "gold_claims": [
+    {
+     "claim": "Cash is to a business what oxygen is to a person, unnoticed until it is missing; in the 2008 panic Berkshire could supply $15.6 billion to American businesses in three weeks.",
+     "required_terms": [
+      "as oxygen is to an individual",
+      "$15.6 billion"
+     ],
+     "gold_passage_ids": [
+      "2014_p0199"
+     ],
+     "verification_note": "2014 letter (2014_p0199): cash as oxygen."
+    },
+    {
+     "claim": "Berkshire customarily keeps at least $20 billion (usually far more, held in U.S. Treasury bills) so it can both withstand unprecedented insurance losses and quickly seize acquisition or investment opportunities, even during financial turmoil.",
+     "required_terms": [
+      "at least $20 billion",
+      "insurance losses"
+     ],
+     "gold_passage_ids": [
+      "2010_p0139",
+      "2014_p0200"
+     ],
+     "verification_note": "2010 letter (2010_p0139): the two-part reason; 2014 letter (2014_p0200) supports the $20 billion floor in Treasury bills."
+    },
+    {
+     "claim": "In 2021 he and Munger pledged that Berkshire will always hold more than $30 billion of cash and equivalents so it is financially impregnable and never dependent on the kindness of strangers.",
+     "required_terms": [
+      "$30 billion",
+      "kindness of strangers"
+     ],
+     "gold_passage_ids": [
+      "2021_p0040"
+     ],
+     "verification_note": "2021 letter (2021_p0040): the raised cash floor."
+    },
+    {
+     "claim": "He accepts that this cash earns a pittance because it lets him sleep well.",
+     "required_terms": [
+      "earning a pittance",
+      "we sleep well"
+     ],
+     "gold_passage_ids": [
+      "2009_p0022"
+     ],
+     "verification_note": "2009 letter (2009_p0022): price of financial strength."
+    },
+    {
+     "claim": "He warns that crowds say 'cash is king' at the wrong time, as in late 2008 when cash should have been deployed rather than held.",
+     "required_terms": [
+      "cash is king",
+      "should have been deployed"
+     ],
+     "gold_passage_ids": [
+      "2011_p0123"
+     ],
+     "verification_note": "2011 letter (2011_p0123): cash at peaks of fear."
+    },
+    {
+     "claim": "In 2024 he stressed that despite the large cash position the great majority of shareholders' money stays in equities, and Berkshire will never prefer cash-equivalents over owning good businesses.",
+     "required_terms": [
+      "great majority of your money remains in equities",
+      "never prefer ownership of cash-equivalent assets"
+     ],
+     "gold_passage_ids": [
+      "2024_p0025",
+      "2024_p0026"
+     ],
+     "verification_note": "2024 letter (2024_p0025, 2024_p0026): equities over cash."
+    }
+   ],
+   "multi_part": true,
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": true
+   },
+   "reject": {
+    "forbidden_terms": []
+   },
+   "verification_note": "2014_p0199, 2010_p0139 (+2014_p0200), 2021_p0040, 2009_p0022, 2011_p0123, 2024_p0025/p0026 supply the 6 claims (oxygen; at least $20 billion + insurance losses; $30 billion; sleep well; cash is king; majority in equities).",
+   "group": 2
+  },
+  {
+   "qid": "fin_g2_12",
+   "question_type": "trend_over_years",
+   "answerable": true,
+   "years": [
+    2011,
+    2012,
+    2018,
+    2021,
+    2022
+   ],
+   "query": "How has Berkshire's own share-repurchase policy changed from its 2011 buyback authorization to the 2020s?",
+   "gold_passage_ids": [
+    "2011_p0031",
+    "2011_p0032",
+    "2012_p0114",
+    "2012_p0115",
+    "2018_p0017",
+    "2018_p0037",
+    "2018_p0038",
+    "2021_p0045",
+    "2022_p0027",
+    "2022_p0028",
+    "2022_p0029"
+   ],
+   "relevant_ids": [
+    "2011_p0031",
+    "2011_p0032",
+    "2011_p0033",
+    "2012_p0114",
+    "2012_p0115",
+    "2012_p0116",
+    "2013_p0012",
+    "2013_p0013",
+    "2015_p0014",
+    "2016_p0036",
+    "2016_p0037",
+    "2018_p0016",
+    "2018_p0017",
+    "2018_p0037",
+    "2018_p0038",
+    "2019_p0077",
+    "2020_p0033",
+    "2020_p0034",
+    "2021_p0044",
+    "2021_p0045",
+    "2021_p0046",
+    "2022_p0027",
+    "2022_p0028",
+    "2022_p0029"
+   ],
+   "gold_claims": [
+    {
+     "claim": "In 2011 Berkshire authorized buybacks at up to 110% of book value; he favours repurchases only when a company has ample funds and its stock sells at a material discount to intrinsic value, conservatively calculated.",
+     "required_terms": [
+      "110% of book value",
+      "ample funds"
+     ],
+     "gold_passage_ids": [
+      "2011_p0031",
+      "2011_p0032"
+     ],
+     "verification_note": "2011 letter (2011_p0031, 2011_p0032): Berkshire's repurchase authorization and the two conditions."
+    },
+    {
+     "claim": "The 110% limit proved unrealistic, so in December 2012 Berkshire raised it to 120% of book value when a large block became available at about 116% of book.",
+     "required_terms": [
+      "120%",
+      "unrealistic"
+     ],
+     "gold_passage_ids": [
+      "2012_p0114",
+      "2012_p0115"
+     ],
+     "verification_note": "2012 letter (2012_p0114, 2012_p0115): limit raised to 120%."
+    },
+    {
+     "claim": "By 2018 he framed repurchases by intrinsic value rather than a book-value limit: Berkshire would likely be a significant repurchaser at prices above book value but below its estimate of intrinsic value, and repurchases must be price-sensitive.",
+     "required_terms": [
+      "below our estimate of intrinsic value"
+     ],
+     "gold_passage_ids": [
+      "2018_p0017",
+      "2018_p0037",
+      "2018_p0038"
+     ],
+     "verification_note": "2018 letter (2018_p0017, 2018_p0037, 2018_p0038): the switch to the intrinsic-value standard."
+    },
+    {
+     "claim": "In 2020-2021 Berkshire repurchased 9% of its shares for $51.7 billion, while he insisted overpaying for its own shares would be value-destroying.",
+     "required_terms": [
+      "$51.7 billion",
+      "value-destroying"
+     ],
+     "gold_passage_ids": [
+      "2021_p0045"
+     ],
+     "verification_note": "2021 letter (2021_p0045): two years of large repurchases."
+    },
+    {
+     "claim": "In 2022 Berkshire repurchased 1.2% of its shares, and he defended value-accretive repurchases: people who say all repurchases harm shareholders or the country are economic illiterates or silver-tongued demagogues.",
+     "required_terms": [
+      "1.2%",
+      "economic illiterate"
+     ],
+     "gold_passage_ids": [
+      "2022_p0027",
+      "2022_p0028",
+      "2022_p0029"
+     ],
+     "verification_note": "2022 letter (2022_p0027-p0029): 2022 repurchases and defence of buybacks."
+    }
+   ],
+   "multi_part": true,
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": true
+   },
+   "reject": {
+    "forbidden_terms": []
+   },
+   "verification_note": "Re-focused on Berkshire's own repurchase policy (fixlist DECISION). 2011_p0031/p0032, 2012_p0114/p0115, 2018_p0017/p0037/p0038, 2021_p0045, 2022_p0027-p0029 supply the 5 claims (110% of book; 120%; below our estimate of intrinsic value; $51.7 billion; 1.2% + economic illiterate). The general principles (1984_p0018, 1999_p0100/p0101) stay gold in fin_g5_06 and are not gold here.",
+   "group": 2
+  },
+  {
+   "qid": "fin_g2_13",
+   "question_type": "investing_principle",
+   "answerable": true,
+   "years": [
+    1984,
+    2012,
+    2014
+   ],
+   "query": "Why doesn't Berkshire pay a dividend, and how does Buffett think a company should choose between paying dividends and retaining earnings?",
+   "gold_passage_ids": [
+    "1984_p0115",
+    "1984_p0128",
+    "2012_p0120",
+    "2012_p0122",
+    "2012_p0124",
+    "2014_p0221"
+   ],
+   "relevant_ids": [
+    "1984_p0110",
+    "1984_p0114",
+    "1984_p0115",
+    "1984_p0126",
+    "1984_p0128",
+    "2012_p0116",
+    "2012_p0117",
+    "2012_p0118",
+    "2012_p0119",
+    "2012_p0120",
+    "2012_p0121",
+    "2012_p0122",
+    "2012_p0124",
+    "2012_p0126",
+    "2012_p0127",
+    "2012_p0128",
+    "2014_p0220",
+    "2014_p0221",
+    "2014_p0228"
+   ],
+   "gold_claims": [
+    {
+     "claim": "Earnings should be retained only when each dollar retained is likely to create at least one dollar of market value for owners.",
+     "required_terms": [
+      "at least one dollar of market value"
+     ],
+     "gold_passage_ids": [
+      "1984_p0115"
+     ],
+     "verification_note": "1984 letter (1984_p0115): the one valid reason for retention."
+    },
+    {
+     "claim": "Because Berkshire earned well above market rates on retained earnings, any distribution would have been contrary to shareholders' financial interest.",
+     "required_terms": [
+      "contrary to the financial interest of shareholders"
+     ],
+     "gold_passage_ids": [
+      "1984_p0128"
+     ],
+     "verification_note": "1984 letter (1984_p0128): dividend principles applied to Berkshire."
+    },
+    {
+     "claim": "His 2012 example showed that a sell-off approach (owners selling a few shares each year) leaves them with about 4% more value and more cash than a dividend policy.",
+     "required_terms": [
+      "sell-off policy",
+      "about 4% greater"
+     ],
+     "gold_passage_ids": [
+      "2012_p0120"
+     ],
+     "verification_note": "2012 letter (2012_p0120): sell-off versus dividend math."
+    },
+    {
+     "claim": "Dividends force one cash-out policy on every shareholder and are taxed in full, while a sell-off is taxed only on the gain portion.",
+     "required_terms": [
+      "specific cash-out policy",
+      "tax on only the gain portion"
+     ],
+     "gold_passage_ids": [
+      "2012_p0122",
+      "2012_p0124"
+     ],
+     "verification_note": "2012 letter (2012_p0122, 2012_p0124): two further arguments against dividends."
+    },
+    {
+     "claim": "Shareholders agreed: in a proxy vote the B shares rejected a dividend by about 47 to 1 and the A shares by 89 to 1.",
+     "required_terms": [
+      "47 to 1",
+      "89 to 1"
+     ],
+     "gold_passage_ids": [
+      "2014_p0221"
+     ],
+     "verification_note": "2014 letter (2014_p0221): shareholder vote on a dividend."
+    }
+   ],
+   "multi_part": true,
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": true
+   },
+   "reject": {
+    "forbidden_terms": []
+   },
+   "verification_note": "1984_p0115, 1984_p0128, 2012_p0120, 2012_p0122/p0124, 2014_p0221 supply the 5 claims (one dollar of market value; contrary to interest; 4% greater; cash-out policy and tax; 47 to 1).",
+   "group": 2
+  },
+  {
+   "qid": "fin_g2_15",
+   "question_type": "partial",
+   "answerable": true,
+   "years": [
+    2011
+   ],
+   "query": "In his 2011 letter, after the financial crisis, how did Buffett describe Wells Fargo and the banks Berkshire invested in, and how did he react to Wells Fargo's 2016 fake-accounts scandal?",
+   "gold_passage_ids": [
+    "2011_p0016",
+    "2011_p0017",
+    "2011_p0102",
+    "2011_p0103"
+   ],
+   "relevant_ids": [
+    "2011_p0016",
+    "2011_p0017",
+    "2011_p0101",
+    "2011_p0102",
+    "2011_p0103"
+   ],
+   "gold_claims": [
+    {
+     "claim": "One of Berkshire's three important investment moves in 2011 was a $1 billion addition to its Wells Fargo position (alongside buying IBM and Bank of America).",
+     "required_terms": [
+      "$1 billion"
+     ],
+     "gold_passage_ids": [
+      "2011_p0102"
+     ],
+     "verification_note": "2011 letter (2011_p0102): the three important moves of 2011."
+    },
+    {
+     "claim": "He said the banking industry was back on its feet and Wells Fargo was prospering: its earnings strong, its assets solid and its capital at record levels.",
+     "required_terms": [
+      "back on its feet",
+      "record levels"
+     ],
+     "gold_passage_ids": [
+      "2011_p0102"
+     ],
+     "verification_note": "2011 letter (2011_p0102): banks after the crisis."
+    },
+    {
+     "claim": "Wells Fargo (7.6% owned) was one of four exceptional companies in which Berkshire held large stakes, viewed as partnership interests in wonderful businesses rather than securities to trade.",
+     "required_terms": [
+      "7.6%",
+      "partnership interests"
+     ],
+     "gold_passage_ids": [
+      "2011_p0017"
+     ],
+     "verification_note": "2011 letter (2011_p0017): the four large holdings."
+    },
+    {
+     "claim": "At Bank of America, where Berkshire bought a $5 billion 6% preferred with warrants on 700 million shares, prior management had made huge mistakes that Brian Moynihan was cleaning up, and he expected the warrants to be of great value.",
+     "required_terms": [
+      "huge mistakes",
+      "700 million"
+     ],
+     "gold_passage_ids": [
+      "2011_p0016",
+      "2011_p0102",
+      "2011_p0103"
+     ],
+     "verification_note": "2011 letter (2011_p0016, 2011_p0102, 2011_p0103): Bank of America preferred, warrants and management."
+    }
+   ],
+   "missing_part": "The letters never mention Wells Fargo's 2016 fake-accounts (sales-practices) scandal or any reaction to it; the 2016-2019 letters only list Wells Fargo in holdings tables.",
+   "absence_search_patterns": [
+    "fake accounts",
+    "unauthorized accounts",
+    "cross-sell"
+   ],
+   "multi_part": true,
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": true,
+    "must_state_missing_part": true
+   },
+   "reject": {
+    "forbidden_terms": []
+   },
+   "verification_note": "Answerable half moved off the 1990 purchase (fixlist DECISION; that story stays in fin_g1_06): 2011_p0102, 2011_p0017, 2011_p0016/p0103 supply the 4 claims ($1 billion; back on its feet; 7.6% + partnership interests; huge mistakes + 700 million). Missing part: whole-corpus searches for fake accounts, unauthorized accounts, cross-sell have zero matches; Wells Fargo appears 2016-2019 only in holdings tables.",
+   "group": 2
+  },
+  {
+   "qid": "fin_g2_17",
+   "question_type": "partial",
+   "answerable": true,
+   "years": [
+    1996,
+    2013,
+    2017
+   ],
+   "query": "Does Buffett recommend index funds for ordinary investors, and what does he say about using robo-advisors to invest in them?",
+   "gold_passage_ids": [
+    "1996_p0092",
+    "2013_p0114",
+    "2017_p0064",
+    "2017_p0065",
+    "2017_p0066"
+   ],
+   "relevant_ids": [
+    "1993_p0081",
+    "1996_p0092",
+    "2003_p0049",
+    "2013_p0111",
+    "2013_p0114",
+    "2014_p0113",
+    "2016_p0118",
+    "2016_p0119",
+    "2016_p0122",
+    "2016_p0123",
+    "2016_p0129",
+    "2016_p0134",
+    "2016_p0136",
+    "2017_p0059",
+    "2017_p0060",
+    "2017_p0064",
+    "2017_p0065",
+    "2017_p0066"
+   ],
+   "gold_claims": [
+    {
+     "claim": "Most investors, institutional and individual, will find the best way to own stocks is an index fund with minimal fees, which beats the net results of most professionals.",
+     "required_terms": [
+      "index fund that charges minimal fees"
+     ],
+     "gold_passage_ids": [
+      "1996_p0092"
+     ],
+     "verification_note": "1996 letter (1996_p0092): advice for your own investments."
+    },
+    {
+     "claim": "His instruction for a trust set up in his will: 10% in short-term government bonds and 90% in a very low-cost S&P 500 index fund, with Vanguard's suggested.",
+     "required_terms": [
+      "90% in a very low-cost S&P 500 index fund",
+      "I suggest Vanguard's"
+     ],
+     "gold_passage_ids": [
+      "2013_p0114"
+     ],
+     "verification_note": "2013 letter (2013_p0114): 90/10 allocation advice."
+    },
+    {
+     "claim": "His ten-year bet against Protege Partners' funds-of-funds ended with the S&P index fund up 125.8%, or 8.5% a year, ahead of all five funds.",
+     "required_terms": [
+      "125.8%",
+      "8.5%"
+     ],
+     "gold_passage_ids": [
+      "2017_p0064"
+     ],
+     "verification_note": "2017 letter (2017_p0064): final scorecard of the bet."
+    },
+    {
+     "claim": "After beating the index in 2008, the funds-of-funds trailed it in each of the next nine years; his lesson was that performance comes and goes but fees never falter.",
+     "required_terms": [
+      "trailed the index fund",
+      "Fees never falter"
+     ],
+     "gold_passage_ids": [
+      "2017_p0065",
+      "2017_p0066"
+     ],
+     "verification_note": "2017 letter (2017_p0065, 2017_p0066): lesson of the bet."
+    }
+   ],
+   "missing_part": "The letters never mention robo-advisors.",
+   "absence_search_patterns": [
+    "robo-advis",
+    "robo advis",
+    "roboadvis"
+   ],
+   "multi_part": true,
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": true,
+    "must_state_missing_part": true
+   },
+   "reject": {
+    "forbidden_terms": []
+   },
+   "verification_note": "Answerable part: 1996_p0092, 2013_p0114, 2017_p0064, 2017_p0065/p0066 supply the 4 claims (minimal fees; 90% S&P 500 fund; 125.8%; fees never falter). Missing part: whole-corpus searches for robo-advis, robo advis, roboadvis have zero matches.",
+   "group": 2
+  },
+  {
+   "qid": "fin_g2_20",
+   "question_type": "unanswerable",
+   "answerable": false,
+   "refusal_category": "absent_topic",
+   "years": [],
+   "query": "Does Buffett see artificial intelligence as a sector with big growth potential, and which AI companies has he favoured as investments?",
+   "gold_passage_ids": [],
+   "relevant_ids": [],
+   "gold_claims": [],
+   "expected_answer": "The retrieved passages do not provide enough evidence to answer this question.",
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_exact_refusal": true,
+    "require_valid_citation": false
+   },
+   "reject": {
+    "forbidden_terms": []
+   },
+   "absence_search_patterns": [
+    "artificial intelligence",
+    "machine learning",
+    "ChatGPT"
+   ],
+   "verification_note": "Whole-corpus case-insensitive searches for artificial intelligence, machine learning, ChatGPT have zero matches; the only 'AI' mention (2023_p0062) is a passing joke, not an investment view.",
+   "group": 2
+  },
+  {
+   "qid": "fin_g3_03",
+   "question_type": "trend_over_years",
+   "answerable": true,
+   "years": [
+    1988,
+    1989,
+    1993,
+    1994,
+    1997
+   ],
+   "query": "How did Berkshire build its Coca-Cola stake in 1988-89, and how much was that holding worth by the mid-to-late 1990s?",
+   "gold_passage_ids": [
+    "1988_p0060",
+    "1989_p0075",
+    "1989_p0076",
+    "1993_p0110",
+    "1994_p0009",
+    "1994_p0074",
+    "1997_p0085"
+   ],
+   "relevant_ids": [
+    "1988_p0060",
+    "1989_p0075",
+    "1989_p0076",
+    "1993_p0110",
+    "1994_p0009",
+    "1994_p0074",
+    "1997_p0085",
+    "1990_p0077",
+    "1991_p0070",
+    "1992_p0059",
+    "1993_p0057",
+    "1995_p0078",
+    "1996_p0074"
+   ],
+   "gold_claims": [
+    {
+     "claim": "At the end of 1988 Berkshire held 14,172,500 Coca-Cola shares at a cost of about $592.5 million.",
+     "required_terms": [
+      "14,172,500"
+     ],
+     "gold_passage_ids": [
+      "1988_p0060"
+     ],
+     "verification_note": "1988 letter (1988_p0060); unit=figure (000s omitted); definition=14,172,500 KO shares, cost $592,540 thousand."
+    },
+    {
+     "claim": "During 1989 the holding grew to 23,350,000 shares, with a total cost of about $1.02 billion and a yearend market value of about $1.8 billion.",
+     "required_terms": [
+      "23,350,000"
+     ],
+     "gold_passage_ids": [
+      "1989_p0075",
+      "1989_p0076"
+     ],
+     "verification_note": "1989 letter (1989_p0075, 1989_p0076); unit=figure (000s omitted); definition=23,350,000 shares, cost $1,023,920K, market $1,803,787K."
+    },
+    {
+     "claim": "Buffett described it as a record $1 billion investment in Coca-Cola made in 1988-89.",
+     "required_terms": [
+      "record $1 billion"
+     ],
+     "gold_passage_ids": [
+      "1993_p0110"
+     ],
+     "verification_note": "1993 letter (1993_p0110); unit=figure; definition=record $1 billion investment in Coca-Cola in 1988-89."
+    },
+    {
+     "claim": "At yearend 1994 Berkshire held 100,000,000 shares (7.8% of Coke) costing about $1.3 billion and worth $5.15 billion.",
+     "required_terms": [
+      "100,000,000",
+      "7.8%"
+     ],
+     "gold_passage_ids": [
+      "1994_p0009",
+      "1994_p0074"
+     ],
+     "verification_note": "1994 letter (1994_p0009, 1994_p0074); unit=figure (000s omitted); definition=100,000,000 shares, cost $1,298,888K, market $5,150,000K; 7.8% ownership."
+    },
+    {
+     "claim": "At yearend 1997 the 200,000,000 Coca-Cola shares, still at a cost of $1,298.9 million, had a market value of $13,337.5 million (about $13.3 billion).",
+     "required_terms": [
+      "200,000,000"
+     ],
+     "gold_passage_ids": [
+      "1997_p0085"
+     ],
+     "verification_note": "1997 letter (1997_p0085); unit=figure ($ millions); definition=200,000,000 KO shares, cost $1,298.9M, market $13,337.5M."
+    }
+   ],
+   "multi_part": true,
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": true
+   },
+   "reject": {
+    "forbidden_terms": []
+   },
+   "verification_note": "1988_p0060, 1989_p0075, 1989_p0076, 1993_p0110, 1994_p0009, 1994_p0074, 1997_p0085 supply the 5 claims (14,172,500; 23,350,000; record $1 billion; 100,000,000 and 7.8%; 200,000,000). Required terms are share counts and prose values; the thousands-omitted cost/market cells stay only in the claim text.",
+   "group": 3
+  },
+  {
+   "qid": "fin_g3_04",
+   "question_type": "trend_over_years",
+   "answerable": true,
+   "years": [
+    1995,
+    2009,
+    2018
+   ],
+   "query": "What did Berkshire pay over the years to own all of GEICO, and how much did GEICO's float and market position grow after the 1996 buyout?",
+   "gold_passage_ids": [
+    "1995_p0036",
+    "1995_p0037",
+    "2009_p0036",
+    "2018_p0063",
+    "2018_p0064"
+   ],
+   "relevant_ids": [
+    "1995_p0036",
+    "1995_p0037",
+    "2009_p0036",
+    "2018_p0063",
+    "2018_p0064",
+    "1980_p0040",
+    "1995_p0051",
+    "1996_p0052"
+   ],
+   "gold_claims": [
+    {
+     "claim": "By yearend 1980 Berkshire had put $45.7 million into GEICO for 33.3% of its shares; GEICO's own buybacks later lifted that interest to about 50%.",
+     "required_terms": [
+      "$45.7 million",
+      "33.3%"
+     ],
+     "gold_passage_ids": [
+      "1995_p0036"
+     ],
+     "verification_note": "1995 letter (1995_p0036); unit=figure; definition=$45.7 million invested by 1980 for 33.3%; stake grew to about 50% via GEICO repurchases."
+    },
+    {
+     "claim": "In 1995 Berkshire agreed to pay $2.3 billion for the half of GEICO it did not own, about 50 times what it had paid for the first half.",
+     "required_terms": [
+      "$2.3 billion",
+      "about 50 times"
+     ],
+     "gold_passage_ids": [
+      "1995_p0037",
+      "2018_p0063"
+     ],
+     "verification_note": "1995 letter (1995_p0037) and 2018 letter (2018_p0063); unit=figure; definition=$2.3 billion for the remaining half, ~50x the cost of the first half."
+    },
+    {
+     "claim": "By 2009 GEICO had risen from sixth-largest U.S. auto insurer (1995) to number three, its float had grown from $2.7 billion to $9.6 billion, and it made an underwriting profit in 13 of 14 years.",
+     "required_terms": [
+      "$2.7 billion to $9.6 billion",
+      "13 of the 14 years"
+     ],
+     "gold_passage_ids": [
+      "2009_p0036"
+     ],
+     "verification_note": "2009 letter (2009_p0036); unit=figure; definition=GEICO float $2.7B to $9.6B; underwriting profit 13 of 14 years."
+    },
+    {
+     "claim": "By 2018 GEICO was the Number Two auto insurer with sales 1,200% above 1995, cumulative pre-tax underwriting profits of $15.5 billion since the purchase, and float up from $2.5 billion to $22.1 billion.",
+     "required_terms": [
+      "1,200% greater",
+      "$15.5 billion",
+      "$22.1 billion"
+     ],
+     "gold_passage_ids": [
+      "2018_p0064"
+     ],
+     "verification_note": "2018 letter (2018_p0064); unit=figure; definition=sales +1,200% vs 1995; $15.5B underwriting profit; float $2.5B to $22.1B."
+    }
+   ],
+   "multi_part": true,
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": true
+   },
+   "reject": {
+    "forbidden_terms": []
+   },
+   "verification_note": "1995_p0036, 1995_p0037, 2009_p0036, 2018_p0063, 2018_p0064 supply the 4 claims ($45.7 million; $2.3 billion; $2.7 billion to $9.6 billion; 1,200% greater).",
+   "group": 3
+  },
+  {
+   "qid": "fin_g3_05",
+   "question_type": "trend_over_years",
+   "answerable": true,
+   "years": [
+    1991,
+    2007,
+    2014
+   ],
+   "query": "Berkshire bought See's Candies in 1972. What did it pay, and how did See's sales and pre-tax earnings grow over the following decades compared with the capital the business needed?",
+   "gold_passage_ids": [
+    "1991_p0036",
+    "2007_p0034",
+    "2007_p0035",
+    "2014_p0156"
+   ],
+   "relevant_ids": [
+    "1991_p0036",
+    "2007_p0034",
+    "2007_p0035",
+    "2014_p0156",
+    "1991_p0035",
+    "1991_p0037",
+    "1999_p0081",
+    "1983_p0105"
+   ],
+   "gold_claims": [
+    {
+     "claim": "Berkshire (via Blue Chip Stamps) bought See's for $25 million when its sales were $30 million and pre-tax earnings were under $5 million.",
+     "required_terms": [
+      "for $25 million when its sales were $30 million"
+     ],
+     "gold_passage_ids": [
+      "2007_p0034"
+     ],
+     "verification_note": "2007 letter (2007_p0034); unit=figure; definition=purchase price $25 million in 1972; sales $30 million; pre-tax earnings < $5 million."
+    },
+    {
+     "claim": "By 1991, See's sales had grown from $29 million to $196 million and pre-tax profits from $4.2 million to $42.4 million.",
+     "required_terms": [
+      "$196 million",
+      "$42.4 million"
+     ],
+     "gold_passage_ids": [
+      "1991_p0036"
+     ],
+     "verification_note": "1991 letter (1991_p0036); unit=figure; definition=sales $29M (1972) to $196M (1991); pre-tax $4.2M to $42.4M."
+    },
+    {
+     "claim": "In 2007 See's had sales of $383 million and pre-tax profits of $82 million, needed only $32 million of reinvestment since 1972, and had earned $1.35 billion pre-tax in total.",
+     "required_terms": [
+      "$383 million",
+      "$82 million",
+      "$1.35 billion"
+     ],
+     "gold_passage_ids": [
+      "2007_p0035"
+     ],
+     "verification_note": "2007 letter (2007_p0035); unit=figure; definition=2007 sales $383M, pre-tax $82M; cumulative pre-tax $1.35B; reinvested $32M."
+    },
+    {
+     "claim": "By 2014 See's had earned $1.9 billion pre-tax while its growth required added investment of only $40 million.",
+     "required_terms": [
+      "$1.9 billion pre-tax",
+      "added investment of only $40 million"
+     ],
+     "gold_passage_ids": [
+      "2014_p0156"
+     ],
+     "verification_note": "2014 letter (2014_p0156); unit=figure; definition=cumulative pre-tax earnings $1.9 billion; added investment $40 million."
+    }
+   ],
+   "multi_part": true,
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": true
+   },
+   "reject": {
+    "forbidden_terms": []
+   },
+   "verification_note": "2007_p0034, 1991_p0036, 2007_p0035, 2014_p0156 supply the 4 claims (for $25 million when its sales were $30 million; $196 million; $383 million; $1.9 billion pre-tax).",
+   "group": 3
+  },
+  {
+   "qid": "fin_g3_07",
+   "question_type": "comparison",
+   "answerable": true,
+   "years": [
+    2001,
+    2002
+   ],
+   "query": "How did Berkshire's per-share book value perform against the S&P 500 in 2001 versus 2002?",
+   "gold_passage_ids": [
+    "2001_p0006",
+    "2001_p0007",
+    "2002_p0006",
+    "2002_p0008"
+   ],
+   "relevant_ids": [
+    "2001_p0006",
+    "2001_p0007",
+    "2002_p0006",
+    "2002_p0008",
+    "2001_p0008",
+    "2002_p0009"
+   ],
+   "gold_claims": [
+    {
+     "claim": "In 2001 Berkshire's net worth fell $3.77 billion, cutting per-share book value by 6.2%.",
+     "required_terms": [
+      "$3.77 billion",
+      "6.2%"
+     ],
+     "gold_passage_ids": [
+      "2001_p0006"
+     ],
+     "verification_note": "2001 letter (2001_p0006); unit=figure; definition=net worth -$3.77 billion; book value per share -6.2%."
+    },
+    {
+     "claim": "Even so, in 2001 Berkshire beat the S&P 500 by 5.7 percentage points.",
+     "required_terms": [
+      "5.7 percentage points"
+     ],
+     "gold_passage_ids": [
+      "2001_p0007"
+     ],
+     "verification_note": "2001 letter (2001_p0007); unit=figure; definition=advantage over S&P 500 of 5.7 percentage points in 2001."
+    },
+    {
+     "claim": "In 2002 net worth rose $6.1 billion, increasing per-share book value by 10.0%.",
+     "required_terms": [
+      "$6.1 billion",
+      "10.0%"
+     ],
+     "gold_passage_ids": [
+      "2002_p0006"
+     ],
+     "verification_note": "2002 letter (2002_p0006); unit=figure; definition=net worth +$6.1 billion; book value per share +10.0%."
+    },
+    {
+     "claim": "The 2002 book-value gain outstripped the S&P 500 by 32.1 percentage points, a result Buffett called aberrational.",
+     "required_terms": [
+      "32.1 percentage points",
+      "aberrational"
+     ],
+     "gold_passage_ids": [
+      "2002_p0008"
+     ],
+     "verification_note": "2002 letter (2002_p0008); unit=figure; definition=book value beat S&P 500 by 32.1 points in 2002; called aberrational."
+    }
+   ],
+   "multi_part": true,
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": true
+   },
+   "reject": {
+    "forbidden_terms": []
+   },
+   "verification_note": "2001_p0006, 2001_p0007, 2002_p0006, 2002_p0008 supply the 4 claims ($3.77 billion; 5.7 percentage points; $6.1 billion; 32.1 percentage points).",
+   "group": 3
+  },
+  {
+   "qid": "fin_g3_09",
+   "question_type": "company_financials",
+   "answerable": true,
+   "years": [
+    2009,
+    2010
+   ],
+   "query": "What did Berkshire pay for Burlington Northern Santa Fe in 2009-2010, how was the price split between cash and Berkshire stock, and how much did the deal add to Berkshire's earning power?",
+   "gold_passage_ids": [
+    "2009_p0083",
+    "2009_p0094",
+    "2009_p0098",
+    "2009_p0099",
+    "2010_p0010"
+   ],
+   "relevant_ids": [
+    "2009_p0083",
+    "2009_p0094",
+    "2009_p0098",
+    "2009_p0099",
+    "2010_p0010",
+    "2009_p0085",
+    "2010_p0091"
+   ],
+   "gold_claims": [
+    {
+     "claim": "BNSF's selling shareholders valued Berkshire's offer at $100 per share, 40% of which was paid in Berkshire shares.",
+     "required_terms": [
+      "$100 per share",
+      "40% of the $100"
+     ],
+     "gold_passage_ids": [
+      "2009_p0098"
+     ],
+     "verification_note": "2009 letter (2009_p0098); unit=figure; definition=offer valued at $100 per BNSF share; 40% in Berkshire stock."
+    },
+    {
+     "claim": "Because Berkshire already owned 22.5% of BNSF bought for cash, only about 30% of its overall cost was paid with Berkshire shares.",
+     "required_terms": [
+      "22.5%",
+      "only about 30% of our cost"
+     ],
+     "gold_passage_ids": [
+      "2009_p0083",
+      "2009_p0098"
+     ],
+     "verification_note": "2009 letter (2009_p0083, 2009_p0098); unit=figure; definition=prior 22.5% stake (76,777,029 shares); ~30% of total cost paid in stock."
+    },
+    {
+     "claim": "The deal required issuing about 95,000 Berkshire shares, 6.1% of those previously outstanding.",
+     "required_terms": [
+      "95,000 Berkshire shares",
+      "6.1%"
+     ],
+     "gold_passage_ids": [
+      "2009_p0094"
+     ],
+     "verification_note": "2009 letter (2009_p0094); unit=figure; definition=about 95,000 shares issued = 6.1% dilution."
+    },
+    {
+     "claim": "The acquisition deployed $22 billion of Berkshire's cash.",
+     "required_terms": [
+      "$22 billion of cash"
+     ],
+     "gold_passage_ids": [
+      "2009_p0099",
+      "2010_p0010"
+     ],
+     "verification_note": "2009 letter (2009_p0099) and 2010 letter (2010_p0010); unit=figure; definition=$22 billion of cash used."
+    },
+    {
+     "claim": "Owning BNSF was expected to raise Berkshire's normal earning power by nearly 40% pre-tax and well over 30% after-tax.",
+     "required_terms": [
+      "nearly 40% pre-tax",
+      "well over 30% after-tax"
+     ],
+     "gold_passage_ids": [
+      "2010_p0010"
+     ],
+     "verification_note": "2010 letter (2010_p0010); unit=figure; definition=normal earning power +~40% pre-tax, >30% after-tax."
+    }
+   ],
+   "multi_part": true,
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": true
+   },
+   "reject": {
+    "forbidden_terms": []
+   },
+   "verification_note": "2009_p0083, 2009_p0094, 2009_p0098, 2009_p0099, 2010_p0010 supply the 5 claims ($100 per share; only about 30% of our cost; 95,000 Berkshire shares; $22 billion of cash; nearly 40% pre-tax).",
+   "group": 3
+  },
+  {
+   "qid": "fin_g3_10",
+   "question_type": "figure",
+   "answerable": true,
+   "years": [
+    2017,
+    2018
+   ],
+   "query": "Did Berkshire's insurance operations make an underwriting profit in 2017, and how did that year compare with its underwriting record before and after?",
+   "gold_passage_ids": [
+    "2017_p0039",
+    "2017_p0040",
+    "2017_p0042",
+    "2018_p0053"
+   ],
+   "relevant_ids": [
+    "2017_p0039",
+    "2017_p0040",
+    "2017_p0042",
+    "2018_p0053",
+    "2017_p0038",
+    "2016_p0046",
+    "2019_p0040"
+   ],
+   "gold_claims": [
+    {
+     "claim": "Before 2017 Berkshire had 14 consecutive years of underwriting profits totaling $28.3 billion pre-tax.",
+     "required_terms": [
+      "14 consecutive years",
+      "$28.3 billion pre-tax"
+     ],
+     "gold_passage_ids": [
+      "2017_p0042"
+     ],
+     "verification_note": "2017 letter (2017_p0042); unit=figure; definition=14-year underwriting profit streak, $28.3 billion pre-tax."
+    },
+    {
+     "claim": "In 2017 Berkshire lost $3.2 billion pre-tax from underwriting.",
+     "required_terms": [
+      "$3.2 billion pre-tax from underwriting"
+     ],
+     "gold_passage_ids": [
+      "2017_p0042"
+     ],
+     "verification_note": "2017 letter (2017_p0042); unit=figure; definition=2017 underwriting loss $3.2 billion pre-tax."
+    },
+    {
+     "claim": "Losses from the three 2017 hurricanes were estimated at $3 billion (about $2 billion after tax), roughly 3% of an industry loss of about $100 billion.",
+     "required_terms": [
+      "$3 billion (or about $2 billion after tax)",
+      "about 3%"
+     ],
+     "gold_passage_ids": [
+      "2017_p0039",
+      "2017_p0040"
+     ],
+     "verification_note": "2017 letter (2017_p0039, 2017_p0040); unit=figure; definition=hurricane losses $3B pre-tax/$2B after tax; ~3% industry share."
+    },
+    {
+     "claim": "By 2018 Berkshire had an underwriting profit in 15 of the past 16 years, 2017 being the exception; the 16-year pre-tax gain was $27 billion, of which $2 billion came in 2018.",
+     "required_terms": [
+      "15 of the past 16 years",
+      "$2 billion was recorded in 2018"
+     ],
+     "gold_passage_ids": [
+      "2018_p0053"
+     ],
+     "verification_note": "2018 letter (2018_p0053); unit=figure; definition=15 of 16 profitable years; $27B total; $2B in 2018."
+    }
+   ],
+   "multi_part": true,
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": true
+   },
+   "reject": {
+    "forbidden_terms": []
+   },
+   "verification_note": "2017_p0039, 2017_p0040, 2017_p0042, 2018_p0053 supply the 4 claims (14 consecutive years; $3.2 billion pre-tax from underwriting; about 3%; 15 of the past 16 years).",
+   "group": 3
+  },
+  {
+   "qid": "fin_g3_11",
+   "question_type": "company_financials",
+   "answerable": true,
+   "years": [
+    2015,
+    2020
+   ],
+   "query": "How much did Berkshire pay for Precision Castparts, and how did Buffett later judge that acquisition?",
+   "gold_passage_ids": [
+    "2015_p0020",
+    "2020_p0020",
+    "2020_p0021"
+   ],
+   "relevant_ids": [
+    "2015_p0020",
+    "2020_p0020",
+    "2020_p0021",
+    "2020_p0015",
+    "2016_p0079"
+   ],
+   "gold_claims": [
+    {
+     "claim": "Berkshire bought Precision Castparts (PCC) for more than $32 billion in cash.",
+     "required_terms": [
+      "more than $32 billion of cash"
+     ],
+     "gold_passage_ids": [
+      "2015_p0020"
+     ],
+     "verification_note": "2015 letter (2015_p0020); unit=figure; definition=PCC purchase price > $32 billion cash."
+    },
+    {
+     "claim": "In 2020 Berkshire took an $11 billion write-down that was almost entirely the quantification of a 2016 mistake: Buffett paid too much for PCC.",
+     "required_terms": [
+      "$11 billion write-down",
+      "I paid too much"
+     ],
+     "gold_passage_ids": [
+      "2020_p0020"
+     ],
+     "verification_note": "2020 letter (2020_p0020); unit=figure; definition=$11 billion write-down, mainly PCC overpayment."
+    },
+    {
+     "claim": "He had been too optimistic about PCC's normalized profit potential, which adverse developments throughout the aerospace industry exposed.",
+     "required_terms": [
+      "too optimistic",
+      "aerospace industry"
+     ],
+     "gold_passage_ids": [
+      "2020_p0020"
+     ],
+     "verification_note": "2020 letter (2020_p0020); unit=qualitative statement; definition=over-optimism on normalized profits; aerospace downturn."
+    },
+    {
+     "claim": "He still expects PCC to earn good returns on its net tangible assets but misjudged its average future earnings and therefore the proper price to pay.",
+     "required_terms": [
+      "net tangible assets",
+      "proper price to pay"
+     ],
+     "gold_passage_ids": [
+      "2020_p0021"
+     ],
+     "verification_note": "2020 letter (2020_p0021); unit=qualitative statement; definition=good returns on tangible assets, wrong on earnings and price."
+    }
+   ],
+   "multi_part": true,
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": true
+   },
+   "reject": {
+    "forbidden_terms": []
+   },
+   "verification_note": "2015_p0020, 2020_p0020, 2020_p0021 supply the 4 claims (more than $32 billion of cash; $11 billion write-down; too optimistic; proper price to pay).",
+   "group": 3
+  },
+  {
+   "qid": "fin_g3_15",
+   "question_type": "partial",
+   "answerable": true,
+   "years": [
+    2016,
+    2020,
+    2021
+   ],
+   "query": "How did Berkshire build its Apple stake from 2016 onward, what did it cost, and why did Berkshire sell a large part of its Apple shares in 2024?",
+   "gold_passage_ids": [
+    "2016_p0101",
+    "2020_p0034",
+    "2020_p0035",
+    "2021_p0029",
+    "2021_p0030"
+   ],
+   "relevant_ids": [
+    "2016_p0101",
+    "2020_p0034",
+    "2020_p0035",
+    "2021_p0029",
+    "2021_p0030",
+    "2017_p0048",
+    "2018_p0067",
+    "2020_p0036",
+    "2020_p0038"
+   ],
+   "gold_claims": [
+    {
+     "claim": "Berkshire began buying Apple late in 2016; at yearend 2016 it held 61,242,652 shares (1.1% of Apple) at a cost of $6,747 million.",
+     "required_terms": [
+      "61,242,652"
+     ],
+     "gold_passage_ids": [
+      "2016_p0101",
+      "2020_p0034"
+     ],
+     "verification_note": "2016 letter (2016_p0101) gives the yearend-2016 holding; 2020 letter (2020_p0034, 'late in 2016') is supporting; unit=figure; definition=buying began late 2016; 61,242,652 shares, cost $6,747M at 12/31/16."
+    },
+    {
+     "claim": "By mid-2018 Berkshire's general account owned 5.2% of Apple, slightly more than one billion split-adjusted shares, at a cost of $36 billion.",
+     "required_terms": [
+      "5.2% of Apple",
+      "$36 billion"
+     ],
+     "gold_passage_ids": [
+      "2020_p0034",
+      "2020_p0035"
+     ],
+     "verification_note": "2020 letter (2020_p0034, 2020_p0035); unit=figure; definition=5.2% stake by mid-2018, cost $36 billion."
+    },
+    {
+     "claim": "Dividends averaged about $775 million a year; in 2020 Berkshire sold a small portion for $11 billion, yet its ownership rose to 5.4% because Apple kept repurchasing shares.",
+     "required_terms": [
+      "$775 million",
+      "$11 billion",
+      "5.4% of Apple"
+     ],
+     "gold_passage_ids": [
+      "2020_p0035"
+     ],
+     "verification_note": "2020 letter (2020_p0035); unit=figure; definition=~$775M dividends/yr; $11B sale in 2020; ownership 5.4%."
+    },
+    {
+     "claim": "At end-2021 ownership was 5.55%, up from 5.39%; Berkshire's share of Apple's 2021 earnings was $5.6 billion, while only the dividends were in GAAP earnings.",
+     "required_terms": [
+      "5.55%",
+      "$5.6 billion"
+     ],
+     "gold_passage_ids": [
+      "2021_p0029",
+      "2021_p0030"
+     ],
+     "verification_note": "2021 letter (2021_p0029, 2021_p0030); unit=figure; definition=5.55% ownership; $5.6B share of Apple earnings; $785M dividends."
+    }
+   ],
+   "multi_part": true,
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": true
+   },
+   "reject": {
+    "forbidden_terms": []
+   },
+   "absence_search_patterns": [
+    "sold Apple",
+    "selling Apple",
+    "sale of Apple",
+    "reduced our Apple"
+   ],
+   "expected_coverage_note": "The build-up, cost and ownership (2016-2021) can be answered. No letter through 2024 explains or quantifies a 2024 reduction of the Apple stake (the 2023 and 2024 letters mention Apple only in passing), so that part must be stated as not covered.",
+   "verification_note": "2016_p0101, 2020_p0034, 2020_p0035, 2021_p0029, 2021_p0030 supply the 4 claims (61,242,652; 5.2% of Apple; $775 million; 5.55%). Absent part: reasons for a 2024 Apple sale; patterns have zero corpus matches.",
+   "group": 3
+  },
+  {
+   "qid": "fin_g3_16",
+   "question_type": "partial",
+   "answerable": true,
+   "years": [
+    2023
+   ],
+   "query": "Why did BNSF's earnings fall in 2023, by how much, and what was the railroad's operating ratio that year?",
+   "gold_passage_ids": [
+    "2023_p0039",
+    "2023_p0043",
+    "2023_p0046"
+   ],
+   "relevant_ids": [
+    "2023_p0039",
+    "2023_p0043",
+    "2023_p0046",
+    "2023_p0040",
+    "2023_p0047",
+    "2024_p0016"
+   ],
+   "gold_claims": [
+    {
+     "claim": "BNSF (railroad) earnings were $5,087 million in 2023, down from $5,946 million in 2022.",
+     "required_terms": [
+      "5,087",
+      "5,946"
+     ],
+     "gold_passage_ids": [
+      "2023_p0039"
+     ],
+     "verification_note": "2023 letter (2023_p0039); unit=figure ($ millions); definition=railroad earnings $5,087M (2023) vs $5,946M (2022)."
+    },
+    {
+     "claim": "Earnings fell more than Buffett expected as revenues fell; fuel costs also fell, but wage increases set in Washington ran far beyond the country's inflation goals.",
+     "required_terms": [
+      "revenues fell",
+      "wage increases"
+     ],
+     "gold_passage_ids": [
+      "2023_p0046"
+     ],
+     "verification_note": "2023 letter (2023_p0046); unit=qualitative statement; definition=lower revenues and high wage increases cut 2023 earnings."
+    },
+    {
+     "claim": "BNSF's profit margins have slipped relative to all five other major North American railroads since Berkshire bought it.",
+     "required_terms": [
+      "profit margins have slipped"
+     ],
+     "gold_passage_ids": [
+      "2023_p0046"
+     ],
+     "verification_note": "2023 letter (2023_p0046); unit=qualitative statement; definition=margins slipped vs the five other major railroads."
+    },
+    {
+     "claim": "Capital outlays above GAAP depreciation since the purchase total $22 billion, so BNSF's dividends to Berkshire fall well short of its reported earnings.",
+     "required_terms": [
+      "$22 billion",
+      "GAAP depreciation"
+     ],
+     "gold_passage_ids": [
+      "2023_p0043"
+     ],
+     "verification_note": "2023 letter (2023_p0043); unit=figure; definition=$22 billion of capex above GAAP depreciation in 14 years."
+    }
+   ],
+   "multi_part": true,
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": true
+   },
+   "reject": {
+    "forbidden_terms": []
+   },
+   "absence_search_patterns": [
+    "operating ratio"
+   ],
+   "expected_coverage_note": "The 2023 earnings decline and its causes can be answered. The letters never report BNSF's operating ratio, so that part must be stated as not covered.",
+   "verification_note": "2023_p0039, 2023_p0043, 2023_p0046 supply the 4 claims (5,087; revenues fell; profit margins have slipped; $22 billion). Absent part: operating ratio; pattern has zero corpus matches.",
+   "group": 3
+  },
+  {
+   "qid": "fin_g3_19",
+   "question_type": "unanswerable",
+   "answerable": false,
+   "refusal_category": "unsupported_figure",
+   "years": [],
+   "query": "What share of Sirius XM did Berkshire own at the end of 2024, and how much had it paid for those shares?",
+   "gold_passage_ids": [],
+   "relevant_ids": [],
+   "gold_claims": [],
+   "expected_answer": "The retrieved passages do not provide enough evidence to answer this question.",
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_exact_refusal": true,
+    "require_valid_citation": false
+   },
+   "reject": {
+    "forbidden_terms": []
+   },
+   "absence_search_patterns": [
+    "Sirius",
+    "satellite radio",
+    "Liberty Media"
+   ],
+   "verification_note": "Whole-corpus case-insensitive searches for Sirius (covers Sirius XM, SiriusXM, Liberty SiriusXM), satellite radio and Liberty Media have zero matches; the 2024 letter names only Apple, American Express, Coca-Cola and Moody's among its large holdings (2024_p0022). Replaces the TSMC question that duplicated fin_g2_18.",
+   "group": 3
+  },
+  {
+   "qid": "fin_g4_02",
+   "question_type": "out_of_scope",
+   "answerable": false,
+   "refusal_category": "personal_anecdote",
+   "years": [],
+   "query": "How many people showed up at Berkshire's annual meeting in 2008, and how many came back in 1981?",
+   "gold_passage_ids": [],
+   "relevant_ids": [],
+   "gold_claims": [],
+   "expected_answer": "I only answer questions about Buffett's financial views and Berkshire's financial results.",
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_exact_refusal": true,
+    "require_valid_citation": false
+   },
+   "reject": {
+    "forbidden_terms": [
+     "35,000",
+     "no zeros omitted"
+    ]
+   },
+   "scope_trap_passage_ids": [
+    "2009_p0104",
+    "1986_p0123"
+   ],
+   "verification_note": "Annual-meeting trivia. 2009_p0104 says about 35,000 attended the 2008 meeting, up from 12 in 1981 (1986_p0123 gives the mid-1980s counts). Out of product scope, so the expected answer is the scope sentence.",
+   "group": 4
+  },
+  {
+   "qid": "fin_g4_03",
+   "question_type": "out_of_scope",
+   "answerable": false,
+   "refusal_category": "personal_anecdote",
+   "years": [],
+   "query": "What joke did Buffett make at the 2022 annual meeting about his and Charlie's ages, and what did he credit for their longevity?",
+   "gold_passage_ids": [],
+   "relevant_ids": [],
+   "gold_claims": [],
+   "expected_answer": "I only answer questions about Buffett's financial views and Berkshire's financial results.",
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_exact_refusal": true,
+    "require_valid_citation": false
+   },
+   "reject": {
+    "forbidden_terms": [
+     "99 and 92",
+     "P.T. Barnum",
+     "peanut brittle"
+    ]
+   },
+   "scope_trap_passage_ids": [
+    "2022_p0046"
+   ],
+   "verification_note": "Personal joke about age. 2022_p0046: at the 2022 meeting (the first in three years) Buffett's 'P.T. Barnum pitch' promised longevity: what else but See's candy could account for Charlie and him making it to 99 and 92. No financial part is asked (the See's meeting sales in 2022_p0046-2022_p0047 were removed from the question). Out of product scope, so the expected answer is the scope sentence.",
+   "group": 4
+  },
+  {
+   "qid": "fin_g4_05",
+   "question_type": "out_of_scope",
+   "answerable": false,
+   "refusal_category": "personal_anecdote",
+   "years": [],
+   "query": "How did Buffett's ceremonial first pitches go at the Omaha Royals games held on annual meeting weekend in the 1990s?",
+   "gold_passage_ids": [],
+   "relevant_ids": [],
+   "gold_claims": [],
+   "expected_answer": "I only answer questions about Buffett's financial views and Berkshire's financial results.",
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_exact_refusal": true,
+    "require_valid_citation": false
+   },
+   "reject": {
+    "forbidden_terms": [
+     "sinker",
+     "eight miles per hour",
+     "flutterball"
+    ]
+   },
+   "scope_trap_passage_ids": [
+    "1993_p0115",
+    "1993_p0116",
+    "1995_p0125",
+    "1996_p0126",
+    "1997_p0121",
+    "1998_p0106",
+    "2000_p0128"
+   ],
+   "verification_note": "Sports story. 1993_p0116 (the 'sinker' that barely missed his foot), 1997_p0121 (fast ball clocked at eight miles per hour), 1998_p0106 (the 'flutterball'), 1996_p0126 and 2000_p0128 (five pitches to find the plate; Ernie Banks). Out of product scope, so the expected answer is the scope sentence.",
+   "group": 4
+  },
+  {
+   "qid": "fin_g4_07",
+   "question_type": "mixed_scope",
+   "answerable": true,
+   "years": [
+    1988,
+    1990
+   ],
+   "query": "When Berkshire bought into Borsheim's at the end of the 1980s, what stake did it take and what made the jeweler's economics so strong by 1990? And how did the Friedman family get out of Russia?",
+   "gold_passage_ids": [
+    "1988_p0040",
+    "1988_p0043",
+    "1990_p0024",
+    "1990_p0025",
+    "1990_p0027"
+   ],
+   "relevant_ids": [
+    "1988_p0040",
+    "1988_p0043",
+    "1988_p0044",
+    "1989_p0038",
+    "1990_p0024",
+    "1990_p0025",
+    "1990_p0027",
+    "1990_p0028"
+   ],
+   "gold_claims": [
+    {
+     "claim": "Berkshire bought an 80% interest in Borsheim's, becoming 80% partners with another branch of Mrs. B's family.",
+     "required_terms": [
+      "80% partners"
+     ],
+     "gold_passage_ids": [
+      "1988_p0040"
+     ],
+     "verification_note": "1988 letter (1988_p0040); unit=figure; definition=Berkshire became 80% partners in Borsheim's, as it had with NFM in 1983."
+    },
+    {
+     "claim": "Borsheim's runs on the NFM formula: a single store with huge inventories, rapid turnover, shrewd buying and incredibly low expenses, which allow prices no one can match.",
+     "required_terms": [
+      "rapid turnover",
+      "incredibly low expenses"
+     ],
+     "gold_passage_ids": [
+      "1988_p0043"
+     ],
+     "verification_note": "1988 letter (1988_p0043); unit=qualitative statement; definition=The five fundamentals shared by Borsheim's and NFM."
+    },
+    {
+     "claim": "In a poor year for retailing, Borsheim's sales rose 18% in 1990 from its single store.",
+     "required_terms": [
+      "Sales were up 18%"
+     ],
+     "gold_passage_ids": [
+      "1990_p0024"
+     ],
+     "verification_note": "1990 letter (1990_p0024); unit=figure; definition=Borsheim's sales up 18%, same-store and all-store, in 1990."
+    },
+    {
+     "claim": "Buffett believed Borsheim's did more volume than any other U.S. jewelry store except Tiffany's New York store, with growth coming from customers outside the Midwest.",
+     "required_terms": [
+      "except for Tiffany's New York store"
+     ],
+     "gold_passage_ids": [
+      "1990_p0025"
+     ],
+     "verification_note": "1990 letter (1990_p0025); unit=qualitative statement; definition=Borsheim's volume second only to Tiffany's New York store."
+    },
+    {
+     "claim": "Its operating costs were about 18% of sales against roughly 40% at a typical competitor, so it could undersell rivals and gain share.",
+     "required_terms": [
+      "18% of sales",
+      "40% or so"
+     ],
+     "gold_passage_ids": [
+      "1990_p0027"
+     ],
+     "verification_note": "1990 letter (1990_p0027); unit=figure; definition=Operating costs about 18% of sales vs 40% or so at the typical competitor."
+    }
+   ],
+   "multi_part": true,
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": true
+   },
+   "reject": {
+    "forbidden_terms": [
+     "Latvia",
+     "Manchuria",
+     "Rebecca"
+    ]
+   },
+   "out_of_scope_part": "How the Friedman family got out of Russia (Rebecca and Louis Friedman escaped through Latvia in 1922; Mrs. B went east through Manchuria).",
+   "scope_trap_passage_ids": [
+    "1988_p0041",
+    "1990_p0029"
+   ],
+   "expected_coverage_note": "Answer only the financial part (stake, business model, 1990 sales and cost figures). Leave out the family's escape from Russia, or say that only financial questions are answered.",
+   "verification_note": "1988_p0040, 1988_p0043, 1990_p0024, 1990_p0025, 1990_p0027 supply the 5 financial claims (80% partners; rapid turnover; Sales were up 18%; Tiffany's; 18% of sales). The personal part is in 1988_p0041 (escape through Latvia, Manchuria) and 1990_p0029 (Ike's 89-year-old mother Rebecca).",
+   "group": 4
+  },
+  {
+   "qid": "fin_g4_10",
+   "question_type": "mixed_scope",
+   "answerable": true,
+   "years": [
+    2006,
+    2011,
+    2021
+   ],
+   "query": "How did TTI's sales and earnings grow from its founding through its years under Berkshire, and what personal setback pushed Paul Andrews to start the company?",
+   "gold_passage_ids": [
+    "2006_p0029",
+    "2011_p0080",
+    "2021_p0048",
+    "2021_p0052"
+   ],
+   "relevant_ids": [
+    "2006_p0029",
+    "2007_p0011",
+    "2010_p0072",
+    "2011_p0080",
+    "2021_p0048",
+    "2021_p0052"
+   ],
+   "gold_claims": [
+    {
+     "claim": "Over 35 years before the sale, Paul Andrews built TTI from $112,000 of sales to $1.3 billion.",
+     "required_terms": [
+      "$112,000 of sales",
+      "$1.3 billion"
+     ],
+     "gold_passage_ids": [
+      "2006_p0029"
+     ],
+     "verification_note": "2006 letter (2006_p0029); unit=figure; definition=TTI grew from $112,000 of sales to $1.3 billion over 35 years."
+    },
+    {
+     "claim": "In 2011 TTI's sales reached a record $2.1 billion, up 12.4%, and earnings were up 127% from 2007, the year Berkshire bought it.",
+     "required_terms": [
+      "$2.1 billion",
+      "127%"
+     ],
+     "gold_passage_ids": [
+      "2011_p0080"
+     ],
+     "verification_note": "2011 letter (2011_p0080); unit=figure; definition=Record sales $2.1 billion (+12.4%); earnings +127% vs 2007."
+    },
+    {
+     "claim": "By 2021 TTI marketed more than one million different items with annual volume of $7.7 billion.",
+     "required_terms": [
+      "one million different items",
+      "$7.7 billion"
+     ],
+     "gold_passage_ids": [
+      "2021_p0048"
+     ],
+     "verification_note": "2021 letter (2021_p0048); unit=figure; definition=More than one million items; annual volume $7.7 billion."
+    },
+    {
+     "claim": "Under Berkshire, TTI's workforce grew from 2,387 to 8,043 and its earnings rose 673%.",
+     "required_terms": [
+      "8,043",
+      "673%"
+     ],
+     "gold_passage_ids": [
+      "2021_p0052"
+     ],
+     "verification_note": "2021 letter (2021_p0052); unit=figure; definition=Employees 2,387 to 8,043; earnings up 673%."
+    }
+   ],
+   "multi_part": true,
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": true
+   },
+   "reject": {
+    "forbidden_terms": [
+     "General Dynamics",
+     "first child",
+     "Duesenberg"
+    ]
+   },
+   "out_of_scope_part": "Paul Andrews' personal story: fired by General Dynamics in 1971 with his first child due, his 1935 Duesenberg, his memorial service.",
+   "scope_trap_passage_ids": [
+    "2021_p0048",
+    "2008_p0130",
+    "2021_p0052",
+    "2021_p0053"
+   ],
+   "expected_coverage_note": "Answer only the financial part (sales and earnings growth, employees). Leave out Paul Andrews' firing, family and car, or say that only financial questions are answered. Note 2021_p0048 holds both the $7.7 billion figure and the firing story, so the answer must use the figure and drop the story.",
+   "verification_note": "2006_p0029, 2011_p0080, 2021_p0048, 2021_p0052 supply the 4 financial claims ($112,000 of sales; $2.1 billion; $7.7 billion; 673%). The personal part is in 2021_p0048 (fired by General Dynamics, first child due), 2008_p0130 (1935 Duesenberg) and 2021_p0052-0053 (memorial service).",
+   "group": 4
+  },
+  {
+   "qid": "fin_g5_01",
+   "question_type": "corpus_wide",
+   "answerable": true,
+   "years": [
+    1990,
+    1995,
+    2004,
+    2008,
+    2009,
+    2010,
+    2018,
+    2024
+   ],
+   "query": "Across all of these letters, which sector did Buffett speak most positively about?",
+   "gold_passage_ids": [
+    "2004_p0032",
+    "2010_p0057",
+    "2024_p0032",
+    "2009_p0028",
+    "2018_p0049",
+    "1990_p0076",
+    "1995_p0066",
+    "2008_p0020",
+    "2004_p0035"
+   ],
+   "relevant_ids": [
+    "2004_p0032",
+    "2010_p0057",
+    "2024_p0032",
+    "2009_p0028",
+    "2018_p0049",
+    "1990_p0076",
+    "1995_p0066",
+    "2008_p0020",
+    "2004_p0035",
+    "2002_p0030",
+    "2005_p0030",
+    "2006_p0009",
+    "2008_p0018",
+    "2011_p0043",
+    "2012_p0034",
+    "2013_p0036",
+    "2014_p0043",
+    "2015_p0051",
+    "2016_p0039",
+    "2017_p0029",
+    "2019_p0035",
+    "2020_p0028",
+    "2023_p0053"
+   ],
+   "gold_claims": [
+    {
+     "claim": "Property-casualty insurance: he repeatedly calls it Berkshire's core business and the engine that has propelled its growth since National Indemnity was bought in 1967, and still calls it the core business in the last letter.",
+     "required_terms": [
+      "core business"
+     ],
+     "gold_passage_ids": [
+      "2004_p0032",
+      "2010_p0057",
+      "2024_p0032"
+     ],
+     "verification_note": "Required term in the 2004 letter (2004_p0032 'core business and the propellant of our growth') and the 2024 letter (2024_p0032 'continues to be Berkshire's core business'); 2010_p0057 ('core operation and the engine') supports. Basis for 'most positive': the core business / core strength / most important business or sector / engine of growth wording for P/C insurance appears in 20 letters (1995, 2002, 2004, 2005, 2006, 2008-2020, 2023, 2024; e.g. 2002_p0030, 2005_p0030, 2006_p0009, 2011_p0043 ... 2023_p0053), plus 'greatest potential' in 1990. No other sector gets sustained praise of this kind: newspapers were praised in 1984 but called eroding from 1990 on, utilities were praised mainly 2005-2016 and warned about in 2023, airlines were negative throughout."
+    },
+    {
+     "claim": "The reason is float: insurers collect premiums upfront and pay claims later, which has given Berkshire a fountain of funds to buy securities and businesses.",
+     "required_terms": [
+      "float",
+      "collect-now, pay-later"
+     ],
+     "gold_passage_ids": [
+      "2004_p0032",
+      "2009_p0028",
+      "2018_p0049"
+     ],
+     "verification_note": "Required terms in the 2009 letter (2009_p0028) and again in the 2018 letter (2018_p0049); 2004_p0032 ('fountain of funds') supports: float from the collect-now, pay-later model funds Berkshire's acquisitions."
+    },
+    {
+     "claim": "The praise spans decades: as early as 1990 insurance is the business with the greatest potential among all Berkshire owns; in 1995 it is 'our core strength' and in 2008 an economic powerhouse.",
+     "required_terms": [
+      "greatest potential"
+     ],
+     "gold_passage_ids": [
+      "1990_p0076",
+      "1995_p0066",
+      "2008_p0020"
+     ],
+     "verification_note": "Required term in the 1990 letter (1990_p0076); 1995_p0066 ('core strength') and 2008_p0020 ('economic powerhouse') support."
+    },
+    {
+     "claim": "The praise is for Berkshire's own insurers, not the industry at large: insurers generally earn poor returns because they sell a commodity-like product with fierce price competition.",
+     "required_terms": [
+      "commodity-like product",
+      "Think airline seats"
+     ],
+     "gold_passage_ids": [
+      "2004_p0035"
+     ],
+     "verification_note": "2004 letter (2004_p0035): caveat that the insurance industry as a whole has poor economics."
+    }
+   ],
+   "multi_part": true,
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": true
+   },
+   "reject": {
+    "forbidden_terms": []
+   },
+   "verification_note": "Superlative weighed over the whole corpus: P/C insurance is praised as core business / engine in 20 letters 1995-2024 plus 1990 ('greatest potential'); 9 gold passages from 8 letters supply the 4 claims (core and engine; float as fountain of funds; praise across decades; caveat on industry economics).",
+   "group": 5
+  },
+  {
+   "qid": "fin_g5_02",
+   "question_type": "corpus_wide",
+   "answerable": true,
+   "years": [
+    1989,
+    1990,
+    1991,
+    1994,
+    2007,
+    2016
+   ],
+   "query": "How did Buffett's opinion of the airline industry change over the years?",
+   "gold_passage_ids": [
+    "1989_p0089",
+    "1990_p0102",
+    "1991_p0090",
+    "1994_p0087",
+    "2007_p0042",
+    "2007_p0043",
+    "2016_p0152"
+   ],
+   "relevant_ids": [
+    "1989_p0089",
+    "1996_p0098",
+    "1990_p0102",
+    "1991_p0090",
+    "1994_p0085",
+    "1994_p0087",
+    "2007_p0042",
+    "2007_p0043",
+    "2016_p0152",
+    "1990_p0100",
+    "1990_p0101",
+    "1992_p0067",
+    "1992_p0081",
+    "1992_p0082",
+    "1992_p0084",
+    "1994_p0086",
+    "1994_p0088",
+    "1996_p0099",
+    "1996_p0100",
+    "1996_p0101",
+    "1996_p0102",
+    "1997_p0097",
+    "2004_p0035",
+    "2005_p0085",
+    "2016_p0102",
+    "2017_p0049",
+    "2017_p0050",
+    "2018_p0068",
+    "2019_p0025",
+    "2019_p0051"
+   ],
+   "gold_claims": [
+    {
+     "claim": "Around 1989 he said he had no ability to forecast the economics of the airline industry ('agnostics, not atheists'), so Berkshire had to structure any investment in it differently from investments in businesses with splendid economics.",
+     "required_terms": [
+      "agnostics, not atheists"
+     ],
+     "gold_passage_ids": [
+      "1989_p0089"
+     ],
+     "verification_note": "1989 letter (1989_p0089)."
+    },
+    {
+     "claim": "In the early 1990s he said industry economics deteriorated at an alarming pace because of kamikaze pricing; in a commodity business you cannot be much smarter than your dumbest competitor, and the industry has lost money in aggregate since Kitty Hawk.",
+     "required_terms": [
+      "kamikaze pricing",
+      "dumbest competitor"
+     ],
+     "gold_passage_ids": [
+      "1990_p0102",
+      "1991_p0090"
+     ],
+     "verification_note": "Required terms in the 1990 letter (1990_p0102); the 1991 letter (1991_p0090, 'net loss since its birth after Kitty Hawk') supports."
+    },
+    {
+     "claim": "By 1994 he blamed deregulation: in an unregulated commodity business high-cost carriers must lower their costs to competitive levels or face extinction, a rule he admitted he had missed when Berkshire put capital into USAir.",
+     "required_terms": [
+      "face extinction"
+     ],
+     "gold_passage_ids": [
+      "1994_p0087"
+     ],
+     "verification_note": "1994 letter (1994_p0087)."
+    },
+    {
+     "claim": "In 2007 he used airlines as the example of the worst sort of business (fast growth, heavy capital, little profit): investors poured money into a bottomless pit, and he bought USAir 'to my shame'.",
+     "required_terms": [
+      "Think airlines",
+      "bottomless pit",
+      "to my shame"
+     ],
+     "gold_passage_ids": [
+      "2007_p0042",
+      "2007_p0043"
+     ],
+     "verification_note": "2007 letter (2007_p0042, 2007_p0043)."
+    },
+    {
+     "claim": "By 2016 Berkshire had made large investments in America's four major carriers, and he wrote of a tolerance 'bordering on enthusiasm' for airlines.",
+     "required_terms": [
+      "four major carriers",
+      "bordering on enthusiasm"
+     ],
+     "gold_passage_ids": [
+      "2016_p0152"
+     ],
+     "verification_note": "2016 letter (2016_p0152); holdings tables 2016-2019 (Delta, Southwest, United) are in relevant_ids."
+    }
+   ],
+   "multi_part": true,
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": true
+   },
+   "reject": {
+    "forbidden_terms": []
+   },
+   "verification_note": "All airline passages in the corpus were read (22 letters mention airlines; many are annual-meeting travel notes). Gold passages from 6 letters (1989-2016) supply the 5 claims of the industry arc (agnostic; kamikaze pricing; deregulation; worst business and the USAir regret; 2016 investments in four carriers). The USAir-specific passages 1994_p0085 and 1996_p0098 and the 1992 'competitive tontine' passage 1992_p0082 stay in relevant_ids only, because fin_g2_02 now covers the USAir investment.",
+   "group": 5
+  },
+  {
+   "qid": "fin_g5_03",
+   "question_type": "corpus_wide",
+   "answerable": true,
+   "years": [
+    1984,
+    1990,
+    1991,
+    1995,
+    2006,
+    2012
+   ],
+   "query": "How has Buffett's view of newspapers as a business changed across his letters?",
+   "gold_passage_ids": [
+    "1984_p0049",
+    "1984_p0050",
+    "1990_p0038",
+    "1991_p0022",
+    "1995_p0074",
+    "2006_p0067",
+    "2006_p0072",
+    "2012_p0091",
+    "2012_p0105",
+    "2012_p0100"
+   ],
+   "relevant_ids": [
+    "1984_p0049",
+    "1984_p0050",
+    "1990_p0038",
+    "1991_p0022",
+    "1995_p0074",
+    "2006_p0067",
+    "2006_p0072",
+    "2012_p0091",
+    "2012_p0105",
+    "1984_p0045",
+    "1984_p0046",
+    "1984_p0051",
+    "1985_p0121",
+    "1990_p0037",
+    "1990_p0039",
+    "1991_p0021",
+    "1991_p0027",
+    "1991_p0028",
+    "1991_p0032",
+    "2006_p0068",
+    "2006_p0069",
+    "2006_p0070",
+    "2006_p0071",
+    "2006_p0073",
+    "2006_p0074",
+    "2006_p0075",
+    "2012_p0092",
+    "2012_p0093",
+    "2012_p0095",
+    "2012_p0096",
+    "2012_p0097",
+    "2012_p0098",
+    "2012_p0099",
+    "2012_p0100",
+    "2012_p0101",
+    "2012_p0102",
+    "2012_p0103",
+    "2012_p0104",
+    "2015_p0138",
+    "2015_p0139"
+   ],
+   "gold_claims": [
+    {
+     "claim": "In the 1980s he called the economics of a dominant newspaper among the very best in the business world: once dominant, even a poor paper prospers.",
+     "required_terms": [
+      "among the very best in the business world",
+      "Good or bad, it will prosper"
+     ],
+     "gold_passage_ids": [
+      "1984_p0049",
+      "1984_p0050"
+     ],
+     "verification_note": "1984 letter (1984_p0049, 1984_p0050)."
+    },
+    {
+     "claim": "From 1990-1991 he warned that media businesses would prove considerably less marvelous than expected and that newspapers had begun to behave more like ordinary businesses than franchises.",
+     "required_terms": [
+      "businesses more than franchises"
+     ],
+     "gold_passage_ids": [
+      "1990_p0038",
+      "1991_p0022"
+     ],
+     "verification_note": "Required term in the 1991 letter (1991_p0022); the 1990 letter (1990_p0038, 'considerably less marvelous') supports."
+    },
+    {
+     "claim": "In 1995 he said the industry had lost still another notch and that newspapers' competitive strength would gradually erode, though it would remain a fine business for years.",
+     "required_terms": [
+      "still another notch",
+      "gradually erode"
+     ],
+     "gold_passage_ids": [
+      "1995_p0074"
+     ],
+     "verification_note": "1995 letter (1995_p0074)."
+    },
+    {
+     "claim": "By 2006 fundamentals were definitely eroding: papers were losing the battle for eyeballs, and had cable, satellite and the internet come first, newspapers probably would never have existed.",
+     "required_terms": [
+      "definitely eroding",
+      "battle for eyeballs",
+      "probably would never have existed"
+     ],
+     "gold_passage_ids": [
+      "2006_p0067",
+      "2006_p0072"
+     ],
+     "verification_note": "2006 letter (2006_p0067, 2006_p0072)."
+    },
+    {
+     "claim": "Even so, in 2011-2012 Berkshire bought 28 daily newspapers for $344 million while he still predicted industry decline, because local papers remain indispensable; he would buy more only at a very low multiple of current earnings.",
+     "required_terms": [
+      "28 daily newspapers",
+      "$344 million",
+      "very low multiple of current earnings"
+     ],
+     "gold_passage_ids": [
+      "2012_p0091",
+      "2012_p0105"
+     ],
+     "verification_note": "2012 letter (2012_p0091, 2012_p0105); 2015_p0139 (circulation will keep falling) is in relevant_ids."
+    },
+    {
+     "claim": "He and Munger believe papers that deliver comprehensive and reliable information to tightly-bound communities and have a sensible Internet strategy will remain viable for a long time.",
+     "required_terms": [
+      "tightly-bound communities",
+      "sensible Internet strategy"
+     ],
+     "gold_passage_ids": [
+      "2012_p0100"
+     ],
+     "verification_note": "2012 letter (2012_p0100)."
+    }
+   ],
+   "multi_part": true,
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": true
+   },
+   "reject": {
+    "forbidden_terms": []
+   },
+   "verification_note": "All newspaper passages were read (27 letters mention newspapers; most are Buffalo News operating detail). Gold passages from 6 letters 1984-2012 supply the 6 claims (dominant paper economics; less marvelous and businesses more than franchises; another notch; eroding fundamentals; 2012 purchase at low multiples; papers serving tightly-bound communities remain viable).",
+   "group": 5
+  },
+  {
+   "qid": "fin_g5_06",
+   "question_type": "corpus_wide",
+   "answerable": true,
+   "years": [
+    1980,
+    1984,
+    1999,
+    2011,
+    2012,
+    2016,
+    2019,
+    2020,
+    2022
+   ],
+   "query": "What does Buffett keep repeating about when share buybacks make sense?",
+   "gold_passage_ids": [
+    "1980_p0011",
+    "1984_p0018",
+    "1999_p0097",
+    "2011_p0032",
+    "2019_p0077",
+    "2011_p0033",
+    "1999_p0100",
+    "2012_p0116",
+    "1999_p0101",
+    "2020_p0034",
+    "2016_p0039",
+    "2022_p0029"
+   ],
+   "relevant_ids": [
+    "1980_p0011",
+    "1984_p0018",
+    "1999_p0097",
+    "2011_p0032",
+    "2019_p0077",
+    "2011_p0033",
+    "1999_p0100",
+    "2012_p0116",
+    "1999_p0101",
+    "2020_p0034",
+    "2016_p0039",
+    "2022_p0029",
+    "1978_p0043",
+    "1984_p0015",
+    "1984_p0016",
+    "1984_p0019",
+    "1984_p0021",
+    "1984_p0022",
+    "1985_p0027",
+    "1990_p0020",
+    "1994_p0029",
+    "1997_p0023",
+    "1999_p0098",
+    "1999_p0102",
+    "1999_p0103",
+    "1999_p0104",
+    "1999_p0105",
+    "1999_p0107",
+    "2011_p0034",
+    "2011_p0035",
+    "2011_p0036",
+    "2011_p0040",
+    "2012_p0114",
+    "2012_p0128",
+    "2013_p0013",
+    "2014_p0193",
+    "2014_p0194",
+    "2014_p0207",
+    "2015_p0014",
+    "2016_p0033",
+    "2016_p0034",
+    "2016_p0036",
+    "2016_p0106",
+    "2018_p0017",
+    "2018_p0029",
+    "2018_p0037",
+    "2018_p0038",
+    "2019_p0078",
+    "2020_p0037",
+    "2021_p0044",
+    "2021_p0046",
+    "2022_p0028"
+   ],
+   "gold_claims": [
+    {
+     "claim": "Buying back shares when a fine business sells far below intrinsic value is one of the most certain and profitable uses of capital; such buybacks often get $2 of present value for $1.",
+     "required_terms": [
+      "$2 of present value for $1"
+     ],
+     "gold_passage_ids": [
+      "1980_p0011",
+      "1984_p0018"
+     ],
+     "verification_note": "Required term in the 1984 letter (1984_p0018); the 1980 letter (1980_p0011, 'far less than intrinsic value') supports."
+    },
+    {
+     "claim": "Two conditions must hold: the company has funds beyond the needs of the business, and its stock sells below intrinsic value, conservatively calculated.",
+     "required_terms": [
+      "ample funds",
+      "conservatively calculated"
+     ],
+     "gold_passage_ids": [
+      "1999_p0097",
+      "2011_p0032",
+      "2019_p0077"
+     ],
+     "verification_note": "Required terms in the 2011 letter (2011_p0032); the 1999 letter (1999_p0097, 'beyond the near-term needs of the business') and the 2019 letter (2019_p0077, 'selling for less than it is worth', 'ample cash') support."
+    },
+    {
+     "claim": "Price is everything: what is smart at one price is dumb at another, and buying above intrinsic value (dollar bills for $1.10) destroys value for continuing shareholders.",
+     "required_terms": [
+      "smart at one price is dumb at another"
+     ],
+     "gold_passage_ids": [
+      "2011_p0033",
+      "1999_p0100",
+      "2012_p0116"
+     ],
+     "verification_note": "Required term in the 2011 letter (2011_p0033); the 1999 letter (1999_p0100, 'dollar bills for $1.10') and the 2012 letter (2012_p0116, 'price is all-important') support."
+    },
+    {
+     "claim": "He criticizes managements that repurchase to support the price or 'show confidence', and American CEOs' embarrassing record of buying back more when prices have risen than when they have fallen.",
+     "required_terms": [
+      "show confidence"
+     ],
+     "gold_passage_ids": [
+      "1999_p0101",
+      "2020_p0034"
+     ],
+     "verification_note": "Required term in the 1999 letter (1999_p0101); the 2020 letter (2020_p0034, 'embarrassing record') supports."
+    },
+    {
+     "claim": "He defends value-accretive buybacks against blanket critics who call them un-American or harmful: such critics are economic illiterates or silver-tongued demagogues.",
+     "required_terms": [
+      "un-American"
+     ],
+     "gold_passage_ids": [
+      "2016_p0039",
+      "2022_p0029"
+     ],
+     "verification_note": "Required term in the 2016 letter (2016_p0039); the 2022 letter (2022_p0029, 'economic illiterate') supports."
+    }
+   ],
+   "multi_part": true,
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": true
+   },
+   "reject": {
+    "forbidden_terms": []
+   },
+   "verification_note": "Repurchase passages in all 35 letters that mention them were scanned. Gold passages from 9 letters 1980-2022 supply the 5 claims (below-value buybacks create value; two conditions; price is all-important; criticism of CEOs; defense against critics).",
+   "group": 5
+  },
+  {
+   "qid": "fin_g5_10",
+   "question_type": "corpus_wide",
+   "answerable": true,
+   "years": [
+    1979,
+    1989,
+    1991,
+    1992,
+    1993,
+    2007,
+    2009,
+    2014
+   ],
+   "query": "What kind of business does Buffett consistently describe as the best kind to own?",
+   "gold_passage_ids": [
+    "2009_p0051",
+    "1992_p0072",
+    "1991_p0023",
+    "2007_p0028",
+    "1993_p0074",
+    "2007_p0034",
+    "2007_p0038",
+    "2014_p0155",
+    "1979_p0025",
+    "1989_p0127",
+    "2014_p0153"
+   ],
+   "relevant_ids": [
+    "2009_p0051",
+    "1992_p0072",
+    "1991_p0023",
+    "2007_p0028",
+    "1993_p0074",
+    "2007_p0034",
+    "2007_p0038",
+    "2014_p0155",
+    "1979_p0025",
+    "1989_p0127",
+    "2014_p0153",
+    "1983_p0120",
+    "1983_p0122",
+    "1986_p0072",
+    "1987_p0021",
+    "1989_p0126",
+    "1995_p0039",
+    "1996_p0085",
+    "2007_p0027",
+    "2007_p0029",
+    "2007_p0030",
+    "2007_p0031",
+    "2007_p0033",
+    "2007_p0035",
+    "2007_p0037",
+    "2007_p0040",
+    "2007_p0041",
+    "2007_p0042",
+    "2010_p0108",
+    "2011_p0124",
+    "2012_p0071",
+    "2020_p0026",
+    "2023_p0001",
+    "2023_p0029"
+   ],
+   "gold_claims": [
+    {
+     "claim": "The best businesses earn high returns on capital and need little incremental investment to grow; the rare ideal could reinvest large sums at very high rates of return.",
+     "required_terms": [
+      "little incremental investment"
+     ],
+     "gold_passage_ids": [
+      "2009_p0051",
+      "1992_p0072"
+     ],
+     "verification_note": "Required term in the 2009 letter (2009_p0051); the 1992 letter (1992_p0072, 'very high rates of return') supports."
+    },
+    {
+     "claim": "He prefers an economic franchise: a product that is needed, has no close substitute and is not price-regulated, so it can price aggressively and earn high returns.",
+     "required_terms": [
+      "no close substitute",
+      "not subject to price regulation"
+     ],
+     "gold_passage_ids": [
+      "1991_p0023"
+     ],
+     "verification_note": "1991 letter (1991_p0023)."
+    },
+    {
+     "claim": "A truly great business needs an enduring moat, such as being the low-cost producer or having a powerful worldwide brand like Coca-Cola or Gillette.",
+     "required_terms": [
+      "moat"
+     ],
+     "gold_passage_ids": [
+      "2007_p0028",
+      "1993_p0074"
+     ],
+     "verification_note": "Required term in both the 1993 letter (1993_p0074, 'protective moat') and the 2007 letter (2007_p0028, 'enduring moat', 'powerful world-wide brand')."
+    },
+    {
+     "claim": "See's Candies is his model: it earned about 60% pre-tax on invested capital, had durable pricing power, and grew earnings with virtually no major capital requirements.",
+     "required_terms": [
+      "See's",
+      "60%"
+     ],
+     "gold_passage_ids": [
+      "2007_p0034",
+      "2007_p0038",
+      "2014_p0155"
+     ],
+     "verification_note": "Required terms in the 2007 letter (2007_p0034, '60% pre-tax on invested capital'); 2007_p0038 ('virtually no major capital requirements') and the 2014 letter (2014_p0155, 'significant pricing power') support."
+    },
+    {
+     "claim": "It is better to buy a wonderful business at a fair price than a fair business at a wonderful price, because time is the friend of the wonderful business and the enemy of the mediocre.",
+     "required_terms": [
+      "wonderful business",
+      "fair price"
+     ],
+     "gold_passage_ids": [
+      "1979_p0025",
+      "1989_p0127",
+      "2014_p0153"
+     ],
+     "verification_note": "Required terms in the 2014 letter (2014_p0153, 'wonderful businesses at fair prices'); the 1989 letter (1989_p0127, 'Time is the friend of the wonderful business') and the 1979 letter (1979_p0025, 'good business purchased at a fair price') support."
+    }
+   ],
+   "multi_part": true,
+   "accept": {
+    "min_claim_coverage": 1.0,
+    "require_valid_citation": true
+   },
+   "reject": {
+    "forbidden_terms": []
+   },
+   "verification_note": "Best/great/wonderful business, moat and franchise passages were scanned across all letters. Gold passages from 8 letters 1979-2014 supply the 5 claims (high returns with little capital; economic franchise; enduring moat; See's model; wonderful business at a fair price).",
+   "group": 5
+  }
+ ],
+ "frozen": false
+}

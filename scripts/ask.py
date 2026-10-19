@@ -19,6 +19,16 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 from src.pipeline import BuffettRAGPipeline, PipelineConfig
+from src.services import ask_flow, backend_app
+from src.services.schemas import AskRequest
+
+
+def _hit_to_dict(hit) -> dict:
+    return {
+        "id": hit.id, "score": hit.score, "year": hit.metadata.get("year"),
+        "source_file": hit.metadata.get("source_file"), "topics": hit.metadata.get("topics", ""),
+        "text": hit.text,
+    }
 
 
 def main() -> None:
@@ -30,7 +40,7 @@ def main() -> None:
     ap.add_argument("--no-rerank", action="store_true")
     ap.add_argument("--no-llm", action="store_true",
                     help="Skip LLM; just print retrieved passages")
-    ap.add_argument("--provider", choices=["llama"], default=None,
+    ap.add_argument("--provider", choices=["llama", "remote"], default=None,
                     help="Answer provider (default: config)")
     ap.add_argument("--year", type=int, default=None)
     ap.add_argument("--decade", type=int, default=None)
@@ -48,13 +58,31 @@ def main() -> None:
     cfg = PipelineConfig(use_llm=not args.no_llm, use_reranker=not args.no_rerank, **cfg_kwargs)
     pipeline = BuffettRAGPipeline.build(cfg)
 
-    out = pipeline.ask(
-        args.query,
-        strategy=args.strategy,
-        top_k=args.top_k,
-        rerank=not args.no_rerank,
-        where=where or None,
-    )
+    if args.no_llm:
+        result = pipeline.retriever.search(
+            args.query, strategy=args.strategy, top_k=args.top_k,
+            rerank=not args.no_rerank, where=where or None,
+        )
+        out = {
+            "strategy": args.strategy, "answer": None, "citations": [],
+            "used_filter": result.used_filter, "reranked": result.reranked,
+            "passages": [_hit_to_dict(h) for h in result.hits],
+        }
+    else:
+        # The served answer path: the same ask_flow state and /ask handler the backend runs.
+        ask_flow._state = {
+            "retriever": pipeline.retriever, "docs": list(pipeline.docs_by_id.values()),
+            "docs_by_id": pipeline.docs_by_id, "llm": pipeline.llm,
+        }
+        response = backend_app.ask(AskRequest(
+            query=args.query, strategy=args.strategy, top_k=args.top_k,
+            rerank=not args.no_rerank, where=where or None,
+        ))
+        out = {
+            "strategy": response.strategy, "answer": response.answer, "citations": response.citations,
+            "used_filter": response.used_filter, "reranked": response.reranked,
+            "passages": [hit.model_dump() for hit in response.hits],
+        }
 
     if args.json:
         print(json.dumps(out, indent=2, ensure_ascii=False))

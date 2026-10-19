@@ -4,13 +4,13 @@ from __future__ import annotations
 import os
 import random
 import re
+import time
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 from config import (
     ANSWER_CONTEXT_MAX_CHARS,
-    CHUNKS_FILE,
-    CHUNKS_V2_FILE,
     CHUNKS_V3_FILE,
     EXPANSION_MODE,
     EXPOSE_DEBUG_STATUS,
@@ -26,12 +26,16 @@ from src.generation.prompt import (
     parse_citations,
     strip_chat_artifacts,
 )
+from src.generation import finance_answer
 from src.generation.answer_expand import expand_answer
 from src.generation.compare import comparison_periods, generate_comparison_answer, prepare_answer_context
 from src.generation.decompose import answer_by_parts, split_question
 from src.generation.evidence_gate import assess_evidence
 from src.evaluation.claim_validator import validate_and_filter_answer
 from src.generation.providers import create_llm_provider
+from src.knowledge import KnowledgeStore
+from src.query.plan import CORPUS_WIDE, MIXED, NUMERIC, PERSONAL, TREND, QueryPlan, plan_query
+from src.retrieval.finance_policy import finance_search
 from src.retrieval.query_expansion import build_followup_retrieval_query, expand_query, expand_query_structured
 from src.retrieval.retriever import Retriever
 from src.services.schemas import AskRequest, HitOut, SearchRequest
@@ -45,9 +49,7 @@ _MIN_ANSWER_WORDS = 3
 
 
 def _resolve_chunks_path() -> Path:
-    for candidate in (CHUNKS_V3_FILE, CHUNKS_V2_FILE, CHUNKS_FILE):
-        if candidate.exists():
-            return candidate
+    """The v3 corpus only; backend startup fails loudly when it is missing."""
     return CHUNKS_V3_FILE
 
 
@@ -262,3 +264,135 @@ def _generate_answer(llm, prompt: str, context_hits, max_new_tokens: int, query:
         if retried[0] != REFUSAL_LINE:
             return retried
     return answer, citations
+
+
+# -----------------------------------------------------------------------------
+# Finance pipeline (FINANCE_PIPELINE=1, finance-query-pipeline): one route decision for /ask and /ask/stream.
+# The caller checks `config.finance_pipeline_enabled()`; with the flag off nothing below runs.
+# -----------------------------------------------------------------------------
+SCOPE_VOTE_POOL = 10  # passages of the scope vote's hybrid retrieval (no rerank, no scope filter)
+
+
+@dataclass
+class FinanceRoute:
+    """Where a planned question went: a finished answer (scope / numeric / digest) or the reader inputs."""
+    route: str                      # scope | numeric | digest | reader
+    plan: QueryPlan
+    query: str                      # the question the reader and the evidence gate see (personal clauses dropped)
+    answer: Optional[str] = None
+    citations: List[Dict[str, Any]] = field(default_factory=list)
+    hits: List[SearchHit] = field(default_factory=list)            # served, [n] markers point at these
+    retrieved_hits: List[SearchHit] = field(default_factory=list)
+    used_filter: Optional[Dict[str, Any]] = None
+    reranked: bool = False
+    llm: Any = None
+    prompt: str = ""
+    debug: Dict[str, Any] = field(default_factory=dict)
+
+    @property
+    def final(self) -> bool:
+        """True for scope, numeric and digest answers: returned as they are, no gate, validator or expansion."""
+        return self.route != "reader"
+
+    def prepared(self):
+        """The reader inputs in the shape `_prepare_ask` returns."""
+        return self.llm, self.retrieved_hits, self.used_filter, self.reranked, self.hits, self.prompt, None
+
+
+def _knowledge_store() -> KnowledgeStore:
+    if "knowledge" not in _state:
+        _state["knowledge"] = KnowledgeStore.load()  # KNOWLEDGE_DIR or data/knowledge/; missing = empty store
+    return _state["knowledge"]
+
+
+def _scope_vote(retriever, store: KnowledgeStore, timing: Dict[str, float]):
+    """Share of the top passages (hybrid, no rerank, no scope filter) that are non-financial or carry personal facts."""
+    if not len(store):
+        return None  # nothing is annotated: every passage counts as financial, the vote would always be 0
+
+    def vote(text: str) -> float:
+        started = time.perf_counter()
+        pool = retriever._hybrid_for_filter(text, SCOPE_VOTE_POOL, None)[:SCOPE_VOTE_POOL]
+        timing["scope_vote_s"] = round(time.perf_counter() - started, 3)
+        if not pool:
+            return 0.0
+        return sum(1 for h in pool if not store.is_financial(h.id) or store.has_personal(h.id)) / len(pool)
+
+    return vote
+
+
+def finance_route_steps(req: AskRequest):
+    """Generator like `_prepare_ask_steps`: yields stage names, returns a `FinanceRoute` (StopIteration.value).
+
+    Plans the question (deterministic, `src/query/plan.py`) and routes it: scope reply, numeric answer, digest
+    answer, or `finance_search` plus the reader. The query-expansion LLM call, the retriever's comparison and
+    multipart splits and its auto year filter are bypassed. The reader route caps the served passages at
+    `llm_context_passages()` for every provider (the remote provider's context is not trimmed by
+    `prepare_answer_context`).
+    """
+    retriever: Retriever = _state["retriever"]
+    store = _knowledge_store()
+    docs_by_id = _state.get("docs_by_id", {})
+    history = [turn.model_dump() for turn in req.history]
+    resolved = build_followup_retrieval_query(req.query, history)
+    timing: Dict[str, float] = {}
+    plan = plan_query(resolved, store, scope_vote=_scope_vote(retriever, store, timing))
+    debug: Dict[str, Any] = {"kind": plan.kind, "scope": plan.scope, "scope_source": plan.scope_source, **timing}
+    query = plan.financial_query if plan.scope == MIXED and plan.financial_query else req.query
+
+    if plan.scope == PERSONAL:
+        done = finance_answer.scope_answer()
+        return FinanceRoute("scope", plan, query, done.answer, done.citations, done.hits, [], debug=debug)
+
+    if plan.kind == NUMERIC:
+        done = finance_answer.numeric_answer(plan, store, docs_by_id)
+        if done is not None:  # served from the numbers table: no retrieval
+            debug.update(done.detail)
+            return FinanceRoute("numeric", plan, query, done.answer, done.citations, done.hits, [], debug=debug)
+    yield "retrieving"
+    hits, search_debug = finance_search(plan, retriever, store)
+    debug.update(search_debug)
+    used_filter = ({"year": {"$gte": min(plan.year_range), "$lte": max(plan.year_range)}}
+                   if plan.year_hard and plan.year_range else None)
+    reranked = bool(search_debug.get("reranked"))
+    cap = llm_context_passages()
+
+    if plan.kind == CORPUS_WIDE:
+        done = finance_answer.digest_answer(plan, store, docs_by_id, hits)
+        if done is not None:
+            done.hits = done.hits[:max(cap, done.detail["cited"])]  # the cited quotes always stay
+            debug.update(done.detail)
+            return FinanceRoute("digest", plan, query, done.answer, done.citations, done.hits, hits, used_filter,
+                                reranked, debug=debug)
+
+    llm = _server_llm()
+    context_hits: List[Any] = []
+    prompt = ""
+    if hits:
+        context_hits = prepare_answer_context(
+            llm, hits, docs_by_id, query, history=history,
+            followup=build_followup_retrieval_query(req.query, history) != req.query,
+            neighbors=retrieval_setting("ANSWER_CONTEXT_NEIGHBORS"), max_chars=ANSWER_CONTEXT_MAX_CHARS,
+            max_new_tokens=req.max_new_tokens, n_ctx=llm_n_ctx(),
+            max_passages=cap, passage_max_chars=retrieval_setting("LLM_PASSAGE_MAX_CHARS"),
+        )
+        context_hits = list(context_hits)[:cap]
+        if plan.kind == TREND:
+            context_hits = finance_answer.sort_by_year(context_hits)
+        context_hits = order_passages(context_hits)
+        if plan.kind == TREND:
+            prompt = finance_answer.trend_prompt(query, context_hits, history)
+        else:
+            prompt = build_cited_prompt(query=query, hits=context_hits, history=history)
+    return FinanceRoute("reader", plan, query, hits=context_hits, retrieved_hits=hits, used_filter=used_filter,
+                        reranked=reranked, llm=llm, prompt=prompt, debug=debug)
+
+
+def finance_route(req: AskRequest) -> FinanceRoute:
+    """Plan and route one question without streaming stage names."""
+    steps = finance_route_steps(req)
+    while True:
+        try:
+            next(steps)
+        except StopIteration as stop:
+            return stop.value

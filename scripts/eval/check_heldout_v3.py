@@ -6,13 +6,14 @@ from collections import Counter
 import hashlib
 import json
 from pathlib import Path
+import os
 import re
 
 ROOT = Path(__file__).resolve().parents[2]
 CASES_PATH = ROOT / "data/evaluation/heldout_v3/answer_benchmark_heldout_v3.json"
 CORPUS_PATH = "data/processed/chunks_v3_paragraph.jsonl"
 CORPUS_SHA256 = "8263f08958729a77febf0922e7bbc4161bedd5fdb3e9a8b3fc9a64ab681ab5f0"
-FORBIDDEN_PATH = Path("/Users/necatifurkancolak/AI-Workplace/Artifacts/BuffettRAG/round3/v2_forbidden_passages.json")
+FORBIDDEN_PATH = Path(os.environ.get("BUFFETTRAG_ARTIFACTS", ROOT.parents[2] / "Artifacts" / "BuffettRAG")) / "round3" / "v2_forbidden_passages.json"
 V1_PATH = "data/evaluation/heldout_v1/answer_benchmark_heldout_v1.json"
 V2_PATH = "data/evaluation/heldout_v2/answer_benchmark_heldout_v2.json"
 DEV_PATH = "data/evaluation/answer_quality_program/answer_benchmark_v3.json"

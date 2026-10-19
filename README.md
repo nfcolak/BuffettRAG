@@ -6,7 +6,7 @@ BuffettRAG answers questions about Warren Buffett's Berkshire Hathaway sharehold
 
 The backend can expand the query (`EXPANSION_MODE`: `auto` expands only when first-pass evidence is weak, `always`, or `off`). The embedded LLM proposes up to eight extra search keywords (companies, people, events, financial terms) so that questions phrased outside the corpus vocabulary still land, for example "Middle East" maps to ISCAR and Israel. Expansion failures are swallowed and retrieval falls back to the original query.
 
-Retrieval is hybrid. The expanded query runs through BM25 and through vector search over bge-base-en-v1.5 embeddings, and the two rankings are merged with reciprocal rank fusion. The original query and expanded variant contribute candidate rankings; temporal interpretation and cross-encoder reranking always use the original question. Normal hybrid retrieval sends up to `RERANK_CANDIDATES` (default 15) fused candidates to bge-reranker-v2-m3; temporal comparison can retain up to thirty per period before reranking. Near-duplicate passages are dropped by token-overlap comparison, since overlapping chunk windows would otherwise fill the context with repeats. The top passages are then widened with their neighboring chunks (the chunk file stores previous and next chunk ids) so the LLM sees full paragraphs while retrieval stays precise over compact chunks.
+Retrieval is hybrid. The expanded query runs through BM25 and through vector search over bge-base-en-v1.5 embeddings, and the two rankings are merged with reciprocal rank fusion. The original query and expanded variant contribute candidate rankings; temporal interpretation and cross-encoder reranking always use the original question. Normal hybrid retrieval sends up to `RERANK_CANDIDATES` (default 30) fused candidates to bge-reranker-v2-m3; temporal comparison can retain up to thirty per period before reranking. Near-duplicate passages are dropped by token-overlap comparison, since overlapping chunk windows would otherwise fill the context with repeats. The top passages are then widened with their neighboring chunks (the chunk file stores previous and next chunk ids) so the LLM sees full paragraphs while retrieval stays precise over compact chunks.
 
 Generation is grounded by contract. The system prompt requires the model to test each passage against the question, answer only from passages that pass, cite every sentence as [n], and output a fixed refusal line when nothing is relevant. Citation references are resolved server-side, with invalid numbers reported explicitly. This validates reference existence, not whether a claim is true or entailed. Answer responses expose the exact expanded passage text used in the prompt; original retrieval chunks remain available separately. The claim validator keeps a sentence only when its cited passage covers most of the sentence's content words with matching numbers and negation; this is deterministic lexical checking, not semantic entailment. Both a blocking endpoint and a server-sent-events streaming endpoint are available.
 
@@ -65,11 +65,11 @@ The first backend start downloads the embedding model (~440MB) and the reranker 
 
 Answers come from a small model that runs inside the backend process through llama.cpp (`llama-cpp-python`): Qwen2.5-7B-Instruct fine-tuned with LoRA on Kaggle (FT-r1), 4-bit GGUF (`q4_k_m`, about 4.7 GB). Without the file the backend still starts and search keeps working, but `/ask` returns an "LLM unavailable" message. **No external API keys are used anywhere**: no OpenAI, Anthropic or OpenRouter calls, no per-request provider or key fields, and the frontend stores no keys.
 
-The GGUF is produced by the Kaggle/Colab LoRA notebook under `colab/`, is not downloadable, and is git-ignored; place it at `models/ft/7b_r1/buffett-qwen2.5-7b-ft-r1-q4_k_m.gguf`.
+The GGUF is produced by the LoRA notebook `colab/train_7b_lora_r1.ipynb` (commit 7c522f5, data/ft_v3), is not downloadable, and is git-ignored; place it at `models/ft/7b_r1/buffett-qwen2.5-7b-ft-r1-q4_k_m.gguf`.
 
 Providers: `llama` (default) and `remote`. If `llama` is selected but the model file is missing or `llama_cpp` cannot be imported, the factory logs one warning and the backend runs without an answer engine: search works, `/ask` returns the "LLM unavailable" message.
 
-Latency: with Metal (`LLM_GPU_LAYERS=-1`) an answer takes a few seconds. On a CPU-only server (`LLM_GPU_LAYERS=0`) expect roughly 10 to 40 seconds per answer depending on cores. To keep the prompt inside what a 1.5B model handles, the prompt uses only the first `LLM_CONTEXT_PASSAGES` expanded passages (5 by default, 8 for 7B GGUF files), each cut around its anchor chunk to `LLM_PASSAGE_MAX_CHARS`, and trailing passages are dropped until the prompt fits `LLM_N_CTX` minus the answer budget (4 chars per token estimate). Citation numbers always match the passages shown.
+Latency: with Metal (`LLM_GPU_LAYERS=-1`) an answer takes a few seconds. On a CPU-only server (`LLM_GPU_LAYERS=0`) expect roughly 10 to 40 seconds per answer depending on cores. To keep the prompt inside what a 1.5B model handles, the prompt uses only the first `LLM_CONTEXT_PASSAGES` expanded passages (5 by default, 16 for 7B GGUF files), each cut around its anchor chunk to `LLM_PASSAGE_MAX_CHARS`, and trailing passages are dropped until the prompt fits `LLM_N_CTX` minus the answer budget (4 chars per token estimate). Citation numbers always match the passages shown.
 
 Query expansion is off by default (`EXPANSION_MODE=off`): a 1.5B model proposes unreliable keywords. Set `auto` or `always` only if you accept that.
 
@@ -95,16 +95,16 @@ Everything is set through environment variables, read in `config.py`.
 |---|---|---|
 | `DEFAULT_LLM_PROVIDER` | `llama` | `llama` (embedded GGUF model) or `remote` |
 | `LLM_MODEL_PATH` | `models/ft/7b_r1/buffett-qwen2.5-7b-ft-r1-q4_k_m.gguf` | GGUF file, relative to the repo root |
-| `LLM_N_CTX` | `8192` | Context window |
+| `LLM_N_CTX` | `16384` | Context window |
 | `LLM_N_THREADS` | `0` | CPU threads (0 = auto) |
 | `LLM_TEMPERATURE` | `0.1` | Sampling temperature (seed is fixed) |
 | `LLM_GPU_LAYERS` | `-1` | `-1` all layers on Metal/GPU, `0` CPU only |
-| `LLM_CONTEXT_PASSAGES` | `5` (8 for 7B GGUF files) | Passages placed in the prompt for the llama provider |
+| `LLM_CONTEXT_PASSAGES` | `5` (16 for 7B GGUF files) | Passages placed in the prompt for the llama provider |
 | `LLM_PASSAGE_MAX_CHARS` | `1800` | Per-passage character cap for the llama provider |
 | `VECTOR_BACKEND` | `faiss` | Vector store (`faiss`) |
 | `EMBEDDING_MODEL` | `BAAI/bge-base-en-v1.5` | Embedding model id |
 | `EMBEDDING_DEVICE` | auto | `cuda` when available, otherwise `cpu` |
-| `RERANK_CANDIDATES` | `15` | Max candidates sent to the cross-encoder |
+| `RERANK_CANDIDATES` | `30` | Max candidates sent to the cross-encoder |
 | `EXPANSION_MODE` | `off` | `auto`, `always`, or `off` for the LLM query-expansion call |
 | `EVIDENCE_GATE_SOFT` | on | Default on; `0` restores the strict word-overlap gate. Measured on heldout_v6 (95 blind questions): 72 vs 70 strict claims, correct refusals 16/16 both |
 

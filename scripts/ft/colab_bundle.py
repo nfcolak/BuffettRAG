@@ -1,4 +1,4 @@
-"""Build the zip that colab/train_7b_lora.ipynb trains from (run on the Mac).
+"""Build the zip that colab/train_7b_lora_r3_ft_v5.ipynb trains from (run on the Mac).
 
 python scripts/ft/colab_bundle.py --out /path/colab-bundle-7b.zip
 

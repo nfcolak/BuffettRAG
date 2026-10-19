@@ -18,8 +18,6 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 from config import (
-    CHUNKS_FILE,
-    CHUNKS_V2_FILE,
     CHUNKS_V3_FILE,
     EMBEDDING_DEVICE,
     VECTOR_BACKEND,
@@ -33,7 +31,7 @@ from src.storage.faiss_store import FaissStore
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--chunks", type=Path, default=None,
-                    help="Chunks JSONL (defaults to V3, then legacy corpus fallback).")
+                    help="Chunks JSONL (defaults to the V3 corpus).")
     ap.add_argument("--backend", choices=["faiss"], default=VECTOR_BACKEND)
     ap.add_argument("--embedder", choices=["small", "base"], default="small")
     ap.add_argument("--device", default=EMBEDDING_DEVICE)
@@ -46,10 +44,7 @@ def main() -> None:
 
     chunks_file = args.chunks
     if chunks_file is None:
-        chunks_file = next(
-            (path for path in (CHUNKS_V3_FILE, CHUNKS_V2_FILE, CHUNKS_FILE) if path.exists()),
-            CHUNKS_V3_FILE,
-        )
+        chunks_file = CHUNKS_V3_FILE
     if not chunks_file.exists():
         ap.error(f"Chunks file does not exist: {chunks_file}")
 

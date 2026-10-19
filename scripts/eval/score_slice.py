@@ -15,12 +15,15 @@ from __future__ import annotations
 import argparse
 import collections
 import json
+import os
 import re
 import sys
 from pathlib import Path
 from typing import Any, Dict, List, Tuple
 
-DEFAULT_DIR = Path("/Users/necatifurkancolak/AI-Workplace/Artifacts/BuffettRAG/pv8/slice")
+REPO = Path(__file__).resolve().parents[2]
+ARTIFACTS = Path(os.environ.get("BUFFETTRAG_ARTIFACTS", REPO.parents[2] / "Artifacts" / "BuffettRAG"))
+DEFAULT_DIR = ARTIFACTS / "pv8" / "slice"
 REFUSAL_LINE = "The retrieved passages do not provide enough evidence to answer this question."
 _REFUSAL = re.compile(r"(cannot|can't|can not|do not|don't|doesn't|does not|not).{0,60}(find|contain|support|answer|mention|provide|cover)"
                       r"|insufficient|no information", re.I)

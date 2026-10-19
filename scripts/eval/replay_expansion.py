@@ -121,7 +121,7 @@ def _load_cases(run: Dict[str, Any], cases_path: Optional[Path]) -> Dict[str, Di
     path = cases_path or (ROOT / run["cases"] if run.get("cases") else None)
     if path is None or not Path(path).is_file():
         # the cases path in a run JSON is relative to the repo the run was made in
-        alt = Path(os.environ.get("BUFFETT_MAIN_CHECKOUT", "/Users/necatifurkancolak/AI-Workplace/Projects/current/BuffettRAG")) / (run.get("cases") or "")
+        alt = Path(os.environ.get("BUFFETT_MAIN_CHECKOUT", str(ROOT))) / (run.get("cases") or "")
         path = alt if run.get("cases") and alt.is_file() else None
     if path is None:
         return {}

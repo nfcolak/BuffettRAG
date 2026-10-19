@@ -118,9 +118,8 @@ def test_followup_uses_last_user_terms_and_year_not_assistant_facts():
     assert [item.id for item in result.hits] == ["right"]
 
 
-def test_http_stream_and_pipeline_share_comparison_answers(monkeypatch):
+def test_http_and_stream_share_comparison_answers(monkeypatch):
     from fastapi.testclient import TestClient
-    from src.pipeline import BuffettRAGPipeline
     from src.retrieval.retriever import RetrievalResult
     from src.services import backend_app as backend, ask_flow
     passages = [hit("early", EARLY, 1991), hit("late", LATE, 2003)]
@@ -140,14 +139,12 @@ def test_http_stream_and_pipeline_share_comparison_answers(monkeypatch):
     ordinary = client.post("/ask", json=payload).json()
     stream = client.post("/ask/stream", json=payload)
     events = [json.loads(line[6:]) for line in stream.text.splitlines() if line.startswith("data: ")]
-    pipeline = BuffettRAGPipeline(Fixed(), {}, llm).ask(QUERY)
-    assert events[-1]["answer"] == ordinary["answer"] == pipeline["answer"]
-    assert events[-1]["citations"] == ordinary["citations"] == pipeline["citations"]
+    assert events[-1]["answer"] == ordinary["answer"]
+    assert events[-1]["citations"] == ordinary["citations"]
     assert {year for item in ordinary["citations"] for year in item["years"]} == {1991, 2003}
 
 
-def test_backend_and_pipeline_followup_preserve_original_prompt(monkeypatch):
-    from src.pipeline import BuffettRAGPipeline
+def test_backend_followup_preserves_original_prompt(monkeypatch):
     from src.retrieval.retriever import RetrievalResult
     from src.services import backend_app as backend, ask_flow
     history = [{"role": "user", "content": "Discuss insurance float costs in 2009."}]
@@ -164,7 +161,6 @@ def test_backend_and_pipeline_followup_preserve_original_prompt(monkeypatch):
     llm = Capture()
     monkeypatch.setattr(ask_flow, "_state", {"retriever": Fixed(), "llm": llm, "docs_by_id": {}})
     backend.ask(backend.AskRequest(query=query, history=history, expand_query=False))
-    BuffettRAGPipeline(Fixed(), {}, llm).ask(query, history=history)
-    assert calls[0] == calls[1] == build_followup_retrieval_query(query, history)
-    assert len(prompts) == 2
+    assert calls[0] == build_followup_retrieval_query(query, history)
+    assert len(prompts) == 1
     assert all(f"Question: {query}\n" in prompt and "User: Discuss insurance" in prompt for prompt in prompts)

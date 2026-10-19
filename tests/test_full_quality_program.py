@@ -197,39 +197,39 @@ def test_evidence_gate_refuses_when_hits_do_not_support_query():
     assert result.reason == "no_lexical_evidence"
 
 
-def test_pipeline_blocks_generation_when_evidence_gate_fails():
-    from src.pipeline import BuffettRAGPipeline
+def test_backend_blocks_generation_when_evidence_gate_fails(monkeypatch):
     from src.retrieval.retriever import RetrievalResult
+    from src.services import backend_app as backend, ask_flow
 
     class FixedRetriever:
-        def search(self, query, **_kwargs):
-            return RetrievalResult(query, "hybrid", [_hit("p", "Insurance float was valuable.")])
+        def search(self, **kwargs):
+            return RetrievalResult(kwargs["query"], "hybrid", [_hit("p", "Insurance float was valuable.")])
 
     class ShouldNotRun:
         def generate(self, *_args, **_kwargs):
             raise AssertionError("generation must be blocked before provider call")
 
-    result = BuffettRAGPipeline(FixedRetriever(), {}, ShouldNotRun()).ask("What did Buffett say about moon cheese?")
-    from src.generation.prompt import REFUSAL_LINE
-    assert result["answer"] == REFUSAL_LINE
-    assert result["evidence"]["reason"] == "no_lexical_evidence"
+    monkeypatch.setattr(ask_flow, "_state", {"retriever": FixedRetriever(), "llm": ShouldNotRun(), "docs_by_id": {}})
+    result = backend.ask(backend.AskRequest(query="What did Buffett say about moon cheese?", expand_query=False))
+    assert "enough evidence" in result.answer
+    assert result.citations == []
 
 
-def test_pipeline_post_validation_blocks_unsupported_cited_claim():
-    from src.pipeline import BuffettRAGPipeline
+def test_backend_post_validation_blocks_unsupported_cited_claim(monkeypatch):
     from src.retrieval.retriever import RetrievalResult
+    from src.services import backend_app as backend, ask_flow
 
     class FixedRetriever:
-        def search(self, query, **_kwargs):
-            return RetrievalResult(query, "hybrid", [_hit("p", "Berkshire bought preferred shares.")])
+        def search(self, **kwargs):
+            return RetrievalResult(kwargs["query"], "hybrid", [_hit("p", "Berkshire bought preferred shares.")])
 
     class FakeLLM:
         def generate(self, *_args, **_kwargs):
             return "Berkshire bought preferred shares and guaranteed moon cheese. [1]"
 
-    result = BuffettRAGPipeline(FixedRetriever(), {}, FakeLLM()).ask("preferred shares")
-    assert "moon cheese" not in result["answer"]
-    assert result["citation_validation"]["blocked_claims"] == ["guaranteed moon cheese"]
+    monkeypatch.setattr(ask_flow, "_state", {"retriever": FixedRetriever(), "llm": FakeLLM(), "docs_by_id": {}})
+    result = backend.ask(backend.AskRequest(query="preferred shares", expand_query=False))
+    assert "moon cheese" not in result.answer
 
 
 def test_backend_generation_gate_blocks_provider_before_generation():

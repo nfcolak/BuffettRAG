@@ -1,0 +1,10 @@
+{"metric": "gain_in_net_worth", "year": 1987, "value": 464, "unit": "usd_millions", "entity": "Berkshire", "as_written": "$464 million", "source_id": "1987_p0000", "note": ""}
+{"metric": "book_value_per_share_change_pct", "year": 1987, "value": 19.5, "unit": "percent", "entity": "Berkshire", "as_written": "19.5%", "source_id": "1987_p0000", "note": ""}
+{"metric": "book_value_per_share", "year": 1987, "value": 2477.47, "unit": "usd", "entity": "Berkshire", "as_written": "$2,477.47", "source_id": "1987_p0000", "note": ""}
+{"metric": "holding_cost", "year": 1990, "value": 358, "unit": "usd_millions", "entity": "USAir", "as_written": "$358 million", "source_id": "1990_p0100", "note": ""}
+{"metric": "holding_cost", "year": 1991, "value": 358, "unit": "usd_millions", "entity": "USAir", "as_written": "358,000", "source_id": "1991_p0083", "note": ""}
+{"metric": "holding_market_value", "year": 1991, "value": 232.7, "unit": "usd_millions", "entity": "USAir", "as_written": "232,700", "source_id": "1991_p0083", "note": ""}
+{"metric": "holding_cost", "year": 1977, "value": 10.628, "unit": "usd_millions", "entity": "Washington Post", "as_written": "10,628", "source_id": "1977_p0026", "note": ""}
+{"metric": "holding_market_value", "year": 1977, "value": 33.401, "unit": "usd_millions", "entity": "Washington Post", "as_written": "33,401", "source_id": "1977_p0026", "note": ""}
+{"metric": "underwriting_gain_loss", "year": 1978, "value": 3.001, "unit": "usd_millions", "entity": "Berkshire", "as_written": "$ 3,001", "source_id": "1978_p0011", "note": ""}
+{"metric": "other", "year": 2008, "value": 15.6, "unit": "usd_billions", "entity": "Berkshire", "as_written": "$15.6 billion", "source_id": "2010_p0142", "note": "invested in the 25 days of panic after the Lehman bankruptcy"}

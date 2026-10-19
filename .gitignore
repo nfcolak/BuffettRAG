@@ -43,9 +43,5 @@ data/evaluation/**/source-before.tar.gz
 frontend/node_modules/
 frontend/dist/
 
-# Local model weights (GGUF)
-models/
-/models
-
 # Grounded benchmark caches
 data/evaluation/grounded_cache/

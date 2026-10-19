@@ -1,6 +1,7 @@
 """pv8 D1: replay_expansion re-runs only validator + expansion from stored raw answers."""
 import importlib.util
 import json
+import os
 import re
 from pathlib import Path
 
@@ -81,7 +82,8 @@ def test_provider_failure_rows_are_copied():
     assert status == "copied" and new == row
 
 
-PV7 = Path("/Users/necatifurkancolak/AI-Workplace/Artifacts/BuffettRAG/pv7/runs/ftr3")
+ARTIFACTS = Path(os.environ.get("BUFFETTRAG_ARTIFACTS", Path(__file__).resolve().parents[1].parents[2] / "Artifacts" / "BuffettRAG"))
+PV7 = ARTIFACTS / "pv7" / "runs" / "ftr3"
 
 
 @pytest.mark.skipif(not (PV7 / "ftr3_p16_e3_hv6a.json").is_file(), reason="pv7 runs not on this machine")

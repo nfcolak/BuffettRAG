@@ -3,6 +3,8 @@
 Why one container: the bge reranker takes ~17-19 s per question on CPU (measured on the Mac) and ~1-2 s on the GPU.
 Deploy:  modal deploy deploy/modal/app.py   (needs the volume `buffettrag-models` with the FT-r1 GGUF and the
 secrets `buffettrag-llm-token` (LLM_TOKEN) and `buffettrag-site-password` (SITE_PASSWORD)).
+Staging:  APP_NAME=buffettrag-app-staging FINANCE_PIPELINE=1 modal deploy deploy/modal/app.py
+The live name `buffettrag-app` is deployed only with DEPLOY_LIVE=1.
 """
 import os
 import subprocess
@@ -10,8 +12,9 @@ from pathlib import Path
 
 import modal
 
-APP_NAME = "buffettrag-app"
-IMAGE_TAG = "server-cuda-b11718"  # same llama.cpp build as serve_llm.py
+LIVE_APP_NAME = "buffettrag-app"
+APP_NAME = os.environ.get("APP_NAME", LIVE_APP_NAME)
+IMAGE_TAG = "server-cuda-b11718"  # llama.cpp build, pinned 2026-10-18; bump it deliberately
 GGUF_NAME = "buffett-qwen2.5-7b-ft-r1-q4_k_m.gguf"
 MODELS_DIR = "/models"
 APP_DIR = "/root/app"
@@ -27,6 +30,19 @@ MAX_CONTAINERS = 1
 REPO = Path(__file__).resolve().parents[2] if modal.is_local() else Path(APP_DIR)
 
 
+if modal.is_local():
+    print(f"modal app name: {APP_NAME}")
+    if APP_NAME == LIVE_APP_NAME and os.environ.get("DEPLOY_LIVE") != "1":
+        raise SystemExit(f"refusing to deploy the live app '{LIVE_APP_NAME}' without DEPLOY_LIVE=1 (set APP_NAME for staging)")
+
+
+def _baked_env() -> dict:
+    """Deploy-time settings copied into the image: a local env variable does not reach the container otherwise."""
+    if not modal.is_local():
+        return {}
+    return {k: os.environ[k] for k in ("FINANCE_PIPELINE", "KNOWLEDGE_DIR") if os.environ.get(k)}
+
+
 def _download_retrieval_models() -> None:
     from sentence_transformers import CrossEncoder, SentenceTransformer
 
@@ -37,9 +53,9 @@ def _download_retrieval_models() -> None:
 image = (
     modal.Image.from_registry(f"ghcr.io/ggml-org/llama.cpp:{IMAGE_TAG}", add_python="3.11")
     .entrypoint([])
-    .pip_install_from_requirements(str(REPO / "requirements-space.txt"))
+    .pip_install_from_requirements(str(REPO / "requirements-cloud.txt"))
     .run_function(_download_retrieval_models)
-    .env({"HF_HUB_OFFLINE": "1", "TOKENIZERS_PARALLELISM": "false"})
+    .env({"HF_HUB_OFFLINE": "1", "TOKENIZERS_PARALLELISM": "false", **_baked_env()})
     .add_local_file(str(REPO / "config.py"), f"{APP_DIR}/config.py")
     .add_local_dir(str(REPO / "src"), f"{APP_DIR}/src", ignore=["**/__pycache__/**"])
     .add_local_dir(str(REPO / "frontend" / "dist"), f"{APP_DIR}/frontend/dist")
@@ -49,6 +65,9 @@ image = (
                     f"{APP_DIR}/data/processed/chunks_v3_paragraph_manifest.json")
     .add_local_dir(str(REPO / "data/indices/faiss_v3"), f"{APP_DIR}/data/indices/faiss_v3")
 )
+
+if (REPO / "data/knowledge").is_dir():
+    image = image.add_local_dir(str(REPO / "data/knowledge"), f"{APP_DIR}/data/knowledge")
 
 app = modal.App(APP_NAME)
 models = modal.Volume.from_name("buffettrag-models")

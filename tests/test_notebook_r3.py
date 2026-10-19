@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-NB = Path(__file__).resolve().parents[1] / 'colab' / 'train_7b_lora.ipynb'
+NB = Path(__file__).resolve().parents[1] / 'colab' / 'train_7b_lora_r3_ft_v5.ipynb'
 
 
 @pytest.fixture(scope='module')

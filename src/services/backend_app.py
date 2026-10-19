@@ -1,19 +1,21 @@
 """Backend FastAPI service.
 
-Deployment: runs on the Nuvolos **Backend app**.
+Deployment: runs on Modal, started by deploy/modal/app.py (one L4 container: UI, API, retrieval, llama.cpp).
 Responsibilities:
     - Loads chunks once at startup
-    - Connects to pgvector (Database app) for vector storage
+    - Loads the FAISS index `faiss_v3` for vector storage
     - Hosts the configured embedding model and cross-encoder reranker
       (see EMBEDDING_MODEL_PRIMARY and RERANKER_MODEL in config.py)
     - Runs retrieval (vector / metadata / hybrid) and reranking
-    - For answer generation, sends grounded prompts to the configured LLM provider.
+    - For answer generation, sends grounded prompts to the remote llama.cpp provider.
 
 Endpoints:
     GET  /health
+    GET  /ready
     GET  /stats
     POST /search       -- retrieval only
     POST /ask          -- retrieval + LLM generation
+    POST /ask/stream   -- same as /ask, streamed as server-sent events
 
 Run:
     uvicorn src.services.backend_app:app --host 0.0.0.0 --port 8000
@@ -49,6 +51,7 @@ from config import (
     RATE_LIMIT_WINDOW_SECONDS,
     TRUST_PROXY_HEADERS,
     VECTOR_BACKEND,
+    finance_pipeline_enabled,
 )
 from src.storage.embeddings import BGEEmbedder
 from src.generation.prompt import REFUSAL_LINE
@@ -243,16 +246,26 @@ def ask(req: AskRequest) -> AskResponse:
     if not ask_flow._state:
         raise HTTPException(status_code=503, detail="Service not ready")
 
+    query = req.query
+    final: Optional[ask_flow.FinanceRoute] = None
     try:
-        llm, hits, used_filter, reranked, context_hits, prompt, expanded = ask_flow._prepare_ask(req)
+        if finance_pipeline_enabled():
+            route = ask_flow.finance_route(req)
+            query = route.query
+            final = route if route.final else None
+            llm, hits, used_filter, reranked, context_hits, prompt, expanded = route.prepared()
+        else:
+            llm, hits, used_filter, reranked, context_hits, prompt, expanded = ask_flow._prepare_ask(req)
     except ValueError as exc:
         raise HTTPException(status_code=400, detail="Invalid retrieval configuration") from exc
 
     answer: Optional[str] = None
     citations: List[Dict[str, Any]] = []
-    if hits or comparison_periods(req.query):
+    if final is not None:  # scope / numeric / digest: finished, no evidence gate, validator or expansion
+        answer, citations = final.answer, final.citations
+    elif hits or comparison_periods(query):
         answer, citations = ask_flow._generate_answer(
-            llm, prompt, context_hits, req.max_new_tokens, req.query, ask_flow._extra_queries(req, expanded),
+            llm, prompt, context_hits, req.max_new_tokens, query, ask_flow._extra_queries(req, expanded),
             [turn.model_dump() for turn in req.history],
         )
 
@@ -279,7 +292,8 @@ def ask_stream(req: AskRequest) -> StreamingResponse:
         raise HTTPException(status_code=503, detail="Service not ready")
 
     def event_source():
-        steps = ask_flow._prepare_ask_steps(req)
+        finance = finance_pipeline_enabled()
+        steps = ask_flow.finance_route_steps(req) if finance else ask_flow._prepare_ask_steps(req)
         try:
             while True:
                 try:
@@ -290,7 +304,13 @@ def ask_stream(req: AskRequest) -> StreamingResponse:
         except ValueError:
             yield _sse("error", {"detail": "Invalid retrieval configuration"})
             return
-        llm, hits, used_filter, reranked, context_hits, prompt, expanded = prepared
+        query = req.query
+        route = prepared if finance else None
+        if route is not None:
+            query = route.query
+            llm, hits, used_filter, reranked, context_hits, prompt, expanded = route.prepared()
+        else:
+            llm, hits, used_filter, reranked, context_hits, prompt, expanded = prepared
         extras = ask_flow._extra_queries(req, expanded)
         yield _sse(
             "meta",
@@ -303,10 +323,13 @@ def ask_stream(req: AskRequest) -> StreamingResponse:
                 "retrieved_hits": [h.model_dump() for h in ask_flow._hits_to_out(hits)],
             },
         )
-        if comparison_periods(req.query):
+        if route is not None and route.final:  # streamed as it is: no assess_evidence gate, validator or expansion
+            yield _sse("done", {"answer": route.answer, "citations": route.citations})
+            return
+        if comparison_periods(query):
             yield _sse("status", {"stage": "generating"})
             answer, citations = ask_flow._generate_answer(
-                llm, prompt, context_hits, req.max_new_tokens, req.query, extras,
+                llm, prompt, context_hits, req.max_new_tokens, query, extras,
                 [turn.model_dump() for turn in req.history],
             )
             yield _sse("done", {"answer": answer, "citations": citations})
@@ -314,7 +337,7 @@ def ask_stream(req: AskRequest) -> StreamingResponse:
         if not hits:
             yield _sse("done", {"answer": None, "citations": []})
             return
-        if not assess_evidence(req.query, context_hits, extra_queries=extras).sufficient:
+        if not assess_evidence(query, context_hits, extra_queries=extras).sufficient:
             yield _sse("done", {"answer": REFUSAL_LINE, "citations": []})
             return
 
@@ -332,7 +355,7 @@ def ask_stream(req: AskRequest) -> StreamingResponse:
             if EXPOSE_DEBUG_STATUS:
                 print(f"[backend] stream failed, falling back: {exc}", flush=True)
             # The non-streaming path carries the full retry/fallback logic.
-            answer, citations = ask_flow._generate_answer(llm, prompt, context_hits, req.max_new_tokens, req.query, extras)
+            answer, citations = ask_flow._generate_answer(llm, prompt, context_hits, req.max_new_tokens, query, extras)
             yield _sse("done", {"answer": answer, "citations": citations})
             return
 

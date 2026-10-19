@@ -10,10 +10,7 @@ from __future__ import annotations
 
 from typing import List
 
-try:
-    from langchain_text_splitters import RecursiveCharacterTextSplitter
-except ImportError:  # pragma: no cover -- fallback for older langchain
-    from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 
 # Order matters: try paragraph break first, then sentence-ending punctuation,

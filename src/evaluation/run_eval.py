@@ -37,6 +37,8 @@ from src.evaluation.retrieval_metrics import (
     per_query_metrics,
 )
 from src.pipeline import BuffettRAGPipeline, PipelineConfig
+from src.services import ask_flow, backend_app
+from src.services.schemas import AskRequest
 
 
 STRATEGIES = ["naive", "metadata", "vector", "hybrid"]
@@ -81,47 +83,57 @@ def evaluate_answers(
         raise RuntimeError("Pipeline was built without an LLM; cannot evaluate answers.")
     gold = get_gold_queries()
     out: List[Dict] = []
-    for g in gold:
-        # Never let a single failed query kill the whole run.
-        try:
-            result = pipeline.ask(
-                g.query, strategy=strategy, top_k=top_k, rerank=rerank
+    # The served answer path: the same ask_flow state and /ask handler the backend runs.
+    old_state = ask_flow._state
+    ask_flow._state = {
+        "retriever": pipeline.retriever, "docs": list(pipeline.docs_by_id.values()),
+        "docs_by_id": pipeline.docs_by_id, "llm": pipeline.llm,
+    }
+    try:
+        for g in gold:
+            # Never let a single failed query kill the whole run.
+            try:
+                response = backend_app.ask(
+                    AskRequest(query=g.query, strategy=strategy, top_k=top_k, rerank=rerank)
+                )
+            except Exception as exc:
+                print(f"    !! {g.qid} failed: {exc}")
+                out.append({"qid": g.qid, "query": g.query, "error": str(exc)[:300]})
+                continue
+            passages = [hit.model_dump() for hit in response.hits]
+            report = evaluate_faithfulness(response.answer or "", _hits_from_passages(passages))
+            # Crude answer-correctness signal: do gold answer keywords appear?
+            ak = [k.lower() for k in g.answer_keywords]
+            ans_lower = (response.answer or "").lower()
+            keyword_hit_rate = (
+                sum(1 for k in ak if k in ans_lower) / len(ak) if ak else None
             )
-        except Exception as exc:
-            print(f"    !! {g.qid} failed: {exc}")
-            out.append({"qid": g.qid, "query": g.query, "error": str(exc)[:300]})
-            continue
-        report = evaluate_faithfulness(result["answer"] or "", _hits_from_passages(result["passages"]))
-        # Crude answer-correctness signal: do gold answer keywords appear?
-        ak = [k.lower() for k in g.answer_keywords]
-        ans_lower = (result["answer"] or "").lower()
-        keyword_hit_rate = (
-            sum(1 for k in ak if k in ans_lower) / len(ak) if ak else None
-        )
-        out.append(
-            {
-                "qid": g.qid,
-                "query": g.query,
-                "answer": result["answer"],
-                "citations": result["citations"],
-                "passages": result["passages"],
-                "retrieved_passages": result.get("retrieved_passages", result["passages"]),
-                "answer_keyword_hit_rate": keyword_hit_rate,
-                "faithfulness": {
-                    "n_sentences": report.n_sentences,
-                    "citation_coverage": report.citation_coverage,
-                    "invalid_citation_rate": report.invalid_citation_rate,
-                    "mean_support": report.mean_support,
-                    "support_method": "lexical_bigram_proxy_not_entailment",
-                    "per_sentence": report.per_sentence,
-                },
-            }
-        )
+            out.append(
+                {
+                    "qid": g.qid,
+                    "query": g.query,
+                    "answer": response.answer,
+                    "citations": response.citations,
+                    "passages": passages,
+                    "retrieved_passages": [hit.model_dump() for hit in response.retrieved_hits],
+                    "answer_keyword_hit_rate": keyword_hit_rate,
+                    "faithfulness": {
+                        "n_sentences": report.n_sentences,
+                        "citation_coverage": report.citation_coverage,
+                        "invalid_citation_rate": report.invalid_citation_rate,
+                        "mean_support": report.mean_support,
+                        "support_method": "lexical_bigram_proxy_not_entailment",
+                        "per_sentence": report.per_sentence,
+                    },
+                }
+            )
+    finally:
+        ask_flow._state = old_state
     return out
 
 
 def _hits_from_passages(passages: List[Dict]):
-    """Re-wrap pipeline.ask passages into SearchHit-like duck-typed objects."""
+    """Re-wrap served passages into SearchHit-like duck-typed objects."""
     class _Hit:
         def __init__(self, p):
             self.text = p["text"]

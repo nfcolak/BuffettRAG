@@ -101,8 +101,8 @@ def test_citation_at_end_does_not_cover_next_uncited_claim():
     assert report.per_sentence[0]['support'] == 1.0
 
 
-def test_pipeline_exposes_exact_prompt_evidence_and_citation_ids():
-    from src.pipeline import BuffettRAGPipeline
+def test_backend_exposes_exact_prompt_evidence_and_citation_ids(monkeypatch):
+    from src.services import backend_app as backend, ask_flow
     from src.retrieval.retriever import RetrievalResult
     from src.retrieval.context import build_doc_lookup
     from src.storage import SearchHit
@@ -110,34 +110,40 @@ def test_pipeline_exposes_exact_prompt_evidence_and_citation_ids():
     hit = SearchHit(docs[1].id, docs[1].text, docs[1].metadata, 1.0)
 
     class FixedRetriever:
-        def search(self, *args, **kwargs):
-            return RetrievalResult(args[0], 'hybrid', [hit])
+        def search(self, **kwargs):
+            return RetrievalResult(kwargs['query'], 'hybrid', [hit])
 
     class EvidenceLLM:
-        def generate(self, prompt):
+        def generate(self, prompt, max_new_tokens=None):
             self.prompt = prompt
             return 'Operating earnings. [1,99]'
 
     llm = EvidenceLLM()
-    result = BuffettRAGPipeline(FixedRetriever(), build_doc_lookup(docs), llm).ask('Earnings?')
-    assert result['passages'][0]['text'] != hit.text
-    assert result['passages'][0]['text'] in llm.prompt
-    assert result['retrieved_passages'][0]['text'] == hit.text
-    assert result['citations'][0]['passage_ids'] == [hit.id]
-    assert result['citations'][0]['invalid_numbers'] == [99]
+    monkeypatch.setattr(ask_flow, '_state', {'retriever': FixedRetriever(), 'docs': docs,
+                                             'docs_by_id': build_doc_lookup(docs), 'llm': llm})
+    result = backend.ask(backend.AskRequest(query='Earnings?', expand_query=False))
+    assert result.hits[0].text != hit.text
+    assert result.hits[0].text in llm.prompt
+    assert result.retrieved_hits[0].text == hit.text
+    assert result.citations[0]['passage_ids'] == [hit.id]
+    assert result.citations[0]['invalid_numbers'] == [99]
 
 
 def test_answer_evaluation_persists_evidence_and_scoring_method(monkeypatch):
     from src.evaluation import run_eval
     from src.evaluation.gold_set import get_gold_queries
-    passage = {'id': '1977_0', 'text': 'Operating earnings increased.', 'year': 1977}
+    from src.services.schemas import AskResponse, HitOut
+    hit = HitOut(id='1977_0', score=1.0, year=1977, text='Operating earnings increased.')
+    passage = hit.model_dump()
 
     class OfflinePipeline:
         llm = object()
-        def ask(self, *args, **kwargs):
-            return {'answer': 'Operating earnings increased. [1]', 'passages': [passage],
-                    'citations': [], 'retrieved_passages': [passage]}
+        retriever = None
+        docs_by_id = {}
 
+    monkeypatch.setattr(run_eval.backend_app, 'ask', lambda req: AskResponse(
+        query=req.query, strategy=req.strategy, reranked=True, hits=[hit], retrieved_hits=[hit],
+        answer='Operating earnings increased. [1]'))
     monkeypatch.setattr(run_eval, 'get_gold_queries', lambda: get_gold_queries()[:1])
     monkeypatch.setattr(run_eval.time, 'sleep', lambda _: None)
     row = run_eval.evaluate_answers(OfflinePipeline())[0]
@@ -168,6 +174,9 @@ def test_backend_returns_prompt_passages_in_citation_order(monkeypatch):
     expanded = SearchHit('1977_0', 'before anchor after', {'year': 1977}, 1.0)
     monkeypatch.setitem(ask_flow._state, 'test_ready', True)
     monkeypatch.setattr(ask_flow, '_prepare_ask', lambda req: (None, [raw], None, False, [expanded], 'prompt', None))
+    # With FINANCE_PIPELINE=1 /ask prepares through finance_route instead; hand it the same prepared inputs.
+    monkeypatch.setattr(ask_flow, 'finance_route', lambda req: ask_flow.FinanceRoute(
+        route='reader', plan=None, query=req.query, hits=[expanded], retrieved_hits=[raw], prompt='prompt'))
     monkeypatch.setattr(ask_flow, '_generate_answer', lambda *args: ('Evidence. [1]', []))
     result = backend.ask(backend.AskRequest(query='Earnings?'))
     assert result.hits[0].text == expanded.text

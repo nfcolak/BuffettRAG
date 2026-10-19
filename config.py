@@ -200,6 +200,35 @@ def retrieval_setting(name: str):
     return type(default)(float(raw)) if isinstance(default, int) else float(raw)
 
 
+# -----------------------------------------------------------------------------
+# Finance pipeline settings (openspec change finance-query-pipeline), read from the environment AT CALL TIME.
+# Nothing reads them unless FINANCE_PIPELINE=1, so the defaults leave flag-off behaviour unchanged.
+# -----------------------------------------------------------------------------
+FINANCE_DEFAULTS: dict = {
+    "FINANCE_K": 12,                   # passages finance_search returns, before the neighbour merge
+    "FINANCE_OVERFETCH": 3,            # candidates fetched per ranking = max(RETRIEVAL_FETCH_K, k * this)
+    "FINANCE_YEAR_BOOST_WEIGHT": 2,    # weight of the year-filtered ranking against the unfiltered one
+    "FINANCE_YEAR_KEEP": 3,            # year boost only: the top-N unfiltered hits stay served even outside the range
+    "FINANCE_ENTITY_BOOST_WEIGHT": 1,  # weight of the ranking of passages tagged with the plan's entities
+    "FINANCE_MAX_PER_LETTER": 2,       # trend / period / corpus_wide: passages per letter at most
+    "FINANCE_MIN_LETTERS": 4,          # trend / period / corpus_wide: different letters at least, when available
+}
+
+
+def finance_setting(name: str):
+    """Typed value of a finance pipeline setting; the environment wins, read on every call."""
+    default = FINANCE_DEFAULTS[name]
+    raw = os.environ.get(name)
+    if raw is None or not raw.strip():
+        return default
+    return type(default)(float(raw))
+
+
+def finance_pipeline_enabled() -> bool:
+    """FINANCE_PIPELINE=1 at call time (default off: today's query path, byte for byte)."""
+    return (os.environ.get("FINANCE_PIPELINE") or "").strip() == "1"
+
+
 def llm_n_ctx() -> int:
     """LLM_N_CTX at call time (default 16384): the llama window and the prompt budget of the served context."""
     raw = os.environ.get("LLM_N_CTX")
@@ -207,7 +236,7 @@ def llm_n_ctx() -> int:
 
 
 def llm_context_passages() -> int:
-    """LLM_CONTEXT_PASSAGES at call time (default: 8 for 7B GGUF models, else 5)."""
+    """LLM_CONTEXT_PASSAGES at call time (default: 16 for 7B GGUF models, else 5)."""
     raw = os.environ.get("LLM_CONTEXT_PASSAGES")
     return int(raw) if raw and raw.strip() else int(_DEFAULT_CONTEXT_PASSAGES)
 

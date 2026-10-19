@@ -35,7 +35,7 @@ os.environ.setdefault("HF_HUB_OFFLINE", "1")
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 
-MAIN = Path("/Users/necatifurkancolak/AI-Workplace/Projects/current/BuffettRAG")  # git-ignored data lives here
+MAIN = ROOT  # git-ignored data lives here
 EVAL = ROOT / "data" / "evaluation"
 CASE_FILES = {
     "heldout_v3": "heldout_v3/answer_benchmark_heldout_v3.json",
@@ -47,7 +47,7 @@ CASE_FILES = {
     "dev_cases": "grounded_dev_v1/confirm/dev_cases.json",
 }
 HARD_NEGATIVES = "hard_negatives_v4/hard_negatives_v4.json"
-STORED_V6 = Path("/Users/necatifurkancolak/AI-Workplace/Artifacts/BuffettRAG/fix-v6/runs")
+STORED_V6 = Path(os.environ.get("BUFFETTRAG_ARTIFACTS", ROOT.parents[2] / "Artifacts" / "BuffettRAG")) / "fix-v6" / "runs"
 TOKENIZER_DIR = MAIN / "models/ft/7b_r1/adapter"  # Qwen2.5-7B tokenizer of the served FT model
 MIN_ANSWER_TOKENS = 768  # tokens left for the answer at the default n_ctx 8192 (max_new_tokens 900 in the request)
 LONG_CTX_ANSWER_TOKENS = 1024  # configs that set MAX_NEW_TOKENS keep this many tokens free

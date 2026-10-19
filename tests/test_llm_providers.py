@@ -196,9 +196,7 @@ if __name__ == "__main__":
     unittest.main()
 
 
-_FT_V4_VALID = Path(
-    "/Users/necatifurkancolak/AI-Workplace/Projects/current/BuffettRAG/data/ft_v4/valid.jsonl"
-)
+_FT_V4_VALID = Path(__file__).resolve().parents[1] / "data/ft_v4/valid.jsonl"
 
 
 def test_split_prompt_keeps_answer_cue_and_training_system_prompt():

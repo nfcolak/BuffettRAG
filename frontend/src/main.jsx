@@ -236,6 +236,11 @@ function TopBar({ health }) {
   );
 }
 
+// Retrieval internals (strategy, rerank, LLM toggle) show only with ?debug=1; hidden, the defaults in App's config apply.
+const DEBUG_UI = new URLSearchParams(window.location.search).get("debug") === "1";
+// Exact text of the backend's scope reply (src/generation/finance_answer.py SCOPE_REPLY).
+const SCOPE_REPLY = "I only answer questions about Buffett's financial views and Berkshire's financial results.";
+
 function LeftRail({ config, setConfig, onPickExample, onClear }) {
   const setKey = (key, value) => setConfig((current) => ({ ...current, [key]: value }));
 
@@ -244,20 +249,22 @@ function LeftRail({ config, setConfig, onPickExample, onClear }) {
       <div className="rail-section">
         <h3 className="rail-heading"><span className="hash">#</span> Retrieval</h3>
 
-        <div className="field">
-          <div className="field-label">Strategy</div>
-          <div className="segmented cols-4">
-            {["hybrid", "vector", "metadata", "naive"].map((strategy) => (
-              <button
-                key={strategy}
-                className={`seg-btn ${config.strategy === strategy ? "active" : ""}`}
-                onClick={() => setKey("strategy", strategy)}
-              >
-                {strategy}
-              </button>
-            ))}
+        {DEBUG_UI && (
+          <div className="field">
+            <div className="field-label">Strategy</div>
+            <div className="segmented cols-4">
+              {["hybrid", "vector", "metadata", "naive"].map((strategy) => (
+                <button
+                  key={strategy}
+                  className={`seg-btn ${config.strategy === strategy ? "active" : ""}`}
+                  onClick={() => setKey("strategy", strategy)}
+                >
+                  {strategy}
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
 
         <div className="field">
           <div className="field-label">
@@ -274,18 +281,22 @@ function LeftRail({ config, setConfig, onPickExample, onClear }) {
           />
         </div>
 
-        <Toggle
-          label="Rerank (cross-encoder)"
-          hint="bge-reranker-v2-m3"
-          on={config.rerank}
-          onChange={(value) => setKey("rerank", value)}
-        />
-        <Toggle
-          label="Generate answer (LLM)"
-          hint="off = retrieval only"
-          on={config.useLlm}
-          onChange={(value) => setKey("useLlm", value)}
-        />
+        {DEBUG_UI && (
+          <>
+            <Toggle
+              label="Rerank (cross-encoder)"
+              hint="bge-reranker-v2-m3"
+              on={config.rerank}
+              onChange={(value) => setKey("rerank", value)}
+            />
+            <Toggle
+              label="Generate answer (LLM)"
+              hint="off = retrieval only"
+              on={config.useLlm}
+              onChange={(value) => setKey("useLlm", value)}
+            />
+          </>
+        )}
       </div>
 
       <div className="rail-section">
@@ -404,6 +415,7 @@ function Message({ msg, isSelected, onSelectSources }) {
   const avatar = isUser ? `${import.meta.env.BASE_URL}assets/user_avatar.png` : `${import.meta.env.BASE_URL}assets/assistant_avatar.png`;
   const blocks = String(msg.content || "").split(/\n{2,}/).filter(Boolean);
   const isLlmError = !isUser && String(msg.content || "").startsWith("[LLM unavailable");
+  const isScopeReply = !isUser && String(msg.content || "").trim() === SCOPE_REPLY;
 
   return (
     <div className={`msg ${isUser ? "user" : "assistant"}`}>
@@ -415,7 +427,10 @@ function Message({ msg, isSelected, onSelectSources }) {
           </span>
           <span className="msg-time">{msg.created_at}</span>
         </div>
-        <div className={`msg-bubble${isLlmError ? " llm-error" : ""}`}>
+        <div
+          className={`msg-bubble${isLlmError ? " llm-error" : ""}${isScopeReply ? " scope-reply" : ""}`}
+          style={isScopeReply ? { fontStyle: "italic", borderLeft: "3px solid currentColor", opacity: 0.85 } : undefined}
+        >
           {blocks.length ? blocks.map((block, index) => renderBlock(block, index)) : <p />}
           {msg.pending && msg.stage && <div className="stage-line">{STAGE_LABELS[msg.stage] || ""}</div>}
         </div>
@@ -467,7 +482,7 @@ function EmptyState() {
       <div className="empty-emblem">
         <img src={`${import.meta.env.BASE_URL}assets/chatbot_avatar.png`} alt="" />
       </div>
-      <h2 className="empty-title">Ask anything about Buffett's letters</h2>
+      <h2 className="empty-title">Ask about Buffett's financial views and Berkshire's results</h2>
       <p className="empty-sub">
         Retrieval-augmented search across 48 Berkshire Hathaway shareholder letters.
         Try a question, or pick one from the prompts panel.
