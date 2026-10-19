@@ -37,8 +37,8 @@ from src.retrieval.context import build_doc_lookup
 from src.retrieval.retriever import Retriever
 from src.storage import SearchHit, load_chunks_as_docs
 
-GROUNDED_PROVIDERS = frozenset({"grounded", "mlx"})
-COMPOSERS = ("mlx", "llama", "template")
+GROUNDED_PROVIDERS = frozenset()
+COMPOSERS = ("llama", "template")
 DEFAULT_CASES = ROOT / "data/evaluation/heldout_v1/answer_benchmark_heldout_v1.json"
 
 
@@ -305,18 +305,9 @@ class _Sidecar:
             return
         resumes = self.manifest.get("resumes", [])
         settings: Any = None
-        try:
-            import dataclasses
-            from src.generation.grounded.settings import GroundedSettings
-            settings = {k: (str(v) if isinstance(v, Path) else v)
-                        for k, v in dataclasses.asdict(GroundedSettings.from_env()).items()}
-        except Exception as exc:
-            settings = {"unavailable": type(exc).__name__}
         status = _git("status", "--porcelain")
         provider_attr = getattr(llm._provider, "temperature", None) if llm is not None else None
         paths = {"model_path": model_path}
-        if model_path is None and provider == "grounded" and isinstance(settings, dict):
-            paths = {"model_path": settings.get({"mlx": "MLX_MODEL", "llama": "LLAMA_MODEL"}.get(composer or "", ""))}
         self.manifest = {
             "schema_version": 1, "started_utc": self.manifest.get("started_utc", started),
             "code_sha": _git("rev-parse", "HEAD"), "code_dirty": bool(status) if status is not None else None,
@@ -380,17 +371,15 @@ def run(
     if max_cases is not None and max_cases < 1:
         raise ValueError("max_cases must be positive")
     grounded_run = provider in GROUNDED_PROVIDERS
-    if provider == "grounded" and composer not in COMPOSERS:
-        raise ValueError("--composer {mlx,llama,template} is required with the grounded provider (no auto)")
-    if composer is not None and provider != "grounded":
-        raise ValueError("--composer applies only to the grounded provider")
+    if composer is not None:
+        raise ValueError("--composer was removed with the grounded engine")
     if model_path is not None:
-        if provider not in {"llama", "mlx", "grounded"} or (provider == "grounded" and composer == "template"):
-            raise ValueError("--model-path applies only to llama, mlx or grounded (mlx/llama composer)")
+        if provider != "llama":
+            raise ValueError("--model-path applies only to the llama provider")
         if not Path(model_path).is_absolute():
             raise ValueError("--model-path must be absolute")
     if resume and (output is None or not grounded_run):
-        raise ValueError("--resume needs --output and a grounded or mlx provider")
+        raise ValueError("--resume applied to grounded runs, which were removed")
     corpus, cases_path = corpus.resolve(), cases_path.resolve()
     payload = json.loads(cases_path.read_text(encoding="utf-8"))
     cases = payload["cases"]
@@ -426,11 +415,8 @@ def run(
     try:
         # Temperature goes through config LLM_TEMPERATURE (env + attr) before creation.
         os.environ["LLM_TEMPERATURE"] = repr(temperature)
-        if composer:
-            os.environ["GROUNDED_COMPOSER"] = composer
         if model_path is not None:
             kind = composer or provider
-            os.environ["GROUNDED_LLAMA_MODEL" if kind == "llama" else "GROUNDED_MLX_MODEL"] = str(model_path)
             if kind == "llama":
                 os.environ["LLM_MODEL_PATH"] = str(model_path)
         import config
@@ -590,12 +576,10 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--cases", type=Path, default=DEFAULT_CASES)
     parser.add_argument("--corpus", type=Path, default=CHUNKS_V3_FILE)
-    parser.add_argument("--provider", choices=("llama", "grounded", "mlx"), default=DEFAULT_LLM_PROVIDER)
-    parser.add_argument("--composer", choices=COMPOSERS, default=None,
-                        help="required with --provider grounded; there is no auto")
-    parser.add_argument("--model-path", type=Path, default=None, help="absolute model path (llama/mlx/grounded)")
+    parser.add_argument("--provider", choices=("llama",), default=DEFAULT_LLM_PROVIDER)
+    parser.add_argument("--model-path", type=Path, default=None, help="absolute model path (llama)")
     parser.add_argument("--resume", action="store_true",
-                        help="grounded/mlx: skip qids already in <output>.rows.jsonl")
+                        help="skip qids already in <output>.rows.jsonl (grounded runs only; removed)")
     parser.add_argument("--temperature", type=float, default=0.0)
     parser.add_argument("--max-cases", type=int, default=None)
     parser.add_argument("--qids", default=None, help="comma-separated qids; only these cases are run")
@@ -606,7 +590,7 @@ def main() -> int:
     try:
         result = run(args.corpus, args.cases, provider=args.provider,
                      temperature=args.temperature, max_cases=args.max_cases, retrieval=args.retrieval, save_raw=args.save_raw,
-                     composer=args.composer, model_path=args.model_path, output=args.output, resume=args.resume,
+                     composer=None, model_path=args.model_path, output=args.output, resume=args.resume,
                      qids=[q.strip() for q in args.qids.split(",") if q.strip()] if args.qids else None)
         args.output.parent.mkdir(parents=True, exist_ok=True)
         args.output.write_text(json.dumps(result, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")

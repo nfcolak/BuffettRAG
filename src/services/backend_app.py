@@ -3,7 +3,7 @@
 Deployment: runs on the Nuvolos **Backend app**.
 Responsibilities:
     - Loads chunks once at startup
-    - Connects to pgvector (Database app) for vector storage
+    - Loads the FAISS index for vector storage
     - Hosts the configured embedding model and cross-encoder reranker
       (see EMBEDDING_MODEL_PRIMARY and RERANKER_MODEL in config.py)
     - Runs retrieval (vector / metadata / hybrid) and reranking
@@ -178,9 +178,6 @@ async def startup() -> None:
     ask_flow._state["docs"] = docs
     ask_flow._state["docs_by_id"] = build_doc_lookup(docs)
     ask_flow._state["chunks_path"] = str(chunks_path)
-    if DEFAULT_LLM_PROVIDER == "grounded":
-        # Create the provider now so it shares the retriever's reranker (one scorer).
-        ask_flow.attach_grounded_resources(ask_flow._server_llm(), retriever)
 
 
 # -----------------------------------------------------------------------------
@@ -253,13 +250,7 @@ def ask(req: AskRequest) -> AskResponse:
 
     answer: Optional[str] = None
     citations: List[Dict[str, Any]] = []
-    if ask_flow.is_grounded(llm):
-        # The engine owns refusal/partial/no-hit/comparison decisions; no gate here.
-        answer, citations = ask_flow._generate_grounded(
-            llm, req.query, context_hits, req.max_new_tokens,
-            [turn.model_dump() for turn in req.history],
-        )
-    elif hits or comparison_periods(req.query):
+    if hits or comparison_periods(req.query):
         answer, citations = ask_flow._generate_answer(
             llm, prompt, context_hits, req.max_new_tokens, req.query, ask_flow._extra_queries(req, expanded),
             [turn.model_dump() for turn in req.history],
@@ -312,15 +303,6 @@ def ask_stream(req: AskRequest) -> StreamingResponse:
                 "retrieved_hits": [h.model_dump() for h in ask_flow._hits_to_out(hits)],
             },
         )
-        if ask_flow.is_grounded(llm):
-            yield _sse("status", {"stage": "generating"})
-            answer, citations = ask_flow._generate_grounded(
-                llm, req.query, context_hits, req.max_new_tokens,
-                [turn.model_dump() for turn in req.history],
-            )
-            yield _sse("status", {"stage": "validating"})
-            yield _sse("done", {"answer": answer, "citations": citations})
-            return
         if comparison_periods(req.query):
             yield _sse("status", {"stage": "generating"})
             answer, citations = ask_flow._generate_answer(

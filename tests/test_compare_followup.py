@@ -69,7 +69,7 @@ def test_neighbor_evidence_has_its_own_citation_identity():
     assert EARLY not in context[0].text and context[1].text == EARLY
 
 
-@pytest.mark.parametrize("provider_name", ["llama", "mlx"])
+@pytest.mark.parametrize("provider_name", ["llama"])
 def test_comparison_isolates_generation_validates_and_renumbers(provider_name):
     class Capture:
         def generate(self, prompt, max_new_tokens=None):

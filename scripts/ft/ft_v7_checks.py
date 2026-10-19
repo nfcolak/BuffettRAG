@@ -120,7 +120,7 @@ def distinctive_missing(term):
 
 # ------------------------------------------------------------------ partial answers (REFUSAL-05, RL-05, DS-07)
 def gap_line(part):
-    """The gap sentence. Wording = the coverage note the grounded engine writes (generation/grounded/engine.py `_coverage_note`),
+    """The gap sentence. Wording = the coverage note of the removed grounded engine,
     which is what prompt v3 means by 'write a gap line only for a part that is genuinely absent'.
 
     It has no [n]: the serving validator removes an uncited line, so the user never sees it and the answer keeps only verified

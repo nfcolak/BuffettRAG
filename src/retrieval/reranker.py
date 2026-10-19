@@ -21,7 +21,7 @@ from config import EMBEDDING_DEVICE, RERANKER_MODEL
 from src.storage import SearchHit
 
 # One process-wide lock serialising every inference on a shared reranker
-# (rerank and score_pairs); re-exported by grounded.resources.rerank_lock().
+# (rerank and score_pairs).
 RERANK_LOCK = threading.RLock()
 
 

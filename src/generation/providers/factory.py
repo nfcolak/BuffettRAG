@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 
 
 def create_llm_provider(provider: Optional[str] = None) -> LLMProvider:
-    """Create the answer provider: ``llama`` (default), ``mlx`` or ``grounded``.
+    """Create the answer provider: ``llama`` (default).
 
     When the llama model file or ``llama_cpp`` is unavailable an
     ``UnavailableProvider`` is returned: the backend still starts and search works,
@@ -38,16 +38,5 @@ def create_llm_provider(provider: Optional[str] = None) -> LLMProvider:
         return LlamaCppProvider(model_path=path)
 
     if selected in ("local", "extractive"):
-        raise ValueError("The extractive engine was removed; use 'llama', 'mlx' or 'grounded'.")
-    # Factory-local imports: grounded/mlx stay out of the import graph of old providers.
-    if selected == "grounded":
-        from src.generation.providers.grounded_provider import GroundedProvider
-
-        return GroundedProvider()
-
-    if selected == "mlx":
-        from src.generation.providers.mlx_provider import MlxProvider
-
-        return MlxProvider()
-
+        raise ValueError("The extractive engine was removed; use 'llama'.")
     raise ValueError(f"Unsupported LLM provider: {selected}")

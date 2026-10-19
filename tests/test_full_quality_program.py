@@ -313,23 +313,6 @@ def test_backend_prefers_structured_expansion_without_replacing_original_query(m
     assert seen == [None]
 
 
-def test_demo_security_rejects_private_backend_and_enforces_request_budget(monkeypatch):
-    import socket
-    from src.services.demo_security import DemoRequestBudget, validate_demo_backend_url
-
-    monkeypatch.setattr(socket, "getaddrinfo", lambda *_args, **_kwargs: [
-        (socket.AF_INET, socket.SOCK_STREAM, 6, "", ("8.8.8.8", 443)),
-    ])
-    assert validate_demo_backend_url("https://demo.example.com", allowed_hosts={"demo.example.com"}) == "https://demo.example.com"
-    assert validate_demo_backend_url("http://127.0.0.1:8000", allowed_hosts={"127.0.0.1"}) is None
-    assert validate_demo_backend_url("https://2130706433", allowed_hosts={"2130706433"}) is None
-    assert validate_demo_backend_url("https://foo.localhost", allowed_hosts={"foo.localhost"}) is None
-    assert validate_demo_backend_url("https://other.example.com", allowed_hosts={"demo.example.com"}) is None
-    budget = DemoRequestBudget(max_requests=1, max_tokens=10)
-    assert budget.allow("session", tokens=5) is True
-    assert budget.allow("session", tokens=5) is False
-
-
 def test_backend_request_validation_rejects_unsafe_payloads(monkeypatch):
     from pydantic import ValidationError
     from src.services import schemas as backend
@@ -401,14 +384,6 @@ def test_backend_rejects_oversized_body_before_endpoint(monkeypatch):
     assert response.status_code == 413
 
 
-def test_demo_token_reservation_includes_context_and_output_allowance():
-    from src.services.demo_security import estimate_token_reservation
-
-    reserved = estimate_token_reservation("short question", max_output_tokens=500,
-                                          context_token_allowance=1500)
-    assert reserved >= 2000
-
-
 def test_claim_validator_rejects_negation_number_and_citation_line_smuggling():
     from src.evaluation.claim_validator import validate_and_filter_answer
 
@@ -461,19 +436,6 @@ def test_answer_benchmark_requires_claim_level_gold_citation_and_polarity():
     paired_hits = [_hit("revenue", "Revenue was $10."), _hit("costs", "Costs were $7.")]
     assert not evaluate_answer("Revenue was $10. [2] Costs were $7. [1]", paired_hits, paired_case)["accepted"]
     assert evaluate_answer("Revenue was $10. [1] Costs were $7. [2]", paired_hits, paired_case)["accepted"]
-
-
-def test_demo_evidence_html_escapes_backend_supplied_text():
-    from src.services.demo_security import render_evidence_html
-
-    rendered = render_evidence_html({
-        "year": "2024<script>alert(1)</script>",
-        "source_file": "letter <img src=x>",
-        "text": "Evidence <script>alert(1)</script>",
-    }, 1)
-    assert "<script>" not in rendered
-    assert "&lt;script&gt;" in rendered
-    assert "<img" not in rendered
 
 
 def test_validator_accepts_attributed_paraphrase_and_blocks_changes():

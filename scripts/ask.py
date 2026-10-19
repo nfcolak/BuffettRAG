@@ -30,7 +30,7 @@ def main() -> None:
     ap.add_argument("--no-rerank", action="store_true")
     ap.add_argument("--no-llm", action="store_true",
                     help="Skip LLM; just print retrieved passages")
-    ap.add_argument("--provider", choices=["llama", "mlx", "grounded"], default=None,
+    ap.add_argument("--provider", choices=["llama"], default=None,
                     help="Answer provider (default: config)")
     ap.add_argument("--year", type=int, default=None)
     ap.add_argument("--decade", type=int, default=None)
