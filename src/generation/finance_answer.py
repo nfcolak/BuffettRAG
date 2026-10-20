@@ -190,7 +190,7 @@ def expansion_hits(hits: Sequence[SearchHit], store: KnowledgeStore) -> List[Sea
             for h in hits]
 
 
-_SENTENCE_END_RE = re.compile(r"(?<=[.!?])((?:\s*\[\d+(?:\s*,\s*\d+)*\])*)\s+")
+_SENTENCE_END_RE = re.compile(r"(?<=[.!?])((?:\s*\[\d+(?:\s*,\s*\d+)*\])*)\s+(?=[^\s\[])")
 _CITE_RE = re.compile(r"\[(\d+(?:\s*,\s*\d+)*)\]")
 # Personal cues in an answer sentence (narrower than the planner's question rules: no generic words like "sports").
 _PERSONAL_SENTENCE = re.compile(
