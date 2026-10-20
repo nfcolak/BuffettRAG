@@ -235,6 +235,10 @@ FINANCE_DEFAULTS: dict = {
     "FINANCE_THEME_CENTROIDS": 1,      # 1: theme inference also matches tagged-passage summary centroids
     "FINANCE_SOURCE_SLOTS": 0,         # served slots reserved for source candidates below the rerank cut
     "FINANCE_PLAN_TERM_BOOST": 5,      # integer, hundredths (5 = +0.05): rerank score bonus for candidates tagged with the plan's targets (0 = off)
+    "FINANCE_WINDOW_TOKENS": 0,        # 1: finance reader trim counts tokens (server /tokenize, else tokenizer.json, else chars/4)
+    "FINANCE_MULTI_QUERY": 0,          # extra theme-description searches for view/opinion plans (0 = off)
+    "FINANCE_DIGEST_QUERY": 0,         # 1: one extra search with the matching digest's summary as the query
+    "FINANCE_SUPERLATIVE_TAGGED": 0,   # superlative route: serve up to N positive-stance passages of the winner (0 = off)
 }
 
 
