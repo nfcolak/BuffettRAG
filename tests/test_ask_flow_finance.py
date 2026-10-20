@@ -230,3 +230,38 @@ def test_superlative_question_is_ranked_from_the_annotations_on_both_endpoints(e
     assert body["hits"] and [h["id"] for h in body["hits"]] == [h["id"] for h in events["meta"]["hits"]]
     assert _resolves(body["answer"], body["hits"]) and env.llm.prompts == []
     assert env.retriever.calls == [("hybrid", None)] * 2  # only the scope vote of each request
+
+
+SCHEMA_KEYS = {"query", "strategy", "reranked", "used_filter", "hits", "retrieved_hits", "answer", "citations"}
+
+
+def test_debug_off_leaves_the_response_schema_unchanged(env, monkeypatch):
+    monkeypatch.delenv("FINANCE_DEBUG", raising=False)
+    for query in (PERSONAL_Q, TREND_Q):
+        assert set(_ask(env, query)) == SCHEMA_KEYS
+
+
+def test_debug_on_adds_route_plan_raw_answer_validator_and_served_ids(env, monkeypatch):
+    monkeypatch.setenv("FINANCE_DEBUG", "1")
+    first = " ".join(env.docs["1986_p0118"].text.split(". ")[0].split()).rstrip(".")  # first sentence of the oldest served passage
+    env.llm.reply = f"{first} [1]. Nothing in the letters supports this invented claim about zebras [1]."
+    body = _ask(env, TREND_Q)
+    assert set(body) == SCHEMA_KEYS | {"debug"}
+    debug = body["debug"]
+    assert debug["route"] == "reader" and debug["plan"]["kind"] and "scope" in debug["plan"]
+    assert debug["raw_answer"] == env.llm.reply
+    assert debug["refusal_retry"] is False
+    assert debug["prompt_chars"] == len(env.llm.prompts[0])
+    assert debug["served_ids"] == [h["id"] for h in body["hits"]]
+    validator = debug["validator"]
+    assert set(validator) == {"kept", "dropped"}
+    assert all({"sentence", "reason"} <= set(d) for d in validator["dropped"])
+    assert len(validator["kept"]) == 1 and len(validator["dropped"]) == 1
+    assert validator["dropped"][0]["reason"] == "unsupported_claim"
+
+
+def test_debug_on_finished_route_reports_route_and_no_raw_answer(env, monkeypatch):
+    monkeypatch.setenv("FINANCE_DEBUG", "1")
+    debug = _ask(env, PERSONAL_Q)["debug"]
+    assert debug["route"] == "scope" and debug["raw_answer"] is None and debug["prompt_chars"] == 0
+    assert debug["served_ids"] == [] and debug["refusal_retry"] is False

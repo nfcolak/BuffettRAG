@@ -49,7 +49,8 @@ def record(case: dict, half: str, resp, data: dict, seconds: float) -> dict:
             "answer": data.get("answer"), "citations": data.get("citations"), "used_filter": data.get("used_filter"),
             "served_ids": [h.get("id") for h in data.get("hits") or []],
             "retrieved_ids": [h.get("id") for h in data.get("retrieved_hits") or []],
-            "error": data.get("error") or data.get("detail")}
+            "error": data.get("error") or data.get("detail"),
+            **({"debug": data["debug"]} if data.get("debug") is not None else {})}
 
 
 def main(argv=None) -> None:

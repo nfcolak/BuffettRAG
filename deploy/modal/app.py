@@ -3,7 +3,7 @@
 Why one container: the bge reranker takes ~17-19 s per question on CPU (measured on the Mac) and ~1-2 s on the GPU.
 Deploy:  modal deploy deploy/modal/app.py   (needs the volume `buffettrag-models` with the FT-r1 GGUF and the
 secrets `buffettrag-llm-token` (LLM_TOKEN) and `buffettrag-site-password` (SITE_PASSWORD)).
-Staging:  APP_NAME=buffettrag-app-staging FINANCE_PIPELINE=1 modal deploy deploy/modal/app.py
+Staging:  APP_NAME=buffettrag-app-staging FINANCE_PIPELINE=1 [FINANCE_DEBUG=1] modal deploy deploy/modal/app.py
 The live name `buffettrag-app` is deployed only with DEPLOY_LIVE=1.
 """
 import os
@@ -40,7 +40,7 @@ def _baked_env() -> dict:
     """Deploy-time settings copied into the image: a local env variable does not reach the container otherwise."""
     if not modal.is_local():
         return {}
-    return {k: os.environ[k] for k in ("FINANCE_PIPELINE", "KNOWLEDGE_DIR") if os.environ.get(k)}
+    return {k: os.environ[k] for k in ("FINANCE_PIPELINE", "FINANCE_DEBUG", "KNOWLEDGE_DIR") if os.environ.get(k)}
 
 
 def _download_retrieval_models() -> None:

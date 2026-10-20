@@ -231,6 +231,11 @@ def finance_pipeline_enabled() -> bool:
     return (os.environ.get("FINANCE_PIPELINE") or "").strip() == "1"
 
 
+def finance_debug_enabled() -> bool:
+    """FINANCE_DEBUG=1 at call time (staging only; default off: /ask responses keep today's schema)."""
+    return (os.environ.get("FINANCE_DEBUG") or "").strip() == "1"
+
+
 def llm_n_ctx() -> int:
     """LLM_N_CTX at call time (default 16384): the llama window and the prompt budget of the served context."""
     raw = os.environ.get("LLM_N_CTX")

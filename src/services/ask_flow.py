@@ -184,21 +184,36 @@ def is_citation_only(answer: str) -> bool:
     return len(_ANSWER_WORD_RE.findall(_CITATION_MARKER_RE.sub(" ", answer or ""))) < _MIN_ANSWER_WORDS
 
 
-def _finalize_answer(llm, prompt: str, context_hits, raw_answer: str, max_new_tokens: int):
+def _finalize_answer(llm, prompt: str, context_hits, raw_answer: str, max_new_tokens: int,
+                     trace: Optional[Dict[str, Any]] = None):
     """Format and resolve citation references; this is not entailment validation.
+
+    `trace` (FINANCE_DEBUG only) collects the raw output and the validator's kept/dropped sentences.
 
     A refusal is not a provider error. Repeating the same prompt until the
     model answers selects against justified abstention without new evidence.
     """
     answer = format_answer_markdown(strip_chat_artifacts(raw_answer))
+    if trace is not None:
+        trace["raw_answer"] = raw_answer
     if is_citation_only(answer):
+        if trace is not None:
+            trace["validator"] = {"skipped": "citation_only", "kept": [], "dropped": []}
         # A bare "[5]" is a failed generation, not an answer: refuse, with no citations.
         if EXPOSE_DEBUG_STATUS:
             print(f"[backend] citation-only answer {answer!r}, refusing", flush=True)
         return REFUSAL_LINE, []
     if answer == REFUSAL_LINE:
+        if trace is not None:
+            trace["validator"] = {"skipped": "model_refused", "kept": [], "dropped": []}
         return answer, []
     validation = validate_and_filter_answer(answer, context_hits)
+    if trace is not None:
+        trace["validator"] = {
+            "kept": [s["sentence"] for s in validation.sentences if s["kept"]],
+            "dropped": [{"sentence": s["sentence"], "reason": s["reason"], "failed_claims": s.get("failed_claims", [])}
+                        for s in validation.sentences if not s["kept"]],
+        }
     answer = validation.safe_answer or REFUSAL_LINE
     if answer != REFUSAL_LINE:
         answer = expand_answer(answer, context_hits)
@@ -211,9 +226,13 @@ def _refusal_retry_enabled() -> bool:
 
 
 def _generate_answer(llm, prompt: str, context_hits, max_new_tokens: int, query: Optional[str] = None,
-                     extra_queries=(), history=None, per_period: Optional[bool] = None):
+                     extra_queries=(), history=None, per_period: Optional[bool] = None,
+                     trace: Optional[Dict[str, Any]] = None):
     """`per_period` None: answer per period when the query names comparison periods (the legacy rule); the finance
-    route passes its own decision (True only for comparison plans), so a trend gets one reader call."""
+    route passes its own decision (True only for comparison plans), so a trend gets one reader call.
+    `trace` (FINANCE_DEBUG only) is filled in place: raw_answer, validator, refusal_retry, refusal_by."""
+    if trace is not None:
+        trace["refusal_retry"] = False
     if per_period is None:
         is_comparison = bool(query and comparison_periods(query))
     else:
@@ -227,6 +246,8 @@ def _generate_answer(llm, prompt: str, context_hits, max_new_tokens: int, query:
             and 0.15 <= evidence.best_overlap < 0.30
         )
         if not evidence.sufficient and not soft_gate:
+            if trace is not None:
+                trace["refusal_by"] = "evidence_gate"
             return REFUSAL_LINE, []
         if EXPOSE_DEBUG_STATUS:
             print(f"[backend] evidence overlap: {evidence.best_overlap:.3f}", flush=True)
@@ -245,6 +266,9 @@ def _generate_answer(llm, prompt: str, context_hits, max_new_tokens: int, query:
                 llm, query, context_hits, history=history, max_new_tokens=max_new_tokens,
                 extra_queries=extra_queries,
             )
+            if trace is not None:
+                trace["raw_answer"] = comparison.answer  # per-period answers, already assembled and validated
+                trace["raw_answer_note"] = "per_period"
             expanded = expand_answer(comparison.answer, context_hits)
             if expanded == comparison.answer:
                 return comparison.answer, comparison.citations
@@ -254,7 +278,9 @@ def _generate_answer(llm, prompt: str, context_hits, max_new_tokens: int, query:
         if EXPOSE_DEBUG_STATUS:
             print(f"[backend] LLM provider unavailable: {exc}", flush=True)
         return _llm_error_message(exc), []
-    answer, citations = _finalize_answer(llm, prompt, context_hits, raw_answer, max_new_tokens)
+    answer, citations = _finalize_answer(llm, prompt, context_hits, raw_answer, max_new_tokens, trace)
+    if answer == REFUSAL_LINE and trace is not None:
+        trace["refusal_by"] = "model_or_validator"
     if answer == REFUSAL_LINE and soft_gate and len(context_hits) > 3 and _refusal_retry_enabled():
         # The soft gate let weak evidence through and the model refused: ask once with the top 3 passages.
         top = list(context_hits[:3])
@@ -265,8 +291,16 @@ def _generate_answer(llm, prompt: str, context_hits, max_new_tokens: int, query:
             if EXPOSE_DEBUG_STATUS:
                 print(f"[backend] LLM provider unavailable: {exc}", flush=True)
             return answer, citations
-        retried = _finalize_answer(llm, retry_prompt, top, retry_raw, max_new_tokens)
+        retry_trace: Optional[Dict[str, Any]] = {} if trace is not None else None
+        retried = _finalize_answer(llm, retry_prompt, top, retry_raw, max_new_tokens, retry_trace)
+        if trace is not None:
+            trace["refusal_retry"] = True
+            trace["first_raw_answer"] = trace.get("raw_answer")
+            trace["retry_prompt_chars"] = len(retry_prompt)
+            trace.update(retry_trace)
         if retried[0] != REFUSAL_LINE:
+            if trace is not None:
+                trace.pop("refusal_by", None)
             return retried
     return answer, citations
 

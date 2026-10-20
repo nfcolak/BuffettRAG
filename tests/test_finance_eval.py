@@ -70,3 +70,9 @@ def test_scorer_default_set_is_dev(tmp_path) -> None:
     f.write_text(json.dumps(resp(qid, "x")) + "\n")
     sf.main([str(f)])
     assert json.loads((tmp_path / "scores.json").read_text())[0]["half"] == "dev"
+
+
+def test_record_stores_debug_only_when_present() -> None:
+    case = {"qid": "a1"}
+    assert "debug" not in finance_eval.record(case, "dev", None, {"answer": "x"}, 1.0)
+    assert finance_eval.record(case, "dev", None, {"answer": "x", "debug": {"route": "reader"}}, 1.0)["debug"] == {"route": "reader"}

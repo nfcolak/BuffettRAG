@@ -51,6 +51,7 @@ from config import (
     RATE_LIMIT_WINDOW_SECONDS,
     TRUST_PROXY_HEADERS,
     VECTOR_BACKEND,
+    finance_debug_enabled,
     finance_pipeline_enabled,
 )
 from src.storage.embeddings import BGEEmbedder
@@ -242,11 +243,13 @@ def search(req: SearchRequest) -> SearchResponse:
 
 
 @app.post("/ask", response_model=AskResponse)
-def ask(req: AskRequest) -> AskResponse:
+def ask(req: AskRequest):
     if not ask_flow._state:
         raise HTTPException(status_code=503, detail="Service not ready")
 
     query = req.query
+    debug_on = finance_debug_enabled()
+    route: Optional[ask_flow.FinanceRoute] = None
     final: Optional[ask_flow.FinanceRoute] = None
     per_period: Optional[bool] = None  # None: the legacy rule (comparison_periods of the query)
     try:
@@ -263,15 +266,32 @@ def ask(req: AskRequest) -> AskResponse:
 
     answer: Optional[str] = None
     citations: List[Dict[str, Any]] = []
+    trace: Optional[Dict[str, Any]] = {} if debug_on else None
     if final is not None:  # scope / numeric / digest: finished, no evidence gate, validator or expansion
         answer, citations = final.answer, final.citations
     elif hits or (comparison_periods(query) if per_period is None else per_period):
+        kwargs = {"trace": trace} if debug_on else {}
         answer, citations = ask_flow._generate_answer(
             llm, prompt, context_hits, req.max_new_tokens, query, ask_flow._extra_queries(req, expanded),
-            [turn.model_dump() for turn in req.history], per_period,
+            [turn.model_dump() for turn in req.history], per_period, **kwargs,
         )
 
-    return AskResponse(
+    debug = None
+    if debug_on:
+        plan = route.plan if route is not None else None
+        debug = {
+            "route": ask_flow.finance_answer_mode(route) if route is not None else "legacy",
+            "plan": {"scope": plan.scope, "kind": plan.kind, "years": list(plan.year_range or ())} if plan else None,
+            "raw_answer": trace.get("raw_answer"),
+            "validator": trace.get("validator", {"kept": [], "dropped": []}),
+            "refusal_retry": bool(trace.get("refusal_retry", False)),
+            "prompt_chars": len(prompt),
+            "served_ids": [h.id for h in context_hits],
+            **{k: v for k, v in trace.items() if k in ("refusal_by", "first_raw_answer", "retry_prompt_chars",
+                                                        "raw_answer_note")},
+        }
+
+    response = AskResponse(
         query=req.query,
         strategy=req.strategy,
         reranked=reranked,
@@ -281,6 +301,9 @@ def ask(req: AskRequest) -> AskResponse:
         answer=answer,
         citations=citations,
     )
+    if debug_on:  # staging only: the extra field lives outside the response schema
+        return JSONResponse({**response.model_dump(mode="json"), "debug": debug})
+    return response
 
 
 def _sse(event: str, data: Dict[str, Any]) -> str:

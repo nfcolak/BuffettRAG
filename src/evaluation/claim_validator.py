@@ -7,7 +7,7 @@ from __future__ import annotations
 
 import re
 import unicodedata
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from decimal import Decimal
 from typing import Any, Callable, List, Sequence
 
@@ -57,6 +57,7 @@ class ClaimValidationResult:
     blocked_claims: List[str]
     validations: List[dict]
     nli_available: bool
+    sentences: List[dict] = field(default_factory=list)  # per sentence: text, kept, reason (diagnostics only)
 
 
 def _normalize(text: str) -> str:
@@ -312,7 +313,7 @@ def validate_and_filter_answer(answer: str, hits: Sequence[Any], *, nli_scorer: 
                                threshold: float = 0.2) -> ClaimValidationResult:
     """Drop unsupported sentences individually; supported sentences stay verbatim."""
     out_lines: List[str] = []
-    blocked, validations = [], []
+    blocked, validations, sentence_log = [], [], []
     for line in answer.split("\n"):
         if not line.strip():
             out_lines.append("")
@@ -336,6 +337,7 @@ def validate_and_filter_answer(answer: str, hits: Sequence[Any], *, nli_scorer: 
                 validations.append({"claim": _CITATION_RE.sub("", body).strip(), "cited_indexes": valid, "support": 1.0,
                                     "method": "verbatim_span", "supported": True})
                 kept.append(sentence.strip())
+                sentence_log.append({"sentence": sentence.strip(), "kept": True, "reason": "verbatim_span"})
                 continue
             for claim in claims:
                 scores, agreements = [], []
@@ -359,9 +361,15 @@ def validate_and_filter_answer(answer: str, hits: Sequence[Any], *, nli_scorer: 
                     failed.append(claim)
             if sentence_ok:
                 kept.append(sentence.strip())
+                sentence_log.append({"sentence": sentence.strip(), "kept": True, "reason": "supported"})
             else:
                 blocked.extend(failed or [body.strip()])
+                sentence_log.append({
+                    "sentence": sentence.strip(), "kept": False,
+                    "reason": "unsupported_claim" if valid else "no_valid_citation_marker",
+                    "failed_claims": failed,
+                })
         if kept:
             out_lines.append(" ".join(kept))
     text = re.sub(r"\n{3,}", "\n\n", "\n".join(out_lines)).strip()
-    return ClaimValidationResult(text, blocked, validations, nli_scorer is not None)
+    return ClaimValidationResult(text, blocked, validations, nli_scorer is not None, sentence_log)
