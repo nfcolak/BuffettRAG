@@ -38,6 +38,13 @@ The served budget k is adaptive by plan kind (`served_budget`): `FINANCE_K_TREND
 FINANCE_K / `llm_context_passages()`. The caller caps the prompt by the reader window (`reader_window_chars`). The
 reranker takes `rerank_depth()` (`FINANCE_RERANK_CANDIDATES`) candidates.
 
+Two methods behind settings, both default 0 (finance-recall-75-r2): `FINANCE_PLAN_TERM_BOOST` adds that many hundredths
+to the normalised cross-encoder score of the reranked candidates tagged with the plan's sectors, themes, companies or
+events, for the order only (`boost_plan_terms`); `FINANCE_SOURCE_SLOTS` then reserves up to that many of the k places
+for the best-ranked source candidates (the knowledge and summary sources) that the budget cut off, in the
+cross-encoder's order, replacing the lowest-ranked served hits that are neither source candidates nor protected
+(`_reserve_slots`; debug `source_slots`, `plan_term_boosted`).
+
 A candidate source never fails a request: one that raises is skipped and recorded in the debug dict as
 `source_errors` (`{source, error_type}`), and one whose data is missing (`source_unavailable`, the summary index) is
 skipped with a note in `source_skipped`; the request is served from the remaining candidates.
@@ -224,6 +231,29 @@ def _tag_hits(plan: QueryPlan, store: KnowledgeStore, pool: Sequence[SearchHit])
     return events_tagged, [pid for _, _, pid in sorted(scored)]
 
 
+def boost_plan_terms(plan: QueryPlan, store: KnowledgeStore, ranked: Sequence[SearchHit]
+                     ) -> Tuple[List[SearchHit], int]:
+    """FINANCE_PLAN_TERM_BOOST: (the reranked hits re-ordered, how many got the bonus).
+
+    A hit whose annotation carries one of the plan's sectors, themes, companies or events gets
+    FINANCE_PLAN_TERM_BOOST / 100 added to its normalised cross-encoder score (0..1 within the window) for the order
+    only; the hits keep their scores. The setting is an integer (hundredths), 0 = off. The order is stable for ties.
+    """
+    bonus = max(0, finance_setting("FINANCE_PLAN_TERM_BOOST")) / 100.0
+    if not bonus or not _has_entities(plan) or not len(store):
+        return list(ranked), 0
+    wanted = {"events": set(plan.events), "sectors": set(plan.sectors),
+              "companies": set(plan.companies), "themes": set(plan.themes)}
+
+    def tagged(hit: SearchHit) -> bool:
+        ann = store.annotation(hit.id) or {}
+        return any(values.intersection(ann.get(f) or ()) for f, values in wanted.items() if values)
+
+    flags = [tagged(h) for h in ranked]
+    order = sorted(range(len(ranked)), key=lambda i: (-(ranked[i].score + (bonus if flags[i] else 0.0)), i))
+    return [ranked[i] for i in order], sum(flags)
+
+
 def _letter_cap(plan: QueryPlan, k: int) -> int:
     """FINANCE_MAX_PER_LETTER, raised so k passages fit into the letters of the question's range (a 5-letter range
     with k = 16 takes 4 per letter); a question without explicit years keeps the setting."""
@@ -265,9 +295,47 @@ def _protect(hits: List[SearchHit], pool: Sequence[SearchHit], protected: Sequen
     return sorted(hits, key=lambda h: order[h.id])
 
 
+def _reserve_slots(hits: List[SearchHit], pool: Sequence[SearchHit], protected: Sequence[str],
+                   source_ids: Sequence[str], slots: int, k: int, diverse: bool, cap: Optional[int] = None,
+                   added: Optional[List[str]] = None) -> List[SearchHit]:
+    """FINANCE_SOURCE_SLOTS: serve the best `slots` source candidates the budget cut off.
+
+    `pool` is the reranked order (the cross-encoder's, period reservations first). The source candidates (ids in
+    `source_ids`) that `hits` does not hold, best-ranked first, take the places of the lowest-ranked served hits that
+    are neither source candidates nor protected, so the served count stays within k (a free place is taken first).
+    Under a per-letter cap a victim is replaced only when the cap and the minimum letters still hold. Ids placed are
+    appended to `added`.
+    """
+    if slots <= 0 or not source_ids:
+        return hits
+    order = {h.id: i for i, h in enumerate(pool)}
+    sources, keep = set(source_ids), set(protected)
+    placed = 0
+    for hit in pool:
+        if placed >= slots:
+            break
+        if hit.id not in sources or hit.id in {h.id for h in hits}:
+            continue
+        if len(hits) < k and (not diverse or _diverse_ok([*hits, hit], len({_letter(h) for h in hits}), cap)):
+            hits = [*hits, hit]
+        else:
+            victims = sorted((h for h in hits if h.id not in keep and h.id not in sources), key=lambda h: -order[h.id])
+            victim = next((v for v in victims if not diverse or _diverse_ok(
+                [h for h in hits if h is not v] + [hit], len({_letter(h) for h in hits}), cap)), None)
+            if victim is None:
+                continue
+            hits = [h for h in hits if h is not victim] + [hit]
+        placed += 1
+        if added is not None:
+            added.append(hit.id)
+    return sorted(hits, key=lambda h: order[h.id])
+
+
 def _select(ranked: Sequence[SearchHit], plan: QueryPlan, k: int, protected: Sequence[str] = (),
-            diverse: Optional[bool] = None) -> List[SearchHit]:
-    """Pick k hits: period reservation first, then (diverse questions) the per-letter cap and the minimum letters."""
+            diverse: Optional[bool] = None, source_ids: Sequence[str] = (), slots: int = 0,
+            added: Optional[List[str]] = None) -> List[SearchHit]:
+    """Pick k hits: period reservation first, then (diverse questions) the per-letter cap and the minimum letters;
+    `slots` of the places then go to the best source candidates the cut left out (`_reserve_slots`)."""
     pool = list(ranked)
     if k <= 0:
         return []
@@ -280,7 +348,8 @@ def _select(ranked: Sequence[SearchHit], plan: QueryPlan, k: int, protected: Seq
             taken = {h.id for h in reserved}
             pool = reserved + [h for h in pool if h.id not in taken]
     if not (_diverse(plan) if diverse is None else diverse):
-        return _protect(pool[:k], pool, protected, k, diverse=False)
+        hits = _protect(pool[:k], pool, protected, k, diverse=False)
+        return _reserve_slots(hits, pool, protected, source_ids, slots, k, False, added=added)
 
     cap = _letter_cap(plan, k)
     min_letters = finance_setting("FINANCE_MIN_LETTERS")
@@ -304,7 +373,8 @@ def _select(ranked: Sequence[SearchHit], plan: QueryPlan, k: int, protected: Seq
             take(hit)
             chosen.add(hit.id)
     order = {h.id: i for i, h in enumerate(pool)}
-    return _protect(sorted(picked, key=lambda h: order[h.id]), pool, protected, k, diverse=True, cap=cap)
+    hits = _protect(sorted(picked, key=lambda h: order[h.id]), pool, protected, k, diverse=True, cap=cap)
+    return _reserve_slots(hits, pool, protected, source_ids, slots, k, True, cap, added)
 
 
 def _hybrid_ranking(retriever: Any, query: str, fetch_k: int, where: Optional[Dict[str, Any]]) -> List[SearchHit]:
@@ -426,6 +496,7 @@ def finance_search(
     dropped = [h.id for h in fused if h.id not in kept_ids]
 
     reranked = False
+    plan_boosted = 0
     window_ids = [h.id for h in kept]  # no reranker: every kept candidate is in play
     reranker = getattr(retriever, "reranker", None)
     injected: List[SearchHit] = []
@@ -442,6 +513,7 @@ def finance_search(
         window = window + injected
         window_ids = [h.id for h in window]
         kept = list(reranker.rerank(query, window, top_k=len(window)))
+        kept, plan_boosted = boost_plan_terms(plan, store, kept)
         reranked = True
     if retrieval_setting("RETRIEVAL_DEDUP"):
         kept = deduplicate_hits(kept)
@@ -456,8 +528,10 @@ def finance_search(
     pins = list({h.id: h for h in pinned}.values())[:k]
     pin_ids = {h.id for h in pins}
     diverse = _diverse(plan)
+    slot_ids: List[str] = []  # source candidates placed by FINANCE_SOURCE_SLOTS
     hits = pins + _select([h for h in kept if h.id not in pin_ids], plan, k - len(pins),
-                          [p for p in protected if p not in pin_ids], diverse)
+                          [p for p in protected if p not in pin_ids], diverse,
+                          [h.id for h in source_hits], max(0, finance_setting("FINANCE_SOURCE_SLOTS")), slot_ids)
     lo_hi = (min(a for a, _ in blocks), max(b for _, b in blocks)) if blocks else None
     debug = {
         "coverage": store.coverage(pool_ids),
@@ -472,6 +546,8 @@ def finance_search(
         "event_tagged": len(events_tagged),
         "entity_tagged": len(tagged),
         "tag_injected": len(injected),
+        "plan_term_boosted": plan_boosted,
+        "source_slots": slot_ids,
         "pinned": [h.id for h in pins],
         "dropped_not_financial": dropped,
         "source_candidates": source_counts,

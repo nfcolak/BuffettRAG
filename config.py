@@ -230,7 +230,7 @@ FINANCE_DEFAULTS: dict = {
     "FINANCE_SUMMARY_FUSE_WEIGHT": 0,  # RRF weight of the summary ranking fused into the candidate order (0 = off)
     "FINANCE_THEME_CENTROIDS": 0,      # 1: theme inference also matches tagged-passage summary centroids
     "FINANCE_SOURCE_SLOTS": 0,         # served slots reserved for source candidates below the rerank cut
-    "FINANCE_PLAN_TERM_BOOST": 0,      # rerank score bonus for candidates tagged with the plan's targets (0 = off)
+    "FINANCE_PLAN_TERM_BOOST": 0,      # integer, hundredths (5 = +0.05): rerank score bonus for candidates tagged with the plan's targets (0 = off)
 }
 
 

@@ -18,7 +18,9 @@ Final answers, returned as they are (no evidence gate, no claim validator, no `e
     does not cover get the annotation's verbatim stance quote), citing the quoted source passages served as hits.
     Uncited evidence fills the rest of the served budget: with FINANCE_DIGEST_SOURCE the winner's digest timeline
     passages and with FINANCE_STANCE_SOURCE the stance passages of the top targets (finance-recall-75), each spread
-    across letters; then, as without them, the winner's other stance passages, one per letter.
+    across letters; then, as without them, the winner's other stance passages, one per letter. The budget is the
+    caller's `max_hits`, raised to FINANCE_K_CORPUS when that is larger (finance-recall-75-r2, default 0 = unchanged);
+    the passages beyond `max_hits` must fit the reader window (`reader_window_chars`), lowest ranks cut first.
 
 Matching figure rows never use another entity's rows: when the question names a company other than Berkshire, only
 that company's rows match; Berkshire's rows are the default only when no other company is named.
@@ -49,11 +51,12 @@ from dataclasses import dataclass, field
 from itertools import zip_longest
 from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple
 
-from config import finance_setting
+from config import finance_setting, retrieval_setting
 from src.generation.decompose import split_question
 from src.generation.prompt import REFUSAL_LINE, build_cited_prompt, format_answer_markdown, parse_citations
 from src.knowledge import KnowledgeStore
 from src.query.plan import QueryPlan
+from src.retrieval.finance_policy import reader_window_chars
 from src.retrieval.knowledge_source import spread_letters
 from src.storage import SearchHit
 
@@ -514,9 +517,12 @@ def _source_evidence(plan: QueryPlan, top: Sequence[Tuple[str, List[int], List[s
 
 
 def superlative_answer(plan: QueryPlan, store: KnowledgeStore, docs_by_id: Mapping[str, Any],
-                       max_hits: int = 16) -> Optional[FinanceAnswer]:
+                       max_hits: int = 16, max_new_tokens: int = 900) -> Optional[FinanceAnswer]:
     """Top targets by distinct letters with a stance of the asked polarity, then quotes from the winner's digest
-    timeline (or, without a digest, its stance quotes), citing the quoted passages; None without stance data."""
+    timeline (or, without a digest, its stance quotes), citing the quoted passages; None without stance data.
+
+    The served budget is `max_hits`, or FINANCE_K_CORPUS when that is larger; what is served beyond `max_hits` is cut
+    to fit the reader window (`max_new_tokens` is the answer budget the window leaves out)."""
     if not plan.superlative:
         return None
     ranked = [r for r in stance_letters(plan, store, docs_by_id) if r[2]]
@@ -564,7 +570,8 @@ def superlative_answer(plan: QueryPlan, store: KnowledgeStore, docs_by_id: Mappi
         lines += ["", f"What he wrote about {_label(winner, kind).lower() if kind == 'sector' else winner}:", *quoted]
     answer = "\n".join(lines)
     cited = len(hits)
-    budget = max(0, max_hits - cited)
+    limit = max(max_hits, finance_setting("FINANCE_K_CORPUS"))
+    budget = max(0, limit - cited)
     extra = _source_evidence(plan, top, digest, docs_by_id, set(index), budget)
     # uncited evidence for the count: the winner's other stance passages, one per letter, after the quoted ones
     by_letter_ids: Dict[int, str] = {}
@@ -575,5 +582,10 @@ def superlative_answer(plan: QueryPlan, store: KnowledgeStore, docs_by_id: Mappi
             by_letter_ids.setdefault(letter, pid)
     extra += _spread([by_letter_ids[y] for y in sorted(by_letter_ids)], budget - len(extra))
     hits.extend(_hit_from_doc(docs_by_id[pid]) for pid in extra)
+    if len(hits) > max(max_hits, cited):  # a budget beyond today's: the extra passages must fit the reader window
+        window, per_passage = reader_window_chars(max_new_tokens), retrieval_setting("LLM_PASSAGE_MAX_CHARS")
+        while len(hits) > max(max_hits, cited) and sum(min(len(h.text), per_passage) for h in hits) > window:
+            hits.pop()
     return FinanceAnswer(answer=answer, hits=hits, citations=parse_citations(answer, hits[:cited]), route="superlative",
-                         detail={"ranking": [(t, len(y)) for t, y, _ in top], "cited": cited, "evidence": len(extra)})
+                         detail={"ranking": [(t, len(y)) for t, y, _ in top], "cited": cited,
+                                 "evidence": len(hits) - cited})
