@@ -25,12 +25,16 @@ and the first sentence of its description, embedded as passages). Some descripti
 Berkshire (berkshire_performance, buybacks), so a theme counts only when its cosine is at least THEME_MIN_SIM and at
 least THEME_MIN_MARGIN above its cosine with THEME_ANCHOR, a question about nothing in particular; the best THEME_TOP
 such themes are kept. The constants were set on the heldout_v4 / v5 questions, not on dev or heldout_v6.
+FINANCE_THEME_CENTROIDS (default 0, finance-recall-75-r2) also represents each theme by the centroid of the summary
+embeddings of its tagged passages and matches the question against both (THEME_CENTROID_MIN_SIM and
+THEME_CENTROID_MIN_Z, also set on heldout_v4 / v5), so a paraphrase far from the description's words reaches it.
 
 `stance_passages`, `spread_letters` and `letter_of` are shared with the superlative route
 (`finance_answer.superlative_answer`).
 """
 from __future__ import annotations
 
+import logging
 import re
 import weakref
 from collections import OrderedDict
@@ -41,8 +45,11 @@ import numpy as np
 from config import RETRIEVAL_FETCH_K, finance_setting
 from src.knowledge import KnowledgeStore
 from src.query.plan import CORPUS_WIDE, NUMERIC, TREND, QueryPlan
+from src.retrieval import summary_source
 from src.retrieval.finance_policy import _boost, _has_entities, _hybrid_ranking
 from src.storage import SearchHit
+
+log = logging.getLogger(__name__)
 
 TAGGED_CAP = 24          # tagged candidates per question, at most
 DIGEST_CAP = 16          # digest timeline passages per question, at most (one served budget)
@@ -52,6 +59,9 @@ THEME_TOP = 2            # inferred themes per question, at most
 THEME_MIN_SIM = 0.50     # cosine of the question (bge query embedding) and a theme description, at least
 THEME_MIN_MARGIN = 0.15  # ... and at least this much above the theme's cosine with THEME_ANCHOR
 THEME_ANCHOR = "What did Warren Buffett write about Berkshire Hathaway in his letters to shareholders?"
+THEME_CENTROID_MIN_SIM = 0.58    # FINANCE_THEME_CENTROIDS: cosine of the question and a theme's summary centroid, at least
+THEME_CENTROID_MIN_Z = 2.625     # ... and its margin over THEME_ANCHOR at least this many standard deviations above the
+                                 # mean margin of the question's themes (the theme stands out for this question)
 DIGEST_KINDS = (TREND, CORPUS_WIDE)
 # Opinion words: the question asks what Buffett thinks, says or feels about something.
 VIEW_CUE = re.compile(
@@ -65,6 +75,8 @@ _DOCS: "weakref.WeakKeyDictionary[Any, Dict[str, Any]]" = weakref.WeakKeyDiction
 _RANKS: "weakref.WeakKeyDictionary[Any, OrderedDict]" = weakref.WeakKeyDictionary()
 _THEMES: "weakref.WeakKeyDictionary[Any, Dict[Tuple[str, ...], Tuple[np.ndarray, np.ndarray]]]" = \
     weakref.WeakKeyDictionary()
+_CENTROIDS: "weakref.WeakKeyDictionary[Any, Dict[Optional[str], Tuple[Any, ...]]]" = weakref.WeakKeyDictionary()
+_CENTROID_WARNED: set = set()
 
 
 # --- shared helpers ---
@@ -214,9 +226,46 @@ def theme_texts(store: KnowledgeStore) -> Tuple[List[str], List[str]]:
     return keys, [f"{key.replace('_', ' ')}: {re.split(r'(?<=[.])\s', str(themes[key]).strip(), 1)[0]}" for key in keys]
 
 
+def theme_centroids(store: KnowledgeStore, embedder: Any, keys: Sequence[str]
+                    ) -> Optional[Tuple[np.ndarray, np.ndarray]]:
+    """(unit centroids, has one): per theme of `keys`, the mean of the summary embeddings (the summary index,
+    `summary_source.summary_vectors`) of the passages tagged with it; a theme no summarised passage carries has none
+    (a zero row). None when the summary index is missing or does not match the embedder (the descriptions still work)."""
+    model = getattr(embedder, "model_name", None)
+    try:
+        found = summary_source.summary_vectors(model)
+    except ValueError as exc:
+        if model not in _CENTROID_WARNED:
+            _CENTROID_WARNED.add(model)
+            log.warning("theme centroids off, the summary index does not load: %s", exc)
+        return None
+    if found is None:
+        return None
+    ids, matrix = found
+    memo = _memo(_CENTROIDS, store, dict)
+    entry = memo.get(model)
+    if entry is None or entry[0] is not matrix or entry[1] != tuple(keys):  # once per index, store and taxonomy
+        column = {key: i for i, key in enumerate(keys)}
+        members = np.zeros((len(keys), len(ids)), dtype=np.float32)
+        for j, pid in enumerate(ids):
+            for theme in (store.annotation(pid) or {}).get("themes") or ():
+                if theme in column:
+                    members[column[theme], j] = 1.0
+        entry = (matrix, tuple(keys), _unit(members @ matrix), members.sum(axis=1) > 0)
+        memo[model] = entry
+    return entry[2], entry[3]
+
+
 def infer_themes(query: str, store: KnowledgeStore, embedder: Any) -> Tuple[str, ...]:
-    """The best THEME_TOP taxonomy themes whose description the question matches: cosine >= THEME_MIN_SIM and
-    >= THEME_MIN_MARGIN above the theme's cosine with THEME_ANCHOR. () without an embedder, a query or themes."""
+    """The best THEME_TOP taxonomy themes the question matches. () without an embedder, a query or themes.
+
+    A theme matches by its description: cosine >= THEME_MIN_SIM and >= THEME_MIN_MARGIN above the description's cosine
+    with THEME_ANCHOR. With FINANCE_THEME_CENTROIDS on it also matches by its centroid (`theme_centroids`), which
+    carries how the letters talk about the theme, so a general paraphrase that shares no word with the description
+    still reaches it. Every centroid sits close to any Buffett question (the margins over THEME_ANCHOR are small and
+    alike), so the centroid test is relative: cosine >= THEME_CENTROID_MIN_SIM and a margin THEME_CENTROID_MIN_Z
+    standard deviations above the mean margin of the question's centroids. Themes are ranked by the larger of their
+    two scores, each over its threshold (description margin / THEME_MIN_MARGIN, centroid z / THEME_CENTROID_MIN_Z)."""
     keys, texts = theme_texts(store)
     if embedder is None or not query or not keys:
         return ()
@@ -226,10 +275,22 @@ def infer_themes(query: str, store: KnowledgeStore, embedder: Any) -> Tuple[str,
         anchor = _unit(np.asarray([embedder.embed_query(THEME_ANCHOR)], dtype=np.float32))[0]
         memo[tuple(texts)] = (vectors, vectors @ anchor)
     vectors, base = memo[tuple(texts)]
-    sims = vectors @ _unit(np.asarray([embedder.embed_query(query)], dtype=np.float32))[0]
-    order = np.argsort(-(sims - base), kind="stable")
-    return tuple(keys[i] for i in order
-                 if sims[i] >= THEME_MIN_SIM and sims[i] - base[i] >= THEME_MIN_MARGIN)[:THEME_TOP]
+    question = _unit(np.asarray([embedder.embed_query(query)], dtype=np.float32))[0]
+    sims = vectors @ question
+    match = (sims >= THEME_MIN_SIM) & (sims - base >= THEME_MIN_MARGIN)
+    score = sims - base
+    centroids = theme_centroids(store, embedder, keys) if finance_setting("FINANCE_THEME_CENTROIDS") else None
+    if centroids is not None and centroids[1].sum() > 1:
+        rows, has = centroids
+        anchor = _unit(np.asarray([embedder.embed_query(THEME_ANCHOR)], dtype=np.float32))[0]
+        c_sims = rows @ question
+        margin = c_sims - rows @ anchor
+        spread = float(margin[has].std()) or 1.0
+        z = np.where(has, (margin - margin[has].mean()) / spread, -np.inf)
+        match |= has & (c_sims >= THEME_CENTROID_MIN_SIM) & (z >= THEME_CENTROID_MIN_Z)
+        score = np.maximum(score / THEME_MIN_MARGIN, z / THEME_CENTROID_MIN_Z)
+    order = np.argsort(-score, kind="stable")
+    return tuple(keys[i] for i in order if match[i])[:THEME_TOP]
 
 
 def _inferred(plan: QueryPlan, store: KnowledgeStore, retriever: Any, query: str) -> Tuple[str, ...]:

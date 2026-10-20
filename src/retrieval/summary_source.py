@@ -16,6 +16,13 @@ dense and BM25 rankings miss). The source:
   - returns the PASSAGES (main-corpus text and metadata), not the summaries, best first; tables only for numeric plans.
 The policy keeps only ids that are not in the pool yet and sends them to the reranker with the rest.
 
+`fuse_summary` (FINANCE_SUMMARY_FUSE_WEIGHT, default 0, finance-recall-75-r2) promotes the ids the pool already has: it
+fuses the same summary ranking into the candidate order before the rerank (weighted RRF), so a pooled passage whose
+summary matches the question can move into the reranker window. Its call site is `finance_search`, right after the
+entity boost and before the sources run: `fused = fuse_summary(fused, plan, store, retriever, query)`.
+
+`summary_vectors` hands the stored summary embeddings to the theme centroids of `knowledge_source.infer_themes`.
+
 The BM25 side is rebuilt from the stored summaries at load time with the main BM25 class (the main index does the same),
 so both sides tokenise identically. A missing index logs a warning and returns no candidates (like a missing knowledge
 directory); an index that does not match `annotations.jsonl` or the embedder raises ValueError.
@@ -29,6 +36,8 @@ import threading
 import weakref
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Mapping, Optional, Sequence, Tuple
+
+import numpy as np
 
 from config import finance_setting, retrieval_setting
 from src.knowledge import default_dir
@@ -76,9 +85,17 @@ class SummaryIndex:
         self.vectors = vectors
         self.manifest = dict(manifest)
         self.bm25 = BM25Retriever(docs)
+        self._embeddings: Optional[Tuple[List[str], np.ndarray]] = None
 
     def __len__(self) -> int:
         return len(self.vectors)
+
+    def embeddings(self) -> Tuple[List[str], np.ndarray]:
+        """(passage ids, their unit summary embeddings), read back from the FAISS index once."""
+        if self._embeddings is None:
+            matrix = np.asarray(self.vectors._index.reconstruct_n(0, len(self.vectors)), dtype=np.float32)
+            self._embeddings = ([d.id for d in self.vectors._docs], matrix)
+        return self._embeddings
 
     def hybrid(self, query_vector: Sequence[float], query: str, depth: int,
                where: Optional[Dict[str, Any]] = None) -> List[SearchHit]:
@@ -146,6 +163,13 @@ def _summary_index(model_name: Optional[str]) -> Optional[SummaryIndex]:
     return index
 
 
+def summary_vectors(model_name: Optional[str]) -> Optional[Tuple[List[str], np.ndarray]]:
+    """(passage ids, unit summary embeddings) of the summary index; None when it has not been built. Raises
+    ValueError like the source when the index does not match its inputs or `model_name`."""
+    index = _summary_index(model_name)
+    return None if index is None else index.embeddings()
+
+
 def _passages(retriever: Any) -> Dict[str, StoredDoc]:
     """Passage id -> the main corpus' StoredDoc (text and metadata), from the retriever's BM25 documents."""
     try:
@@ -181,25 +205,32 @@ def _rankings(index: SummaryIndex, plan: QueryPlan, store: Any, vector: Sequence
     return rankings, weights
 
 
-def summary_candidates(plan: QueryPlan, store: Any, retriever: Any, query: str, k: int) -> List[SearchHit]:
-    """Passages whose annotation summary matches the finance query (see the module docstring).
-
-    `k` (the served budget) is not used: the source returns SUMMARY_CANDIDATES passages whatever the budget, so the
-    reranker's work does not grow with it.
-    """
+def summary_ranking(plan: QueryPlan, store: Any, retriever: Any, query: str) -> List[SearchHit]:
+    """The summary hits of the finance query, best first (id = passage id, text = its summary): the rankings of
+    `_rankings` fused by weighted RRF. [] without an embedder, a query or a built index."""
     embedder = getattr(retriever, "embedder", None)
-    passages = _passages(retriever)
-    if embedder is None or not passages or not str(query).strip():
+    if embedder is None or not str(query).strip():
         return []
     index = _summary_index(getattr(embedder, "model_name", None))
     if index is None:
         return []
     rankings, weights = _rankings(index, plan, store, embedder.embed_query(query), query)
     total = sum(len(r) for r in rankings)
-    fused = reciprocal_rank_fusion(rankings, top_k=max(total, 1), weights=weights) if total else []
+    return reciprocal_rank_fusion(rankings, top_k=max(total, 1), weights=weights) if total else []
+
+
+def summary_candidates(plan: QueryPlan, store: Any, retriever: Any, query: str, k: int) -> List[SearchHit]:
+    """Passages whose annotation summary matches the finance query (see the module docstring).
+
+    `k` (the served budget) is not used: the source returns SUMMARY_CANDIDATES passages whatever the budget, so the
+    reranker's work does not grow with it.
+    """
+    passages = _passages(retriever)
+    if not passages:
+        return []
     numeric = plan.kind == NUMERIC
     out: List[SearchHit] = []
-    for hit in fused:
+    for hit in summary_ranking(plan, store, retriever, query):
         doc = passages.get(hit.id)
         if doc is None or (store.is_table(hit.id) and not numeric):
             continue
@@ -207,6 +238,27 @@ def summary_candidates(plan: QueryPlan, store: Any, retriever: Any, query: str, 
         if len(out) >= SUMMARY_CANDIDATES:
             break
     return out
+
+
+def fuse_summary(fused: Sequence[SearchHit], plan: QueryPlan, store: Any, retriever: Any, query: str
+                 ) -> List[SearchHit]:
+    """The candidate order `fused` with the summary ranking fused in (FINANCE_SUMMARY_FUSE_WEIGHT, default 0 = off).
+
+    The source above only adds ids the pool does not have. This promotes the pooled ones: `fused` and the summary
+    ranking go through weighted RRF (1 : FINANCE_SUMMARY_FUSE_WEIGHT, each id at its rank in the full summary ranking),
+    so a pooled passage whose summary matches the question moves up, into the reranker window. Only pooled ids are
+    returned, with their pool hits: the summary's new ids stay with the source. Returns `fused` (a copy) when the
+    weight is 0, the index is missing or no pooled id has a summary hit.
+    """
+    weight = float(max(0, finance_setting("FINANCE_SUMMARY_FUSE_WEIGHT")))
+    if not weight or not fused:
+        return list(fused)
+    pooled = {h.id for h in fused}
+    ranking = summary_ranking(plan, store, retriever, query)
+    if not any(h.id in pooled for h in ranking):
+        return list(fused)
+    both = reciprocal_rank_fusion([fused, ranking], top_k=len(pooled) + len(ranking), weights=[1.0, weight])
+    return [h for h in both if h.id in pooled]  # the pool's hit wins for a shared id (fused is the first ranking)
 
 
 SOURCES: List[Tuple[str, Callable]] = [("FINANCE_SUMMARY_SOURCE", summary_candidates)]

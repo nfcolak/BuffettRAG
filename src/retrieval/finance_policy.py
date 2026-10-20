@@ -33,9 +33,14 @@ Steps:
      Period, comparison and trend plans reserve the best hit of each named period first. `pinned` hits (the source
      passages of matching figure rows) are served first, before the k - len(pinned) selected ones.
 
-The served budget k is adaptive by plan kind (`served_budget`): `FINANCE_K_TREND`, `FINANCE_K_CORPUS` and
-`FINANCE_K_PERIOD` (period and comparison plans) when set, else FINANCE_K / `llm_context_passages()`. The caller caps
-the prompt by the reader window (`reader_window_chars`). The reranker takes `rerank_depth()` (`FINANCE_RERANK_CANDIDATES`) candidates.
+The served budget k is adaptive by plan kind (`served_budget`): `FINANCE_K_TREND`, `FINANCE_K_CORPUS`,
+`FINANCE_K_PERIOD` (period and comparison plans) and `FINANCE_K_SPECIFIC` (specific and numeric plans) when set, else
+FINANCE_K / `llm_context_passages()`. The caller caps the prompt by the reader window (`reader_window_chars`). The
+reranker takes `rerank_depth()` (`FINANCE_RERANK_CANDIDATES`) candidates.
+
+A candidate source never fails a request: one that raises is skipped and recorded in the debug dict as
+`source_errors` (`{source, error_type}`), and one whose data is missing (`source_unavailable`, the summary index) is
+skipped with a note in `source_skipped`; the request is served from the remaining candidates.
 
 The debug dict reports the annotation coverage of the candidate pool and `year_filtered_out`, the ids of the
 unfiltered ranking outside the year range that the range removed (hard) or ranked lower (boost), so the
@@ -43,14 +48,15 @@ evaluation can count gold passages lost to the year filter.
 """
 from __future__ import annotations
 
+import logging
 import os
 from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple
 
 from config import (RETRIEVAL_DEFAULTS, RETRIEVAL_FETCH_K, finance_setting, llm_context_passages, llm_n_ctx,
                     retrieval_setting)
 from src.knowledge import KnowledgeStore
-from src.query.plan import (COMPARISON, CORPUS_WIDE, FIRST_LETTER_YEAR, LAST_LETTER_YEAR, NUMERIC, PERIOD, TREND,
-                            QueryPlan)
+from src.query.plan import (COMPARISON, CORPUS_WIDE, FIRST_LETTER_YEAR, LAST_LETTER_YEAR, NUMERIC, PERIOD, SPECIFIC,
+                            TREND, QueryPlan)
 from src.retrieval.bm25 import _meta_matches
 from src.retrieval.retriever import (
     deduplicate_hits,
@@ -59,6 +65,8 @@ from src.retrieval.retriever import (
     reserve_period_hits,
 )
 from src.storage import SearchHit
+
+log = logging.getLogger(__name__)
 
 DIVERSE_KINDS = (TREND, CORPUS_WIDE)       # served diverse when the question names no years
 RESERVE_KINDS = (PERIOD, COMPARISON, TREND)
@@ -84,14 +92,35 @@ def candidate_sources() -> List[Tuple[str, Source]]:
     return [(name, fn) for name, fn in registered_sources() if finance_setting(name)]
 
 
+def source_unavailable(name: str, source: Source) -> Optional[str]:
+    """A note when the registered source `source` (setting `name`) cannot run because its data is missing, else None.
+
+    It is skipped with the note, not counted as an error. Only the summary source has data of its own: its index is
+    git-ignored, so a fresh clone serves without it. A source that merely shares the setting name (a test double) is
+    not checked.
+    """
+    from src.retrieval import summary_source  # lazy, like registered_sources(): faiss loads only when needed
+    if dict(summary_source.SOURCES).get(name) is source:
+        from src.storage.faiss_store import FaissStore
+        from src.storage.index_manifest import MANIFEST_FILE
+        directory = summary_source.index_dir()
+        missing = [f for f in (MANIFEST_FILE, FaissStore.INDEX_FILE, FaissStore.META_JSON_FILE)
+                   if not (directory / f).is_file()]
+        if missing:
+            return f"summary index missing: {', '.join(missing)} not in {directory}"
+    return None
+
+
 def kind_budget(plan: QueryPlan) -> int:
-    """The adaptive served budget of the plan's kind (FINANCE_K_TREND / _CORPUS / _PERIOD), 0 = not set."""
+    """The adaptive served budget of the plan's kind (FINANCE_K_TREND / _CORPUS / _PERIOD / _SPECIFIC), 0 = not set."""
     if plan.kind == TREND:
         return max(0, finance_setting("FINANCE_K_TREND"))
     if plan.kind == CORPUS_WIDE:
         return max(0, finance_setting("FINANCE_K_CORPUS"))
     if plan.kind in (PERIOD, COMPARISON):
         return max(0, finance_setting("FINANCE_K_PERIOD"))
+    if plan.kind in (SPECIFIC, NUMERIC):
+        return max(0, finance_setting("FINANCE_K_SPECIFIC"))
     return 0
 
 
@@ -360,11 +389,28 @@ def finance_search(
             fused = reciprocal_rank_fusion([fused, [by_id[p] for p in tagged]],
                                            top_k=len({h.id for h in fused} | set(tagged)), weights=[1.0, weight])
 
+    if finance_setting("FINANCE_SUMMARY_FUSE_WEIGHT"):  # promote pooled ids whose summary matches (0 = unchanged)
+        try:
+            from src.retrieval.summary_source import fuse_summary
+            fused = fuse_summary(fused, plan, store, retriever, query)
+        except Exception:  # noqa: BLE001 - a fusion failure never fails the request
+            pass
     source_hits: List[SearchHit] = []  # extra candidate sources: they join the pool before the rerank
     source_counts: Dict[str, int] = {}
+    source_errors: List[Dict[str, str]] = []   # a source that raised: skipped, the request is served without it
+    source_skipped: List[Dict[str, str]] = []  # a source whose data is missing: skipped with a note
     seen_ids = {h.id for h in fused}
     for name, source in candidate_sources():
-        got = [h for h in source(plan, store, retriever, query, k) if h.id not in seen_ids]
+        try:
+            note = source_unavailable(name, source)
+            if note:
+                source_skipped.append({"source": name, "note": note})
+                continue
+            got = [h for h in source(plan, store, retriever, query, k) if h.id not in seen_ids]
+        except Exception as exc:  # noqa: BLE001 - no candidate source may fail the request
+            log.warning("finance candidate source %s skipped: %s: %s", name, type(exc).__name__, exc)
+            source_errors.append({"source": name, "error_type": type(exc).__name__})
+            continue
         source_counts[name] = len(got)
         for h in got:
             seen_ids.add(h.id)
@@ -429,6 +475,8 @@ def finance_search(
         "pinned": [h.id for h in pins],
         "dropped_not_financial": dropped,
         "source_candidates": source_counts,
+        "source_errors": source_errors,
+        "source_skipped": source_skipped,
         "stage_pool": pool_ids,                 # every candidate before the financial filter (loss analysis)
         "stage_window": window_ids,             # the ids the reranker saw
         "stage_ranked": stage_ranked,           # reranked order, before the budget and per-letter cap
