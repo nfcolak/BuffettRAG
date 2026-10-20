@@ -141,3 +141,102 @@ def test_trend_prompt_keeps_system_prompt_v1_and_adds_exactly_one_sentence(monke
     assert trend.endswith("\n\nAnswer:") and fa.TREND_SENTENCE in trend
     assert trend.replace(" " + fa.TREND_SENTENCE, "") == plain
     assert len(re.findall(r"[.!?](?:\s|$)", fa.TREND_SENTENCE)) == 1
+
+
+# --- finance-dev-fix-1: plain lookups only, entity-safe rows, figure rows for the reader, superlatives ---
+@pytest.mark.parametrize("query,plain", [
+    ("What was Berkshire's book value per share in 1987?", True),
+    ("How much float did Berkshire have in 1999?", True),
+    ("Why did Berkshire's book value per share rise in 1987?", False),
+    ("How did book value per share grow after 1987?", False),
+    ("How much did Berkshire pay for USAir, and how did Buffett later judge it?", False),
+    ("What did Berkshire pay for USAir in 1989? And what did he think of airlines?", False),
+])
+def test_plain_figure_lookup(store, query, plain):
+    assert fa.plain_figure_lookup(plan_query(query, store)) is plain
+
+
+def _rows_store(*rows, companies=None):
+    base = {"unit": "usd_millions", "as_written": "x", "source_id": "1990_p0100"}
+    return KnowledgeStore(numbers=[dict(base, **r) for r in rows], companies=companies)
+
+
+def test_a_metric_named_only_in_part_and_tied_is_not_a_plain_lookup_but_both_groups_reach_the_reader():
+    store = _rows_store({"metric": "insurance_float", "year": 1999, "value": 25298, "entity": "Berkshire"},
+                        {"metric": "cost_of_float_pct", "year": 1999, "value": 5.8, "unit": "percent",
+                         "entity": "Berkshire"})
+    plan = plan_query("How much float did Berkshire have in 1999?", store)
+    assert not fa.metric_named(plan, store)
+    assert {r["metric"] for r in fa._match_numbers(plan, store)} == {"insurance_float", "cost_of_float_pct"}
+    named = plan_query("What was Berkshire's insurance float in 1999?", store)
+    assert fa.metric_named(named, store) and [r["metric"] for r in fa._match_numbers(named, store)] == ["insurance_float"]
+
+
+def test_rows_of_another_entity_are_never_used():
+    companies = {"companies": {"BNSF": {"aliases": ["BNSF", "Burlington Northern Santa Fe"]}}}
+    store = _rows_store({"metric": "acquisition_price", "year": 2009, "value": 100, "unit": "usd", "entity": "BNSF"},
+                        {"metric": "cash_and_equivalents", "year": 2009, "value": 30558, "entity": "Berkshire"},
+                        companies=companies)
+    plan = plan_query("What price did Berkshire pay for Burlington Northern Santa Fe in 2009, in cash and stock?", store)
+    assert [r["entity"] for r in fa._match_numbers(plan, store)] == ["BNSF"]
+    plain = plan_query("How much cash did Berkshire hold in 2009?", store)  # no other company: Berkshire's rows
+    assert [r["entity"] for r in fa._match_numbers(plain, store)] == ["Berkshire"]
+
+
+def test_figures_prompt_adds_the_rows_before_the_question_citing_the_served_passages(store, docs):
+    plan = plan_query("Why did Berkshire's book value per share reach its 1987 level?", store)
+    rows = fa.figure_rows(plan, store, docs)
+    pinned = fa.figure_source_hits(rows, docs)
+    assert [h.id for h in pinned] == ["1987_p0000"]
+    other = SearchHit("1990_p0100", docs["1990_p0100"].text, dict(docs["1990_p0100"].metadata), 1.0)
+    hits = [other, *pinned]
+    prompt = fa.figures_prompt(build_cited_prompt(plan.query, hits), rows, hits)
+    block = prompt[prompt.index(fa.FIGURES_BEGIN):prompt.index(fa.FIGURES_END)]
+    assert '$2,477.47; as written: "$2,477.47" [2]' in block  # the row cites its passage's served number
+    assert prompt.index(fa.FIGURES_END) < prompt.index("BEGIN USER QUESTION")
+    assert fa.figures_prompt(build_cited_prompt(plan.query, [other]), rows, [other]) == build_cited_prompt(
+        plan.query, [other])  # a row whose passage is not served is left out
+    assert fa.figures_prompt("no question block", rows, hits) == "no question block"
+
+
+def _stance_store():
+    def ann(pid, target, polarity, quote="q"):
+        return {"id": pid, "scope": "financial", "stance": [{"target": target, "polarity": polarity, "quote": quote}]}
+    annotations = [ann("1980_p0001", "insurance", "positive", "insurance is a fine business"),
+                   ann("1980_p0002", "insurance", "positive"), ann("1980_p0003", "insurance", "positive"),
+                   ann("1990_p0001", "insurance", "positive", "we like insurance"),
+                   ann("2000_p0001", "insurance", "positive", "insurance shines"),
+                   ann("2000_p0002", "inflation", "positive")]  # a theme: never a sector target
+    annotations += [ann(f"2010_p{n:04d}", "railroads", "positive") for n in range(1, 7)]  # 6 rows, one letter
+    annotations += [ann("2011_p0001", "railroads", "positive"), ann("1995_p0001", "USAir", "positive")]
+    digest = {"topic": "insurance", "kind": "sector", "overview": "o",
+              "timeline": [{"year": 1990, "quote": "from the digest", "source_id": "1990_p0001"},
+                           {"year": 1995, "quote": "not a stance passage", "source_id": "1995_p0001"}]}
+    taxonomy = {"sectors": {"insurance": "", "railroads": ""}, "themes": {"inflation": ""}}
+    docs = {a["id"]: StoredDoc(id=a["id"], text=f"text {a['id']}", metadata={"year": int(a["id"][:4])})
+            for a in annotations}
+    return KnowledgeStore(annotations=annotations, digests=[digest], taxonomy=taxonomy), docs
+
+
+def test_superlative_counts_letters_not_stance_rows():
+    store, docs = _stance_store()
+    plan = QueryPlan(query="q", kind="corpus_wide", superlative="sector:positive")
+    ranking = fa.stance_letters(plan, store, docs)
+    assert [(t, years) for t, years, _ in ranking] == [("insurance", [1980, 1990, 2000]), ("railroads", [2010, 2011])]
+    result = fa.superlative_answer(plan, store, docs)
+    assert result.route == "superlative"
+    assert "1. Insurance: 3 letters (1980–2000)" in result.answer and "2. Railroads: 2 letters (2010–2011)" in result.answer
+    assert '1990: "from the digest" [' in result.answer and "not a stance passage" not in result.answer
+    assert '"insurance is a fine business"' in result.answer  # letters the timeline misses: the stance quote
+    assert _resolves(result) and result.detail["cited"] == len(result.citations)
+    cited = {pid for c in result.citations for pid in c["passage_ids"]}
+    assert cited and cited <= {h.id for h in result.hits[:result.detail["cited"]]}
+
+
+def test_superlative_company_targets_exclude_sectors_and_a_year_range_limits_the_letters():
+    store, docs = _stance_store()
+    company = fa.stance_letters(QueryPlan(query="q", superlative="company:positive"), store, docs)
+    assert [t for t, _, _ in company] == ["USAir"]
+    ranged = fa.stance_letters(QueryPlan(query="q", superlative="sector:positive", year_range=(2005, 2015)), store, docs)
+    assert [t for t, _, _ in ranged] == ["railroads"]
+    assert fa.superlative_answer(QueryPlan(query="q", superlative="sector:negative"), store, docs) is None

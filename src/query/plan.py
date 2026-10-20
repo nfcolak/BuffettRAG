@@ -5,7 +5,15 @@ mixed), kind, year range, events, sectors, companies and themes. No model, no re
 `scope_vote` callable the caller passes in. Callers gate it behind `FINANCE_PIPELINE=1`; this module does not
 read the flag.
 
-Years are a boost range by default; `year_hard` is True only for "in the YYYY letter" questions.
+Years are a boost range by default; `year_hard` is True only for "in the YYYY letter" questions. `year_spans` keeps
+each year mention of the question apart (two single years are two spans, not one range), so retrieval can tell a
+narrow question from one that spans several letters.
+
+Scope (finance-dev-fix-1): a clause about a business's sales, earnings, growth or price is financial even when it
+names a founder, a family or a meeting; jokes, anecdotes, longevity, attendance, ballgames and shopping at the
+annual meeting are personal; in a question with a personal clause, a clause with no financial cue at all is a
+personal follow-up ("... and what did he credit for their longevity?"). The scope vote cannot make a question
+about a business's figures personal: it only drops the clauses that carry no financial cue.
 """
 from __future__ import annotations
 
@@ -124,6 +132,11 @@ _COMPANY_SUFFIX = re.compile(r"\s+(?:international|inc\.?|corp\.?|corporation|co
 
 # --- patterns ---
 _YEAR = r"(?:1[89]\d{2}|20\d{2})"
+_MEETING = r"(?:annual meeting|shareholder weekend|shareholders' meeting|meeting weekend|the meeting)"
+# meeting logistics and side events: tickets, attendance, shopping, ballgames
+_MEETING_SIDE = (r"(?:tickets?|schedule|location|venue|seating|registration|what time|exhibit\w*|shop\w*|bargains?|"
+                 r"merchandise|discounts?|attend\w*|showed up|show up|turn(?:ed)? out|turnout|crowds?|came back|"
+                 r"ball ?games?|games?)")
 
 _PERSONAL_RULES: Tuple[re.Pattern, ...] = tuple(re.compile(p, re.I) for p in (
     r"\bhow old\b", r"\byears? old\b", r"\b(?:his|her|their|buffett's|munger's)\s+age\b",
@@ -132,15 +145,23 @@ _PERSONAL_RULES: Tuple[re.Pattern, ...] = tuple(re.compile(p, re.I) for p in (
     r"brother|sister|parents|children|kids|childhood|marriage|married|spouse)\b",
     r"\bhealth\b(?!\s*(?:care|insurance|plans?|benefits?))", r"\b(?:surgery|illness|sick|medical condition)\b",
     r"\bdiet\b", r"\b(?:eats?|eating|breakfast|lunch|dinner|hamburgers?|favou?rite food)\b",
-    r"\b(?:jokes?|joking|funny|humou?r|witty|laugh\w*)\b",
+    r"\b(?:jokes?|joking|funny|humou?r|witty|laugh\w*|anecdotes?)\b",
+    r"\b(?:longevity|lifespan|live so long|lived so long|long lives?)\b",
+    r"\bpersonal (?:setbacks?|life|lives|story|stories|tragedy|tragedies|loss|losses|struggles?|history|background|"
+    r"reasons?|habits?)\b",
     r"\b(?:sports?|baseball|basketball|golf|football|tennis|ping[- ]pong|bowling)\b",
+    r"\b(?:first pitch(?:es)?|ball ?games?|ballpark|stadium)\b",
     r"\bplays?\s+bridge\b", r"\bbridge (?:game|player|playing)\b",
     r"\b(?:hotels?|parking|shuttles?|airport|restaurants?|reservations?)\b",
-    r"\b(?:annual meeting|shareholder weekend|shareholders' meeting|the meeting)\b.{0,60}\b(?:tickets?|schedule|"
-    r"location|venue|seating|registration|what time|where|when is|exhibit\w*|shopping|discounts?|attend\w*|date)\b",
-    r"\b(?:tickets?|schedule|location|venue|seating|registration|what time|exhibit\w*|shopping day)\b.{0,60}"
-    r"\b(?:annual meeting|shareholder weekend|shareholders' meeting|the meeting)\b",
+    rf"\b{_MEETING}\b.{{0,60}}\b(?:{_MEETING_SIDE}|where|when is|date)\b",
+    rf"\b{_MEETING_SIDE}\b.{{0,60}}\b{_MEETING}\b",
+    rf"\bhow many (?:people|shareholders|attendees|guests|visitors)\b.{{0,60}}\b(?:{_MEETING}|meeting)\b",
 ))
+# A business's sales, earnings, growth or price: the clause is financial even next to a founder, family or meeting.
+_BUSINESS_FIGURE = re.compile(
+    r"\b(?:sales|revenues?|earn(?:s|ed|ing|ings)?|profits?|margins?|growth|grew|grow(?:s|n|ing)?|prices?|priced|"
+    r"paid|pay|costs?|"
+    r"valuation|book value|float|premiums?|dividends?|market share|operating ratio|returns? on)\b", re.I)
 
 _NUMERIC_METRIC = re.compile(r"\b(?:per[- ]share|float|book value|net worth)\b", re.I)
 _NUMERIC_RULES: Tuple[re.Pattern, ...] = tuple(re.compile(p, re.I) for p in (
@@ -167,15 +188,37 @@ _CORPUS_WEAK = re.compile(r"\balways\b|\bnever\b|\bmost\b(?! of\b)|\bconsistentl
 _FINANCE_CUE = re.compile(
     r"\b(?:berkshire|invest\w*|stocks?|shares?|earnings|profits?|insurance|bonds?|acqui\w+|dividends?|market|"
     r"economy|premiums?|float|price|prices|return|returns|crisis|recession|inflation|tax\w*|debt|sector|"
-    r"companies|company|business(?:es)?|revenue|sales)\b", re.I)
+    r"companies|company|business(?:es)?|revenue|sales|funds?|banks?|cash|buybacks?|repurchas\w*|valuation|"
+    r"interest rates?|industr(?:y|ies)|holdings?|stake|subsidiar(?:y|ies)|deal|capital)\b", re.I)
+
+# Corpus-wide superlatives: "which sector did he speak most positively about", "which company did he praise most".
+_SUPERLATIVE_TARGET = re.compile(
+    r"\b(?:which|what)\s+(?:\w+\s+){0,2}?(sectors?|industr(?:y|ies)|compan(?:y|ies)|business(?:es)?|holdings?|"
+    r"investments?|stocks?|subsidiar(?:y|ies))\b", re.I)
+_SUPERLATIVE_NEGATIVE = (r"negative(?:ly)?|critical(?:ly)?|pessimistic(?:ally)?|bearish|harsh(?:ly)?|"
+                         r"criticiz\w*|criticis\w*|disparag\w*|complain\w*|disliked?")
+_SUPERLATIVE_POSITIVE = (r"positive(?:ly)?|favou?rabl[ey]|enthusiastic(?:ally)?|optimistic(?:ally)?|bullish|warmly|"
+                         r"prais\w*|admir\w*|lik(?:e|ed|es)|lov(?:e|ed|es)")
+_SUPERLATIVE = re.compile(
+    rf"\bmost\s+(?:\w+\s+)?(?P<a>{_SUPERLATIVE_POSITIVE}|{_SUPERLATIVE_NEGATIVE})\b|"
+    rf"\b(?P<b>{_SUPERLATIVE_POSITIVE}|{_SUPERLATIVE_NEGATIVE})\b[^?.;]{{0,40}}\b(?:the\s+)?most\b", re.I)
 
 _SPAN_SEP = r"(?:\s*(?:-|–|—|to|through|thru|until|and)\s*)"
 _RANGE_BETWEEN = re.compile(rf"\b(?:between|from)\s+({_YEAR}){_SPAN_SEP}({_YEAR})\b", re.I)
 _RANGE_DASH = re.compile(rf"\b({_YEAR})\s*(?:-|–|—)\s*({_YEAR})\b")
-_DECADE_FULL = re.compile(r"\b(?:(early|mid|late)[- ]?)?(?:the )?(1[89]|20)(\d)0'?s\b", re.I)
-_DECADE_SHORT = re.compile(r"(?<![\d$])(?:(early|mid|late)[- ]?)?'?([6-9])0'?s\b", re.I)
-_AFTER = re.compile(rf"\b(after|since)\s+({_YEAR})\b", re.I)
-_BEFORE = re.compile(rf"\b(before|prior to|until|up to)\s+({_YEAR})\b", re.I)
+_RANGE_SHORT = re.compile(rf"\b({_YEAR})\s*(?:-|–|—|/)\s*(\d{{2}})\b(?![%.,]\d)")  # "1988-89"
+_QUALIFIER = r"(?:(early|mid|late)(?:[- ]?(?:to|or)[- ]?(early|mid|late))?[- ]?)?"
+_DECADE_FULL = re.compile(rf"\b{_QUALIFIER}(?:the )?(1[89]|20)(\d)0'?s\b", re.I)
+_DECADE_SHORT = re.compile(rf"(?<![\d$]){_QUALIFIER}'?([6-9])0'?s\b", re.I)
+# "after 2008", "since the 1996 buyout" (the year of a named event or deal, not a letter)
+_AFTER = re.compile(rf"\b(after|since)\s+(?:the\s+|its\s+|his\s+)?({_YEAR})\b(?!\s+(?:annual\s+)?(?:letter|report))", re.I)
+_ONWARD = re.compile(rf"\bfrom\s+({_YEAR})\s+on(?:wards?)?\b|\b({_YEAR})\s+(?:onwards?|and (?:later|beyond|after))\b",
+                     re.I)
+_AROUND = re.compile(rf"\b(?:around|circa|approximately|roughly)\s+({_YEAR})\b", re.I)
+_DECADE_EDGE = re.compile(r"\b(?:the\s+)?(end|close|start|beginning)\s+of\s+(?:the\s+)?(?=(?:(?:1[89]|20)\d0|'?[6-9]0)'?s\b)",
+                          re.I)
+_BEFORE = re.compile(rf"\b(before|prior to|until|up to)\s+(?:the\s+|its\s+|his\s+)?({_YEAR})\b"
+                     rf"(?!\s+(?:annual\s+)?(?:letter|report))", re.I)
 _YEAR_LETTER = re.compile(
     rf"\b({_YEAR})\s+(?:annual\s+|shareholder(?:s'?)?\s+|berkshire\s+|chairman'?s?\s+)*(?:letter|report)\b|"
     rf"\b(?:letter|report)\s+(?:for|of|from)\s+(?:the\s+year\s+)?({_YEAR})\b|"
@@ -193,6 +236,8 @@ class QueryPlan:
     year_range: Optional[Tuple[int, int]] = None
     year_hard: bool = False                     # True only for "in the YYYY letter" questions
     years: Tuple[int, ...] = ()                 # explicit single years named in the question
+    year_spans: Tuple[Tuple[int, int], ...] = ()  # each year mention of the question, in order (a single year: (y, y))
+    year_source: str = ""                       # explicit | event | "" (where year_range comes from)
     events: Tuple[str, ...] = ()
     sectors: Tuple[str, ...] = ()
     companies: Tuple[str, ...] = ()
@@ -201,6 +246,8 @@ class QueryPlan:
     personal_clauses: Tuple[str, ...] = ()
     scope_source: str = "rules"                 # rules | vote | default
     vote_share: Optional[float] = None
+    numeric: bool = False                       # the question asks for a figure (any kind)
+    superlative: str = ""                       # "sector:positive" | "company:negative" | ... | "" (corpus-wide ranking)
 
 
 def _norm(text: str) -> str:
@@ -227,29 +274,75 @@ def _personal_hit(text: str) -> bool:
     return any(rule.search(text) for rule in _PERSONAL_RULES)
 
 
-def _scope_from_rules(query: str) -> Tuple[str, str, Tuple[str, ...]]:
+def _personal_clause(text: str) -> bool:
+    """A personal rule fires and the clause is not about a business's figures."""
+    return _personal_hit(text) and not _BUSINESS_FIGURE.search(text)
+
+
+def _finance_cue(text: str, store: KnowledgeStore) -> bool:
+    """Any financial word, business figure, sector, theme, company or event phrase (years alone are not a cue)."""
+    if _FINANCE_CUE.search(text) or _BUSINESS_FIGURE.search(text):
+        return True
+    if _match_keys(text, _sector_terms(store)) or _match_keys(text, THEME_TERMS) or _match_companies(text, store):
+        return True
+    return bool(_match_events(text, store)[0])
+
+
+def _split_scope(parts: Sequence[str], personal: Sequence[str]) -> Tuple[str, str, Tuple[str, ...]]:
+    financial = [p for p in parts if p not in personal]
+    if not financial:
+        return PERSONAL, "", tuple(personal)
+    return MIXED, " ".join(financial), tuple(personal)
+
+
+def _scope_from_rules(query: str, store: KnowledgeStore) -> Tuple[str, str, Tuple[str, ...]]:
     """(scope or '' when silent, financial_query, personal clauses)."""
     if not _personal_hit(query):
         return "", query, ()
     parts = [p for p in split_question(query) if p] or [query]
-    personal = tuple(p for p in parts if _personal_hit(p))
-    financial = [p for p in parts if not _personal_hit(p)]
-    if not financial:
-        return PERSONAL, "", personal
-    return MIXED, " ".join(financial), personal
+    personal = [p for p in parts if _personal_clause(p)]
+    if not personal:  # every personal word sits in a clause about a business's figures
+        return "", query, ()
+    # a clause with no financial cue next to a personal one is its follow-up ("what did he credit for it?")
+    personal += [p for p in parts if p not in personal and not _finance_cue(p, store)]
+    return _split_scope(parts, [p for p in parts if p in personal])
+
+
+def _scope_from_vote(query: str, store: KnowledgeStore) -> Tuple[str, str, Tuple[str, ...]]:
+    """The vote said personal: a question about a business's figures keeps its clauses that carry a financial cue."""
+    if not _BUSINESS_FIGURE.search(query):
+        return PERSONAL, "", (query,)
+    parts = [p for p in split_question(query) if p] or [query]
+    personal = [p for p in parts if not _finance_cue(p, store)]
+    if not personal:
+        return FINANCIAL, query, ()
+    return _split_scope(parts, personal)
 
 
 # --- years ---
-def _decade_range(century: str, digit: str, qualifier: Optional[str]) -> Tuple[int, int]:
+def _decade_range(century: str, digit: str, qualifier: Optional[str], until: Optional[str] = None) -> Tuple[int, int]:
     start = int(century) * 100 + int(digit) * 10
     lo, hi = _DECADE_EARLY_MID_LATE.get((qualifier or "").lower(), (0, 9))
+    if until:  # "early-to-mid 1980s": from the first qualifier's start to the second one's end
+        hi = _DECADE_EARLY_MID_LATE[until.lower()][1]
     return start + lo, start + hi
 
 
-def _parse_years(text: str) -> Tuple[Optional[Tuple[int, int]], bool, Tuple[int, ...]]:
-    """(year_range, year_hard, explicit single years) from the text with event phrases already blanked out."""
+def _short_range(m: re.Match) -> Optional[Tuple[int, int]]:
+    start = int(m.group(1))
+    end = start // 100 * 100 + int(m.group(2))
+    end += 100 if end < start else 0
+    return (start, end) if end - start <= 10 else None
+
+
+def _edge(m: re.Match) -> str:
+    return "late " if m.group(1).lower() in ("end", "close") else "early "
+
+
+def _parse_years(text: str):
+    """(year_range, year_hard, explicit single years, spans) from the text with event phrases already blanked out."""
     hard_years = [int(next(g for g in m.groups() if g)) for m in _YEAR_LETTER.finditer(text)]
-    work = text
+    work = _DECADE_EDGE.sub(_edge, text)  # "the end of the 1980s" -> "late 1980s"
     ranges: List[Tuple[int, int]] = []
     singles: List[int] = []
 
@@ -263,8 +356,11 @@ def _parse_years(text: str) -> Tuple[Optional[Tuple[int, int]], bool, Tuple[int,
 
     take(_RANGE_BETWEEN, lambda m: tuple(sorted((int(m.group(1)), int(m.group(2))))))
     take(_RANGE_DASH, lambda m: tuple(sorted((int(m.group(1)), int(m.group(2))))))
-    take(_DECADE_FULL, lambda m: _decade_range(m.group(2), m.group(3), m.group(1)))
-    take(_DECADE_SHORT, lambda m: _decade_range("19", m.group(2), m.group(1)))
+    take(_RANGE_SHORT, _short_range)
+    take(_DECADE_FULL, lambda m: _decade_range(m.group(3), m.group(4), m.group(1), m.group(2)))
+    take(_DECADE_SHORT, lambda m: _decade_range("19", m.group(3), m.group(1), m.group(2)))
+    take(_ONWARD, lambda m: (int(m.group(1) or m.group(2)), LAST_LETTER_YEAR))
+    take(_AROUND, lambda m: (int(m.group(1)) - 1, int(m.group(1)) + 1))
     take(_AFTER, lambda m: (int(m.group(2)) + (1 if m.group(1).lower() == "after" else 0), LAST_LETTER_YEAR))
     take(_BEFORE, lambda m: (FIRST_LETTER_YEAR, int(m.group(2)) - (1 if m.group(1).lower() in ("before", "prior to") else 0)))
     for m in _YEAR_SINGLE.finditer(work):
@@ -272,14 +368,14 @@ def _parse_years(text: str) -> Tuple[Optional[Tuple[int, int]], bool, Tuple[int,
         singles.append(year)
         ranges.append((year, year))
     if not ranges and not hard_years:
-        return None, False, ()
+        return None, False, (), ()
     for year in hard_years:
         if year not in singles:
             singles.append(year)
             ranges.append((year, year))
     lo, hi = min(r[0] for r in ranges), max(r[1] for r in ranges)
     hard = bool(hard_years) and len(set(singles)) == 1 and len(ranges) == 1
-    return (lo, hi), hard, tuple(sorted(set(singles)))
+    return (lo, hi), hard, tuple(sorted(set(singles))), tuple(dict.fromkeys(ranges))
 
 
 # --- events ---
@@ -303,10 +399,12 @@ def _match_events(text: str, store: KnowledgeStore):
     for start, end, phrase in found:
         if any(start < b and a < end for a, b in taken):
             continue
+        spec = phrases[phrase]
+        if _year_contradicts(text[:start], known.get(spec.get("event") or ""), spec.get("years")):
+            continue  # "the 1997 Asian financial crisis" is not the 2008 one
         taken.append((start, end))
         for i in range(start, end):
             blanked[i] = " "
-        spec = phrases[phrase]
         event = spec.get("event")
         if event and event in known:
             if event not in events:
@@ -319,6 +417,19 @@ def _match_events(text: str, store: KnowledgeStore):
                 terms.append(term)
     rng = (min(r[0] for r in fallback), max(r[1] for r in fallback)) if fallback else None
     return tuple(events), rng, tuple(terms), "".join(blanked)
+
+
+_YEAR_BEFORE = re.compile(rf"\b({_YEAR})\s+(?:[\w'-]+\s+){{0,2}}$")
+
+
+def _year_contradicts(before: str, event: Optional[Dict[str, Any]], fallback) -> bool:
+    """A year just before the phrase (at most two words between) outside the event's years and letters, +-1."""
+    m = _YEAR_BEFORE.search(before)
+    if not m:
+        return False
+    years = list((event or {}).get("event_years") or []) + list((event or {}).get("letter_years") or [])
+    years += list(fallback or ())
+    return bool(years) and not min(years) - 1 <= int(m.group(1)) <= max(years) + 1
 
 
 def _event_range(event: Dict[str, Any], fallback: Optional[Tuple[int, int]]) -> Tuple[int, int]:
@@ -347,11 +458,15 @@ def _match_keys(text: str, table: Dict[str, Sequence[str]]) -> Tuple[str, ...]:
 
 
 def _match_companies(text: str, store: KnowledgeStore) -> Tuple[str, ...]:
+    """Canonical company names named in the text; aliases ("Burlington Northern Santa Fe" for BNSF) must keep their case."""
     low = text.lower()
     found = []
-    for name in store.company_names():
+    aliases = store.company_aliases()
+    for name in sorted(set(store.company_names()) | set(aliases)):
         variants = {name.lower(), _COMPANY_SUFFIX.sub("", name).lower()}
-        if any(len(v) >= 3 and re.search(r"(?<![\w])" + re.escape(v) + r"(?:'s)?(?![\w])", low) for v in variants):
+        if any(len(v) >= 3 and re.search(r"(?<![\w])" + re.escape(v) + r"(?:'s)?(?![\w])", low) for v in variants) \
+                or any(len(a) >= 3 and re.search(r"(?<![\w])" + re.escape(a) + r"(?:'s)?(?![\w])", text)
+                       for a in aliases.get(name, ())):
             found.append(name)
     return tuple(found)
 
@@ -383,6 +498,17 @@ def _kind(query: str, year_range, year_hard: bool, events, years) -> str:
     return SPECIFIC
 
 
+def _superlative(query: str) -> str:
+    """"sector:positive", "company:negative", ...: a question that ranks sectors or companies by Buffett's stance."""
+    target, stance = _SUPERLATIVE_TARGET.search(query), _SUPERLATIVE.search(query)
+    if not target or not stance:
+        return ""
+    kind = "sector" if target.group(1).lower().startswith(("sector", "industr")) else "company"
+    word = stance.group("a") or stance.group("b")
+    polarity = "negative" if re.fullmatch(_SUPERLATIVE_NEGATIVE, word, re.I) else "positive"
+    return f"{kind}:{polarity}"
+
+
 def _vote_share(scope_vote: Callable[[str], float], text: str) -> Optional[float]:
     try:
         share = float(scope_vote(text))
@@ -396,7 +522,7 @@ def plan_query(query: str, store: Optional[KnowledgeStore] = None,
     """Plan one question. `scope_vote(query)` is called only when the scope rules are silent."""
     store = store if store is not None else KnowledgeStore.empty()
     query = _norm(str(query or ""))
-    scope, financial_query, personal = _scope_from_rules(query)
+    scope, financial_query, personal = _scope_from_rules(query, store)
     source, share = "rules", None
     if not scope:
         scope, source = FINANCIAL, "default"
@@ -405,7 +531,7 @@ def plan_query(query: str, store: Optional[KnowledgeStore] = None,
             if share is not None:
                 source = "vote"
                 if share >= SCOPE_VOTE_PERSONAL_SHARE:
-                    scope, financial_query = PERSONAL, ""
+                    scope, financial_query, personal = _scope_from_vote(query, store)
     if scope == FINANCIAL:
         financial_query = query
 
@@ -414,14 +540,16 @@ def plan_query(query: str, store: Optional[KnowledgeStore] = None,
                          personal_clauses=personal or (query,), scope_source=source, vote_share=share)
     text = financial_query or query
     events, event_range, terms, blanked = _match_events(text, store)
-    year_range, year_hard, years = _parse_years(blanked)
-    if year_range is None:
-        year_range = event_range
+    year_range, year_hard, years, spans = _parse_years(blanked)
+    year_source = "explicit" if year_range is not None else ""
+    if year_range is None and event_range is not None:
+        year_range, year_source = event_range, "event"
     sectors = _match_keys(text, _sector_terms(store))
-    themes = _match_keys(text, THEME_TERMS)
+    themes = _match_keys(blanked, THEME_TERMS)  # "Long-Term Capital Management" is an event, not the management theme
     companies = _match_companies(text, store)
     kind = _kind(text, year_range, year_hard, events, years)
     return QueryPlan(
         query=query, scope=scope, financial_query=financial_query, kind=kind, year_range=year_range,
-        year_hard=year_hard, years=years, events=events, sectors=sectors, companies=companies, themes=themes,
-        terms=terms, personal_clauses=personal, scope_source=source, vote_share=share)
+        year_hard=year_hard, years=years, year_spans=spans, year_source=year_source, events=events, sectors=sectors,
+        companies=companies, themes=themes, terms=terms, personal_clauses=personal, scope_source=source,
+        vote_share=share, numeric=_numeric_intent(text), superlative=_superlative(text))

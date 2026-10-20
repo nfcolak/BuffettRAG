@@ -130,15 +130,16 @@ def period_label(period: Dict[str, Any]) -> str:
 def prepare_answer_context(
     llm, hits, docs_by_id, query, *, history=None, followup=False,
     neighbors: int, max_chars: int, max_new_tokens: int, n_ctx: int,
-    max_passages: int, passage_max_chars: int,
+    max_passages: int, passage_max_chars: int, periods: Optional[Sequence[Dict[str, Any]]] = None,
 ) -> List[SearchHit]:
     """Fit each isolated comparison prompt, not a never-generated global prompt.
 
     Neighbors are independently citable for comparisons and resolved follow-ups.
     The combined client list is the union of the exact per-period prompt lists;
     each model call still obeys the configured passage/window limits.
+    ``periods`` None detects them from the query; ``()`` prepares one prompt (the finance route's single call).
     """
-    periods = comparison_periods(query, history)
+    periods = comparison_periods(query, history) if periods is None else list(periods)
     context = expand_hits_with_neighbors(
         hits, docs_by_id, neighbors=neighbors, max_chars=max_chars,
         separate_neighbors=bool(periods) or followup,

@@ -240,3 +240,105 @@ def test_plan_is_frozen(store):
     assert isinstance(plan, QueryPlan)
     with pytest.raises(Exception):
         plan.scope = "personal"  # type: ignore[misc]
+
+
+# --- finance-dev-fix-1: scope rules and vote, year spans, event years, company aliases, superlatives ---
+@pytest.mark.parametrize("query", [
+    "How did the Blumkin family's furniture business grow its sales after Berkshire bought it?",
+    "What did the founder's company earn in its first year under Berkshire?",
+    "At the annual meeting, what did Buffett say about Apple's earnings?",
+])
+def test_a_business_figure_is_financial_next_to_a_founder_family_or_meeting(store, query):
+    plan = _plan(query, store, scope_vote=Vote(0.0))
+    assert plan.scope == "financial"
+    assert _plan(query, store, scope_vote=Vote(0.9)).scope == "financial"  # the vote cannot make it personal
+
+
+@pytest.mark.parametrize("query,financial", [
+    ("How did the company's revenues grow under Berkshire, and what personal setback led its founder to start it?",
+     "How did the company's revenues grow under Berkshire?"),
+    ("How much did Nebraska Furniture Mart earn in 1990, and how old was Mrs. B when she founded it?",
+     "How much did Nebraska Furniture Mart earn in 1990?"),
+])
+def test_the_mixed_split_keeps_the_financial_clause(store, query, financial):
+    plan = _plan(query, store, scope_vote=Vote(0.0))
+    assert plan.scope == "mixed" and plan.financial_query == financial
+
+
+@pytest.mark.parametrize("query", [
+    "What joke did Charlie tell at the 2015 annual meeting, and what did the crowd make of it?",
+    "Tell me an anecdote Buffett shared about his first job.",
+    "What did Buffett say about Charlie's longevity?",
+    "How many people attended the annual meeting in 2010?",
+    "How many shareholders showed up at the meeting in 1995, and how many came the year before?",
+    "Did Buffett throw the first pitch at the ballgame during meeting weekend?",
+    "What bargains could shareholders find shopping at the annual meeting?",
+])
+def test_jokes_anecdotes_attendance_ballgames_and_shopping_are_personal(store, query):
+    vote = Vote(0.0)
+    plan = _plan(query, store, scope_vote=vote)
+    assert plan.scope == "personal" and plan.scope_source == "rules" and vote.calls == []
+
+
+def test_the_vote_drops_only_the_clauses_without_a_financial_cue(store):
+    query = "How did the company's revenues grow under Berkshire, and who inspired the founder?"
+    plan = _plan(query, store, scope_vote=Vote(0.9))
+    assert plan.scope == "mixed" and plan.scope_source == "vote"
+    assert plan.financial_query == "How did the company's revenues grow under Berkshire?"
+    assert plan.personal_clauses == ("Who inspired the founder?",)
+
+
+@pytest.mark.parametrize("query,year_range,spans", [
+    ("How did rates matter in the years around 2020?", (2019, 2021), ((2019, 2021),)),
+    ("How did Berkshire build its Apple stake from 2016 onward?", (2016, 2024), ((2016, 2024),)),
+    ("What made the jeweler strong at the end of the 1980s?", (1986, 1989), ((1986, 1989),)),
+    ("Did he think inflation was over in the early-to-mid 1980s?", (1980, 1986), ((1980, 1986),)),
+    ("How did Berkshire build its stake in 1988-89?", (1988, 1989), ((1988, 1989),)),
+    ("How much did the float grow after the 1996 buyout?", (1997, 2024), ((1997, 2024),)),
+    ("How did he describe banks in 2011, and what did he say in 2016?", (2011, 2016), ((2011, 2011), (2016, 2016))),
+])
+def test_year_spans(store, query, year_range, spans):
+    plan = _plan(query, store, scope_vote=Vote(0.0))
+    assert plan.year_range == year_range and plan.year_spans == spans and plan.year_source == "explicit"
+
+
+def test_event_years_are_marked_as_event_years(store):
+    plan = _plan("What did Buffett learn from the credit crisis?", store)
+    assert plan.year_source == "event" and plan.year_spans == () and plan.year_range[0] == 2007
+
+
+def test_a_year_the_event_cannot_have_drops_the_event(store):
+    plan = _plan("How did Buffett react to the 1997 Asian financial crisis?", store)
+    assert plan.events == () and plan.year_range == (1997, 1997)
+    assert _plan("What did he say about the 1998 collapse of Long-Term Capital Management?", store).events == (
+        "ltcm_1998",)
+
+
+def test_event_phrases_do_not_create_themes(store):
+    plan = _plan("What did Buffett say about the collapse of Long-Term Capital Management?", store)
+    assert plan.events == ("ltcm_1998",) and "management_governance" not in plan.themes
+
+
+def test_company_aliases_match_with_their_case():
+    store = KnowledgeStore(companies={"companies": {"BNSF": {"aliases": ["BNSF", "Burlington Northern Santa Fe"]},
+                                                    "Pilot Flying J": {"aliases": ["Pilot"]}}})
+    assert plan_query("What did Berkshire pay for Burlington Northern Santa Fe?", store).companies == ("BNSF",)
+    assert plan_query("Did Buffett ever work as a pilot for insurers?", store).companies == ()
+    assert plan_query("Why did Berkshire buy Pilot?", store).companies == ("Pilot Flying J",)
+
+
+@pytest.mark.parametrize("query,superlative", [
+    ("Across all of these letters, which sector did Buffett speak most positively about?", "sector:positive"),
+    ("Which company did Buffett praise the most?", "company:positive"),
+    ("Which industry did he criticize most harshly across the letters?", "sector:negative"),
+    ("Which businesses was Buffett most negative about?", "company:negative"),
+    ("What kind of business does Buffett describe as the best kind to own?", ""),
+    ("Which industries did Buffett always avoid over the years?", ""),
+])
+def test_superlatives(store, query, superlative):
+    assert _plan(query, store).superlative == superlative
+
+
+def test_numeric_intent_is_kept_for_every_kind(store):
+    assert _plan("How did the book value per share change between 1990 and 1995?", store).numeric
+    assert not _plan("What is Buffett's view on share buybacks?", store).numeric

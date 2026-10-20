@@ -248,11 +248,13 @@ def ask(req: AskRequest) -> AskResponse:
 
     query = req.query
     final: Optional[ask_flow.FinanceRoute] = None
+    per_period: Optional[bool] = None  # None: the legacy rule (comparison_periods of the query)
     try:
         if finance_pipeline_enabled():
             route = ask_flow.finance_route(req)
             query = route.query
             final = route if route.final else None
+            per_period = route.per_period
             llm, hits, used_filter, reranked, context_hits, prompt, expanded = route.prepared()
         else:
             llm, hits, used_filter, reranked, context_hits, prompt, expanded = ask_flow._prepare_ask(req)
@@ -263,10 +265,10 @@ def ask(req: AskRequest) -> AskResponse:
     citations: List[Dict[str, Any]] = []
     if final is not None:  # scope / numeric / digest: finished, no evidence gate, validator or expansion
         answer, citations = final.answer, final.citations
-    elif hits or comparison_periods(query):
+    elif hits or (comparison_periods(query) if per_period is None else per_period):
         answer, citations = ask_flow._generate_answer(
             llm, prompt, context_hits, req.max_new_tokens, query, ask_flow._extra_queries(req, expanded),
-            [turn.model_dump() for turn in req.history],
+            [turn.model_dump() for turn in req.history], per_period,
         )
 
     return AskResponse(
@@ -326,11 +328,12 @@ def ask_stream(req: AskRequest) -> StreamingResponse:
         if route is not None and route.final:  # streamed as it is: no assess_evidence gate, validator or expansion
             yield _sse("done", {"answer": route.answer, "citations": route.citations})
             return
-        if comparison_periods(query):
+        per_period = route.per_period if route is not None else None
+        if comparison_periods(query) if per_period is None else per_period:
             yield _sse("status", {"stage": "generating"})
             answer, citations = ask_flow._generate_answer(
                 llm, prompt, context_hits, req.max_new_tokens, query, extras,
-                [turn.model_dump() for turn in req.history],
+                [turn.model_dump() for turn in req.history], per_period,
             )
             yield _sse("done", {"answer": answer, "citations": citations})
             return
@@ -355,7 +358,8 @@ def ask_stream(req: AskRequest) -> StreamingResponse:
             if EXPOSE_DEBUG_STATUS:
                 print(f"[backend] stream failed, falling back: {exc}", flush=True)
             # The non-streaming path carries the full retry/fallback logic.
-            answer, citations = ask_flow._generate_answer(llm, prompt, context_hits, req.max_new_tokens, query, extras)
+            answer, citations = ask_flow._generate_answer(llm, prompt, context_hits, req.max_new_tokens, query, extras,
+                                                          None, per_period)
             yield _sse("done", {"answer": answer, "citations": citations})
             return
 

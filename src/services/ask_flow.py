@@ -34,7 +34,7 @@ from src.generation.evidence_gate import assess_evidence
 from src.evaluation.claim_validator import validate_and_filter_answer
 from src.generation.providers import create_llm_provider
 from src.knowledge import KnowledgeStore
-from src.query.plan import CORPUS_WIDE, MIXED, NUMERIC, PERSONAL, TREND, QueryPlan, plan_query
+from src.query.plan import COMPARISON, CORPUS_WIDE, MIXED, NUMERIC, PERSONAL, TREND, QueryPlan, plan_query
 from src.retrieval.finance_policy import finance_search
 from src.retrieval.query_expansion import build_followup_retrieval_query, expand_query, expand_query_structured
 from src.retrieval.retriever import Retriever
@@ -211,8 +211,13 @@ def _refusal_retry_enabled() -> bool:
 
 
 def _generate_answer(llm, prompt: str, context_hits, max_new_tokens: int, query: Optional[str] = None,
-                     extra_queries=(), history=None):
-    is_comparison = bool(query and comparison_periods(query))
+                     extra_queries=(), history=None, per_period: Optional[bool] = None):
+    """`per_period` None: answer per period when the query names comparison periods (the legacy rule); the finance
+    route passes its own decision (True only for comparison plans), so a trend gets one reader call."""
+    if per_period is None:
+        is_comparison = bool(query and comparison_periods(query))
+    else:
+        is_comparison = bool(query and per_period)
     soft_gate = False
     if query and not is_comparison:
         evidence = assess_evidence(query, context_hits, extra_queries=extra_queries)
@@ -275,8 +280,8 @@ SCOPE_VOTE_POOL = 10  # passages of the scope vote's hybrid retrieval (no rerank
 
 @dataclass
 class FinanceRoute:
-    """Where a planned question went: a finished answer (scope / numeric / digest) or the reader inputs."""
-    route: str                      # scope | numeric | digest | reader
+    """Where a planned question went: a finished answer (scope / superlative / numeric / digest) or the reader inputs."""
+    route: str                      # scope | superlative | numeric | digest | reader
     plan: QueryPlan
     query: str                      # the question the reader and the evidence gate see (personal clauses dropped)
     answer: Optional[str] = None
@@ -288,10 +293,12 @@ class FinanceRoute:
     llm: Any = None
     prompt: str = ""
     debug: Dict[str, Any] = field(default_factory=dict)
+    per_period: bool = False        # reader: one call per comparison period (comparison plans only), else one call
 
     @property
     def final(self) -> bool:
-        """True for scope, numeric and digest answers: returned as they are, no gate, validator or expansion."""
+        """True for scope, superlative, numeric and digest answers: returned as they are, no gate, validator or
+        expansion."""
         return self.route != "reader"
 
     def prepared(self):
@@ -324,11 +331,14 @@ def _scope_vote(retriever, store: KnowledgeStore, timing: Dict[str, float]):
 def finance_route_steps(req: AskRequest):
     """Generator like `_prepare_ask_steps`: yields stage names, returns a `FinanceRoute` (StopIteration.value).
 
-    Plans the question (deterministic, `src/query/plan.py`) and routes it: scope reply, numeric answer, digest
-    answer, or `finance_search` plus the reader. The query-expansion LLM call, the retriever's comparison and
-    multipart splits and its auto year filter are bypassed. The reader route caps the served passages at
-    `llm_context_passages()` for every provider (the remote provider's context is not trimmed by
-    `prepare_answer_context`).
+    Plans the question (deterministic, `src/query/plan.py`) and routes it: scope reply, superlative answer
+    (corpus-wide "which sector did he praise most"), numeric answer (plain figure lookups only), digest answer, or
+    `finance_search` plus the reader. The query-expansion LLM call, the retriever's comparison and multipart splits
+    and its auto year filter are bypassed. The reader route caps the served passages at `llm_context_passages()` for
+    every provider (the remote provider's context is not trimmed by `prepare_answer_context`). A question with
+    numeric intent that is not a plain lookup reaches the reader with its matching figure rows: their source passages
+    are served first and the rows are added to the prompt. Only comparison plans are answered per period; every other
+    reader question (a trend included) is one reader call over the served passages.
     """
     retriever: Retriever = _state["retriever"]
     store = _knowledge_store()
@@ -343,19 +353,32 @@ def finance_route_steps(req: AskRequest):
     if plan.scope == PERSONAL:
         done = finance_answer.scope_answer()
         return FinanceRoute("scope", plan, query, done.answer, done.citations, done.hits, [], debug=debug)
+    cap = llm_context_passages()
 
-    if plan.kind == NUMERIC:
-        done = finance_answer.numeric_answer(plan, store, docs_by_id)
-        if done is not None:  # served from the numbers table: no retrieval
+    if plan.superlative:
+        done = finance_answer.superlative_answer(plan, store, docs_by_id, max_hits=cap)
+        if done is not None:  # ranked from the stance annotations: no retrieval
             debug.update(done.detail)
-            return FinanceRoute("numeric", plan, query, done.answer, done.citations, done.hits, [], debug=debug)
+            return FinanceRoute("superlative", plan, query, done.answer, done.citations, done.hits, [], debug=debug)
+
+    rows: List[Any] = []
+    if plan.kind == NUMERIC or plan.numeric:
+        rows = finance_answer.figure_rows(plan, store, docs_by_id)
+        if rows and plan.kind == NUMERIC and finance_answer.plain_figure_lookup(plan) \
+                and finance_answer.metric_named(plan, store):
+            done = finance_answer.numeric_answer(plan, store, docs_by_id)
+            if done is not None:  # a plain figure lookup, served from the numbers table: no retrieval
+                debug.update(done.detail)
+                return FinanceRoute("numeric", plan, query, done.answer, done.citations, done.hits, [], debug=debug)
+    pinned = finance_answer.figure_source_hits(rows, docs_by_id)[:max(1, cap // 3)]
+    rows = [row for row in rows if row["source_id"] in {h.id for h in pinned}]
     yield "retrieving"
-    hits, search_debug = finance_search(plan, retriever, store)
+    hits, search_debug = finance_search(plan, retriever, store, pinned=pinned)
     debug.update(search_debug)
+    debug["figure_rows"] = len(rows)
     used_filter = ({"year": {"$gte": min(plan.year_range), "$lte": max(plan.year_range)}}
                    if plan.year_hard and plan.year_range else None)
     reranked = bool(search_debug.get("reranked"))
-    cap = llm_context_passages()
 
     if plan.kind == CORPUS_WIDE:
         done = finance_answer.digest_answer(plan, store, docs_by_id, hits)
@@ -366,6 +389,7 @@ def finance_route_steps(req: AskRequest):
                                 reranked, debug=debug)
 
     llm = _server_llm()
+    per_period = plan.kind == COMPARISON and bool(comparison_periods(query, history))
     context_hits: List[Any] = []
     prompt = ""
     if hits:
@@ -375,6 +399,7 @@ def finance_route_steps(req: AskRequest):
             neighbors=retrieval_setting("ANSWER_CONTEXT_NEIGHBORS"), max_chars=ANSWER_CONTEXT_MAX_CHARS,
             max_new_tokens=req.max_new_tokens, n_ctx=llm_n_ctx(),
             max_passages=cap, passage_max_chars=retrieval_setting("LLM_PASSAGE_MAX_CHARS"),
+            periods=None if per_period else (),
         )
         context_hits = list(context_hits)[:cap]
         if plan.kind == TREND:
@@ -384,8 +409,17 @@ def finance_route_steps(req: AskRequest):
             prompt = finance_answer.trend_prompt(query, context_hits, history)
         else:
             prompt = build_cited_prompt(query=query, hits=context_hits, history=history)
+        if rows:
+            prompt = finance_answer.figures_prompt(prompt, rows, context_hits)
     return FinanceRoute("reader", plan, query, hits=context_hits, retrieved_hits=hits, used_filter=used_filter,
-                        reranked=reranked, llm=llm, prompt=prompt, debug=debug)
+                        reranked=reranked, llm=llm, prompt=prompt, debug=debug, per_period=per_period)
+
+
+def finance_answer_mode(route: FinanceRoute) -> str:
+    """How the backend answers a route: the final route name, or reader / reader:periods (one call per period)."""
+    if route.final:
+        return route.route
+    return "reader:periods" if route.per_period else "reader"
 
 
 def finance_route(req: AskRequest) -> FinanceRoute:

@@ -1,4 +1,4 @@
-"""Read-only lookups over `data/knowledge/` (annotations, numbers, digests, taxonomy, events).
+"""Read-only lookups over `data/knowledge/` (annotations, numbers, digests, taxonomy, events, companies).
 
 A passage without an annotation counts as financial, so an empty or partial store lets every passage pass through.
 """
@@ -11,7 +11,7 @@ from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional
 
 FINANCIAL = "financial"
-_FILES = ("annotations.jsonl", "numbers.jsonl", "digests.jsonl", "taxonomy.json", "events.json")
+_FILES = ("annotations.jsonl", "numbers.jsonl", "digests.jsonl", "taxonomy.json", "events.json", "companies.json")
 
 
 def default_dir() -> Path:
@@ -82,12 +82,14 @@ class KnowledgeStore:
         digests: Optional[Iterable[Dict[str, Any]]] = None,
         taxonomy: Optional[Dict[str, Any]] = None,
         events: Optional[Dict[str, Any]] = None,
+        companies: Optional[Dict[str, Any]] = None,
     ) -> None:
         self._ann: Dict[str, Dict[str, Any]] = {a["id"]: a for a in (annotations or [])}
         self._numbers: List[Dict[str, Any]] = [n for n in (numbers or []) if "metric" in n]
         self._digests: List[Dict[str, Any]] = list(digests or [])
         self.taxonomy: Dict[str, Any] = taxonomy or {}
         self._events: Dict[str, Any] = (events or {}).get("events", events or {}) if events else {}
+        self._companies: Dict[str, Any] = (companies or {}).get("companies", companies or {}) if companies else {}
 
     @classmethod
     def empty(cls) -> "KnowledgeStore":
@@ -110,6 +112,7 @@ class KnowledgeStore:
             digests=_read_jsonl(root / "digests.jsonl"),
             taxonomy=_read_json(root / "taxonomy.json"),
             events=_read_json(root / "events.json"),
+            companies=_read_json(root / "companies.json"),
         )
 
     def __len__(self) -> int:
@@ -126,6 +129,9 @@ class KnowledgeStore:
     def has_personal(self, pid: str) -> bool:
         ann = self._ann.get(pid)
         return bool(ann and ann.get("has_personal"))
+
+    def annotations(self) -> Iterable[Dict[str, Any]]:
+        return self._ann.values()
 
     def is_table(self, pid: str) -> bool:
         ann = self._ann.get(pid)
@@ -181,3 +187,8 @@ class KnowledgeStore:
 
     def company_names(self) -> List[str]:
         return sorted({name for ann in self._ann.values() for name in ann.get("companies") or ()})
+
+    def company_aliases(self) -> Dict[str, List[str]]:
+        """Canonical company name -> the other ways the letters write it (`companies.json`; empty without it)."""
+        return {name: [a for a in (row.get("aliases") or []) if a and a != name]
+                for name, row in self._companies.items() if isinstance(row, dict)}

@@ -205,13 +205,15 @@ def retrieval_setting(name: str):
 # Nothing reads them unless FINANCE_PIPELINE=1, so the defaults leave flag-off behaviour unchanged.
 # -----------------------------------------------------------------------------
 FINANCE_DEFAULTS: dict = {
-    "FINANCE_K": 12,                   # passages finance_search returns, before the neighbour merge
+    "FINANCE_K": 0,                    # passages finance_search returns before the neighbour merge; 0 = llm_context_passages()
     "FINANCE_OVERFETCH": 3,            # candidates fetched per ranking = max(RETRIEVAL_FETCH_K, k * this)
     "FINANCE_YEAR_BOOST_WEIGHT": 2,    # weight of the year-filtered ranking against the unfiltered one
     "FINANCE_YEAR_KEEP": 3,            # year boost only: the top-N unfiltered hits stay served even outside the range
     "FINANCE_ENTITY_BOOST_WEIGHT": 1,  # weight of the ranking of passages tagged with the plan's entities
-    "FINANCE_MAX_PER_LETTER": 2,       # trend / period / corpus_wide: passages per letter at most
-    "FINANCE_MIN_LETTERS": 4,          # trend / period / corpus_wide: different letters at least, when available
+    "FINANCE_TAG_DEPTH": 200,          # depth of the ranking the entity-tagged candidates are drawn from
+    "FINANCE_TAG_POOL": 24,            # entity-tagged candidates the reranker always sees, beyond RERANK_CANDIDATES
+    "FINANCE_MAX_PER_LETTER": 2,       # questions spanning several letters: passages per letter at most
+    "FINANCE_MIN_LETTERS": 4,          # questions spanning several letters: different letters at least, when available
 }
 
 

@@ -8,6 +8,7 @@ from pathlib import Path
 import pytest
 from fastapi.testclient import TestClient
 
+from src.generation import finance_answer
 from src.generation.finance_answer import SCOPE_REPLY, TREND_SENTENCE
 from src.generation.prompt import REFUSAL_LINE
 from src.knowledge import KnowledgeStore
@@ -145,6 +146,7 @@ def test_finished_answers_do_not_go_through_the_validator_or_expansion(env, monk
 
 def test_reader_route_serves_trend_passages_oldest_first_capped_for_the_remote_provider(env, monkeypatch):
     monkeypatch.setenv("LLM_CONTEXT_PASSAGES", "4")
+    monkeypatch.setenv("FINANCE_K", "6")  # retrieval returns more than the reader context takes
     body = _ask(env, TREND_Q)
     years = [h["year"] for h in body["hits"]]
     assert len(body["hits"]) == 4 and years == sorted(years)
@@ -188,3 +190,43 @@ def test_flag_off_keeps_the_old_path(env, monkeypatch):
     body = _ask(env, PERSONAL_Q)
     assert body["answer"] is None and old.calls == [("search", None)]
     assert env.llm.prompts == []
+
+
+# --- finance-dev-fix-1: one reader call for trends, figures for non-plain numeric questions, superlatives ---
+TREND_SPAN_Q = "How did Buffett's view of bonds change from the 1980s to 2010?"
+
+
+def test_a_trend_with_named_periods_is_one_reader_call_on_both_endpoints(env):
+    route = ask_flow.finance_route(ask_flow.AskRequest(query=TREND_SPAN_Q))
+    assert route.route == "reader" and not route.per_period and ask_flow.finance_answer_mode(route) == "reader"
+    body = _ask(env, TREND_SPAN_Q)
+    events, _ = _stream(env, TREND_SPAN_Q)
+    assert len(env.llm.prompts) == 2 and all(p.count(TREND_SENTENCE) == 1 for p in env.llm.prompts)  # one per request
+    for answer in (body["answer"], events["done"]["answer"]):
+        assert "do not cover this question" not in (answer or "")
+
+
+def test_a_comparison_plan_is_still_answered_per_period(env):
+    route = ask_flow.finance_route(ask_flow.AskRequest(query="Compare Buffett's view of bonds in 1986 and in 2010."))
+    assert route.plan.kind == "comparison" and route.per_period
+    assert ask_flow.finance_answer_mode(route) == "reader:periods"
+
+
+def test_a_numeric_question_that_is_not_a_plain_lookup_goes_to_the_reader_with_its_figures(env):
+    query = "What was Berkshire's book value per share in 1987, and why did it rise?"
+    body = _ask(env, query)
+    assert body["hits"][0]["id"] == "1987_p0000"  # the figure row's source passage is served first
+    prompt = env.llm.prompts[0]
+    assert finance_answer.FIGURES_BEGIN in prompt and '$2,477.47; as written: "$2,477.47" [1]' in prompt
+    assert prompt.index(finance_answer.FIGURES_END) < prompt.index("BEGIN USER QUESTION")
+
+
+def test_superlative_question_is_ranked_from_the_annotations_on_both_endpoints(env):
+    query = "Across all the letters, which sector did Buffett speak most negatively about?"
+    body = _ask(env, query)
+    events, _ = _stream(env, query)
+    assert body["answer"] == events["done"]["answer"] and body["answer"].startswith("Ranked by the number of letters")
+    assert "Airlines aviation: 1 letter (1990–1990)" in body["answer"]
+    assert body["hits"] and [h["id"] for h in body["hits"]] == [h["id"] for h in events["meta"]["hits"]]
+    assert _resolves(body["answer"], body["hits"]) and env.llm.prompts == []
+    assert env.retriever.calls == [("hybrid", None)] * 2  # only the scope vote of each request
