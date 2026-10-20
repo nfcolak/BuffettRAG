@@ -190,10 +190,15 @@ def _finalize_answer(llm, prompt: str, context_hits, raw_answer: str, max_new_to
 
     `trace` (FINANCE_DEBUG only) collects the raw output and the validator's kept/dropped sentences.
 
+    A finance reader prompt (`finance_answer.is_reader_prompt`) gets the reader settings: number-safe list formatting,
+    the validator's reader options (`finance_answer.READER_VALIDATION`) and neighbour expansion
+    (`finance_answer.READER_EXPANSION`). Every other prompt is finalized exactly as before.
+
     A refusal is not a provider error. Repeating the same prompt until the
     model answers selects against justified abstention without new evidence.
     """
-    answer = format_answer_markdown(strip_chat_artifacts(raw_answer))
+    reader = finance_answer.is_reader_prompt(prompt)
+    answer = (finance_answer.format_reader_answer if reader else format_answer_markdown)(strip_chat_artifacts(raw_answer))
     if trace is not None:
         trace["raw_answer"] = raw_answer
     if is_citation_only(answer):
@@ -207,15 +212,22 @@ def _finalize_answer(llm, prompt: str, context_hits, raw_answer: str, max_new_to
         if trace is not None:
             trace["validator"] = {"skipped": "model_refused", "kept": [], "dropped": []}
         return answer, []
-    validation = validate_and_filter_answer(answer, context_hits)
+    validation = validate_and_filter_answer(answer, context_hits, **(finance_answer.READER_VALIDATION if reader else {}))
     if trace is not None:
         trace["validator"] = {
             "kept": [s["sentence"] for s in validation.sentences if s["kept"]],
             "dropped": [{"sentence": s["sentence"], "reason": s["reason"], "failed_claims": s.get("failed_claims", [])}
                         for s in validation.sentences if not s["kept"]],
         }
+        repaired = [{"sentence": s["original"], "repaired": s["sentence"]}
+                    for s in validation.sentences if s["reason"] == "citation_repaired"]
+        if repaired:  # reader route only, and only when a marker was repaired
+            trace["validator"]["repaired"] = repaired
     answer = validation.safe_answer or REFUSAL_LINE
-    if answer != REFUSAL_LINE:
+    if answer != REFUSAL_LINE and reader:
+        answer = expand_answer(answer, finance_answer.expansion_hits(context_hits, _knowledge_store()),
+                               **finance_answer.READER_EXPANSION)
+    elif answer != REFUSAL_LINE:
         answer = expand_answer(answer, context_hits)
     return answer, parse_citations(answer, context_hits)
 
@@ -281,8 +293,11 @@ def _generate_answer(llm, prompt: str, context_hits, max_new_tokens: int, query:
     answer, citations = _finalize_answer(llm, prompt, context_hits, raw_answer, max_new_tokens, trace)
     if answer == REFUSAL_LINE and trace is not None:
         trace["refusal_by"] = "model_or_validator"
-    if answer == REFUSAL_LINE and soft_gate and len(context_hits) > 3 and _refusal_retry_enabled():
+    if answer == REFUSAL_LINE and soft_gate and len(context_hits) > 3 and _refusal_retry_enabled() \
+            and not finance_answer.is_reader_prompt(prompt):
         # The soft gate let weak evidence through and the model refused: ask once with the top 3 passages.
+        # Not on the finance reader route: its prompt already asks for the part the passages cover, and a second
+        # answer from 3 of the served passages would replace the reader's own (staging_v3: 2 retries, 0 answers).
         top = list(context_hits[:3])
         retry_prompt = build_cited_prompt(query=query, hits=top, history=history)
         try:
@@ -372,7 +387,8 @@ def finance_route_steps(req: AskRequest):
     every provider (the remote provider's context is not trimmed by `prepare_answer_context`). A question with
     numeric intent that is not a plain lookup reaches the reader with its matching figure rows: their source passages
     are served first and the rows are added to the prompt. Only comparison plans are answered per period; every other
-    reader question (a trend included) is one reader call over the served passages.
+    reader question (a trend included) is one reader call over the served passages, with the finance reader prompt
+    (`finance_answer.reader_prompt`) and, in `_finalize_answer`, the reader settings.
     """
     retriever: Retriever = _state["retriever"]
     store = _knowledge_store()
@@ -439,10 +455,7 @@ def finance_route_steps(req: AskRequest):
         if plan.kind == TREND:
             context_hits = finance_answer.sort_by_year(context_hits)
         context_hits = order_passages(context_hits)
-        if plan.kind == TREND:
-            prompt = finance_answer.trend_prompt(query, context_hits, history)
-        else:
-            prompt = build_cited_prompt(query=query, hits=context_hits, history=history)
+        prompt = finance_answer.reader_prompt(query, context_hits, history, trend=plan.kind == TREND)
         if rows:
             prompt = finance_answer.figures_prompt(prompt, rows, context_hits)
     return FinanceRoute("reader", plan, query, hits=context_hits, retrieved_hits=hits, used_filter=used_filter,

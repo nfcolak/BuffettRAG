@@ -24,6 +24,17 @@ Reader route helpers (the answer still goes through `ask_flow._finalize_answer`)
   - `sort_by_year(hits)` and `trend_prompt(query, hits, history)`: trend answers keep the system prompt v1 (FT-r1 was
     trained on it), serve the passages sorted by year (the [n] markers follow the served list) and append one sentence
     to the user block that asks for a year-by-year answer;
+  - `reader_prompt(query, hits, history, trend)`: every finance reader prompt. The system prompt, the passage and
+    question blocks and the "Answer:" cue stay exactly as FT-r1 was trained on them; `READER_INSTRUCTIONS` is appended
+    to the user block (after the trend sentence for a trend). It asks for every relevant passage, the reasons and the
+    figures, several cited sentences, a gap sentence for a part the passages do not cover, and the refusal line only
+    when no passage answers any part. `is_reader_prompt(prompt)` recognises such a prompt by its tail, so
+    `ask_flow._finalize_answer` applies the reader settings below on /ask and /ask/stream alike;
+  - reader post-processing: `format_reader_answer` (list formatting that keeps "600,000" whole), `READER_VALIDATION`
+    (claim validator options: citation repair, gap sentences via `is_gap_line`, contentless sentences dropped) and
+    `READER_EXPANSION` (up to two passage sentences after every verbatim answer sentence, within the existing
+    ANSWER_MAX_SENTENCES / ANSWER_EXPANDED_MAX_SENTENCES caps; `expansion_hits` keeps passages with personal facts
+    out of it);
   - `figure_rows(plan, store, docs_by_id)` and `figures_prompt(prompt, rows, hits)`: a question with numeric intent
     that is not a plain lookup goes to the reader; its matching figure rows' source passages are served first and
     the rows are added to the user block as extra context, each citing its served passage.
@@ -35,13 +46,29 @@ from dataclasses import dataclass, field
 from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple
 
 from src.generation.decompose import split_question
-from src.generation.prompt import build_cited_prompt, parse_citations
+from src.generation.prompt import REFUSAL_LINE, build_cited_prompt, format_answer_markdown, parse_citations
 from src.knowledge import KnowledgeStore
 from src.query.plan import QueryPlan
 from src.storage import SearchHit
 
 SCOPE_REPLY = "I only answer questions about Buffett's financial views and Berkshire's financial results."
 TREND_SENTENCE = "Answer year by year, in the order of the passages, and say which year each point comes from."
+READER_INSTRUCTIONS = (
+    "Use every passage that answers part of the question, not only the first one. "
+    "Give the reasons and the figures the passages state. "
+    "Write several sentences, one point each, copying the passage sentence when you can, and end every sentence "
+    "with the citation of the passage it comes from. "
+    "If the passages answer only part of the question, answer that part, then say in one sentence which part they "
+    "do not cover. "
+    "Write the refusal line only when no passage answers any part of the question; a passage that only shares a "
+    "topic word with the question does not answer it."
+)
+# Passage sentences added after / before every verbatim reader-answer sentence (staging_v3 replay of the raw answers:
+# claim coverage 6.2% -> 14.3% with 2/0, 13.8% with 1/1, 17.5% with 2/1; sentences before an anchor often open
+# mid-argument, so none are added before).
+READER_NEIGHBOR_AFTER = 2
+READER_NEIGHBOR_BEFORE = 0
+GAP_LINE_MAX_WORDS = 40
 MAX_NUMERIC_ROWS = 6
 DIGEST_GAP_PASSAGES = 4  # reader passages appended after the digest's quoted passages, at most
 SUPERLATIVE_TOP = 3      # targets named in a superlative answer
@@ -57,6 +84,17 @@ _EXPLAIN_CLAUSE = re.compile(
 _SECOND_ASK = re.compile(r"(?:[,;]|\band\b)\s*(?:and\s+)?(?:how|what|why|which|when|where|who)\b", re.I)
 
 _ANSWER_SUFFIX = "\n\nAnswer:"
+_READER_TAIL = f" {READER_INSTRUCTIONS}{_ANSWER_SUFFIX}"
+# a gap sentence: "The (retrieved) passages / letters ... do not ...", or "There is no information ..."
+_GAP_START = re.compile(
+    r"^(?:(?:however|but),?\s+)?(?:(?:the|these)\s+(?:[a-z-]+\s+){0,3}?(?:passages?|letters?|excerpts?)\b"
+    r"|there\s+is\s+no\s+(?:information|evidence|mention)\b)", re.I)
+_GAP_NEGATION = re.compile(r"\b(?:do|does|did)\s+not\b|\b(?:don't|doesn't|didn't)\b|\bno\s+(?:information|evidence|mention)\b",
+                           re.I)
+_GAP_CLAIM = re.compile(r"\b(?:but|although|though|while|whereas|instead)\b|;", re.I)  # a second clause may state a fact
+_GAP_FIGURE = re.compile(r"[$£€]\s*\d|\d\s*(?:%|percent\b)", re.I)
+_THOUSANDS_RE = re.compile(r"(?<=\d),(?=\d{3}(?!\d))")
+_COMMA_MASK = "\ue000"  # a private-use character, never in model output
 _TOKEN_RE = re.compile(r"[a-z0-9]+")
 _METRIC_STOP = {"in", "of", "the", "a", "an", "and", "to", "usd", "pct", "per"}
 _UNIT_FORMATS = {
@@ -113,6 +151,54 @@ def trend_prompt(query: str, hits: Sequence[SearchHit], history: Optional[Sequen
     if not prompt.endswith(_ANSWER_SUFFIX):  # defensive: never rewrite a prompt whose tail we do not know
         return prompt
     return f"{prompt[:-len(_ANSWER_SUFFIX)]} {TREND_SENTENCE}{_ANSWER_SUFFIX}"
+
+
+# --- reader ---
+def reader_prompt(query: str, hits: Sequence[SearchHit], history: Optional[Sequence[Dict[str, str]]] = None,
+                  trend: bool = False) -> str:
+    """The finance reader prompt: the cited prompt (or the trend prompt) with READER_INSTRUCTIONS at the end of the
+    user block, before the "Answer:" cue. The system prompt and the blocks the model was trained on are unchanged."""
+    prompt = trend_prompt(query, hits, history) if trend else build_cited_prompt(query=query, hits=hits, history=history)
+    if not prompt.endswith(_ANSWER_SUFFIX):  # defensive, as in trend_prompt
+        return prompt
+    return prompt[:-len(_ANSWER_SUFFIX)] + _READER_TAIL
+
+
+def is_reader_prompt(prompt: str) -> bool:
+    """True for a prompt built by `reader_prompt` (the question text cannot reach the tail)."""
+    return bool(prompt) and prompt.endswith(_READER_TAIL)
+
+
+def is_gap_line(text: str) -> bool:
+    """A sentence that only says which part of the question the passages do not cover: it opens with the passages
+    (or "There is no information"), negates, has no second clause and no money or percent figure, and is not the
+    refusal line itself (beside an answer that line would read as a refusal)."""
+    s = " ".join(str(text).replace("’", "'").split())
+    if not s or s.rstrip(".") == REFUSAL_LINE.rstrip(".") or len(s.split()) > GAP_LINE_MAX_WORDS:
+        return False
+    negation = _GAP_NEGATION.search(s)
+    return bool(_GAP_START.match(s) and negation and not _GAP_CLAIM.search(s, negation.end())
+                and not _GAP_FIGURE.search(s))
+
+
+def expansion_hits(hits: Sequence[SearchHit], store: KnowledgeStore) -> List[SearchHit]:
+    """The served hits as neighbour expansion sees them: a passage with personal facts in any of its merged chunks
+    (annotations) is blanked, so expansion never adds a sentence nobody asked for from a personal story. The [n]
+    positions stay; citations are still parsed against the served hits."""
+    return [SearchHit(h.id, "", dict(h.metadata), h.score)
+            if any(store.has_personal(pid) for pid in (h.metadata.get("merged_ids") or [h.id])) else h
+            for h in hits]
+
+
+def format_reader_answer(text: str) -> str:
+    """`format_answer_markdown` that keeps a number with thousands separators whole: its inline-list split turns
+    "... is about 600,000. [2]" into "... is about 600" and a list item "000. [2]"."""
+    return format_answer_markdown(_THOUSANDS_RE.sub(_COMMA_MASK, text)).replace(_COMMA_MASK, ",")
+
+
+# claim validator options and neighbour expansion of the finance reader route (ask_flow._finalize_answer)
+READER_VALIDATION: Dict[str, Any] = {"repair_citations": True, "gap_line": is_gap_line, "drop_contentless": True}
+READER_EXPANSION: Dict[str, int] = {"after": READER_NEIGHBOR_AFTER, "before": READER_NEIGHBOR_BEFORE}
 
 
 # --- scope ---

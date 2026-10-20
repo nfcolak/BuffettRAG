@@ -15,6 +15,7 @@ from config import retrieval_setting
 from src.evaluation.citation_faithfulness import lexical_support_score
 
 _CITATION_RE = re.compile(r"\[(\d+(?:\s*,\s*\d+)*)\]")
+_MARKERS_RE = re.compile(r"\s*\[\d+(?:\s*,\s*\d+)*\]")  # markers with the space before them
 _TOKEN_RE = re.compile(r"[A-Za-z0-9']+")
 _NUMBER_RE = re.compile(
     r"(?<![\w.])(?P<currency>[$£€]?)\s*(?P<value>\d(?:[\d,]*\d)?(?:\.\d+)?)"
@@ -309,11 +310,53 @@ def _verbatim_span(body: str, passages: Sequence[str]) -> bool:
     return len(_TOKEN_RE.findall(sentence)) >= 6 and any(sentence in _span_norm(p) for p in passages)
 
 
+def _agreement(claim: str, hit: Any, nli_scorer: Callable[[str, str], float] | None,
+               threshold: float) -> tuple[bool, float]:
+    """(supported, score) of one claim against one passage."""
+    passage = hit.text
+    year = _hit_year(hit)
+    if nli_scorer:
+        score = float(nli_scorer(passage, claim))
+        return (score >= max(0.5, threshold) and _nli_hard_agreement(claim, passage, year)), score
+    return _deterministic_agreement(claim, passage, year)
+
+
+def _repair_index(body: str, claims: Sequence[str], hits: Sequence[Any], cited: Sequence[int],
+                  nli_scorer: Callable[[str, str], float] | None, threshold: float) -> int | None:
+    """The first other served passage that supports the whole sentence, or None.
+
+    A passage supports it when the sentence is its own text (verbatim span, >= 6 tokens) or, for a sentence that cites
+    a valid passage, when every claim passes the same checks against it (numbers, polarity and entities included).
+    A sentence without a valid marker is only repaired to a passage whose own text it is.
+    """
+    others = [i for i in range(len(hits)) if i not in cited]
+    for index in others:
+        if _verbatim_span(body, [hits[index].text]):
+            return index
+    if not cited or not claims:
+        return None
+    for index in others:
+        if all(_agreement(claim, hits[index], nli_scorer, threshold)[0] for claim in claims):
+            return index
+    return None
+
+
 def validate_and_filter_answer(answer: str, hits: Sequence[Any], *, nli_scorer: Callable[[str, str], float] | None = None,
-                               threshold: float = 0.2) -> ClaimValidationResult:
-    """Drop unsupported sentences individually; supported sentences stay verbatim."""
-    out_lines: List[str] = []
+                               threshold: float = 0.2, repair_citations: bool = False,
+                               gap_line: Callable[[str], bool] | None = None,
+                               drop_contentless: bool = False) -> ClaimValidationResult:
+    """Drop unsupported sentences individually; supported sentences stay verbatim.
+
+    Options for the finance reader route (all off by default, so every other caller is unchanged):
+      - `repair_citations`: a sentence its cited passages do not support, but another served passage does
+        (`_repair_index`), is kept with its markers replaced by that passage's [n];
+      - `gap_line`: a predicate; a sentence it accepts ("The passages do not cover ...") is not a claim and is kept
+        without markers, but only when the answer keeps at least one cited sentence;
+      - `drop_contentless`: a sentence with no words left after its list prefix and markers ("000. [2]") is dropped.
+    """
+    out_lines: List[Any] = []  # "" for a blank line, else the line's kept (sentence, is_gap_line) pairs
     blocked, validations, sentence_log = [], [], []
+    gap_logs: List[dict] = []
     for line in answer.split("\n"):
         if not line.strip():
             out_lines.append("")
@@ -327,6 +370,17 @@ def validate_and_filter_answer(answer: str, hits: Sequence[Any], *, nli_scorer: 
             sentence_ok = bool(valid)
             failed = []
             body = re.sub(r"^\s*(?:[-*]|\d+\.)\s+", "", sentence)
+            if drop_contentless and not re.search(r"[A-Za-z]", _CITATION_RE.sub("", body)):
+                blocked.append(body.strip())
+                sentence_log.append({"sentence": sentence.strip(), "kept": False, "reason": "no_content",
+                                     "failed_claims": []})
+                continue
+            if gap_line is not None and gap_line(_CITATION_RE.sub("", body).strip()):
+                gap = _MARKERS_RE.sub("", sentence).strip()
+                kept.append((gap, True))
+                gap_logs.append({"sentence": gap, "kept": True, "reason": "gap_line"})
+                sentence_log.append(gap_logs[-1])
+                continue
             claims = split_claims(body)
             # Do not approve a numeric relation by splicing quantities from
             # different source sentences/periods. Check the unsplit relation too.
@@ -336,20 +390,13 @@ def validate_and_filter_answer(answer: str, hits: Sequence[Any], *, nli_scorer: 
                 # The sentence is the cited passage's own text: nothing to check, and a split must not drop it.
                 validations.append({"claim": _CITATION_RE.sub("", body).strip(), "cited_indexes": valid, "support": 1.0,
                                     "method": "verbatim_span", "supported": True})
-                kept.append(sentence.strip())
+                kept.append((sentence.strip(), False))
                 sentence_log.append({"sentence": sentence.strip(), "kept": True, "reason": "verbatim_span"})
                 continue
             for claim in claims:
                 scores, agreements = [], []
                 for index in valid:
-                    passage = hits[index].text
-                    year = _hit_year(hits[index])
-                    if nli_scorer:
-                        score = float(nli_scorer(passage, claim))
-                        agreement = (score >= max(0.5, threshold) and
-                                     _nli_hard_agreement(claim, passage, year))
-                    else:
-                        agreement, score = _deterministic_agreement(claim, passage, year)
+                    agreement, score = _agreement(claim, hits[index], nli_scorer, threshold)
                     scores.append(score)
                     agreements.append(agreement)
                 supported = bool(valid) and any(agreements)
@@ -359,9 +406,20 @@ def validate_and_filter_answer(answer: str, hits: Sequence[Any], *, nli_scorer: 
                 if not supported:
                     sentence_ok = False
                     failed.append(claim)
+            target = None
+            if not sentence_ok and repair_citations:
+                target = _repair_index(body, claims, hits, valid, nli_scorer, threshold)
             if sentence_ok:
-                kept.append(sentence.strip())
+                kept.append((sentence.strip(), False))
                 sentence_log.append({"sentence": sentence.strip(), "kept": True, "reason": "supported"})
+            elif target is not None:
+                # A true sentence with the wrong [n]: it keeps its text and points at the passage that supports it.
+                repaired = f"{_MARKERS_RE.sub('', sentence).strip()} [{target + 1}]"
+                validations.append({"claim": _CITATION_RE.sub("", body).strip(), "cited_indexes": [target],
+                                    "support": 1.0, "method": "citation_repair", "supported": True})
+                kept.append((repaired, False))
+                sentence_log.append({"sentence": repaired, "kept": True, "reason": "citation_repaired",
+                                     "original": sentence.strip()})
             else:
                 blocked.extend(failed or [body.strip()])
                 sentence_log.append({
@@ -370,6 +428,17 @@ def validate_and_filter_answer(answer: str, hits: Sequence[Any], *, nli_scorer: 
                     "failed_claims": failed,
                 })
         if kept:
-            out_lines.append(" ".join(kept))
-    text = re.sub(r"\n{3,}", "\n\n", "\n".join(out_lines)).strip()
+            out_lines.append(kept)
+    answered = any(not is_gap for part in out_lines if part for _, is_gap in part)
+    if not answered:  # a gap line alone is no answer: the caller refuses
+        for entry in gap_logs:
+            entry.update(kept=False, reason="gap_line_without_answer", failed_claims=[])
+    lines = []
+    for part in out_lines:
+        texts = [text for text, is_gap in part if answered or not is_gap] if part else None
+        if texts is None:
+            lines.append("")
+        elif texts:
+            lines.append(" ".join(texts))
+    text = re.sub(r"\n{3,}", "\n\n", "\n".join(lines)).strip()
     return ClaimValidationResult(text, blocked, validations, nli_scorer is not None, sentence_log)
