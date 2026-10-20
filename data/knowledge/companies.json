@@ -1,0 +1,1517 @@
+{
+ "version": 1,
+ "note": "Canonical company names for annotations (companies, stance targets), digests and routing. Annotators write the canonical name (the key); aliases are the other ways the letters write it. One home per company: sector is a taxonomy.json sector key (g1-9). A company not listed here may still be written as named in the letter; check_kl reports it on a REVIEW line, not as a problem, and M1 adds it or maps it.",
+ "provenance": "Built 2026-10-19 by plan-fix group 1 (finding g1-15) from corpus counts only: candidate names were counted with a case-sensitive whole-word search over input/chunks_v3_paragraph.jsonl (quotes normalised); 'passages' = passages containing the canonical name or any alias, 'letters' = letters with such a passage. Companies with fewer than 5 passages are left out. Counts are navigation aids, not labels: a passage that only lists a holding counts too. No test-set access.",
+ "min_passages": 5,
+ "companies": {
+  "GEICO": {
+   "sector": "insurance",
+   "aliases": [
+    "GEICO",
+    "Government Employees Insurance"
+   ],
+   "passages": 370,
+   "letters": 46,
+   "first_letter": 1977,
+   "last_letter": 2024
+  },
+  "Berkshire Hathaway Energy": {
+   "sector": "utilities_energy",
+   "aliases": [
+    "Berkshire Hathaway Energy",
+    "MidAmerican",
+    "BHE"
+   ],
+   "passages": 178,
+   "letters": 26,
+   "first_letter": 1999,
+   "last_letter": 2024
+  },
+  "Nebraska Furniture Mart": {
+   "sector": "retail",
+   "aliases": [
+    "Nebraska Furniture Mart",
+    "NFM",
+    "Furniture Mart"
+   ],
+   "passages": 162,
+   "letters": 36,
+   "first_letter": 1983,
+   "last_letter": 2020
+  },
+  "See's Candies": {
+   "sector": "consumer_brands",
+   "aliases": [
+    "See's"
+   ],
+   "passages": 158,
+   "letters": 36,
+   "first_letter": 1977,
+   "last_letter": 2022
+  },
+  "General Re": {
+   "sector": "insurance",
+   "aliases": [
+    "General Re",
+    "Gen Re",
+    "General Reinsurance"
+   ],
+   "passages": 140,
+   "letters": 20,
+   "first_letter": 1985,
+   "last_letter": 2016
+  },
+  "Coca-Cola": {
+   "sector": "consumer_brands",
+   "aliases": [
+    "Coca-Cola",
+    "Coke"
+   ],
+   "passages": 135,
+   "letters": 39,
+   "first_letter": 1983,
+   "last_letter": 2024
+  },
+  "BNSF": {
+   "sector": "railroads",
+   "aliases": [
+    "BNSF",
+    "Burlington Northern Santa Fe",
+    "Burlington Northern"
+   ],
+   "passages": 134,
+   "letters": 18,
+   "first_letter": 2007,
+   "last_letter": 2024
+  },
+  "Borsheim's": {
+   "sector": "retail",
+   "aliases": [
+    "Borsheim's",
+    "Borsheims"
+   ],
+   "passages": 121,
+   "letters": 30,
+   "first_letter": 1988,
+   "last_letter": 2017
+  },
+  "Clayton Homes": {
+   "sector": "housing_construction",
+   "aliases": [
+    "Clayton Homes",
+    "Clayton"
+   ],
+   "passages": 112,
+   "letters": 18,
+   "first_letter": 2003,
+   "last_letter": 2020
+  },
+  "American Express": {
+   "sector": "financial_services_other",
+   "aliases": [
+    "American Express",
+    "Amex"
+   ],
+   "passages": 94,
+   "letters": 35,
+   "first_letter": 1980,
+   "last_letter": 2024
+  },
+  "Scott Fetzer": {
+   "sector": "manufacturing_industrial",
+   "aliases": [
+    "Scott Fetzer"
+   ],
+   "passages": 85,
+   "letters": 18,
+   "first_letter": 1985,
+   "last_letter": 2002
+  },
+  "National Indemnity": {
+   "sector": "insurance",
+   "aliases": [
+    "National Indemnity",
+    "NICO"
+   ],
+   "passages": 81,
+   "letters": 35,
+   "first_letter": 1977,
+   "last_letter": 2022
+  },
+  "NetJets": {
+   "sector": "airlines_aviation",
+   "aliases": [
+    "NetJets",
+    "Executive Jet",
+    "EJA"
+   ],
+   "passages": 81,
+   "letters": 17,
+   "first_letter": 1998,
+   "last_letter": 2019
+  },
+  "Washington Post": {
+   "sector": "newspapers_publishing",
+   "aliases": [
+    "Washington Post",
+    "WPC",
+    "Graham Holdings"
+   ],
+   "passages": 81,
+   "letters": 36,
+   "first_letter": 1977,
+   "last_letter": 2019
+  },
+  "Wells Fargo": {
+   "sector": "banking",
+   "aliases": [
+    "Wells Fargo"
+   ],
+   "passages": 76,
+   "letters": 30,
+   "first_letter": 1990,
+   "last_letter": 2019
+  },
+  "Gillette": {
+   "sector": "consumer_brands",
+   "aliases": [
+    "Gillette"
+   ],
+   "passages": 67,
+   "letters": 19,
+   "first_letter": 1989,
+   "last_letter": 2019
+  },
+  "Wesco Financial": {
+   "sector": "banking",
+   "aliases": [
+    "Wesco Financial",
+    "Wesco"
+   ],
+   "passages": 64,
+   "letters": 21,
+   "first_letter": 1977,
+   "last_letter": 2019
+  },
+  "Blue Chip Stamps": {
+   "sector": "services_distribution_other",
+   "aliases": [
+    "Blue Chip Stamps",
+    "Blue Chip"
+   ],
+   "passages": 64,
+   "letters": 16,
+   "first_letter": 1977,
+   "last_letter": 2020
+  },
+  "Capital Cities/ABC": {
+   "sector": "tv_broadcasting_media",
+   "aliases": [
+    "Capital Cities",
+    "Cap Cities",
+    "ABC",
+    "American Broadcasting"
+   ],
+   "passages": 63,
+   "letters": 18,
+   "first_letter": 1977,
+   "last_letter": 2019
+  },
+  "Buffalo News": {
+   "sector": "newspapers_publishing",
+   "aliases": [
+    "Buffalo News",
+    "Buffalo Evening News"
+   ],
+   "passages": 60,
+   "letters": 26,
+   "first_letter": 1978,
+   "last_letter": 2015
+  },
+  "Salomon": {
+   "sector": "financial_services_other",
+   "aliases": [
+    "Salomon"
+   ],
+   "passages": 51,
+   "letters": 15,
+   "first_letter": 1987,
+   "last_letter": 2022
+  },
+  "Marmon": {
+   "sector": "manufacturing_industrial",
+   "aliases": [
+    "Marmon"
+   ],
+   "passages": 51,
+   "letters": 14,
+   "first_letter": 2007,
+   "last_letter": 2021
+  },
+  "Kraft Heinz": {
+   "sector": "consumer_brands",
+   "aliases": [
+    "Kraft Heinz",
+    "Kraft Foods",
+    "Kraft",
+    "H. J. Heinz",
+    "Heinz"
+   ],
+   "passages": 46,
+   "letters": 16,
+   "first_letter": 2007,
+   "last_letter": 2024
+  },
+  "USAir": {
+   "sector": "airlines_aviation",
+   "aliases": [
+    "USAir",
+    "US Airways",
+    "USAir Group"
+   ],
+   "passages": 43,
+   "letters": 9,
+   "first_letter": 1989,
+   "last_letter": 2022
+  },
+  "World Book": {
+   "sector": "newspapers_publishing",
+   "aliases": [
+    "World Book"
+   ],
+   "passages": 39,
+   "letters": 13,
+   "first_letter": 1985,
+   "last_letter": 1999
+  },
+  "Shaw Industries": {
+   "sector": "housing_construction",
+   "aliases": [
+    "Shaw Industries",
+    "Shaw"
+   ],
+   "passages": 39,
+   "letters": 15,
+   "first_letter": 2000,
+   "last_letter": 2019
+  },
+  "Fechheimer": {
+   "sector": "consumer_brands",
+   "aliases": [
+    "Fechheimer"
+   ],
+   "passages": 38,
+   "letters": 14,
+   "first_letter": 1986,
+   "last_letter": 2007
+  },
+  "HomeServices": {
+   "sector": "housing_construction",
+   "aliases": [
+    "HomeServices",
+    "Home Services"
+   ],
+   "passages": 37,
+   "letters": 16,
+   "first_letter": 2002,
+   "last_letter": 2017
+  },
+  "Freddie Mac": {
+   "sector": "banking",
+   "aliases": [
+    "Freddie Mac",
+    "Freddie",
+    "Federal Home Loan Mortgage"
+   ],
+   "passages": 33,
+   "letters": 17,
+   "first_letter": 1988,
+   "last_letter": 2010
+  },
+  "Dexter Shoe": {
+   "sector": "textiles_apparel_shoes",
+   "aliases": [
+    "Dexter Shoe",
+    "Dexter"
+   ],
+   "passages": 33,
+   "letters": 13,
+   "first_letter": 1993,
+   "last_letter": 2016
+  },
+  "MiTek": {
+   "sector": "housing_construction",
+   "aliases": [
+    "MiTek"
+   ],
+   "passages": 29,
+   "letters": 13,
+   "first_letter": 2001,
+   "last_letter": 2018
+  },
+  "IBM": {
+   "sector": "technology",
+   "aliases": [
+    "IBM",
+    "International Business Machines"
+   ],
+   "passages": 29,
+   "letters": 10,
+   "first_letter": 1977,
+   "last_letter": 2016
+  },
+  "Kirby": {
+   "sector": "services_distribution_other",
+   "aliases": [
+    "Kirby"
+   ],
+   "passages": 29,
+   "letters": 12,
+   "first_letter": 1985,
+   "last_letter": 1996
+  },
+  "FlightSafety": {
+   "sector": "airlines_aviation",
+   "aliases": [
+    "FlightSafety"
+   ],
+   "passages": 28,
+   "letters": 11,
+   "first_letter": 1996,
+   "last_letter": 2007
+  },
+  "XTRA": {
+   "sector": "transportation_other",
+   "aliases": [
+    "XTRA"
+   ],
+   "passages": 27,
+   "letters": 14,
+   "first_letter": 2001,
+   "last_letter": 2016
+  },
+  "Walmart": {
+   "sector": "retail",
+   "aliases": [
+    "Wal-Mart",
+    "Walmart"
+   ],
+   "passages": 26,
+   "letters": 16,
+   "first_letter": 1990,
+   "last_letter": 2015
+  },
+  "CORT": {
+   "sector": "services_distribution_other",
+   "aliases": [
+    "CORT"
+   ],
+   "passages": 25,
+   "letters": 13,
+   "first_letter": 2000,
+   "last_letter": 2016
+  },
+  "Goldman Sachs": {
+   "sector": "financial_services_other",
+   "aliases": [
+    "Goldman Sachs",
+    "Goldman"
+   ],
+   "passages": 24,
+   "letters": 14,
+   "first_letter": 2003,
+   "last_letter": 2019
+  },
+  "Moody's": {
+   "sector": "financial_services_other",
+   "aliases": [
+    "Moody's"
+   ],
+   "passages": 24,
+   "letters": 21,
+   "first_letter": 2001,
+   "last_letter": 2024
+  },
+  "Berkadia": {
+   "sector": "financial_services_other",
+   "aliases": [
+    "Berkadia"
+   ],
+   "passages": 23,
+   "letters": 13,
+   "first_letter": 2001,
+   "last_letter": 2024
+  },
+  "RC Willey": {
+   "sector": "retail",
+   "aliases": [
+    "R.C. Willey",
+    "Willey"
+   ],
+   "passages": 22,
+   "letters": 8,
+   "first_letter": 1995,
+   "last_letter": 2005
+  },
+  "Procter & Gamble": {
+   "sector": "consumer_brands",
+   "aliases": [
+    "Procter & Gamble",
+    "P&G"
+   ],
+   "passages": 22,
+   "letters": 11,
+   "first_letter": 2005,
+   "last_letter": 2015
+  },
+  "H.H. Brown": {
+   "sector": "textiles_apparel_shoes",
+   "aliases": [
+    "H.H. Brown",
+    "H. H. Brown"
+   ],
+   "passages": 22,
+   "letters": 9,
+   "first_letter": 1991,
+   "last_letter": 2010
+  },
+  "Apple": {
+   "sector": "technology",
+   "aliases": [
+    "Apple"
+   ],
+   "passages": 22,
+   "letters": 10,
+   "first_letter": 1991,
+   "last_letter": 2024
+  },
+  "Northern Natural Gas": {
+   "sector": "utilities_energy",
+   "aliases": [
+    "Northern Natural"
+   ],
+   "passages": 21,
+   "letters": 13,
+   "first_letter": 2002,
+   "last_letter": 2016
+  },
+  "Acme Brick": {
+   "sector": "housing_construction",
+   "aliases": [
+    "Acme Brick",
+    "Acme"
+   ],
+   "passages": 19,
+   "letters": 12,
+   "first_letter": 2000,
+   "last_letter": 2011
+  },
+  "Mutual Savings and Loan": {
+   "sector": "banking",
+   "aliases": [
+    "Mutual Savings"
+   ],
+   "passages": 18,
+   "letters": 12,
+   "first_letter": 1978,
+   "last_letter": 1991
+  },
+  "Bank of America": {
+   "sector": "banking",
+   "aliases": [
+    "Bank of America"
+   ],
+   "passages": 18,
+   "letters": 11,
+   "first_letter": 2011,
+   "last_letter": 2022
+  },
+  "U.S. Bancorp": {
+   "sector": "banking",
+   "aliases": [
+    "U.S. Bancorp",
+    "US Bancorp"
+   ],
+   "passages": 18,
+   "letters": 16,
+   "first_letter": 2006,
+   "last_letter": 2021
+  },
+  "Kern River": {
+   "sector": "utilities_energy",
+   "aliases": [
+    "Kern River"
+   ],
+   "passages": 18,
+   "letters": 11,
+   "first_letter": 2002,
+   "last_letter": 2016
+  },
+  "IMC (Iscar)": {
+   "sector": "manufacturing_industrial",
+   "aliases": [
+    "Iscar",
+    "IMC"
+   ],
+   "passages": 18,
+   "letters": 9,
+   "first_letter": 2007,
+   "last_letter": 2015
+  },
+  "Champion International": {
+   "sector": "manufacturing_industrial",
+   "aliases": [
+    "Champion International",
+    "Champion"
+   ],
+   "passages": 18,
+   "letters": 8,
+   "first_letter": 1989,
+   "last_letter": 2013
+  },
+  "Johns Manville": {
+   "sector": "housing_construction",
+   "aliases": [
+    "Johns Manville",
+    "JM"
+   ],
+   "passages": 18,
+   "letters": 13,
+   "first_letter": 2000,
+   "last_letter": 2019
+  },
+  "Berkshire textile operations": {
+   "sector": "textiles_apparel_shoes",
+   "aliases": [
+    "Waumbec",
+    "Berkshire-Waumbec",
+    "New Bedford"
+   ],
+   "passages": 18,
+   "letters": 11,
+   "first_letter": 1977,
+   "last_letter": 2021
+  },
+  "TTI": {
+   "sector": "services_distribution_other",
+   "aliases": [
+    "TTI"
+   ],
+   "passages": 18,
+   "letters": 9,
+   "first_letter": 2006,
+   "last_letter": 2021
+  },
+  "Washington Public Power Supply System": {
+   "sector": "utilities_energy",
+   "aliases": [
+    "Washington Public Power Supply System",
+    "WPPSS"
+   ],
+   "passages": 18,
+   "letters": 8,
+   "first_letter": 1984,
+   "last_letter": 1992
+  },
+  "General Foods": {
+   "sector": "consumer_brands",
+   "aliases": [
+    "General Foods"
+   ],
+   "passages": 17,
+   "letters": 8,
+   "first_letter": 1979,
+   "last_letter": 1986
+  },
+  "Lubrizol": {
+   "sector": "manufacturing_industrial",
+   "aliases": [
+    "Lubrizol"
+   ],
+   "passages": 17,
+   "letters": 8,
+   "first_letter": 2011,
+   "last_letter": 2019
+  },
+  "M&T Bank": {
+   "sector": "banking",
+   "aliases": [
+    "M&T",
+    "First Empire State",
+    "First Empire"
+   ],
+   "passages": 16,
+   "letters": 11,
+   "first_letter": 1991,
+   "last_letter": 2006
+  },
+  "Precision Castparts": {
+   "sector": "manufacturing_industrial",
+   "aliases": [
+    "Precision Castparts",
+    "PCC"
+   ],
+   "passages": 15,
+   "letters": 6,
+   "first_letter": 2015,
+   "last_letter": 2020
+  },
+  "FINOVA": {
+   "sector": "financial_services_other",
+   "aliases": [
+    "FINOVA",
+    "Finova"
+   ],
+   "passages": 14,
+   "letters": 6,
+   "first_letter": 2000,
+   "last_letter": 2009
+  },
+  "Walt Disney": {
+   "sector": "tv_broadcasting_media",
+   "aliases": [
+    "Disney"
+   ],
+   "passages": 14,
+   "letters": 6,
+   "first_letter": 1991,
+   "last_letter": 2012
+  },
+  "Helzberg": {
+   "sector": "retail",
+   "aliases": [
+    "Helzberg"
+   ],
+   "passages": 14,
+   "letters": 5,
+   "first_letter": 1995,
+   "last_letter": 2000
+  },
+  "Associated Retail Stores": {
+   "sector": "retail",
+   "aliases": [
+    "Associated Retail Stores",
+    "Associated Retail"
+   ],
+   "passages": 14,
+   "letters": 8,
+   "first_letter": 1978,
+   "last_letter": 1985
+  },
+  "Fruit of the Loom": {
+   "sector": "consumer_brands",
+   "aliases": [
+    "Fruit of the Loom"
+   ],
+   "passages": 14,
+   "letters": 7,
+   "first_letter": 2001,
+   "last_letter": 2024
+  },
+  "Justin Industries": {
+   "sector": "consumer_brands",
+   "aliases": [
+    "Justin"
+   ],
+   "passages": 14,
+   "letters": 9,
+   "first_letter": 2000,
+   "last_letter": 2014
+  },
+  "Forest River": {
+   "sector": "manufacturing_industrial",
+   "aliases": [
+    "Forest River"
+   ],
+   "passages": 14,
+   "letters": 9,
+   "first_letter": 2005,
+   "last_letter": 2024
+  },
+  "State Farm": {
+   "sector": "insurance",
+   "aliases": [
+    "State Farm"
+   ],
+   "passages": 13,
+   "letters": 8,
+   "first_letter": 1986,
+   "last_letter": 2015
+  },
+  "Tesco": {
+   "sector": "retail",
+   "aliases": [
+    "Tesco"
+   ],
+   "passages": 13,
+   "letters": 9,
+   "first_letter": 2006,
+   "last_letter": 2014
+  },
+  "Dairy Queen": {
+   "sector": "consumer_brands",
+   "aliases": [
+    "Dairy Queen",
+    "IDQ"
+   ],
+   "passages": 13,
+   "letters": 6,
+   "first_letter": 1997,
+   "last_letter": 2011
+  },
+  "Quikut": {
+   "sector": "manufacturing_industrial",
+   "aliases": [
+    "Quikut"
+   ],
+   "passages": 13,
+   "letters": 10,
+   "first_letter": 1995,
+   "last_letter": 2013
+  },
+  "Lloyd's": {
+   "sector": "insurance",
+   "aliases": [
+    "Lloyd's"
+   ],
+   "passages": 12,
+   "letters": 4,
+   "first_letter": 1995,
+   "last_letter": 2014
+  },
+  "Illinois National Bank": {
+   "sector": "banking",
+   "aliases": [
+    "Illinois National Bank",
+    "Rockford Bancorp"
+   ],
+   "passages": 12,
+   "letters": 7,
+   "first_letter": 1977,
+   "last_letter": 2001
+  },
+  "Leucadia": {
+   "sector": "financial_services_other",
+   "aliases": [
+    "Leucadia"
+   ],
+   "passages": 12,
+   "letters": 7,
+   "first_letter": 2001,
+   "last_letter": 2014
+  },
+  "PacifiCorp": {
+   "sector": "utilities_energy",
+   "aliases": [
+    "PacifiCorp"
+   ],
+   "passages": 12,
+   "letters": 7,
+   "first_letter": 2005,
+   "last_letter": 2016
+  },
+  "Guinness": {
+   "sector": "consumer_brands",
+   "aliases": [
+    "Guinness"
+   ],
+   "passages": 12,
+   "letters": 5,
+   "first_letter": 1991,
+   "last_letter": 2014
+  },
+  "Cypress Insurance": {
+   "sector": "insurance",
+   "aliases": [
+    "Cypress Insurance",
+    "Cypress"
+   ],
+   "passages": 11,
+   "letters": 9,
+   "first_letter": 1977,
+   "last_letter": 2007
+  },
+  "Occidental": {
+   "sector": "oil_gas",
+   "aliases": [
+    "Occidental"
+   ],
+   "passages": 11,
+   "letters": 6,
+   "first_letter": 2019,
+   "last_letter": 2024
+  },
+  "ConocoPhillips": {
+   "sector": "oil_gas",
+   "aliases": [
+    "ConocoPhillips",
+    "Conoco Phillips",
+    "Conoco"
+   ],
+   "passages": 11,
+   "letters": 7,
+   "first_letter": 2006,
+   "last_letter": 2012
+  },
+  "Exxon Mobil": {
+   "sector": "oil_gas",
+   "aliases": [
+    "Exxon",
+    "Exxon Mobil",
+    "Mobil"
+   ],
+   "passages": 11,
+   "letters": 6,
+   "first_letter": 1983,
+   "last_letter": 2013
+  },
+  "Brooks": {
+   "sector": "consumer_brands",
+   "aliases": [
+    "Brooks"
+   ],
+   "passages": 11,
+   "letters": 8,
+   "first_letter": 2011,
+   "last_letter": 2024
+  },
+  "RJR Nabisco": {
+   "sector": "consumer_brands",
+   "aliases": [
+    "RJR Nabisco",
+    "RJR"
+   ],
+   "passages": 11,
+   "letters": 6,
+   "first_letter": 1988,
+   "last_letter": 2014
+  },
+  "General Electric": {
+   "sector": "manufacturing_industrial",
+   "aliases": [
+    "General Electric",
+    "GE"
+   ],
+   "passages": 11,
+   "letters": 8,
+   "first_letter": 1987,
+   "last_letter": 2016
+  },
+  "Sanofi": {
+   "sector": "healthcare_pharma",
+   "aliases": [
+    "Sanofi"
+   ],
+   "passages": 11,
+   "letters": 10,
+   "first_letter": 2007,
+   "last_letter": 2016
+  },
+  "McLane": {
+   "sector": "services_distribution_other",
+   "aliases": [
+    "McLane"
+   ],
+   "passages": 11,
+   "letters": 6,
+   "first_letter": 2003,
+   "last_letter": 2011
+  },
+  "Equitas": {
+   "sector": "insurance",
+   "aliases": [
+    "Equitas"
+   ],
+   "passages": 10,
+   "letters": 2,
+   "first_letter": 2006,
+   "last_letter": 2007
+  },
+  "SAFECO": {
+   "sector": "insurance",
+   "aliases": [
+    "SAFECO"
+   ],
+   "passages": 10,
+   "letters": 4,
+   "first_letter": 1978,
+   "last_letter": 1981
+  },
+  "Fannie Mae": {
+   "sector": "banking",
+   "aliases": [
+    "Fannie Mae",
+    "Fannie"
+   ],
+   "passages": 10,
+   "letters": 5,
+   "first_letter": 1991,
+   "last_letter": 2010
+  },
+  "Gen Re Securities": {
+   "sector": "financial_services_other",
+   "aliases": [
+    "Gen Re Securities"
+   ],
+   "passages": 10,
+   "letters": 5,
+   "first_letter": 2002,
+   "last_letter": 2006
+  },
+  "Berkshire Hathaway Reinsurance Group": {
+   "sector": "insurance",
+   "aliases": [
+    "Berkshire Hathaway Reinsurance Group"
+   ],
+   "passages": 9,
+   "letters": 7,
+   "first_letter": 2010,
+   "last_letter": 2016
+  },
+  "Wrigley": {
+   "sector": "consumer_brands",
+   "aliases": [
+    "Wrigley",
+    "Mars"
+   ],
+   "passages": 9,
+   "letters": 5,
+   "first_letter": 1993,
+   "last_letter": 2014
+  },
+  "Precision Steel": {
+   "sector": "steel_metals_mining",
+   "aliases": [
+    "Precision Steel"
+   ],
+   "passages": 9,
+   "letters": 8,
+   "first_letter": 1979,
+   "last_letter": 1988
+  },
+  "Bank of New York Mellon": {
+   "sector": "banking",
+   "aliases": [
+    "Bank of New York Mellon",
+    "Bank of New York"
+   ],
+   "passages": 9,
+   "letters": 6,
+   "first_letter": 1992,
+   "last_letter": 2021
+  },
+  "Cologne Re": {
+   "sector": "insurance",
+   "aliases": [
+    "Cologne Re"
+   ],
+   "passages": 8,
+   "letters": 3,
+   "first_letter": 1998,
+   "last_letter": 2009
+  },
+  "Allstate": {
+   "sector": "insurance",
+   "aliases": [
+    "Allstate"
+   ],
+   "passages": 8,
+   "letters": 6,
+   "first_letter": 1986,
+   "last_letter": 2015
+  },
+  "Northern Powergrid": {
+   "sector": "utilities_energy",
+   "aliases": [
+    "Northern Electric"
+   ],
+   "passages": 8,
+   "letters": 7,
+   "first_letter": 2003,
+   "last_letter": 2009
+  },
+  "Courier-Express": {
+   "sector": "newspapers_publishing",
+   "aliases": [
+    "Courier-Express"
+   ],
+   "passages": 8,
+   "letters": 5,
+   "first_letter": 1982,
+   "last_letter": 1989
+  },
+  "Interpublic": {
+   "sector": "tv_broadcasting_media",
+   "aliases": [
+    "Interpublic"
+   ],
+   "passages": 8,
+   "letters": 8,
+   "first_letter": 1977,
+   "last_letter": 1984
+  },
+  "Ogilvy & Mather": {
+   "sector": "tv_broadcasting_media",
+   "aliases": [
+    "Ogilvy"
+   ],
+   "passages": 8,
+   "letters": 8,
+   "first_letter": 1977,
+   "last_letter": 2003
+  },
+  "Media General": {
+   "sector": "tv_broadcasting_media",
+   "aliases": [
+    "Media General"
+   ],
+   "passages": 8,
+   "letters": 6,
+   "first_letter": 1979,
+   "last_letter": 2012
+  },
+  "Jordan's Furniture": {
+   "sector": "retail",
+   "aliases": [
+    "Jordan's"
+   ],
+   "passages": 8,
+   "letters": 2,
+   "first_letter": 1993,
+   "last_letter": 1999
+  },
+  "CTB": {
+   "sector": "manufacturing_industrial",
+   "aliases": [
+    "CTB"
+   ],
+   "passages": 8,
+   "letters": 6,
+   "first_letter": 2002,
+   "last_letter": 2011
+  },
+  "General Dynamics": {
+   "sector": "manufacturing_industrial",
+   "aliases": [
+    "General Dynamics"
+   ],
+   "passages": 8,
+   "letters": 3,
+   "first_letter": 1992,
+   "last_letter": 2021
+  },
+  "General Motors": {
+   "sector": "manufacturing_industrial",
+   "aliases": [
+    "General Motors"
+   ],
+   "passages": 8,
+   "letters": 7,
+   "first_letter": 1984,
+   "last_letter": 2021
+  },
+  "Benjamin Moore": {
+   "sector": "housing_construction",
+   "aliases": [
+    "Benjamin Moore"
+   ],
+   "passages": 8,
+   "letters": 6,
+   "first_letter": 2000,
+   "last_letter": 2009
+  },
+  "Charter Communications": {
+   "sector": "technology",
+   "aliases": [
+    "Charter"
+   ],
+   "passages": 8,
+   "letters": 7,
+   "first_letter": 2015,
+   "last_letter": 2021
+  },
+  "Johnson & Johnson": {
+   "sector": "healthcare_pharma",
+   "aliases": [
+    "Johnson & Johnson"
+   ],
+   "passages": 8,
+   "letters": 6,
+   "first_letter": 2006,
+   "last_letter": 2011
+  },
+  "Pilot Flying J": {
+   "sector": "services_distribution_other",
+   "aliases": [
+    "Pilot Flying J",
+    "PFJ",
+    "Pilot Travel Centers",
+    "Pilot"
+   ],
+   "passages": 8,
+   "letters": 4,
+   "first_letter": 2017,
+   "last_letter": 2021
+  },
+  "Handy & Harman": {
+   "sector": "steel_metals_mining",
+   "aliases": [
+    "Handy & Harman"
+   ],
+   "passages": 8,
+   "letters": 8,
+   "first_letter": 1979,
+   "last_letter": 1986
+  },
+  "Arcata": {
+   "sector": "manufacturing_industrial",
+   "aliases": [
+    "Arcata"
+   ],
+   "passages": 8,
+   "letters": 2,
+   "first_letter": 1981,
+   "last_letter": 1988
+  },
+  "Central States Indemnity": {
+   "sector": "insurance",
+   "aliases": [
+    "Central States Indemnity",
+    "Central States"
+   ],
+   "passages": 7,
+   "letters": 6,
+   "first_letter": 1992,
+   "last_letter": 2006
+  },
+  "MedPro": {
+   "sector": "insurance",
+   "aliases": [
+    "MedPro",
+    "Medical Protective"
+   ],
+   "passages": 7,
+   "letters": 3,
+   "first_letter": 2005,
+   "last_letter": 2011
+  },
+  "PetroChina": {
+   "sector": "oil_gas",
+   "aliases": [
+    "PetroChina"
+   ],
+   "passages": 7,
+   "letters": 5,
+   "first_letter": 2003,
+   "last_letter": 2007
+  },
+  "Affiliated Publications": {
+   "sector": "newspapers_publishing",
+   "aliases": [
+    "Affiliated Publications"
+   ],
+   "passages": 7,
+   "letters": 7,
+   "first_letter": 1979,
+   "last_letter": 1985
+  },
+  "Duracell": {
+   "sector": "consumer_brands",
+   "aliases": [
+    "Duracell"
+   ],
+   "passages": 7,
+   "letters": 4,
+   "first_letter": 2005,
+   "last_letter": 2016
+  },
+  "BYD": {
+   "sector": "transportation_other",
+   "aliases": [
+    "BYD"
+   ],
+   "passages": 7,
+   "letters": 6,
+   "first_letter": 2008,
+   "last_letter": 2021
+  },
+  "POSCO": {
+   "sector": "steel_metals_mining",
+   "aliases": [
+    "POSCO"
+   ],
+   "passages": 7,
+   "letters": 7,
+   "first_letter": 2006,
+   "last_letter": 2012
+  },
+  "Kansas Bankers Surety": {
+   "sector": "insurance",
+   "aliases": [
+    "Kansas Bankers Surety",
+    "Kansas Bankers"
+   ],
+   "passages": 6,
+   "letters": 4,
+   "first_letter": 1996,
+   "last_letter": 2006
+  },
+  "Swiss Re": {
+   "sector": "insurance",
+   "aliases": [
+    "Swiss Re"
+   ],
+   "passages": 6,
+   "letters": 4,
+   "first_letter": 2008,
+   "last_letter": 2011
+  },
+  "Munich Re": {
+   "sector": "insurance",
+   "aliases": [
+    "Munich Re"
+   ],
+   "passages": 6,
+   "letters": 5,
+   "first_letter": 2010,
+   "last_letter": 2014
+  },
+  "Phillips 66": {
+   "sector": "oil_gas",
+   "aliases": [
+    "Phillips 66"
+   ],
+   "passages": 6,
+   "letters": 6,
+   "first_letter": 2012,
+   "last_letter": 2017
+  },
+  "BH Media": {
+   "sector": "newspapers_publishing",
+   "aliases": [
+    "Omaha World-Herald",
+    "World-Herald"
+   ],
+   "passages": 6,
+   "letters": 3,
+   "first_letter": 1988,
+   "last_letter": 2012
+  },
+  "Star Furniture": {
+   "sector": "retail",
+   "aliases": [
+    "Star Furniture"
+   ],
+   "passages": 6,
+   "letters": 4,
+   "first_letter": 1997,
+   "last_letter": 2009
+  },
+  "Berkshire Hathaway Automotive": {
+   "sector": "transportation_other",
+   "aliases": [
+    "Berkshire Hathaway Automotive",
+    "Van Tuyl"
+   ],
+   "passages": 6,
+   "letters": 3,
+   "first_letter": 2014,
+   "last_letter": 2019
+  },
+  "Texaco": {
+   "sector": "oil_gas",
+   "aliases": [
+    "Texaco"
+   ],
+   "passages": 6,
+   "letters": 5,
+   "first_letter": 1983,
+   "last_letter": 2001
+  },
+  "Time Inc.": {
+   "sector": "newspapers_publishing",
+   "aliases": [
+    "Time, Inc."
+   ],
+   "passages": 6,
+   "letters": 5,
+   "first_letter": 1977,
+   "last_letter": 1985
+  },
+  "Kansas Fire and Casualty": {
+   "sector": "insurance",
+   "aliases": [
+    "Kansas Fire and Casualty"
+   ],
+   "passages": 5,
+   "letters": 4,
+   "first_letter": 1977,
+   "last_letter": 1982
+  },
+  "Applied Underwriters": {
+   "sector": "insurance",
+   "aliases": [
+    "Applied Underwriters"
+   ],
+   "passages": 5,
+   "letters": 3,
+   "first_letter": 2005,
+   "last_letter": 2007
+  },
+  "Fireman's Fund": {
+   "sector": "insurance",
+   "aliases": [
+    "Fireman's Fund"
+   ],
+   "passages": 5,
+   "letters": 3,
+   "first_letter": 1985,
+   "last_letter": 1988
+  },
+  "JPMorgan Chase": {
+   "sector": "banking",
+   "aliases": [
+    "JPMorgan",
+    "J.P. Morgan"
+   ],
+   "passages": 5,
+   "letters": 4,
+   "first_letter": 2011,
+   "last_letter": 2019
+  },
+  "Delta Air Lines": {
+   "sector": "airlines_aviation",
+   "aliases": [
+    "Delta",
+    "Delta Airlines"
+   ],
+   "passages": 5,
+   "letters": 4,
+   "first_letter": 2016,
+   "last_letter": 2019
+  },
+  "Southwest Airlines": {
+   "sector": "airlines_aviation",
+   "aliases": [
+    "Southwest Airlines"
+   ],
+   "passages": 5,
+   "letters": 5,
+   "first_letter": 1994,
+   "last_letter": 2019
+  },
+  "Ben Bridge": {
+   "sector": "retail",
+   "aliases": [
+    "Ben Bridge"
+   ],
+   "passages": 5,
+   "letters": 4,
+   "first_letter": 2000,
+   "last_letter": 2007
+  },
+  "Diversified Retailing": {
+   "sector": "retail",
+   "aliases": [
+    "Diversified Retailing"
+   ],
+   "passages": 5,
+   "letters": 5,
+   "first_letter": 1978,
+   "last_letter": 1997
+  },
+  "USG": {
+   "sector": "housing_construction",
+   "aliases": [
+    "USG"
+   ],
+   "passages": 5,
+   "letters": 5,
+   "first_letter": 2006,
+   "last_letter": 2018
+  },
+  "Microsoft": {
+   "sector": "technology",
+   "aliases": [
+    "Microsoft"
+   ],
+   "passages": 5,
+   "letters": 5,
+   "first_letter": 1995,
+   "last_letter": 2016
+  },
+  "Itochu": {
+   "sector": "japan_trading_houses",
+   "aliases": [
+    "Itochu",
+    "ITOCHU"
+   ],
+   "passages": 5,
+   "letters": 4,
+   "first_letter": 2020,
+   "last_letter": 2024
+  },
+  "Business Wire": {
+   "sector": "services_distribution_other",
+   "aliases": [
+    "Business Wire"
+   ],
+   "passages": 5,
+   "letters": 4,
+   "first_letter": 2005,
+   "last_letter": 2010
+  },
+  "Pampered Chef": {
+   "sector": "services_distribution_other",
+   "aliases": [
+    "Pampered Chef"
+   ],
+   "passages": 5,
+   "letters": 4,
+   "first_letter": 2002,
+   "last_letter": 2009
+  },
+  "Pinkerton's": {
+   "sector": "services_distribution_other",
+   "aliases": [
+    "Pinkerton"
+   ],
+   "passages": 5,
+   "letters": 3,
+   "first_letter": 1980,
+   "last_letter": 2019
+  },
+  "Kaiser Aluminum": {
+   "sector": "steel_metals_mining",
+   "aliases": [
+    "Kaiser Aluminum"
+   ],
+   "passages": 5,
+   "letters": 4,
+   "first_letter": 1977,
+   "last_letter": 1980
+  },
+  "National Fire & Marine": {
+   "sector": "insurance",
+   "aliases": [
+    "National Fire & Marine",
+    "National Fire and Marine"
+   ],
+   "passages": 5,
+   "letters": 5,
+   "first_letter": 1977,
+   "last_letter": 2019
+  },
+  "3G Capital": {
+   "sector": "financial_services_other",
+   "aliases": [
+    "3G Capital",
+    "3G"
+   ],
+   "passages": 5,
+   "letters": 2,
+   "first_letter": 2013,
+   "last_letter": 2014
+  }
+ }
+}

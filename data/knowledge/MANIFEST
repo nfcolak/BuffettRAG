@@ -1,0 +1,11 @@
+{
+ "files": {
+  "annotations.jsonl": "4fa6d7d5dce85c293e7392047bdf30b44cdb67d6282702bd2d4a33c8610eef47",
+  "companies.json": "5c8657065d1007fb39edd3187ada9ed09efabac1b1263458a0bc439fea1ab20d",
+  "digests.jsonl": "da2f18729f7ff558dc9599f2ce6fcd28ef59df978ebec581276bae96ea9d4d5a",
+  "events.json": "1bf71436c61b0b7b0e8b6c7e71ac4c33961e50276c88b7baec5c93f9bbd5aa09",
+  "numbers.jsonl": "a066b891d62eb0c27ab9ced7af658a42eeade251c65258146f331ee2bf6a7b5e",
+  "taxonomy.json": "794ac2531ee6d7048556258339833fdd02a6b62c878da52061f9adad0fd4bae2",
+  "topic_counts.json": "40f8ea992aaf144c83535607a9aac2fa5be94896cb47ae7721f4c3deb98dc343"
+ }
+}

@@ -1,0 +1,669 @@
+{
+ "version": 2,
+ "note": "Macro events and crises that the letters themselves discuss. event_years = when it happened; letter_years = letters that discuss it beyond a passing mention (judged by reading; a letter for year Y is written early in Y+1). Annotators tag a passage with an event id when the passage is ABOUT that event, using the event's description (Buffett rarely uses the common names). Retrospective mentions in later letters are found through the passage tags, not through letter_years. After wave 1, M1 recomputes per-event tagged-passage counts and letter years from the event tags and stores them in knowledge_v1. The query router maps user wording to event ids through aliases and event_years.",
+ "provenance": {
+  "built": "2026-10-19 by plan-fix group 1 (finding g1-1, with g1-7 and g1-8)",
+  "method": "Corpus only (input/chunks_v3_paragraph.jsonl, 5,831 passages). Candidate passages were found by keyword search and each candidate was read; an event is kept when at least 5 passages discuss it, judged by reading, not by keyword counts. supporting_passages lists every passage judged to discuss the event (including later look-backs); supporting_count is its length.",
+  "alias_rule": "Every alias occurs verbatim (case-insensitive, after quote/whitespace normalisation) in at least one of the event's supporting passages; alias_corpus_counts gives the number of corpus passages containing it. No alias is taken from user, dev-set or test-set wording.",
+  "test_set_access": "None. No finance_v1*, split, heldout or sealed file was opened. The builder read the plan-review findings, which quote some dev-question wording; the alias rule keeps such wording out unless the letters themselves use it.",
+  "removed_from_v1": {
+   "_note": "Audit record only. This is NOT an absent-topics list: do not use it for routing or refusals.",
+   "oil_shocks_1970s": "0 passages discuss it; 1994_p0004 mentions 'two oil shocks' in a list of past surprises; no passage in the 1977-1981 letters",
+   "covid_2020": "1 passage (2020_p0050/2020_p0051, the same sentence across two overlapping chunks: NFM stores closed six weeks because of COVID-19)",
+   "euro_debt_crisis": "0 passages",
+   "inflation_2022": "4 passing mentions of inflation in the 2021-2023 letters (2021_p0029, 2022_p0037, 2023_p0046, 2023_p0055); none discusses a 2021-23 inflation episode; tag theme inflation instead",
+   "bank_failures_2023": "0 passages"
+  }
+ },
+ "events": {
+  "bear_market_1973_74": {
+   "description": "The 1973-74 stock-market collapse and the 1974-75 insurance underwriting crisis: bargain prices, Berkshire's own losses and share-price fall then, and later letters looking back at that period.",
+   "event_years": [
+    1973,
+    1974,
+    1975
+   ],
+   "letter_years": [
+    1977,
+    1978,
+    1985
+   ],
+   "aliases": [
+    "1974-75 crisis",
+    "1974-1975 period",
+    "bottom had fallen out"
+   ],
+   "alias_corpus_counts": {
+    "1974-75 crisis": 1,
+    "1974-1975 period": 1,
+    "bottom had fallen out": 1
+   },
+   "supporting_count": 10,
+   "supporting_passages": [
+    "1977_p0012",
+    "1977_p0014",
+    "1978_p0032",
+    "1978_p0035",
+    "1985_p0003",
+    "1985_p0118",
+    "1985_p0121",
+    "2013_p0088",
+    "2014_p0105",
+    "2017_p0056"
+   ],
+   "tagged_count": 2,
+   "tagged_letter_years": [
+    1985,
+    2017
+   ]
+  },
+  "high_inflation_late70s_early80s": {
+   "description": "The high inflation of the late 1970s and early 1980s and what it did to business returns, insurance costs, bonds and investors (the 'inflation tax'); not general mentions of inflation in other years (those get theme inflation only).",
+   "event_years": [
+    1977,
+    1978,
+    1979,
+    1980,
+    1981,
+    1982
+   ],
+   "letter_years": [
+    1979,
+    1980,
+    1981,
+    1983,
+    1984
+   ],
+   "aliases": [
+    "high rates of inflation",
+    "inflation tax",
+    "inflationary environment",
+    "tapeworm of inflation",
+    "inflation-ridden"
+   ],
+   "alias_corpus_counts": {
+    "high rates of inflation": 2,
+    "inflation tax": 3,
+    "inflationary environment": 2,
+    "tapeworm of inflation": 1,
+    "inflation-ridden": 1
+   },
+   "supporting_count": 37,
+   "supporting_passages": [
+    "1977_p0013",
+    "1979_p0010",
+    "1979_p0011",
+    "1979_p0012",
+    "1979_p0013",
+    "1979_p0047",
+    "1979_p0048",
+    "1979_p0055",
+    "1979_p0056",
+    "1980_p0007",
+    "1980_p0017",
+    "1980_p0018",
+    "1980_p0019",
+    "1980_p0020",
+    "1980_p0022",
+    "1980_p0023",
+    "1980_p0026",
+    "1980_p0077",
+    "1981_p0010",
+    "1981_p0026",
+    "1981_p0027",
+    "1981_p0038",
+    "1981_p0041",
+    "1981_p0042",
+    "1981_p0043",
+    "1983_p0115",
+    "1983_p0116",
+    "1983_p0117",
+    "1983_p0118",
+    "1983_p0119",
+    "1983_p0120",
+    "1983_p0121",
+    "1983_p0122",
+    "1984_p0107",
+    "1984_p0108",
+    "1984_p0109",
+    "1984_p0111"
+   ],
+   "tagged_count": 32,
+   "tagged_letter_years": [
+    1977,
+    1979,
+    1980,
+    1981
+   ]
+  },
+  "crash_1987": {
+   "description": "The October 1987 market crash (Buffett: 'the break in October', Mr. Market's 'sudden, massive seizure'), portfolio insurance and the market turmoil around it, and later look-backs at it.",
+   "event_years": [
+    1987
+   ],
+   "letter_years": [
+    1987
+   ],
+   "aliases": [
+    "break in october",
+    "portfolio insurance",
+    "october of 1987"
+   ],
+   "alias_corpus_counts": {
+    "break in october": 1,
+    "portfolio insurance": 3,
+    "october of 1987": 1
+   },
+   "supporting_count": 9,
+   "supporting_passages": [
+    "1987_p0092",
+    "1987_p0093",
+    "1987_p0094",
+    "1987_p0095",
+    "1987_p0096",
+    "1987_p0097",
+    "1987_p0098",
+    "1994_p0004",
+    "2017_p0056"
+   ],
+   "tagged_count": 8,
+   "tagged_letter_years": [
+    1987,
+    2017
+   ]
+  },
+  "banking_real_estate_1990": {
+   "description": "The 1989-91 bank and savings-and-loan troubles, the fear of a California real-estate collapse (Wells Fargo bought amid the flight from bank stocks) and the 1990-91 recession's effect on Berkshire businesses.",
+   "event_years": [
+    1989,
+    1990,
+    1991
+   ],
+   "letter_years": [
+    1990,
+    1991
+   ],
+   "aliases": [
+    "failed savings and loan",
+    "chaotic market in bank stocks",
+    "california real estate"
+   ],
+   "alias_corpus_counts": {
+    "failed savings and loan": 1,
+    "chaotic market in bank stocks": 1,
+    "california real estate": 1
+   },
+   "supporting_count": 9,
+   "supporting_passages": [
+    "1989_p0124",
+    "1990_p0037",
+    "1990_p0082",
+    "1990_p0084",
+    "1990_p0085",
+    "1990_p0086",
+    "1990_p0094",
+    "1991_p0016",
+    "1991_p0039"
+   ],
+   "tagged_count": 6,
+   "tagged_letter_years": [
+    1989,
+    1990
+   ]
+  },
+  "salomon_1991": {
+   "description": "The 1991 Salomon scandal: Buffett as interim chairman, the government matters, the rescue of the firm and his look-back on it; not passages that only list the Salomon preferred as a holding.",
+   "event_years": [
+    1991,
+    1992
+   ],
+   "letter_years": [
+    1991,
+    1992,
+    1997
+   ],
+   "aliases": [
+    "salomon situation",
+    "salomon interlude",
+    "interim chairman of salomon",
+    "salomon's problems"
+   ],
+   "alias_corpus_counts": {
+    "salomon situation": 1,
+    "salomon interlude": 2,
+    "interim chairman of salomon": 2,
+    "salomon's problems": 1
+   },
+   "supporting_count": 10,
+   "supporting_passages": [
+    "1991_p0004",
+    "1991_p0007",
+    "1991_p0087",
+    "1992_p0014",
+    "1992_p0015",
+    "1992_p0016",
+    "1992_p0017",
+    "1992_p0018",
+    "1997_p0095",
+    "1997_p0096"
+   ],
+   "tagged_count": 8,
+   "tagged_letter_years": [
+    1991,
+    1992,
+    1997
+   ]
+  },
+  "hurricane_andrew_1992": {
+   "description": "Hurricane Andrew (1992): the largest insured loss up to then, its effect on the industry and on Berkshire's super-cat business, and later comparisons with it.",
+   "event_years": [
+    1992
+   ],
+   "letter_years": [
+    1992,
+    1993
+   ],
+   "aliases": [
+    "hurricane andrew"
+   ],
+   "alias_corpus_counts": {
+    "hurricane andrew": 3
+   },
+   "supporting_count": 6,
+   "supporting_passages": [
+    "1992_p0041",
+    "1992_p0042",
+    "1992_p0043",
+    "1993_p0051",
+    "1995_p0053",
+    "2004_p0064"
+   ],
+   "tagged_count": 5,
+   "tagged_letter_years": [
+    1992,
+    1993,
+    2004
+   ]
+  },
+  "dotcom_bubble": {
+   "description": "The late-1990s internet/tech stock bubble Buffett calls 'The Great Bubble', speculation in bubble companies, its end in 2000 and its aftermath for valuations and corporate behaviour.",
+   "event_years": [
+    1998,
+    1999,
+    2000,
+    2001,
+    2002
+   ],
+   "letter_years": [
+    1999,
+    2000,
+    2001,
+    2002
+   ],
+   "aliases": [
+    "the great bubble",
+    "internet bubble",
+    "bubble market",
+    "bubble companies"
+   ],
+   "alias_corpus_counts": {
+    "the great bubble": 8,
+    "internet bubble": 1,
+    "bubble market": 1,
+    "bubble companies": 1
+   },
+   "supporting_count": 17,
+   "supporting_passages": [
+    "1999_p0095",
+    "1999_p0096",
+    "2000_p0078",
+    "2000_p0079",
+    "2000_p0080",
+    "2000_p0081",
+    "2000_p0082",
+    "2000_p0083",
+    "2000_p0084",
+    "2001_p0093",
+    "2001_p0094",
+    "2002_p0090",
+    "2002_p0093",
+    "2002_p0094",
+    "2002_p0127",
+    "2003_p0116",
+    "2008_p0093"
+   ],
+   "tagged_count": 16,
+   "tagged_letter_years": [
+    1999,
+    2000,
+    2001,
+    2002,
+    2003,
+    2004
+   ]
+  },
+  "ltcm_1998": {
+   "description": "The 1998 near-collapse of the hedge fund Long-Term Capital Management and the Fed-organised rescue, discussed in the 2002 letter as an example of derivatives linkage risk.",
+   "event_years": [
+    1998
+   ],
+   "letter_years": [
+    2002
+   ],
+   "aliases": [
+    "long-term capital management",
+    "ltcm"
+   ],
+   "alias_corpus_counts": {
+    "long-term capital management": 1,
+    "ltcm": 2
+   },
+   "supporting_count": 2,
+   "supporting_passages": [
+    "2002_p0082",
+    "2002_p0083"
+   ],
+   "kept_below_threshold": "kept by verdict g1-1 (confirmed_with_change keeps ltcm_1998); only 2 passages discuss it",
+   "tagged_count": 2,
+   "tagged_letter_years": [
+    2002
+   ]
+  },
+  "accounting_scandals_2002": {
+   "description": "The 2001-2002 corporate accounting scandals (Enron and others), pro-forma earnings games, the 'anything-goes' reporting era and the governance and audit-committee reforms that followed.",
+   "event_years": [
+    2001,
+    2002
+   ],
+   "letter_years": [
+    2001,
+    2002
+   ],
+   "aliases": [
+    "enron",
+    "accounting abuses",
+    "anything-goes earnings reports"
+   ],
+   "alias_corpus_counts": {
+    "enron": 10,
+    "accounting abuses": 1,
+    "anything-goes earnings reports": 1
+   },
+   "supporting_count": 15,
+   "supporting_passages": [
+    "2001_p0011",
+    "2002_p0010",
+    "2002_p0070",
+    "2002_p0075",
+    "2002_p0098",
+    "2002_p0117",
+    "2002_p0118",
+    "2002_p0119",
+    "2002_p0120",
+    "2002_p0121",
+    "2002_p0127",
+    "2002_p0131",
+    "2002_p0132",
+    "2003_p0092",
+    "2006_p0056"
+   ],
+   "tagged_count": 25,
+   "tagged_letter_years": [
+    2001,
+    2002
+   ]
+  },
+  "sept11_2001": {
+   "description": "The September 11, 2001 attacks: the insurance industry's largest loss, General Re's underwriting failure on terrorism risk, effects on Berkshire businesses (FlightSafety, NetJets, XTRA, FINOVA) and terrorism coverage written afterwards.",
+   "event_years": [
+    2001
+   ],
+   "letter_years": [
+    2001,
+    2002
+   ],
+   "aliases": [
+    "september 11th",
+    "september 11",
+    "world trade center",
+    "terrorism",
+    "man-made catastrophe"
+   ],
+   "alias_corpus_counts": {
+    "september 11th": 12,
+    "september 11": 13,
+    "world trade center": 5,
+    "terrorism": 6,
+    "man-made catastrophe": 1
+   },
+   "supporting_count": 20,
+   "supporting_passages": [
+    "2001_p0009",
+    "2001_p0020",
+    "2001_p0021",
+    "2001_p0037",
+    "2001_p0041",
+    "2001_p0042",
+    "2001_p0045",
+    "2001_p0046",
+    "2001_p0047",
+    "2001_p0049",
+    "2001_p0050",
+    "2001_p0051",
+    "2001_p0057",
+    "2001_p0058",
+    "2001_p0085",
+    "2001_p0086",
+    "2001_p0087",
+    "2001_p0100",
+    "2002_p0032",
+    "2004_p0064"
+   ],
+   "tagged_count": 19,
+   "tagged_letter_years": [
+    2001,
+    2002,
+    2004
+   ]
+  },
+  "katrina_2005": {
+   "description": "Hurricane Katrina and the other 2005 hurricanes: record insured losses for Berkshire and the industry, super-cat pricing and the question of changed hurricane frequency, and later comparisons with Katrina.",
+   "event_years": [
+    2005
+   ],
+   "letter_years": [
+    2005,
+    2006
+   ],
+   "aliases": [
+    "katrina",
+    "hurricane katrina",
+    "hurricane seasons of 2004-05"
+   ],
+   "alias_corpus_counts": {
+    "katrina": 12,
+    "hurricane katrina": 1,
+    "hurricane seasons of 2004-05": 1
+   },
+   "supporting_count": 15,
+   "supporting_passages": [
+    "2005_p0008",
+    "2005_p0033",
+    "2005_p0038",
+    "2005_p0039",
+    "2005_p0040",
+    "2005_p0055",
+    "2005_p0066",
+    "2005_p0125",
+    "2006_p0009",
+    "2006_p0042",
+    "2010_p0139",
+    "2012_p0048",
+    "2018_p0058",
+    "2019_p0041",
+    "2019_p0042"
+   ],
+   "tagged_count": 9,
+   "tagged_letter_years": [
+    2005,
+    2006,
+    2018
+   ]
+  },
+  "financial_crisis_2008": {
+   "description": "The 2007-09 housing bust, credit crisis and financial panic and the recession that followed: mortgage and housing passages, Fannie/Freddie, Berkshire's investments during the panic, its businesses in the recession, and later look-backs.",
+   "event_years": [
+    2007,
+    2008,
+    2009
+   ],
+   "letter_years": [
+    2007,
+    2008,
+    2009,
+    2010,
+    2011
+   ],
+   "aliases": [
+    "credit crisis",
+    "financial panic",
+    "financial crisis",
+    "great recession",
+    "housing crash",
+    "housing crisis",
+    "housing collapse",
+    "housing bubble",
+    "real estate bubble",
+    "meltdown",
+    "lehman bankruptcy",
+    "sub-prime"
+   ],
+   "alias_corpus_counts": {
+    "credit crisis": 2,
+    "financial panic": 14,
+    "financial crisis": 3,
+    "great recession": 9,
+    "housing crash": 1,
+    "housing crisis": 1,
+    "housing collapse": 2,
+    "housing bubble": 1,
+    "real estate bubble": 1,
+    "meltdown": 4,
+    "lehman bankruptcy": 1,
+    "sub-prime": 1
+   },
+   "supporting_count": 59,
+   "supporting_passages": [
+    "2007_p0008",
+    "2007_p0010",
+    "2007_p0068",
+    "2007_p0083",
+    "2008_p0011",
+    "2008_p0058",
+    "2008_p0059",
+    "2008_p0060",
+    "2008_p0061",
+    "2008_p0062",
+    "2008_p0063",
+    "2008_p0064",
+    "2008_p0065",
+    "2008_p0067",
+    "2008_p0072",
+    "2008_p0082",
+    "2008_p0093",
+    "2008_p0095",
+    "2008_p0097",
+    "2008_p0098",
+    "2008_p0099",
+    "2008_p0100",
+    "2008_p0114",
+    "2009_p0021",
+    "2009_p0059",
+    "2009_p0069",
+    "2009_p0070",
+    "2009_p0071",
+    "2009_p0072",
+    "2009_p0073",
+    "2009_p0076",
+    "2010_p0094",
+    "2010_p0095",
+    "2010_p0096",
+    "2010_p0097",
+    "2010_p0106",
+    "2010_p0107",
+    "2010_p0119",
+    "2010_p0124",
+    "2010_p0142",
+    "2011_p0024",
+    "2011_p0079",
+    "2011_p0094",
+    "2011_p0095",
+    "2011_p0096",
+    "2012_p0079",
+    "2012_p0080",
+    "2012_p0088",
+    "2013_p0030",
+    "2013_p0106",
+    "2014_p0094",
+    "2014_p0095",
+    "2014_p0196",
+    "2015_p0099",
+    "2015_p0104",
+    "2015_p0107",
+    "2016_p0098",
+    "2021_p0055",
+    "2023_p0024"
+   ],
+   "tagged_count": 94,
+   "tagged_letter_years": [
+    2006,
+    2007,
+    2008,
+    2009,
+    2010,
+    2011,
+    2012,
+    2013,
+    2014,
+    2015,
+    2017,
+    2021,
+    2023
+   ]
+  },
+  "tax_act_2017": {
+   "description": "The December 2017 U.S. tax law that cut the corporate rate to 21%: the $29 billion gain it delivered to Berkshire's net worth in 2017 and its effect on 2018 after-tax earnings and intrinsic value.",
+   "event_years": [
+    2017
+   ],
+   "letter_years": [
+    2017,
+    2018
+   ],
+   "aliases": [
+    "rewrote the u.s. tax code",
+    "cut in the corporate tax rate",
+    "corporate tax rate was reduced to 21%"
+   ],
+   "alias_corpus_counts": {
+    "rewrote the u.s. tax code": 2,
+    "cut in the corporate tax rate": 2,
+    "corporate tax rate was reduced to 21%": 1
+   },
+   "supporting_count": 6,
+   "supporting_passages": [
+    "2017_p0011",
+    "2017_p0012",
+    "2018_p0043",
+    "2018_p0044",
+    "2018_p0045",
+    "2018_p0046"
+   ],
+   "tagged_count": 6,
+   "tagged_letter_years": [
+    2017,
+    2018
+   ]
+  }
+ }
+}

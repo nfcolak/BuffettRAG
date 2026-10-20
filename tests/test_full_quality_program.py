@@ -533,6 +533,9 @@ def test_live_runner_checks_unselected_fixture_ids_before_provider(monkeypatch):
 
 
 def test_live_runner_separates_provider_failure_without_leaking_error(monkeypatch):
+    # provider plumbing of the reader path: with the finance pipeline on, the first fixture case can be answered
+    # from the knowledge layer without calling the provider at all
+    monkeypatch.delenv("FINANCE_PIPELINE", raising=False)
     from scripts.eval import run_live_benchmark as runner
 
     class FailingProvider:
@@ -552,6 +555,9 @@ def test_live_runner_separates_provider_failure_without_leaking_error(monkeypatc
 
 
 def test_live_runner_temperature_goes_through_config(monkeypatch):
+    # provider plumbing of the reader path: with the finance pipeline on, the first fixture case can be answered
+    # from the knowledge layer without calling the provider at all
+    monkeypatch.delenv("FINANCE_PIPELINE", raising=False)
     import config
     from scripts.eval import run_live_benchmark as runner
 
