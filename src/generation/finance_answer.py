@@ -21,6 +21,9 @@ Final answers, returned as they are (no evidence gate, no claim validator, no `e
     across letters; then, as without them, the winner's other stance passages, one per letter. The budget is the
     caller's `max_hits`, raised to FINANCE_K_CORPUS when that is larger (finance-recall-75-r2, default 0 = unchanged);
     the passages beyond `max_hits` must fit the reader window (`reader_window_chars`), lowest ranks cut first.
+    With FINANCE_SUPERLATIVE_TAGGED=N (finance-recall-75-r3) up to N passages tagged with the winner and carrying a
+    stance of the asked polarity (`tagged_stance_ids`) come first among the uncited evidence, taking their places from
+    the same budget.
 
 Matching figure rows never use another entity's rows: when the question names a company other than Berkshire, only
 that company's rows match; Berkshire's rows are the default only when no other company is named.
@@ -57,7 +60,7 @@ from src.generation.prompt import REFUSAL_LINE, build_cited_prompt, format_answe
 from src.knowledge import KnowledgeStore
 from src.query.plan import QueryPlan
 from src.retrieval.finance_policy import reader_window_chars
-from src.retrieval.knowledge_source import spread_letters
+from src.retrieval.knowledge_source import letter_of, spread_letters
 from src.storage import SearchHit
 
 SCOPE_REPLY = "I only answer questions about Buffett's financial views and Berkshire's financial results."
@@ -516,6 +519,46 @@ def _source_evidence(plan: QueryPlan, top: Sequence[Tuple[str, List[int], List[s
     return picked
 
 
+def tagged_stance_ids(plan: QueryPlan, store: KnowledgeStore, docs_by_id: Mapping[str, Any], kind: str, winner: str,
+                      polarity: str, skip: set, n: int) -> List[str]:
+    """Up to n passages tagged with the winner that carry a stance of the asked polarity (FINANCE_SUPERLATIVE_TAGGED).
+
+    A passage counts by its stance rows of the asked polarity: one on the winner itself (2 points), or, for a sector
+    winner, one on a company of a passage tagged with that sector (1 point; other sectors and themes do not count). A
+    passage with the opposite polarity on the winner itself is left out. The strongest passages come first within a
+    letter, and the letters are taken in rounds spread across the years (`spread_letters`), so one letter does not fill
+    the list. The plan's year range limits the letters; `skip` ids (already cited) are left out."""
+    if n <= 0:
+        return []
+    opposite = "negative" if polarity == "positive" else "positive"
+    sectors = set((store.taxonomy.get("sectors") or {}).keys())
+    themes = set((store.taxonomy.get("themes") or {}).keys())
+    scored: List[Tuple[int, str]] = []
+    for ann in store.annotations():
+        pid = ann["id"]
+        letter = _letter_of(pid, docs_by_id)
+        if pid not in docs_by_id or pid in skip or not store.is_financial(pid) or letter is None \
+                or (plan.year_range and not plan.year_range[0] <= letter <= plan.year_range[1]):
+            continue
+        stances = ann.get("stance") or ()
+        if any(s.get("target") == winner and s.get("polarity") == opposite for s in stances):
+            continue
+        points = 0
+        for stance in stances:
+            target = str(stance.get("target", ""))
+            if stance.get("polarity") != polarity:
+                continue
+            if target == winner:
+                points += 2
+            elif kind == "sector" and target and target not in sectors and target not in themes \
+                    and winner in (ann.get("sectors") or ()):
+                points += 1
+        if points:
+            scored.append((points, pid))
+    scored.sort(key=lambda row: -row[0])  # stable: annotation order within the same strength
+    return spread_letters([pid for _, pid in scored], n, lambda pid: letter_of(pid, docs_by_id))
+
+
 def superlative_answer(plan: QueryPlan, store: KnowledgeStore, docs_by_id: Mapping[str, Any],
                        max_hits: int = 16, max_new_tokens: int = 900) -> Optional[FinanceAnswer]:
     """Top targets by distinct letters with a stance of the asked polarity, then quotes from the winner's digest
@@ -572,7 +615,9 @@ def superlative_answer(plan: QueryPlan, store: KnowledgeStore, docs_by_id: Mappi
     cited = len(hits)
     limit = max(max_hits, finance_setting("FINANCE_K_CORPUS"))
     budget = max(0, limit - cited)
-    extra = _source_evidence(plan, top, digest, docs_by_id, set(index), budget)
+    tagged = tagged_stance_ids(plan, store, docs_by_id, kind, winner, polarity, set(index),
+                               min(finance_setting("FINANCE_SUPERLATIVE_TAGGED"), budget))
+    extra = tagged + _source_evidence(plan, top, digest, docs_by_id, set(index) | set(tagged), budget - len(tagged))
     # uncited evidence for the count: the winner's other stance passages, one per letter, after the quoted ones
     by_letter_ids: Dict[int, str] = {}
     served_letters = {_year(h) for h in hits} | {_letter_of(pid, docs_by_id) for pid in extra}

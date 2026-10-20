@@ -96,7 +96,7 @@ def _ids(hits):
 
 # --- registry and settings ---
 def test_three_sources_registered_each_with_its_setting(monkeypatch):
-    assert [name for name, _ in ks.SOURCES] == list(SETTINGS)
+    assert [name for name, _ in ks.SOURCES][:len(SETTINGS)] == list(SETTINGS)  # later rounds append theirs
     # group 5 adopted the tagged and digest sources (finance-recall-75, task 5.1); the stance source stays off
     assert [FINANCE_DEFAULTS[name] for name in SETTINGS] == [1, 1, 0]
     assert all(finance_setting(name) == 0 for name in SETTINGS)  # switched off by the fixture

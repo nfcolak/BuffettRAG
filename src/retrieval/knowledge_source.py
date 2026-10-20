@@ -45,7 +45,7 @@ import numpy as np
 from config import RETRIEVAL_FETCH_K, finance_setting
 from src.knowledge import KnowledgeStore
 from src.query.plan import CORPUS_WIDE, NUMERIC, TREND, QueryPlan
-from src.retrieval import summary_source
+from src.retrieval import multiquery_source, summary_source
 from src.retrieval.finance_policy import _boost, _has_entities, _hybrid_ranking
 from src.storage import SearchHit
 
@@ -223,7 +223,8 @@ def theme_texts(store: KnowledgeStore) -> Tuple[List[str], List[str]]:
     """(theme keys, "theme name: first sentence of its description")."""
     themes = store.taxonomy.get("themes") or {}
     keys = list(themes)
-    return keys, [f"{key.replace('_', ' ')}: {re.split(r'(?<=[.])\s', str(themes[key]).strip(), 1)[0]}" for key in keys]
+    first = [re.split(r"(?<=[.])\s", str(themes[key]).strip(), 1)[0] for key in keys]  # py3.11: no backslash in f-strings
+    return keys, [key.replace("_", " ") + ": " + text for key, text in zip(keys, first)]
 
 
 def theme_centroids(store: KnowledgeStore, embedder: Any, keys: Sequence[str]
@@ -352,4 +353,5 @@ SOURCES: List[Tuple[str, Callable]] = [
     ("FINANCE_TAGGED_SOURCE", tagged_source),
     ("FINANCE_DIGEST_SOURCE", digest_source),
     ("FINANCE_STANCE_SOURCE", stance_source),
+    *multiquery_source.SOURCES,  # FINANCE_MULTI_QUERY, FINANCE_DIGEST_QUERY (finance-recall-75-r3)
 ]

@@ -32,6 +32,7 @@ from src.generation.answer_expand import expand_answer
 from src.generation.compare import comparison_periods, generate_comparison_answer, prepare_answer_context
 from src.generation.decompose import answer_by_parts, split_question
 from src.generation.evidence_gate import assess_evidence
+from src.generation.token_count import count_tokens_and_source, reader_window_tokens
 from src.evaluation.claim_validator import validate_and_filter_answer
 from src.generation.providers import create_llm_provider
 from src.knowledge import KnowledgeStore
@@ -435,7 +436,8 @@ def finance_route_steps(req: AskRequest):
     With FINANCE_FOLLOWUP_HISTORY on, a follow-up whose previous question is financial is never given the scope reply
     only for being short or referential (`_plan_with_history`). The served budget is `llm_context_passages()` unless the plan's kind has its own
     (`FINANCE_K_TREND` / `_CORPUS` / `_PERIOD`); a budget beyond that is cut back, lowest ranks first, until the prompt
-    fits the reader window (`reader_window_chars`), never below `llm_context_passages()`.
+    fits the reader window (`reader_window_chars`), never below `llm_context_passages()`. With FINANCE_WINDOW_TOKENS on
+    the prompt is counted in tokens instead (`token_count.count_tokens_and_source`) against `reader_window_tokens`.
     """
     retriever: Retriever = _state["retriever"]
     store = _knowledge_store()
@@ -510,11 +512,22 @@ def finance_route_steps(req: AskRequest):
         served = list(context_hits)[:limit]
         context_hits, prompt = compose(served)
         if limit > cap:  # an adaptive budget: the passages beyond today's budget must fit the reader window
-            window, before = reader_window_chars(req.max_new_tokens), len(served)
-            while len(served) > cap and len(prompt) > window:
-                served.pop()
-                context_hits, prompt = compose(served)
-            debug["window_chars"], debug["window_trimmed"] = window, before - len(served)
+            before = len(served)
+            if finance_setting("FINANCE_WINDOW_TOKENS"):  # counted in tokens, with a safety margin
+                window = reader_window_tokens(req.max_new_tokens)
+                used, source = count_tokens_and_source(prompt)
+                while len(served) > cap and used > window:
+                    served.pop()
+                    context_hits, prompt = compose(served)
+                    used, source = count_tokens_and_source(prompt)
+                debug.update(window_tokens=window, prompt_tokens=used, token_source=source)
+            else:
+                window = reader_window_chars(req.max_new_tokens)
+                while len(served) > cap and len(prompt) > window:
+                    served.pop()
+                    context_hits, prompt = compose(served)
+                debug["window_chars"] = window
+            debug["window_trimmed"] = before - len(served)
     return FinanceRoute("reader", plan, query, hits=context_hits, retrieved_hits=hits, used_filter=used_filter,
                         reranked=reranked, llm=llm, prompt=prompt, debug=debug, per_period=per_period)
 

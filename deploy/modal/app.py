@@ -17,6 +17,7 @@ LIVE_APP_NAME = "buffettrag-app"
 APP_NAME = os.environ.get("APP_NAME", LIVE_APP_NAME)
 IMAGE_TAG = "server-cuda-b11718"  # llama.cpp build, pinned 2026-10-18; bump it deliberately
 GGUF_NAME = "buffett-qwen2.5-7b-ft-r1-q4_k_m.gguf"
+TOKENIZER_FILE = "data/tokenizer/qwen_tokenizer.json"  # Qwen BPE tokenizer for the reader-window count (about 7 MB)
 MODELS_DIR = "/models"
 APP_DIR = "/root/app"
 GPU = "L4"
@@ -77,6 +78,21 @@ def _warn_missing_summary_index() -> None:
         print(f"WARNING: could not check the summary index ({type(exc).__name__}: {exc})")
 
 
+def _warn_missing_tokenizer() -> None:
+    """Deploy-time check, never a failure: the token window is on in the shipped config but the tokenizer file is absent.
+
+    The window trim (src/generation/token_count.py) counts with the llama.cpp server's /tokenize. While the server loads
+    the model it answers 503, and the trim then needs the shipped tokenizer; without it the count falls back to
+    characters / 4, which undercounts number-dense prompts by a fifth or more.
+    """
+    try:
+        if _shipped_finance_default("FINANCE_WINDOW_TOKENS") and not (REPO / TOKENIZER_FILE).is_file():
+            print(f"WARNING: FINANCE_WINDOW_TOKENS is on but {TOKENIZER_FILE} is missing; the deployed app will count "
+                  "the reader window in characters / 4 while llama.cpp is loading.")
+    except Exception as exc:  # noqa: BLE001 - a warning must never stop a deploy
+        print(f"WARNING: could not check the tokenizer file ({type(exc).__name__}: {exc})")
+
+
 image = (
     modal.Image.from_registry(f"ghcr.io/ggml-org/llama.cpp:{IMAGE_TAG}", add_python="3.11")
     .entrypoint([])
@@ -96,8 +112,12 @@ image = (
 if (REPO / "data/knowledge").is_dir():
     image = image.add_local_dir(str(REPO / "data/knowledge"), f"{APP_DIR}/data/knowledge")
 
+if (REPO / TOKENIZER_FILE).is_file():  # the window trim's second token source (src/generation/token_count.py)
+    image = image.add_local_file(str(REPO / TOKENIZER_FILE), f"{APP_DIR}/{TOKENIZER_FILE}")
+
 if modal.is_local():
     _warn_missing_summary_index()
+    _warn_missing_tokenizer()
 
 app = modal.App(APP_NAME)
 models = modal.Volume.from_name("buffettrag-models")
