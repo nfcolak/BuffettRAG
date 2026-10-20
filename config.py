@@ -226,6 +226,11 @@ FINANCE_DEFAULTS: dict = {
     "FINANCE_K_PERIOD": 32,            # served passages for a period / comparison plan; 0 = today's budget
     "FINANCE_RERANK_CANDIDATES": 30,   # candidates sent to the cross-encoder on the finance path (today: RERANK_CANDIDATES)
     "FINANCE_FOLLOWUP_HISTORY": 0,     # 1: a short / referential follow-up to a financial question is planned on that question, never scope-replied for being short (ask_flow.py)
+    "FINANCE_K_SPECIFIC": 0,           # served budget for specific / numeric plans (0 = today's budget)
+    "FINANCE_SUMMARY_FUSE_WEIGHT": 0,  # RRF weight of the summary ranking fused into the candidate order (0 = off)
+    "FINANCE_THEME_CENTROIDS": 0,      # 1: theme inference also matches tagged-passage summary centroids
+    "FINANCE_SOURCE_SLOTS": 0,         # served slots reserved for source candidates below the rerank cut
+    "FINANCE_PLAN_TERM_BOOST": 0,      # rerank score bonus for candidates tagged with the plan's targets (0 = off)
 }
 
 
