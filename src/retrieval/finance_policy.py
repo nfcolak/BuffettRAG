@@ -39,7 +39,7 @@ evaluation can count gold passages lost to the year filter.
 """
 from __future__ import annotations
 
-from typing import Any, Dict, List, Optional, Sequence, Tuple
+from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple
 
 from config import RETRIEVAL_FETCH_K, finance_setting, llm_context_passages, retrieval_setting
 from src.knowledge import KnowledgeStore
@@ -60,6 +60,22 @@ NARROW_LETTERS = 2  # an explicit year mention of at most this many letters is n
 WIDE_LETTERS = 3    # a question spanning at least this many letters is served diverse
 
 Block = Tuple[int, int]
+
+# Candidate-source registry (finance-recall-75): (setting name, callable) pairs; the callable is
+# `(plan, store, retriever, query, k) -> List[SearchHit]`. A source runs only when its setting is non-zero and its hits
+# join the candidate pool before the cross-encoder rerank. The modules below list their own sources; none is registered yet.
+Source = Callable[..., List[SearchHit]]
+EXTRA_SOURCES: List[Tuple[str, Source]] = []
+
+
+def registered_sources() -> List[Tuple[str, Source]]:
+    from src.retrieval import knowledge_source, summary_source
+    return [*summary_source.SOURCES, *knowledge_source.SOURCES, *EXTRA_SOURCES]
+
+
+def candidate_sources() -> List[Tuple[str, Source]]:
+    """The registered sources whose setting is on."""
+    return [(name, fn) for name, fn in registered_sources() if finance_setting(name)]
 
 
 def _year_filter(rng: Tuple[int, int]) -> Dict[str, Any]:
@@ -306,6 +322,19 @@ def finance_search(
             fused = reciprocal_rank_fusion([fused, [by_id[p] for p in tagged]],
                                            top_k=len({h.id for h in fused} | set(tagged)), weights=[1.0, weight])
 
+    source_hits: List[SearchHit] = []  # extra candidate sources: they join the pool before the rerank
+    source_counts: Dict[str, int] = {}
+    seen_ids = {h.id for h in fused}
+    for name, source in candidate_sources():
+        got = [h for h in source(plan, store, retriever, query, k) if h.id not in seen_ids]
+        source_counts[name] = len(got)
+        for h in got:
+            seen_ids.add(h.id)
+            source_hits.append(h)
+    if source_hits:
+        fused = [*fused, *source_hits]
+        combined = [*combined, *source_hits]
+
     pool_ids = [h.id for h in fused]
     numeric = plan.kind == NUMERIC
     kept = [h for h in fused if store.is_financial(h.id) and (numeric or not store.is_table(h.id))]
@@ -313,6 +342,7 @@ def finance_search(
     dropped = [h.id for h in fused if h.id not in kept_ids]
 
     reranked = False
+    window_ids = [h.id for h in kept]  # no reranker: every kept candidate is in play
     reranker = getattr(retriever, "reranker", None)
     injected: List[SearchHit] = []
     if reranker is not None and kept:
@@ -321,7 +351,12 @@ def finance_search(
         by_id = {h.id: h for h in combined}
         injected = [by_id[p] for p in tagged if p not in in_window and store.is_financial(p)
                     and (numeric or not store.is_table(p))][:max(0, finance_setting("FINANCE_TAG_POOL"))]
+        in_window |= {h.id for h in injected}
+        by_source = [h for h in source_hits if h.id not in in_window and store.is_financial(h.id)
+                     and (numeric or not store.is_table(h.id))]
+        injected = injected + by_source
         window = window + injected
+        window_ids = [h.id for h in window]
         kept = list(reranker.rerank(query, window, top_k=len(window)))
         reranked = True
     if retrieval_setting("RETRIEVAL_DEDUP"):
@@ -329,6 +364,7 @@ def finance_search(
     if blocks and narrow and not plan.year_hard:  # a narrow question: its in-block passages are served first
         kept = [h for h in kept if _in_blocks(h, blocks)] + [h for h in kept if not _in_blocks(h, blocks)]
 
+    stage_ranked = [h.id for h in kept]  # after rerank, dedup and the narrow-block reorder, before select
     protected: List[str] = []
     if blocks and not plan.year_hard:
         in_pool = {h.id for h in kept}
@@ -354,6 +390,10 @@ def finance_search(
         "tag_injected": len(injected),
         "pinned": [h.id for h in pins],
         "dropped_not_financial": dropped,
+        "source_candidates": source_counts,
+        "stage_pool": pool_ids,                 # every candidate before the financial filter (loss analysis)
+        "stage_window": window_ids,             # the ids the reranker saw
+        "stage_ranked": stage_ranked,           # reranked order, before the budget and per-letter cap
         "reranked": reranked,
         "k": k,
         "fetch_k": fetch_k,

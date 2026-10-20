@@ -214,6 +214,15 @@ FINANCE_DEFAULTS: dict = {
     "FINANCE_TAG_POOL": 24,            # entity-tagged candidates the reranker always sees, beyond RERANK_CANDIDATES
     "FINANCE_MAX_PER_LETTER": 2,       # questions spanning several letters: passages per letter at most
     "FINANCE_MIN_LETTERS": 4,          # questions spanning several letters: different letters at least, when available
+    # finance-recall-75: candidate sources (src/retrieval/finance_policy.py registry) and served budget. All off or at today's value.
+    "FINANCE_SUMMARY_SOURCE": 0,       # 1: candidates from the annotation-summary index (summary_source.py)
+    "FINANCE_TAGGED_SOURCE": 0,        # 1: passages tagged with the plan's / inferred sectors, companies, events, themes (knowledge_source.py)
+    "FINANCE_DIGEST_SOURCE": 0,        # 1: digest timeline source passages for trend / corpus-wide questions (knowledge_source.py)
+    "FINANCE_STANCE_SOURCE": 0,        # 1: passages with a stance on the plan's sector or company (knowledge_source.py)
+    "FINANCE_K_TREND": 0,              # served passages for a trend plan; 0 = today's budget (FINANCE_K / llm_context_passages())
+    "FINANCE_K_CORPUS": 0,             # served passages for a corpus-wide plan; 0 = today's budget
+    "FINANCE_K_PERIOD": 0,             # served passages for a period / comparison plan; 0 = today's budget
+    "FINANCE_RERANK_CANDIDATES": 30,   # candidates sent to the cross-encoder on the finance path (today: RERANK_CANDIDATES)
 }
 
 
