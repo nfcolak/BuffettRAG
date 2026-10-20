@@ -190,6 +190,45 @@ def expansion_hits(hits: Sequence[SearchHit], store: KnowledgeStore) -> List[Sea
             for h in hits]
 
 
+_SENTENCE_END_RE = re.compile(r"(?<=[.!?])((?:\s*\[\d+(?:\s*,\s*\d+)*\])*)\s+")
+_CITE_RE = re.compile(r"\[(\d+(?:\s*,\s*\d+)*)\]")
+# Personal cues in an answer sentence (narrower than the planner's question rules: no generic words like "sports").
+_PERSONAL_SENTENCE = re.compile(
+    r"\b(?:child|children|kids?|wife|husband|son|sons|daughters?|grandchild(?:ren)?|grand(?:father|mother)|"
+    r"mother|father|brother|sister|parents|marri(?:ed|age)|spouse|birthday|born|\d{1,3} years old|age \d{1,3}|"
+    r"health|surgery|illness|diet|jok(?:e|es|ed|ing)|ping[- ]pong|first pitch|funeral|died|death)\b", re.I)
+
+
+def drop_personal_sentences(answer: str, hits: Sequence[SearchHit], store: KnowledgeStore) -> str:
+    """Finance reader answers keep personal content out. A sentence is removed when it carries a personal cue and
+    every passage it cites is annotated `has_personal` or non-financial (a founder's family story told next to the
+    company's figures, for example). Returns the refusal line when nothing is left."""
+    if not answer or answer == REFUSAL_LINE:
+        return answer
+
+    def personal_source(n: int) -> bool:
+        if not 1 <= n <= len(hits):
+            return False
+        ids = hits[n - 1].metadata.get("merged_ids") or [hits[n - 1].id]
+        return any(store.has_personal(pid) or not store.is_financial(pid) for pid in ids)
+
+    def personal(sentence: str) -> bool:
+        if not _PERSONAL_SENTENCE.search(sentence):
+            return False
+        cited = [int(x) for m in _CITE_RE.findall(sentence) for x in m.split(",")]
+        return bool(cited) and all(personal_source(n) for n in cited)
+
+    out_lines = []
+    for line in answer.split("\n"):
+        parts = _SENTENCE_END_RE.split(line)
+        sentences = [parts[i] + (parts[i + 1] if i + 1 < len(parts) else "") for i in range(0, len(parts), 2)]
+        kept = [x for x in sentences if x.strip() and not personal(x)]
+        if kept or not line.strip():
+            out_lines.append(" ".join(x.strip() for x in kept))
+    text = "\n".join(out_lines).strip()
+    return text or REFUSAL_LINE
+
+
 def format_reader_answer(text: str) -> str:
     """`format_answer_markdown` that keeps a number with thousands separators whole: its inline-list split turns
     "... is about 600,000. [2]" into "... is about 600" and a list item "000. [2]"."""

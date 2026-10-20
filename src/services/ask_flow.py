@@ -227,6 +227,9 @@ def _finalize_answer(llm, prompt: str, context_hits, raw_answer: str, max_new_to
     if answer != REFUSAL_LINE and reader:
         answer = expand_answer(answer, finance_answer.expansion_hits(context_hits, _knowledge_store()),
                                **finance_answer.READER_EXPANSION)
+        answer = finance_answer.drop_personal_sentences(answer, context_hits, _knowledge_store())
+        if answer == REFUSAL_LINE:
+            return answer, []
     elif answer != REFUSAL_LINE:
         answer = expand_answer(answer, context_hits)
     return answer, parse_citations(answer, context_hits)

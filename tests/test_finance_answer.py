@@ -240,3 +240,28 @@ def test_superlative_company_targets_exclude_sectors_and_a_year_range_limits_the
     ranged = fa.stance_letters(QueryPlan(query="q", superlative="sector:positive", year_range=(2005, 2015)), store, docs)
     assert [t for t, _, _ in ranged] == ["railroads"]
     assert fa.superlative_answer(QueryPlan(query="q", superlative="sector:negative"), store, docs) is None
+
+
+def test_drop_personal_sentences_removes_family_story_cited_to_personal_passage():
+    from src.generation.finance_answer import drop_personal_sentences
+    from src.storage import SearchHit
+
+    class Store:
+        def has_personal(self, pid):
+            return pid == "p_personal"
+
+        def is_financial(self, pid):
+            return True
+
+    hits = [SearchHit("p_personal", "", {}, 0.0), SearchHit("p_fin", "", {}, 0.0)]
+    answer = ("With his first child due soon, he used $500 of his savings to found the company. [1] "
+              "First-year sales totaled $112,000. [1] Sales rose 21% above the previous high. [2]")
+    out = drop_personal_sentences(answer, hits, Store())
+    assert "first child" not in out
+    assert "First-year sales totaled $112,000. [1]" in out and "Sales rose 21%" in out
+    # a personal cue cited to a purely financial passage stays
+    kept = drop_personal_sentences("The company paid its founder's son $1 million in salary. [2]", hits, Store())
+    assert "son" in kept
+    # nothing financial left -> refusal line
+    from src.generation.prompt import REFUSAL_LINE
+    assert drop_personal_sentences("He told a joke about his age. [1]", hits, Store()) == REFUSAL_LINE
