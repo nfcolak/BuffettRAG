@@ -48,10 +48,11 @@ def test_new_follow_up_setting_defaults_off():
 def test_served_budget_follows_the_plan_kind(monkeypatch):
     monkeypatch.setenv("LLM_CONTEXT_PASSAGES", "8")
     kinds = ("trend", "corpus_wide", "period", "comparison", "specific", "numeric")
-    # the defaults group 5 adopted (finance-recall-75, task 5.1): 32 for trend, period and comparison plans
-    assert [served_budget(_plan(k)) for k in kinds] == [32, 8, 32, 32, 8, 8]
-    assert [kind_budget(_plan(k)) for k in kinds] == [32, 0, 32, 32, 0, 0]
-    for name in ("FINANCE_K_TREND", "FINANCE_K_CORPUS", "FINANCE_K_PERIOD"):
+    # the adopted defaults: 32 for trend, period and comparison plans (finance-recall-75, task 5.1), 32 for corpus-wide
+    # and 21 for specific and numeric plans (finance-recall-75-r2, task 4.1)
+    assert [served_budget(_plan(k)) for k in kinds] == [32, 32, 32, 32, 21, 21]
+    assert [kind_budget(_plan(k)) for k in kinds] == [32, 32, 32, 32, 21, 21]
+    for name in ("FINANCE_K_TREND", "FINANCE_K_CORPUS", "FINANCE_K_PERIOD", "FINANCE_K_SPECIFIC"):
         monkeypatch.setenv(name, "0")  # 0: the kind keeps today's budget
     assert [served_budget(_plan(k)) for k in kinds] == [8] * 6 and [kind_budget(_plan(k)) for k in kinds] == [0] * 6
     monkeypatch.setenv("FINANCE_K_TREND", "24")
@@ -66,6 +67,7 @@ def test_served_budget_follows_the_plan_kind(monkeypatch):
 def test_finance_search_serves_the_kind_budget(store, monkeypatch):
     monkeypatch.setenv("LLM_CONTEXT_PASSAGES", "6")
     monkeypatch.setenv("FINANCE_K_TREND", "0")  # 0: today's budget
+    monkeypatch.setenv("FINANCE_K_SPECIFIC", "0")
     ranking = _spread(range(1980, 2000), per_letter=3)
     hits, debug = finance_search(_plan("trend"), FakeRetriever(ranking), store)
     assert len(hits) == debug["k"] == 6
@@ -213,6 +215,7 @@ def test_the_corpus_budget_keeps_more_of_a_digest_answers_passages(monkeypatch):
                                               "docs_by_id": docs, "knowledge": KnowledgeStore.load(FIX)})
     monkeypatch.setenv("FINANCE_PIPELINE", "1")
     monkeypatch.setenv("LLM_CONTEXT_PASSAGES", "4")
+    monkeypatch.setenv("FINANCE_K_CORPUS", "0")  # 0: today's budget
     route = _route(DIGEST_Q)
     assert route.route == "digest" and len(route.hits) == 4  # three quoted passages and one gap passage
     monkeypatch.setenv("FINANCE_K_CORPUS", "6")

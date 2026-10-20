@@ -19,9 +19,10 @@ import finance_route_debug as frd  # noqa: E402
 from test_finance_policy import FakeRetriever, _hit, _plan  # noqa: E402
 
 FIX = Path(__file__).parent / "fixtures" / "knowledge_mini"
-# the defaults group 5 adopted (finance-recall-75, task 5.1); the rest stay off or at today's value
+# the defaults group 5 adopted (finance-recall-75, task 5.1), K_CORPUS 32 since finance-recall-75-r2 (task 4.1); the
+# rest stay off or at today's value
 NEW_SETTINGS = {"FINANCE_SUMMARY_SOURCE": 1, "FINANCE_TAGGED_SOURCE": 1, "FINANCE_DIGEST_SOURCE": 1,
-                "FINANCE_STANCE_SOURCE": 0, "FINANCE_K_TREND": 32, "FINANCE_K_CORPUS": 0, "FINANCE_K_PERIOD": 32,
+                "FINANCE_STANCE_SOURCE": 0, "FINANCE_K_TREND": 32, "FINANCE_K_CORPUS": 32, "FINANCE_K_PERIOD": 32,
                 "FINANCE_RERANK_CANDIDATES": 30}
 SOURCE_SETTINGS = ("FINANCE_SUMMARY_SOURCE", "FINANCE_TAGGED_SOURCE", "FINANCE_DIGEST_SOURCE", "FINANCE_STANCE_SOURCE")
 

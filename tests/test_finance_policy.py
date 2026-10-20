@@ -64,7 +64,8 @@ def _clustered():
             + [_hit(f"{y}_c{n:02d}") for y in (1981, 1987, 1992, 1996, 2003, 2008) for n in range(2)])
 
 
-def test_trend_plan_serves_at_least_four_letters_and_at_most_two_per_letter(store):
+def test_trend_plan_serves_at_least_four_letters_and_at_most_two_per_letter(store, monkeypatch):
+    monkeypatch.setenv("FINANCE_MAX_PER_LETTER", "2")  # the cap this test is written for (default 3 since finance-recall-75-r2)
     for ranking in (_spread(range(1980, 1990)), _clustered()):
         # at today's budget: a trend plan's own default (FINANCE_K_TREND) is larger
         hits, debug = finance_search(_plan("trend"), FakeRetriever(ranking), store, k=llm_context_passages())
@@ -76,18 +77,21 @@ def test_trend_plan_serves_at_least_four_letters_and_at_most_two_per_letter(stor
 
 
 @pytest.mark.parametrize("kind,year_range", [("period", (1980, 2010)), ("specific", (1980, 2010)), ("corpus_wide", None)])
-def test_questions_spanning_several_letters_are_diverse_too(store, kind, year_range):
+def test_questions_spanning_several_letters_are_diverse_too(store, kind, year_range, monkeypatch):
+    monkeypatch.setenv("FINANCE_MAX_PER_LETTER", "2")
     hits, _ = finance_search(_plan(kind, year_range=year_range), FakeRetriever(_clustered()), store)
     years = [h.metadata["year"] for h in hits]
     assert len(set(years)) >= 4 and max(years.count(y) for y in set(years)) <= 2
 
 
-def test_specific_plan_is_not_capped(store):
+def test_specific_plan_is_not_capped(store, monkeypatch):
+    monkeypatch.setenv("FINANCE_K_SPECIFIC", "0")  # 0: the reader context's budget, smaller than the 20 ranked hits
     hits, _ = finance_search(_plan("specific"), FakeRetriever(_clustered()), store)
     assert [h.id for h in hits] == [h.id for h in _clustered()[:llm_context_passages()]]
 
 
-def test_min_letters_stops_at_what_is_available(store):
+def test_min_letters_stops_at_what_is_available(store, monkeypatch):
+    monkeypatch.setenv("FINANCE_MAX_PER_LETTER", "2")
     ranking = [_hit(f"{y}_x{n}") for y in (1990, 1991) for n in range(6)]
     hits, _ = finance_search(_plan("trend"), FakeRetriever(ranking), store)
     assert {h.metadata["year"] for h in hits} == {1990, 1991} and len(hits) == 4  # 2 letters x cap 2
@@ -95,6 +99,7 @@ def test_min_letters_stops_at_what_is_available(store):
 
 def test_k_defaults_to_the_reader_context_and_finance_k_and_the_argument_win(store, monkeypatch):
     ranking = _spread(range(1980, 1995))
+    monkeypatch.setenv("FINANCE_K_SPECIFIC", "0")  # 0: a specific plan falls back to FINANCE_K / the reader context
     assert len(finance_search(_plan("specific"), FakeRetriever(ranking), store)[0]) == llm_context_passages() == 16
     monkeypatch.setenv("LLM_CONTEXT_PASSAGES", "10")
     assert len(finance_search(_plan("specific"), FakeRetriever(ranking), store)[0]) == 10
@@ -248,7 +253,8 @@ def test_retriever_without_hybrid_primitive_falls_back_to_public_search_and_keep
     assert [h.id for h in numeric] == ["1991_p0083", "1991_p0072", "1990_p0100"]
 
 
-def test_fallback_keeps_trend_diversity(store):
+def test_fallback_keeps_trend_diversity(store, monkeypatch):
+    monkeypatch.setenv("FINANCE_MAX_PER_LETTER", "2")
     hits, _ = finance_search(_plan("trend"), PublicSearchOnly(_clustered()), store)
     years = [h.metadata["year"] for h in hits]
     assert len(set(years)) >= 4 and max(years.count(y) for y in set(years)) <= 2

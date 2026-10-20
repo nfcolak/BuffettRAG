@@ -175,7 +175,8 @@ def test_tagged_source_cap_and_per_letter(monkeypatch):
     assert _ids(hits) == [_pid(1993, 3), _pid(1993, 4), _pid(1990, 3), _pid(1991, 3), _pid(1992, 3)]
 
 
-def test_tagged_source_uses_inferred_themes_and_nothing_without_tags():
+def test_tagged_source_uses_inferred_themes_and_nothing_without_tags(monkeypatch):
+    monkeypatch.setenv("FINANCE_THEME_CENTROIDS", "0")  # the descriptions only (centroids: test_candidate_fusion_centroids.py)
     store = _tag_store()
     retriever = Retriever(_docs(), embedder=Embedder())
     assert ks.tagged_source(_plan(query="vague question"), store, retriever, "vague question", 4) == []
@@ -280,6 +281,7 @@ class Prefer:
 
 
 def test_tagged_source_hits_reach_the_rerank_window_only_when_on(monkeypatch):
+    monkeypatch.setenv("FINANCE_PLAN_TERM_BOOST", "0")  # Prefer keeps the retrieval scores: a score bonus would re-sort them
     store = _tag_store()
     plan = _plan(themes=("buybacks",))
     reranker = Prefer("1990_p0005")  # rank 50: beyond the pool (fetch_k 30)
@@ -321,6 +323,7 @@ def test_superlative_without_the_sources_serves_only_the_winners_stance_passages
 
 def test_superlative_stance_source_serves_the_top_targets_within_the_budget(monkeypatch):
     monkeypatch.setenv("FINANCE_STANCE_SOURCE", "1")
+    monkeypatch.setenv("FINANCE_K_CORPUS", "0")  # the budget is the caller's max_hits
     store, docs = _superlative_store()
     result = fa.superlative_answer(PLAN_SUPERLATIVE, store, docs, max_hits=16)
     served = [h.id for h in result.hits]

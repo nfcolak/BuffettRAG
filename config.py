@@ -212,25 +212,29 @@ FINANCE_DEFAULTS: dict = {
     "FINANCE_ENTITY_BOOST_WEIGHT": 1,  # weight of the ranking of passages tagged with the plan's entities
     "FINANCE_TAG_DEPTH": 200,          # depth of the ranking the entity-tagged candidates are drawn from
     "FINANCE_TAG_POOL": 24,            # entity-tagged candidates the reranker always sees, beyond RERANK_CANDIDATES
-    "FINANCE_MAX_PER_LETTER": 2,       # questions spanning several letters: passages per letter at most
+    "FINANCE_MAX_PER_LETTER": 3,       # questions spanning several letters: passages per letter at most (finance-recall-75-r2: 2 -> 3)
     "FINANCE_MIN_LETTERS": 4,          # questions spanning several letters: different letters at least, when available
     # finance-recall-75: candidate sources (src/retrieval/finance_policy.py registry) and served budget. Group 5 adopted the
     # ones that raised dev served gold without lowering heldout_v6 and still add gold in the combination; the rest stay
-    # off or at today's value.
+    # off or at today's value. finance-recall-75-r2 group 4 applied the same rule to the round-2 settings below (and
+    # FINANCE_MAX_PER_LETTER / FINANCE_K_CORPUS); summary fusion, source slots and the stance source stay off.
     "FINANCE_SUMMARY_SOURCE": 1,       # 1: candidates from the annotation-summary index (summary_source.py)
     "FINANCE_TAGGED_SOURCE": 1,        # 1: passages tagged with the plan's / inferred sectors, companies, events, themes (knowledge_source.py)
     "FINANCE_DIGEST_SOURCE": 1,        # 1: digest timeline source passages for trend / corpus-wide questions (knowledge_source.py)
     "FINANCE_STANCE_SOURCE": 0,        # 1: passages with a stance on the plan's sector or company (knowledge_source.py)
     "FINANCE_K_TREND": 32,             # served passages for a trend plan; 0 = today's budget (FINANCE_K / llm_context_passages())
-    "FINANCE_K_CORPUS": 0,             # served passages for a corpus-wide plan; 0 = today's budget
+    "FINANCE_K_CORPUS": 32,            # served passages for a corpus-wide plan (and the superlative route); 0 = today's budget
     "FINANCE_K_PERIOD": 32,            # served passages for a period / comparison plan; 0 = today's budget
     "FINANCE_RERANK_CANDIDATES": 30,   # candidates sent to the cross-encoder on the finance path (today: RERANK_CANDIDATES)
     "FINANCE_FOLLOWUP_HISTORY": 0,     # 1: a short / referential follow-up to a financial question is planned on that question, never scope-replied for being short (ask_flow.py)
-    "FINANCE_K_SPECIFIC": 0,           # served passages for a specific / numeric plan, capped by the reader window like the trend budget; 0 = today's budget
+    # served passages for a specific / numeric plan, capped by the reader window like the trend budget; 0 = today's budget.
+    # 21, not more: the character window does not bound number-dense prompts (~3.1 chars per Qwen token), so the
+    # passage count does; 21 keeps them >1,000 tokens under the window, 22 left 95 tokens and 24 overflowed.
+    "FINANCE_K_SPECIFIC": 21,
     "FINANCE_SUMMARY_FUSE_WEIGHT": 0,  # RRF weight of the summary ranking fused into the candidate order (0 = off)
-    "FINANCE_THEME_CENTROIDS": 0,      # 1: theme inference also matches tagged-passage summary centroids
+    "FINANCE_THEME_CENTROIDS": 1,      # 1: theme inference also matches tagged-passage summary centroids
     "FINANCE_SOURCE_SLOTS": 0,         # served slots reserved for source candidates below the rerank cut
-    "FINANCE_PLAN_TERM_BOOST": 0,      # integer, hundredths (5 = +0.05): rerank score bonus for candidates tagged with the plan's targets (0 = off)
+    "FINANCE_PLAN_TERM_BOOST": 5,      # integer, hundredths (5 = +0.05): rerank score bonus for candidates tagged with the plan's targets (0 = off)
 }
 
 

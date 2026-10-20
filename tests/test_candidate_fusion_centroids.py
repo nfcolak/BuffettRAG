@@ -124,9 +124,10 @@ def _hit(pid):
     return SearchHit(id=pid, text=f"pool text {pid}", metadata={"year": int(pid[:4])}, score=1.0)
 
 
-def test_the_new_settings_default_off():
+def test_the_new_settings_default_to_the_adopted_values():
+    # finance-recall-75-r2 group 4: the centroids passed the adoption rule, the fusion did not
     assert FINANCE_DEFAULTS["FINANCE_SUMMARY_FUSE_WEIGHT"] == 0
-    assert FINANCE_DEFAULTS["FINANCE_THEME_CENTROIDS"] == 0
+    assert FINANCE_DEFAULTS["FINANCE_THEME_CENTROIDS"] == 1
 
 
 # --- FINANCE_SUMMARY_FUSE_WEIGHT -----------------------------------------------------------------------------------
@@ -186,6 +187,7 @@ def test_a_theme_centroid_is_the_mean_of_its_tagged_summaries(kdir, store):
 
 def test_centroids_reach_a_theme_its_description_misses(kdir, store, monkeypatch):
     embedder = ConceptEmbedder()
+    monkeypatch.setenv("FINANCE_THEME_CENTROIDS", "0")
     assert ks.infer_themes("summ3", store, embedder) == ()  # off: the description shares no word with the question
     monkeypatch.setenv("FINANCE_THEME_CENTROIDS", "1")
     assert ks.infer_themes("summ3", store, embedder) == ("theme3",)
@@ -220,6 +222,7 @@ def test_without_a_usable_index_the_descriptions_still_work(kdir, store, tmp_pat
 
 def test_the_tagged_source_serves_the_theme_a_centroid_inferred(kdir, store, monkeypatch):
     plan = _plan("summ3")
+    monkeypatch.setenv("FINANCE_THEME_CENTROIDS", "0")
     assert ks.tagged_source(plan, store, Retriever(), "summ3", 4) == []
     monkeypatch.setenv("FINANCE_THEME_CENTROIDS", "1")
     got = ks.tagged_source(plan, store, Retriever(), "summ3", 4)

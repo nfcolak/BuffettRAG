@@ -150,12 +150,14 @@ def test_every_search_reports_empty_source_debug_when_no_source_runs(store):
 
 
 # --- 1.2 FINANCE_K_SPECIFIC ---
-def test_the_specific_budget_defaults_off():
-    assert FINANCE_DEFAULTS["FINANCE_K_SPECIFIC"] == 0
+def test_the_specific_budget_defaults_to_the_adopted_value():
+    assert FINANCE_DEFAULTS["FINANCE_K_SPECIFIC"] == 21  # finance-recall-75-r2, task 4.1
 
 
 def test_the_specific_budget_is_read_by_specific_and_numeric_plans_only(monkeypatch):
     monkeypatch.setenv("LLM_CONTEXT_PASSAGES", "8")
+    monkeypatch.setenv("FINANCE_K_CORPUS", "0")    # corpus_wide: the kind without a budget of its own here
+    monkeypatch.setenv("FINANCE_K_SPECIFIC", "0")  # off
     kinds = ("trend", "corpus_wide", "period", "comparison", "specific", "numeric")
     assert [kind_budget(_plan(k)) for k in kinds] == [32, 0, 32, 32, 0, 0]  # off: today's budget
     monkeypatch.setenv("FINANCE_K_SPECIFIC", "24")
@@ -169,6 +171,7 @@ def test_the_specific_budget_is_read_by_specific_and_numeric_plans_only(monkeypa
 
 def test_finance_search_serves_the_specific_budget(store, monkeypatch):
     monkeypatch.setenv("LLM_CONTEXT_PASSAGES", "6")
+    monkeypatch.setenv("FINANCE_K_SPECIFIC", "0")  # off: today's budget
     ranking = [_hit(f"19{80 + n // 4}_s{n:02d}") for n in range(60)]
     hits, debug = finance_search(_plan("specific"), FakeRetriever(ranking), store)
     assert len(hits) == debug["k"] == 6
@@ -196,6 +199,7 @@ def _route(query=SPECIFIC_Q, **kw):
 
 def test_a_specific_route_serves_the_specific_budget_and_leaves_todays_without_it(flow, monkeypatch):
     monkeypatch.setenv("LLM_CONTEXT_PASSAGES", "4")
+    monkeypatch.setenv("FINANCE_K_SPECIFIC", "0")  # off: today's budget
     route = _route()
     assert route.plan.kind == "specific" and len(route.hits) == route.debug["k"] == 4
     assert "window_trimmed" not in route.debug

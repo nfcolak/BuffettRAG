@@ -71,8 +71,9 @@ def _search(store, k=4, scores=SCORES, **kw):
 
 
 # --- 3.1 FINANCE_SOURCE_SLOTS ---
-def test_the_new_settings_default_to_off():
-    assert FINANCE_DEFAULTS["FINANCE_SOURCE_SLOTS"] == 0 and FINANCE_DEFAULTS["FINANCE_PLAN_TERM_BOOST"] == 0
+def test_the_new_settings_default_to_the_adopted_values():
+    # finance-recall-75-r2 group 4: the plan-term boost passed the adoption rule, the source slots did not
+    assert FINANCE_DEFAULTS["FINANCE_SOURCE_SLOTS"] == 0 and FINANCE_DEFAULTS["FINANCE_PLAN_TERM_BOOST"] == 5
 
 
 def test_no_slots_serve_the_rerank_order_and_report_none(store, monkeypatch):
@@ -157,6 +158,7 @@ def _ranked():
 
 
 def test_plan_term_boost_adds_hundredths_to_tagged_candidates_for_the_order_only(store, monkeypatch):
+    monkeypatch.setenv("FINANCE_PLAN_TERM_BOOST", "0")  # off
     plain, count = boost_plan_terms(BANKING_PLAN, store, _ranked())
     assert [h.id for h in plain] == ["2008_p0067", "2008_p0011", "1986_p0118"] and count == 0
     monkeypatch.setenv("FINANCE_PLAN_TERM_BOOST", "5")  # .93 + .05 = .98 < 1.0
@@ -213,6 +215,7 @@ def _stance_store(polarity="positive"):
 
 def test_superlative_budget_is_the_callers_without_a_corpus_budget(monkeypatch):
     monkeypatch.setenv("FINANCE_STANCE_SOURCE", "1")
+    monkeypatch.setenv("FINANCE_K_CORPUS", "0")  # no corpus budget
     store, docs = _stance_store()
     result = fa.superlative_answer(PLAN_SUPERLATIVE, store, docs, max_hits=16)
     assert len(result.hits) == 16 and result.detail["evidence"] == 16 - result.detail["cited"]
@@ -220,6 +223,7 @@ def test_superlative_budget_is_the_callers_without_a_corpus_budget(monkeypatch):
 
 def test_superlative_corpus_budget_serves_more_stance_passages_of_the_top_targets(monkeypatch):
     monkeypatch.setenv("FINANCE_STANCE_SOURCE", "1")
+    monkeypatch.setenv("FINANCE_K_CORPUS", "0")  # today's 16 first
     store, docs = _stance_store()
     before = fa.superlative_answer(PLAN_SUPERLATIVE, store, docs, max_hits=16)
     monkeypatch.setenv("FINANCE_K_CORPUS", "24")
@@ -241,6 +245,7 @@ def test_superlative_corpus_budget_below_the_callers_does_not_lower_it(monkeypat
 
 def test_superlative_corpus_budget_without_the_stance_source_adds_the_winners_letters(monkeypatch):
     store, docs = _stance_store()
+    monkeypatch.setenv("FINANCE_K_CORPUS", "0")
     off = fa.superlative_answer(PLAN_SUPERLATIVE, store, docs, max_hits=16)
     monkeypatch.setenv("FINANCE_K_CORPUS", "24")
     on = fa.superlative_answer(PLAN_SUPERLATIVE, store, docs, max_hits=16)
