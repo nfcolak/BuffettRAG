@@ -47,7 +47,8 @@ def site_password() -> str:
 def record(case: dict, half: str, resp, data: dict, seconds: float) -> dict:
     return {"qid": case["qid"], "half": half, "status": getattr(resp, "status_code", None), "seconds": round(seconds, 1),
             "answer": data.get("answer"), "citations": data.get("citations"), "used_filter": data.get("used_filter"),
-            "served_ids": [h.get("id") for h in data.get("hits") or []],
+            "served_ids": (data.get("debug") or {}).get("served_ids")  # FINANCE_DEBUG: merged neighbour chunks included
+                          or [h.get("id") for h in data.get("hits") or []],
             "retrieved_ids": [h.get("id") for h in data.get("retrieved_hits") or []],
             "error": data.get("error") or data.get("detail"),
             **({"debug": data["debug"]} if data.get("debug") is not None else {})}

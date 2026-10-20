@@ -43,9 +43,9 @@ def test_new_settings_default_off_or_to_todays_value(monkeypatch):
     assert finance_setting("FINANCE_SUMMARY_SOURCE") == 1
 
 
-def test_stub_modules_register_no_source():
-    assert summary_source.SOURCES == [] and knowledge_source.SOURCES == []
-    assert finance_policy.registered_sources() == [] and candidate_sources() == []
+def test_registry_lists_the_module_sources_and_runs_none_while_their_settings_are_off():
+    assert finance_policy.registered_sources() == [*summary_source.SOURCES, *knowledge_source.SOURCES]
+    assert candidate_sources() == []
 
 
 def _register(monkeypatch, name, fn):

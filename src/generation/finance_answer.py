@@ -16,6 +16,9 @@ Final answers, returned as they are (no evidence gate, no claim validator, no `e
     rows, so a densely annotated letter does not dominate); the answer names the top three with their letter count
     and year span, then quotes the winner's digest timeline (entries on its stance passages; letters the timeline
     does not cover get the annotation's verbatim stance quote), citing the quoted source passages served as hits.
+    Uncited evidence fills the rest of the served budget: with FINANCE_DIGEST_SOURCE the winner's digest timeline
+    passages and with FINANCE_STANCE_SOURCE the stance passages of the top targets (finance-recall-75), each spread
+    across letters; then, as without them, the winner's other stance passages, one per letter.
 
 Matching figure rows never use another entity's rows: when the question names a company other than Berkshire, only
 that company's rows match; Berkshire's rows are the default only when no other company is named.
@@ -43,12 +46,15 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass, field
+from itertools import zip_longest
 from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple
 
+from config import finance_setting
 from src.generation.decompose import split_question
 from src.generation.prompt import REFUSAL_LINE, build_cited_prompt, format_answer_markdown, parse_citations
 from src.knowledge import KnowledgeStore
 from src.query.plan import QueryPlan
+from src.retrieval.knowledge_source import spread_letters
 from src.storage import SearchHit
 
 SCOPE_REPLY = "I only answer questions about Buffett's financial views and Berkshire's financial results."
@@ -471,6 +477,42 @@ def _spread(items: Sequence[Any], n: int) -> List[Any]:
     return [items[round(i * step)] for i in range(n)]
 
 
+def _interleave(lists: Sequence[Sequence[str]]) -> List[str]:
+    """The lists taken in turns (first items of each, then the second ones, ...), without repeats."""
+    out: Dict[str, None] = {}
+    for row in zip_longest(*lists):
+        out.update((pid, None) for pid in row if pid is not None)
+    return list(out)
+
+
+def _source_evidence(plan: QueryPlan, top: Sequence[Tuple[str, List[int], List[str]]],
+                     digest: Optional[Mapping[str, Any]], docs_by_id: Mapping[str, Any], served: set,
+                     budget: int) -> List[str]:
+    """Uncited evidence from the knowledge sources (finance-recall-75), [] when their settings are off: the winner's
+    digest timeline passages (FINANCE_DIGEST_SOURCE) and the stance passages of the top targets (FINANCE_STANCE_SOURCE,
+    the targets in turns, the winner first), each spread across letters, the two lists in turns. A letter not served
+    yet comes first; at most `budget` ids, none of them already `served`."""
+    letter = lambda pid: _letter_of(pid, docs_by_id)  # noqa: E731
+    lists: List[List[str]] = []
+    if finance_setting("FINANCE_DIGEST_SOURCE") and digest:
+        lo, hi = plan.year_range or (0, 9999)
+        timeline = sorted((e for e in digest.get("timeline") or [] if e.get("source_id") in docs_by_id
+                           and lo <= int(e.get("year") or 0) <= hi), key=lambda e: int(e.get("year") or 0))
+        lists.append(spread_letters([e["source_id"] for e in timeline], budget, letter))
+    if finance_setting("FINANCE_STANCE_SOURCE"):
+        lists.append(_interleave([spread_letters([p for p in ids if p in docs_by_id], budget, letter)
+                                  for _, _, ids in top]))
+    pool = [pid for pid in _interleave(lists) if pid not in served]
+    letters = {letter(pid) for pid in served}
+    picked: List[str] = []
+    for pid in pool:  # one passage of each letter not served yet, then the rest in order
+        if len(picked) < budget and letter(pid) not in letters:
+            picked.append(pid)
+            letters.add(letter(pid))
+    picked += [pid for pid in pool if pid not in picked][:max(0, budget - len(picked))]
+    return picked
+
+
 def superlative_answer(plan: QueryPlan, store: KnowledgeStore, docs_by_id: Mapping[str, Any],
                        max_hits: int = 16) -> Optional[FinanceAnswer]:
     """Top targets by distinct letters with a stance of the asked polarity, then quotes from the winner's digest
@@ -522,13 +564,16 @@ def superlative_answer(plan: QueryPlan, store: KnowledgeStore, docs_by_id: Mappi
         lines += ["", f"What he wrote about {_label(winner, kind).lower() if kind == 'sector' else winner}:", *quoted]
     answer = "\n".join(lines)
     cited = len(hits)
+    budget = max(0, max_hits - cited)
+    extra = _source_evidence(plan, top, digest, docs_by_id, set(index), budget)
     # uncited evidence for the count: the winner's other stance passages, one per letter, after the quoted ones
     by_letter_ids: Dict[int, str] = {}
+    served_letters = {_year(h) for h in hits} | {_letter_of(pid, docs_by_id) for pid in extra}
     for pid in winner_ids:
         letter = _letter_of(pid, docs_by_id)
-        if pid in docs_by_id and pid not in index and letter not in {_year(h) for h in hits}:
+        if pid in docs_by_id and pid not in index and pid not in extra and letter not in served_letters:
             by_letter_ids.setdefault(letter, pid)
-    extra = _spread([by_letter_ids[y] for y in sorted(by_letter_ids)], max(0, max_hits - cited))
+    extra += _spread([by_letter_ids[y] for y in sorted(by_letter_ids)], budget - len(extra))
     hits.extend(_hit_from_doc(docs_by_id[pid]) for pid in extra)
     return FinanceAnswer(answer=answer, hits=hits, citations=parse_citations(answer, hits[:cited]), route="superlative",
                          detail={"ranking": [(t, len(y)) for t, y, _ in top], "cited": cited, "evidence": len(extra)})

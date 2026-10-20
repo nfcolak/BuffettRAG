@@ -5,7 +5,7 @@ import os
 import random
 import re
 import time
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
@@ -14,6 +14,7 @@ from config import (
     CHUNKS_V3_FILE,
     EXPANSION_MODE,
     EXPOSE_DEBUG_STATUS,
+    finance_setting,
     llm_context_passages,
     llm_n_ctx,
     retrieval_setting,
@@ -34,8 +35,9 @@ from src.generation.evidence_gate import assess_evidence
 from src.evaluation.claim_validator import validate_and_filter_answer
 from src.generation.providers import create_llm_provider
 from src.knowledge import KnowledgeStore
-from src.query.plan import COMPARISON, CORPUS_WIDE, MIXED, NUMERIC, PERSONAL, TREND, QueryPlan, plan_query
-from src.retrieval.finance_policy import finance_search
+from src.query.plan import (COMPARISON, CORPUS_WIDE, FINANCIAL, MIXED, NUMERIC, PERSONAL, TREND, QueryPlan,
+                            plan_query)
+from src.retrieval.finance_policy import finance_search, kind_budget, reader_window_chars
 from src.retrieval.query_expansion import build_followup_retrieval_query, expand_query, expand_query_structured
 from src.retrieval.retriever import Retriever
 from src.services.schemas import AskRequest, HitOut, SearchRequest
@@ -122,6 +124,17 @@ def order_passages(hits):
         random.Random(int(order[8:])).shuffle(shuffled)
         return shuffled
     raise ValueError(f"LLM_PASSAGE_ORDER={order!r}; expected natural, reverse or shuffle:<seed>")
+
+
+def served_ids(hits) -> List[str]:
+    """Every passage id the reader sees, in served order: a hit's own id, then the ids of the neighbour chunks merged
+    into its text (`merged_ids`). The API reports these as `served_ids`, so a gold passage that reached the reader
+    inside a merged neighbour counts as served."""
+    ids: Dict[str, None] = {}
+    for hit in hits:
+        for pid in (hit.id, *(hit.metadata.get("merged_ids") or ())):
+            ids.setdefault(pid)
+    return list(ids)
 
 
 def _prepare_ask_steps(req: AskRequest):
@@ -353,6 +366,11 @@ class FinanceRoute:
         expansion."""
         return self.route != "reader"
 
+    @property
+    def served_ids(self) -> List[str]:
+        """Ids of the served passages including those merged into them (see `served_ids`)."""
+        return served_ids(self.hits)
+
     def prepared(self):
         """The reader inputs in the shape `_prepare_ask` returns."""
         return self.llm, self.retrieved_hits, self.used_filter, self.reranked, self.hits, self.prompt, None
@@ -380,6 +398,27 @@ def _scope_vote(retriever, store: KnowledgeStore, timing: Dict[str, float]):
     return vote
 
 
+def _plan_with_history(query: str, resolved: str, history: List[Dict[str, Any]], store: KnowledgeStore,
+                       vote) -> QueryPlan:
+    """Plan `resolved`, the question with its history terms (`build_followup_retrieval_query`: the previous user
+    question plus the follow-up).
+
+    A short or referential follow-up ("and in 2008?", "who was he playing with?") has little text of its own, so its
+    scope vote is noisy. When `resolved` differs from the question (the legacy follow-up handling treated it as a
+    follow-up) and only the vote made it personal, the previous user question is planned on its own; when that one is
+    financial, the follow-up is a financial follow-up and is planned from the rules alone (a personal rule that fires
+    still gives the scope reply). FINANCE_FOLLOWUP_HISTORY (default off) switches this on.
+    """
+    plan = plan_query(resolved, store, scope_vote=vote)
+    if not finance_setting("FINANCE_FOLLOWUP_HISTORY") or plan.scope != PERSONAL or plan.scope_source != "vote" \
+            or resolved == query:
+        return plan
+    previous = next((str(turn.get("content", "")) for turn in reversed(history) if turn.get("role") == "user"), "")
+    if previous and plan_query(previous, store, scope_vote=vote).scope == FINANCIAL:
+        return replace(plan_query(resolved, store), scope_source="history", vote_share=plan.vote_share)
+    return plan
+
+
 def finance_route_steps(req: AskRequest):
     """Generator like `_prepare_ask_steps`: yields stage names, returns a `FinanceRoute` (StopIteration.value).
 
@@ -392,6 +431,11 @@ def finance_route_steps(req: AskRequest):
     are served first and the rows are added to the prompt. Only comparison plans are answered per period; every other
     reader question (a trend included) is one reader call over the served passages, with the finance reader prompt
     (`finance_answer.reader_prompt`) and, in `_finalize_answer`, the reader settings.
+
+    With FINANCE_FOLLOWUP_HISTORY on, a follow-up whose previous question is financial is never given the scope reply
+    only for being short or referential (`_plan_with_history`). The served budget is `llm_context_passages()` unless the plan's kind has its own
+    (`FINANCE_K_TREND` / `_CORPUS` / `_PERIOD`); a budget beyond that is cut back, lowest ranks first, until the prompt
+    fits the reader window (`reader_window_chars`), never below `llm_context_passages()`.
     """
     retriever: Retriever = _state["retriever"]
     store = _knowledge_store()
@@ -399,7 +443,7 @@ def finance_route_steps(req: AskRequest):
     history = [turn.model_dump() for turn in req.history]
     resolved = build_followup_retrieval_query(req.query, history)
     timing: Dict[str, float] = {}
-    plan = plan_query(resolved, store, scope_vote=_scope_vote(retriever, store, timing))
+    plan = _plan_with_history(req.query, resolved, history, store, _scope_vote(retriever, store, timing))
     debug: Dict[str, Any] = {"kind": plan.kind, "scope": plan.scope, "scope_source": plan.scope_source, **timing}
     query = plan.financial_query if plan.scope == MIXED and plan.financial_query else req.query
 
@@ -407,6 +451,8 @@ def finance_route_steps(req: AskRequest):
         done = finance_answer.scope_answer()
         return FinanceRoute("scope", plan, query, done.answer, done.citations, done.hits, [], debug=debug)
     cap = llm_context_passages()
+    budget = kind_budget(plan)  # 0: the plan's kind keeps today's budget
+    limit = budget or cap
 
     if plan.superlative:
         done = finance_answer.superlative_answer(plan, store, docs_by_id, max_hits=cap)
@@ -436,7 +482,7 @@ def finance_route_steps(req: AskRequest):
     if plan.kind == CORPUS_WIDE:
         done = finance_answer.digest_answer(plan, store, docs_by_id, hits)
         if done is not None:
-            done.hits = done.hits[:max(cap, done.detail["cited"])]  # the cited quotes always stay
+            done.hits = done.hits[:max(limit, done.detail["cited"])]  # the cited quotes always stay
             debug.update(done.detail)
             return FinanceRoute("digest", plan, query, done.answer, done.citations, done.hits, hits, used_filter,
                                 reranked, debug=debug)
@@ -451,16 +497,24 @@ def finance_route_steps(req: AskRequest):
             followup=build_followup_retrieval_query(req.query, history) != req.query,
             neighbors=retrieval_setting("ANSWER_CONTEXT_NEIGHBORS"), max_chars=ANSWER_CONTEXT_MAX_CHARS,
             max_new_tokens=req.max_new_tokens, n_ctx=llm_n_ctx(),
-            max_passages=cap, passage_max_chars=retrieval_setting("LLM_PASSAGE_MAX_CHARS"),
+            max_passages=limit, passage_max_chars=retrieval_setting("LLM_PASSAGE_MAX_CHARS"),
             periods=None if per_period else (),
         )
-        context_hits = list(context_hits)[:cap]
-        if plan.kind == TREND:
-            context_hits = finance_answer.sort_by_year(context_hits)
-        context_hits = order_passages(context_hits)
-        prompt = finance_answer.reader_prompt(query, context_hits, history, trend=plan.kind == TREND)
-        if rows:
-            prompt = finance_answer.figures_prompt(prompt, rows, context_hits)
+
+        def compose(served: List[Any]):
+            ordered = finance_answer.sort_by_year(served) if plan.kind == TREND else served
+            ordered = order_passages(ordered)
+            text = finance_answer.reader_prompt(query, ordered, history, trend=plan.kind == TREND)
+            return ordered, (finance_answer.figures_prompt(text, rows, ordered) if rows else text)
+
+        served = list(context_hits)[:limit]
+        context_hits, prompt = compose(served)
+        if limit > cap:  # an adaptive budget: the passages beyond today's budget must fit the reader window
+            window, before = reader_window_chars(req.max_new_tokens), len(served)
+            while len(served) > cap and len(prompt) > window:
+                served.pop()
+                context_hits, prompt = compose(served)
+            debug["window_chars"], debug["window_trimmed"] = window, before - len(served)
     return FinanceRoute("reader", plan, query, hits=context_hits, retrieved_hits=hits, used_filter=used_filter,
                         reranked=reranked, llm=llm, prompt=prompt, debug=debug, per_period=per_period)
 

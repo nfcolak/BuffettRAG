@@ -33,15 +33,21 @@ Steps:
      Period, comparison and trend plans reserve the best hit of each named period first. `pinned` hits (the source
      passages of matching figure rows) are served first, before the k - len(pinned) selected ones.
 
+The served budget k is adaptive by plan kind (`served_budget`): `FINANCE_K_TREND`, `FINANCE_K_CORPUS` and
+`FINANCE_K_PERIOD` (period and comparison plans) when set, else FINANCE_K / `llm_context_passages()`. The caller caps
+the prompt by the reader window (`reader_window_chars`). The reranker takes `rerank_depth()` (`FINANCE_RERANK_CANDIDATES`) candidates.
+
 The debug dict reports the annotation coverage of the candidate pool and `year_filtered_out`, the ids of the
 unfiltered ranking outside the year range that the range removed (hard) or ranked lower (boost), so the
 evaluation can count gold passages lost to the year filter.
 """
 from __future__ import annotations
 
+import os
 from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple
 
-from config import RETRIEVAL_FETCH_K, finance_setting, llm_context_passages, retrieval_setting
+from config import (RETRIEVAL_DEFAULTS, RETRIEVAL_FETCH_K, finance_setting, llm_context_passages, llm_n_ctx,
+                    retrieval_setting)
 from src.knowledge import KnowledgeStore
 from src.query.plan import (COMPARISON, CORPUS_WIDE, FIRST_LETTER_YEAR, LAST_LETTER_YEAR, NUMERIC, PERIOD, TREND,
                             QueryPlan)
@@ -76,6 +82,37 @@ def registered_sources() -> List[Tuple[str, Source]]:
 def candidate_sources() -> List[Tuple[str, Source]]:
     """The registered sources whose setting is on."""
     return [(name, fn) for name, fn in registered_sources() if finance_setting(name)]
+
+
+def kind_budget(plan: QueryPlan) -> int:
+    """The adaptive served budget of the plan's kind (FINANCE_K_TREND / _CORPUS / _PERIOD), 0 = not set."""
+    if plan.kind == TREND:
+        return max(0, finance_setting("FINANCE_K_TREND"))
+    if plan.kind == CORPUS_WIDE:
+        return max(0, finance_setting("FINANCE_K_CORPUS"))
+    if plan.kind in (PERIOD, COMPARISON):
+        return max(0, finance_setting("FINANCE_K_PERIOD"))
+    return 0
+
+
+def served_budget(plan: QueryPlan) -> int:
+    """Passages the plan is served: its kind's setting, else FINANCE_K, else `llm_context_passages()`."""
+    return kind_budget(plan) or finance_setting("FINANCE_K") or llm_context_passages()
+
+
+def rerank_depth() -> int:
+    """Candidates the finance path sends to the cross-encoder: FINANCE_RERANK_CANDIDATES. While that setting is
+    neither set in the environment nor changed from today's value, the global RERANK_CANDIDATES applies as before."""
+    depth = finance_setting("FINANCE_RERANK_CANDIDATES")
+    if not os.environ.get("FINANCE_RERANK_CANDIDATES", "").strip() and depth == RETRIEVAL_DEFAULTS["RERANK_CANDIDATES"]:
+        depth = retrieval_setting("RERANK_CANDIDATES")
+    return max(1, depth)
+
+
+def reader_window_chars(max_new_tokens: int) -> int:
+    """Characters the reader prompt may take: the window (`llm_n_ctx()`) minus the answer budget, at
+    LLM_CHARS_PER_TOKEN (4) characters per token."""
+    return int(max(0, llm_n_ctx() - max_new_tokens) * retrieval_setting("LLM_CHARS_PER_TOKEN"))
 
 
 def _year_filter(rng: Tuple[int, int]) -> Dict[str, Any]:
@@ -265,11 +302,12 @@ def finance_search(
 ) -> Tuple[List[SearchHit], Dict[str, Any]]:
     """Retrieve for a planned finance question; returns (hits, debug).
 
-    `k` defaults to FINANCE_K, or `llm_context_passages()` when that is 0 (the default). `pinned` hits are served
-    first (the source passages of matching figure rows), whatever their scope or table flag.
+    `k` defaults to `served_budget(plan)`: the plan kind's FINANCE_K_* setting, else FINANCE_K, else
+    `llm_context_passages()`. `pinned` hits are served first (the source passages of matching figure rows), whatever
+    their scope or table flag.
     """
     store = store if store is not None else KnowledgeStore.empty()
-    k = int(k) if k else (finance_setting("FINANCE_K") or llm_context_passages())
+    k = int(k) if k else served_budget(plan)
     query = plan.financial_query or plan.query
     fetch_k = max(RETRIEVAL_FETCH_K, k * finance_setting("FINANCE_OVERFETCH"))
 
@@ -346,7 +384,7 @@ def finance_search(
     reranker = getattr(retriever, "reranker", None)
     injected: List[SearchHit] = []
     if reranker is not None and kept:
-        window = kept[:retrieval_setting("RERANK_CANDIDATES")]
+        window = kept[:rerank_depth()]
         in_window = {h.id for h in window}
         by_id = {h.id: h for h in combined}
         injected = [by_id[p] for p in tagged if p not in in_window and store.is_financial(p)

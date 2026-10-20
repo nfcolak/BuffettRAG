@@ -223,6 +223,7 @@ FINANCE_DEFAULTS: dict = {
     "FINANCE_K_CORPUS": 0,             # served passages for a corpus-wide plan; 0 = today's budget
     "FINANCE_K_PERIOD": 0,             # served passages for a period / comparison plan; 0 = today's budget
     "FINANCE_RERANK_CANDIDATES": 30,   # candidates sent to the cross-encoder on the finance path (today: RERANK_CANDIDATES)
+    "FINANCE_FOLLOWUP_HISTORY": 0,     # 1: a short / referential follow-up to a financial question is planned on that question, never scope-replied for being short (ask_flow.py)
 }
 
 

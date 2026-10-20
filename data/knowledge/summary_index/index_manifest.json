@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "backend": "faiss",
+  "corpus": "/Users/necatifurkancolak/AI-Workplace/Projects/current/BuffettRAG/data/knowledge/annotations.jsonl",
+  "corpus_sha256": "4fa6d7d5dce85c293e7392047bdf30b44cdb67d6282702bd2d4a33c8610eef47",
+  "document_ids_sha256": "843154cf78189228df9b3612ecd97ca85a9f9b9314546003d7b98d1561c69cb6",
+  "document_count": 5288,
+  "embedding": {
+    "model": "BAAI/bge-base-en-v1.5",
+    "dimension": 768
+  },
+  "artifacts_sha256": {
+    "index.faiss": "3636293b8a50eb909b0d5e442b3aec9ceb29536916f41062195d4acaf91d2be1",
+    "meta.json": "da954d557172ef2099e611a67ccc2b85c66627304bef7ef188f103ac52aff07d"
+  },
+  "kind": "annotation_summary_index",
+  "scope": "financial",
+  "bm25": {
+    "source": "meta.json",
+    "tokenizer": "src.retrieval.bm25._search_tokens",
+    "documents": 5288,
+    "vocabulary": 7149,
+    "mean_tokens": 18.61
+  }
+}

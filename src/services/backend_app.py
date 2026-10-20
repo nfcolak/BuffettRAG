@@ -286,7 +286,7 @@ def ask(req: AskRequest):
             "validator": trace.get("validator", {"kept": [], "dropped": []}),
             "refusal_retry": bool(trace.get("refusal_retry", False)),
             "prompt_chars": len(prompt),
-            "served_ids": [h.id for h in context_hits],
+            "served_ids": ask_flow.served_ids(context_hits),  # merged neighbour chunks included
             **{k: v for k, v in trace.items() if k in ("refusal_by", "first_raw_answer", "retry_prompt_chars",
                                                         "raw_answer_note")},
         }
