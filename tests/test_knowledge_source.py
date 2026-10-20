@@ -5,7 +5,7 @@ import math
 
 import pytest
 
-from config import finance_setting
+from config import FINANCE_DEFAULTS, finance_setting
 from src.generation import finance_answer as fa
 from src.knowledge import KnowledgeStore
 from src.query.plan import QueryPlan
@@ -25,6 +25,8 @@ def _clean_env(monkeypatch):
     for name in (*SETTINGS, "FINANCE_K", "FINANCE_OVERFETCH", "FINANCE_TAG_DEPTH", "FINANCE_TAG_POOL",
                  "LLM_CONTEXT_PASSAGES", "FINANCE_RERANK_CANDIDATES"):
         monkeypatch.delenv(name, raising=False)
+    for name in (*SETTINGS, "FINANCE_SUMMARY_SOURCE"):  # every source off; a test turns on the one it checks
+        monkeypatch.setenv(name, "0")
     monkeypatch.setenv("RETRIEVAL_DEDUP", "0")
     monkeypatch.setenv("FINANCE_TAG_DEPTH", "30")  # = the shallow depth (fetch_k) at k=4: only ranks 0-29 are pooled
 
@@ -93,9 +95,11 @@ def _ids(hits):
 
 
 # --- registry and settings ---
-def test_three_sources_registered_each_with_its_setting_default_off(monkeypatch):
+def test_three_sources_registered_each_with_its_setting(monkeypatch):
     assert [name for name, _ in ks.SOURCES] == list(SETTINGS)
-    assert all(finance_setting(name) == 0 for name in SETTINGS)
+    # group 5 adopted the tagged and digest sources (finance-recall-75, task 5.1); the stance source stays off
+    assert [FINANCE_DEFAULTS[name] for name in SETTINGS] == [1, 1, 0]
+    assert all(finance_setting(name) == 0 for name in SETTINGS)  # switched off by the fixture
     assert not [name for name, _ in candidate_sources() if name in SETTINGS]
     monkeypatch.setenv("FINANCE_DIGEST_SOURCE", "1")
     assert [name for name, _ in candidate_sources() if name in SETTINGS] == ["FINANCE_DIGEST_SOURCE"]
@@ -308,7 +312,7 @@ def _superlative_store():
 PLAN_SUPERLATIVE = QueryPlan(query="q", kind="corpus_wide", superlative="sector:positive")
 
 
-def test_superlative_default_serves_only_the_winners_stance_passages():
+def test_superlative_without_the_sources_serves_only_the_winners_stance_passages():
     store, docs = _superlative_store()
     result = fa.superlative_answer(PLAN_SUPERLATIVE, store, docs, max_hits=16)
     assert [t for t, _ in result.detail["ranking"]] == ["insurance", "railroads", "banking"]

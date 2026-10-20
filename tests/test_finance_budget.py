@@ -48,6 +48,11 @@ def test_new_follow_up_setting_defaults_off():
 def test_served_budget_follows_the_plan_kind(monkeypatch):
     monkeypatch.setenv("LLM_CONTEXT_PASSAGES", "8")
     kinds = ("trend", "corpus_wide", "period", "comparison", "specific", "numeric")
+    # the defaults group 5 adopted (finance-recall-75, task 5.1): 32 for trend, period and comparison plans
+    assert [served_budget(_plan(k)) for k in kinds] == [32, 8, 32, 32, 8, 8]
+    assert [kind_budget(_plan(k)) for k in kinds] == [32, 0, 32, 32, 0, 0]
+    for name in ("FINANCE_K_TREND", "FINANCE_K_CORPUS", "FINANCE_K_PERIOD"):
+        monkeypatch.setenv(name, "0")  # 0: the kind keeps today's budget
     assert [served_budget(_plan(k)) for k in kinds] == [8] * 6 and [kind_budget(_plan(k)) for k in kinds] == [0] * 6
     monkeypatch.setenv("FINANCE_K_TREND", "24")
     monkeypatch.setenv("FINANCE_K_CORPUS", "30")
@@ -60,6 +65,7 @@ def test_served_budget_follows_the_plan_kind(monkeypatch):
 
 def test_finance_search_serves_the_kind_budget(store, monkeypatch):
     monkeypatch.setenv("LLM_CONTEXT_PASSAGES", "6")
+    monkeypatch.setenv("FINANCE_K_TREND", "0")  # 0: today's budget
     ranking = _spread(range(1980, 2000), per_letter=3)
     hits, debug = finance_search(_plan("trend"), FakeRetriever(ranking), store)
     assert len(hits) == debug["k"] == 6
@@ -129,11 +135,20 @@ def _route(query=TREND_Q, **kw):
     return ask_flow.finance_route(AskRequest(query=query, **kw))
 
 
-def test_default_budget_is_todays_and_leaves_no_window_trace(flow, monkeypatch):
+def test_a_zero_kind_budget_is_todays_and_leaves_no_window_trace(flow, monkeypatch):
     monkeypatch.setenv("LLM_CONTEXT_PASSAGES", "4")
+    monkeypatch.setenv("FINANCE_K_TREND", "0")
     route = _route()
     assert route.plan.kind == "trend" and len(route.hits) == 4 and route.debug["k"] == 4
     assert "window_trimmed" not in route.debug
+
+
+def test_the_default_trend_budget_is_the_adopted_one_and_fits_the_window(flow, monkeypatch):
+    monkeypatch.setenv("LLM_CONTEXT_PASSAGES", "4")
+    route = _route()
+    assert route.plan.kind == "trend" and route.debug["k"] == FINANCE_DEFAULTS["FINANCE_K_TREND"] == 32
+    assert len(route.hits) == len(flow.docs) and route.debug["window_trimmed"] == 0  # 24 passages fit the window
+    assert len(route.prompt) <= route.debug["window_chars"]
 
 
 def test_a_trend_budget_serves_more_passages(flow, monkeypatch):
@@ -181,6 +196,7 @@ def test_the_window_uses_the_requests_answer_budget(flow, monkeypatch):
 
 def test_a_trend_budget_does_not_touch_other_plan_kinds(flow, monkeypatch):
     monkeypatch.setenv("LLM_CONTEXT_PASSAGES", "4")
+    monkeypatch.setenv("FINANCE_K_PERIOD", "0")  # the period kind keeps today's budget
     monkeypatch.setenv("FINANCE_K_TREND", "12")
     route = _route("What did Buffett write about bonds in 1990?")
     assert route.plan.kind != "trend" and len(route.hits) <= 4
@@ -268,12 +284,13 @@ class VoteRetriever(FakeRetriever):
 
     def __init__(self, docs):
         super().__init__([])
-        self.docs = docs
+        self.by_id = docs
+        self.docs = list(docs.values())  # a list of stored passages, as `Retriever.docs` (the knowledge sources read it)
 
     def _hybrid_for_filter(self, query, fetch_k, where):
         ids = [*NON_FINANCIAL, *FINANCIAL] if any(m in query.lower() for m in NOISY) else list(FINANCIAL)
-        return [SearchHit(i, self.docs[i].text, dict(self.docs[i].metadata), 1.0 - n / 100)
-                for n, i in enumerate(ids) if i in self.docs][:fetch_k]
+        return [SearchHit(i, self.by_id[i].text, dict(self.by_id[i].metadata), 1.0 - n / 100)
+                for n, i in enumerate(ids) if i in self.by_id][:fetch_k]
 
 
 @pytest.fixture

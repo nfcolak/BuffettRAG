@@ -13,7 +13,7 @@ import numpy as np
 import pytest
 import sentence_transformers  # noqa: F401  (macOS: imported first, torch and faiss share one libomp; else FAISS search aborts)
 
-from config import finance_setting
+from config import FINANCE_DEFAULTS, finance_setting
 from src.knowledge import KnowledgeStore, default_dir
 from src.query.plan import NUMERIC, QueryPlan
 from src.retrieval import finance_policy, summary_source
@@ -97,6 +97,8 @@ def _clean_env(monkeypatch):
     for name in ("FINANCE_SUMMARY_SOURCE", "FINANCE_YEAR_BOOST_WEIGHT", "FINANCE_K", "LLM_CONTEXT_PASSAGES",
                  "HYBRID_VECTOR_WEIGHT", "HYBRID_BM25_WEIGHT", "KNOWLEDGE_DIR"):
         monkeypatch.delenv(name, raising=False)
+    for name in ("FINANCE_SUMMARY_SOURCE", "FINANCE_TAGGED_SOURCE", "FINANCE_DIGEST_SOURCE", "FINANCE_STANCE_SOURCE"):
+        monkeypatch.setenv(name, "0")  # every source off; a test turns on the one it checks
     monkeypatch.setenv("RETRIEVAL_DEDUP", "0")
     summary_source.reset_cache()
     yield
@@ -276,7 +278,8 @@ def test_a_year_block_reaches_in_range_passages_the_unfiltered_top_misses(kdir, 
 def test_the_source_is_registered_and_gated_by_its_setting(monkeypatch):
     assert ("FINANCE_SUMMARY_SOURCE", summary_candidates) in finance_policy.registered_sources()
     assert summary_source.SOURCES == [("FINANCE_SUMMARY_SOURCE", summary_candidates)]
-    assert finance_setting("FINANCE_SUMMARY_SOURCE") == 0 and candidate_sources() == []
+    assert FINANCE_DEFAULTS["FINANCE_SUMMARY_SOURCE"] == 1  # adopted by group 5 (finance-recall-75, task 5.1)
+    assert finance_setting("FINANCE_SUMMARY_SOURCE") == 0 and candidate_sources() == []  # switched off by the fixture
     monkeypatch.setenv("FINANCE_SUMMARY_SOURCE", "1")
     assert candidate_sources() == [("FINANCE_SUMMARY_SOURCE", summary_candidates)]
 

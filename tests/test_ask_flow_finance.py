@@ -146,6 +146,7 @@ def test_finished_answers_do_not_go_through_the_validator_or_expansion(env, monk
 
 def test_reader_route_serves_trend_passages_oldest_first_capped_for_the_remote_provider(env, monkeypatch):
     monkeypatch.setenv("LLM_CONTEXT_PASSAGES", "4")
+    monkeypatch.setenv("FINANCE_K_TREND", "0")  # today's budget: the trend default (FINANCE_K_TREND) serves what it retrieves
     monkeypatch.setenv("FINANCE_K", "6")  # retrieval returns more than the reader context takes
     body = _ask(env, TREND_Q)
     years = [h["year"] for h in body["hits"]]

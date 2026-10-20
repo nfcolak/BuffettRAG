@@ -19,9 +19,11 @@ import finance_route_debug as frd  # noqa: E402
 from test_finance_policy import FakeRetriever, _hit, _plan  # noqa: E402
 
 FIX = Path(__file__).parent / "fixtures" / "knowledge_mini"
-NEW_SETTINGS = {"FINANCE_SUMMARY_SOURCE": 0, "FINANCE_TAGGED_SOURCE": 0, "FINANCE_DIGEST_SOURCE": 0,
-                "FINANCE_STANCE_SOURCE": 0, "FINANCE_K_TREND": 0, "FINANCE_K_CORPUS": 0, "FINANCE_K_PERIOD": 0,
+# the defaults group 5 adopted (finance-recall-75, task 5.1); the rest stay off or at today's value
+NEW_SETTINGS = {"FINANCE_SUMMARY_SOURCE": 1, "FINANCE_TAGGED_SOURCE": 1, "FINANCE_DIGEST_SOURCE": 1,
+                "FINANCE_STANCE_SOURCE": 0, "FINANCE_K_TREND": 32, "FINANCE_K_CORPUS": 0, "FINANCE_K_PERIOD": 32,
                 "FINANCE_RERANK_CANDIDATES": 30}
+SOURCE_SETTINGS = ("FINANCE_SUMMARY_SOURCE", "FINANCE_TAGGED_SOURCE", "FINANCE_DIGEST_SOURCE", "FINANCE_STANCE_SOURCE")
 
 
 @pytest.fixture(scope="module")
@@ -33,14 +35,18 @@ def store():
 def _clean_env(monkeypatch):
     for name in (*NEW_SETTINGS, "FINANCE_K", "LLM_CONTEXT_PASSAGES"):
         monkeypatch.delenv(name, raising=False)
+    for name in SOURCE_SETTINGS:  # the registry tests start with every source off and turn on the one they check
+        monkeypatch.setenv(name, "0")
     monkeypatch.setenv("RETRIEVAL_DEDUP", "0")
 
 
-def test_new_settings_default_off_or_to_todays_value(monkeypatch):
+def test_new_settings_default_to_the_adopted_values(monkeypatch):
+    for name in SOURCE_SETTINGS:
+        monkeypatch.delenv(name)
     for name, value in NEW_SETTINGS.items():
         assert FINANCE_DEFAULTS[name] == value and finance_setting(name) == value
-    monkeypatch.setenv("FINANCE_SUMMARY_SOURCE", "1")
-    assert finance_setting("FINANCE_SUMMARY_SOURCE") == 1
+    monkeypatch.setenv("FINANCE_SUMMARY_SOURCE", "0")
+    assert finance_setting("FINANCE_SUMMARY_SOURCE") == 0
 
 
 def test_registry_lists_the_module_sources_and_runs_none_while_their_settings_are_off():

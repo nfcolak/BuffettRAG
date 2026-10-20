@@ -4,14 +4,19 @@ Runs `ask_flow.finance_route` (plan, route decision, finance_search, served cont
 on corpus v3 + FAISS with the local bge embedder and reranker, and a fake LLM that never generates. The fake LLM is a
 "remote" provider, as in the cloud app, so the served list is the one the deployed /ask returns (no llama window fit).
 
-  python scripts/eval/finance_route_debug.py [--set dev|heldout_v6] [--loss] [--cache PATH] [--compare RESPONSES.jsonl]
-                                             [--json OUT] [--ids]
+  python scripts/eval/finance_route_debug.py [--set dev|heldout_v6] [--loss] [--legacy] [--cache PATH]
+                                             [--compare RESPONSES.jsonl] [--json OUT] [--ids]
 
 Per question: qid, group, plan (scope, kind, years, events, sectors, companies), route, served ids (with --ids) and
 gold served / total. It ends with the gold-served share per group (mean over the questions that have gold passages,
 as scripts/eval/score_finance.py computes it from a run) and the route counts. --compare adds the gold served of a
 stored run (its served_ids) per question and group. Only the dev half and heldout_v6 are read; the test half is never
 opened.
+
+Gold served is counted two ways (finance-recall-75, task 5.0): `gold served` on the served anchors only (the ids of the
+served hits, the definition the 75% target was written against), and `merged` on every id the reader sees, the anchors
+plus the neighbour chunks merged into their text (`ask_flow.served_ids`). --legacy runs the flag-off path instead
+(`ask_flow._prepare_ask`, FINANCE_PIPELINE unset: what the live app serves); it has no plan and no stage debug.
 
 --set heldout_v6 merges answer_benchmark_heldout_v6_{a,b}.json (second check, already spent) and groups by question_type.
 --loss adds, per group, the first stage that lost each missing gold passage (finance-recall-75, task 1.1):
@@ -136,7 +141,33 @@ def route_one(ask_flow, case: Dict[str, Any]) -> Dict[str, Any]:
         "companies": list(plan.companies), "route": ask_flow.finance_answer_mode(route),
         "served_ids": served, "retrieved_ids": retrieved,
         "gold": len(gold), "gold_served": len(got), "gold_missing": [g for g in gold if g not in set(served)],
+        **_merged(route.served_ids, gold),
     }
+
+
+def legacy_one(ask_flow, case: Dict[str, Any]) -> Dict[str, Any]:
+    """The flag-off path for one question (`_prepare_ask`, the live app's /ask before generation)."""
+    from src.services.schemas import AskRequest
+
+    _, hits, _, _, context_hits, _, _ = ask_flow._prepare_ask(
+        AskRequest(query=case["query"], history=case.get("history") or []))
+    served = [h.id for h in context_hits]
+    gold = list(case.get("gold_passage_ids") or [])
+    missing = [g for g in gold if g not in set(served)]
+    return {
+        "loss": {g: "other" for g in missing},  # no stage debug on the legacy path
+        "qid": case["qid"], "group": case["group"], "type": case["question_type"],
+        "scope": "-", "scope_source": "-", "kind": "-", "year_range": None, "year_hard": False,
+        "years": [], "events": [], "sectors": [], "companies": [], "route": "legacy",
+        "served_ids": served, "retrieved_ids": [h.id for h in hits],
+        "gold": len(gold), "gold_served": len(gold) - len(missing), "gold_missing": missing,
+        **_merged(ask_flow.served_ids(context_hits), gold),
+    }
+
+
+def _merged(merged_ids: List[str], gold: List[str]) -> Dict[str, Any]:
+    """The merged-inclusive count: gold among every id the reader sees (anchors and merged neighbours)."""
+    return {"served_merged_ids": list(merged_ids), "gold_served_merged": len(set(gold) & set(merged_ids))}
 
 
 def share(rows: List[Dict[str, Any]], key: str = "gold_served") -> Optional[float]:
@@ -177,7 +208,8 @@ def report(rows: List[Dict[str, Any]], show_ids: bool, compared: bool, set_name:
     for r in rows:
         stored = f" stored {r['stored_served']}/{r['gold']}" if compared and r.get("stored_served") is not None else ""
         lines.append(f"{r['qid']:10s} {group_tag(r['group'])} {r['route']:15s} served={len(r['served_ids']):2d} "
-                     f"gold {r['gold_served']}/{r['gold']}{stored} | {_plan_text(r)}")
+                     f"gold {r['gold_served']}/{r['gold']} merged {r['gold_served_merged']}/{r['gold']}{stored} "
+                     f"| {_plan_text(r)}")
         if show_ids:
             lines.append(f"    served: {' '.join(r['served_ids'])}")
             if r["gold_missing"]:
@@ -185,12 +217,12 @@ def report(rows: List[Dict[str, Any]], show_ids: bool, compared: bool, set_name:
         if loss and r["loss"]:
             lines.append("    lost: " + " ".join(f"{g}={stage}" for g, stage in r["loss"].items()))
     lines.append("")
-    head = f"{'group':24s} {'n':>3s} {'gold served':>12s}" + (f" {'stored':>8s}" if compared else "")
+    head = f"{'group':24s} {'n':>3s} {'gold served':>12s} {'merged':>8s}" + (f" {'stored':>8s}" if compared else "")
     lines.append(head)
     group_ids = list(GROUP_NAMES) if set_name == "dev" else sorted({r["group"] for r in rows})
     groups = [(f"ALL ({set_name})", rows)] + [(group_label(g), [r for r in rows if r["group"] == g]) for g in group_ids]
     for label, rs in groups:
-        line = f"{label:24s} {len(rs):3d} {_pct(share(rs)):>12s}"
+        line = f"{label:24s} {len(rs):3d} {_pct(share(rs)):>12s} {_pct(share(rs, 'gold_served_merged')):>8s}"
         if compared:
             line += f" {_pct(share(rs, 'stored_served')):>8s}"
         lines.append(line)
@@ -211,6 +243,8 @@ def main(argv=None) -> int:
     ap.add_argument("--set", choices=("dev", "heldout_v6"), default="dev", dest="set_name",
                     help="question set: the finance_v1 dev half, or heldout_v6 (a + b merged, grouped by question_type)")
     ap.add_argument("--loss", action="store_true", help="classify the stage that lost every missing gold passage")
+    ap.add_argument("--legacy", action="store_true",
+                    help="the flag-off path (FINANCE_PIPELINE unset, the live app's /ask) instead of the finance route")
     ap.add_argument("--cache", type=Path, help="pickle cache of query embeddings and reranker scores")
     ap.add_argument("--compare", type=Path, help="stored run responses.jsonl (served_ids) to compare per question")
     ap.add_argument("--json", type=Path, dest="json_out", help="write the per-question rows here")
@@ -221,7 +255,10 @@ def main(argv=None) -> int:
     cases = load_cases(args.set_name)
     if args.only:
         cases = [c for c in cases if c["qid"] in set(args.only)]
+    if args.legacy:
+        os.environ.pop("FINANCE_PIPELINE", None)
     ask_flow, cache = build(args.cache)
+    one = legacy_one if args.legacy else route_one
     stored: Dict[str, List[str]] = {}
     if args.compare:
         for line in args.compare.read_text(encoding="utf-8").splitlines():
@@ -230,7 +267,7 @@ def main(argv=None) -> int:
                 stored[rec["qid"]] = rec.get("served_ids") or []
     rows = []
     for case in cases:
-        row = route_one(ask_flow, case)
+        row = one(ask_flow, case)
         if args.compare:
             served = stored.get(case["qid"])
             row["stored_served"] = None if served is None else len(set(served) & set(case.get("gold_passage_ids") or []))

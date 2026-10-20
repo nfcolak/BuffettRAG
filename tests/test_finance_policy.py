@@ -66,7 +66,8 @@ def _clustered():
 
 def test_trend_plan_serves_at_least_four_letters_and_at_most_two_per_letter(store):
     for ranking in (_spread(range(1980, 1990)), _clustered()):
-        hits, debug = finance_search(_plan("trend"), FakeRetriever(ranking), store)
+        # at today's budget: a trend plan's own default (FINANCE_K_TREND) is larger
+        hits, debug = finance_search(_plan("trend"), FakeRetriever(ranking), store, k=llm_context_passages())
         years = [h.metadata["year"] for h in hits]
         assert len(hits) == min(llm_context_passages(), 2 * len({h.metadata["year"] for h in ranking}))
         assert len(set(years)) >= 4
@@ -186,7 +187,7 @@ def test_non_financial_passages_are_dropped_and_tables_only_for_numeric_plans(st
 
 def test_empty_store_passes_everything_through_and_reports_zero_coverage():
     ranking = _spread(range(1980, 1990))
-    hits, debug = finance_search(_plan("trend"), FakeRetriever(ranking), KnowledgeStore.empty())
+    hits, debug = finance_search(_plan("trend"), FakeRetriever(ranking), KnowledgeStore.empty(), k=llm_context_passages())
     assert len(hits) == llm_context_passages() and debug["coverage"] == 0.0 and debug["annotated"] == 0
     assert debug["pool_size"] == debug["fetch_k"] == 3 * llm_context_passages()
 
@@ -271,7 +272,8 @@ def test_a_single_year_is_never_capped_and_its_letters_y_and_y_plus_1_come_first
     ranking = ([_hit(f"{y}_o{n}") for n in range(2) for y in (2015, 2016, 2017, 2018)]
                + [_hit(f"1999_i{n:02d}") for n in range(8)] + [_hit(f"2000_i{n:02d}") for n in range(4)]
                + [_hit(f"2001_i{n:02d}") for n in range(4)])
-    hits, debug = finance_search(_explicit("period", (1999, 1999)), FakeRetriever(ranking), store)
+    hits, debug = finance_search(_explicit("period", (1999, 1999)), FakeRetriever(ranking), store,
+                                 k=llm_context_passages())  # today's budget, not the period default FINANCE_K_PERIOD
     ids = [h.id for h in hits]
     in_block = [i for i in ids if i[:4] in ("1999", "2000")]
     assert len(hits) == llm_context_passages()
@@ -291,7 +293,7 @@ def test_two_separate_years_are_two_narrow_blocks_not_one_wide_range(store):
 
 def test_a_range_of_three_letters_is_diverse_and_the_cap_grows_so_k_is_filled(store):
     ranking = [_hit(f"{y}_x{n:02d}") for y in (1986, 1987, 1988, 1989, 1990) for n in range(8)]
-    hits, debug = finance_search(_explicit("period", (1986, 1990)), FakeRetriever(ranking), store)
+    hits, debug = finance_search(_explicit("period", (1986, 1990)), FakeRetriever(ranking), store, k=16)
     years = [h.metadata["year"] for h in hits]
     assert debug["diverse"] and len(hits) == 16  # cap = ceil(16 / 5) = 4, not 2 (which would serve 10)
     assert max(years.count(y) for y in set(years)) <= 4 and len(set(years)) >= 4
