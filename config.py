@@ -242,6 +242,9 @@ FINANCE_DEFAULTS: dict = {
     "FINANCE_MULTI_QUERY": 1,          # extra theme searches for view/opinion plans (0 = off; N = 1, 2 and 3 measured the same)
     "FINANCE_DIGEST_QUERY": 0,         # 1: one extra search with the matching digest's summary as the query
     "FINANCE_SUPERLATIVE_TAGGED": 0,   # superlative route: serve up to N positive-stance passages of the winner (0 = off)
+    "FINANCE_WINDOW_PACK": 0,          # 1: drop merged neighbours of low-ranked hits before whole hits; 2: also shorten them
+    "FINANCE_DECADE_BLOCKS": 0,        # corpus-wide/trend plans: top M per decade block as extra candidates (0 = off)
+    "FINANCE_SUPERLATIVE_RERANK": 0,   # superlative route: serve the top N winner passages by cross-encoder score (0 = off)
 }
 
 
