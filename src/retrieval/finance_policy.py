@@ -23,7 +23,8 @@ Steps:
      (`FINANCE_TAG_DEPTH`, inside the blocks of a narrow question), are boosted (an extra fused ranking), and the
      best `FINANCE_TAG_POOL` of them always reach the reranker, so a tagged passage the shallow ranking misses (the
      2008 letter's crisis passages) still competes.
-  4. Keep financial passages only (tables only for numeric plans). A passage with no annotation counts as
+  4. Keep financial passages only (tables only for numeric plans; FINANCE_TABLE_CUE: also for a plan that asks for
+     figures, `tables_allowed`). A passage with no annotation counts as
      financial, so an empty or partial store gives today's candidates.
   5. Rerank, de-duplicate, then select k (default `llm_context_passages()`, what the reader context takes). Only a
      question that spans several letters (an explicit range of `WIDE_LETTERS` or more letters, or a trend /
@@ -45,6 +46,11 @@ for the best-ranked source candidates (the knowledge and summary sources) that t
 cross-encoder's order, replacing the lowest-ranked served hits that are neither source candidates nor protected
 (`_reserve_slots`; debug `source_slots`, `plan_term_boosted`).
 
+FINANCE_LETTER_QUOTA (finance-answer-quality, default 0) replaces the flat per-letter cap of a diverse question that
+names a topic (sector, company, event or theme) by per-letter quotas: each letter may take ceil(k x its share of the
+passages tagged with the topic), never fewer than the cap (`letter_quotas`; debug `letter_quota`), so the letters that
+discuss the topic most are not cut to the same few places as the letters that mention it once.
+
 A candidate source never fails a request: one that raises is skipped and recorded in the debug dict as
 `source_errors` (`{source, error_type}`), and one whose data is missing (`source_unavailable`, the summary index) is
 skipped with a note in `source_skipped`; the request is served from the remaining candidates.
@@ -57,7 +63,9 @@ from __future__ import annotations
 
 import logging
 import os
-from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple
+import re
+import weakref
+from typing import Any, Callable, Dict, FrozenSet, List, Optional, Sequence, Tuple
 
 from config import (RETRIEVAL_DEFAULTS, RETRIEVAL_FETCH_K, finance_setting, llm_context_passages, llm_n_ctx,
                     retrieval_setting)
@@ -116,6 +124,23 @@ def source_unavailable(name: str, source: Source) -> Optional[str]:
         if missing:
             return f"summary index missing: {', '.join(missing)} not in {directory}"
     return None
+
+
+# A question that reads figures off a table or a statement (finance-answer-quality, FINANCE_TABLE_CUE).
+FIGURE_CUE = re.compile(
+    r"\b(?:tables?|rows?|columns?|balance sheets?|financial statements?|stock lists?|holdings lists?|scorecards?|"
+    r"figures?|market values?|book values?|per[- ]share|revenues?|percentages?)\b", re.I)
+
+
+def tables_allowed(plan: QueryPlan) -> bool:
+    """Whether table passages may join the plan's candidates: always for a numeric plan; with FINANCE_TABLE_CUE also for
+    a plan with numeric intent (`plan.numeric`) or whose question names figures (FIGURE_CUE), whatever its kind (a
+    comparison of two letters' tables is a comparison plan)."""
+    if plan.kind == NUMERIC:
+        return True
+    if not finance_setting("FINANCE_TABLE_CUE"):
+        return False
+    return bool(plan.numeric or FIGURE_CUE.search(plan.financial_query or plan.query))
 
 
 def kind_budget(plan: QueryPlan) -> int:
@@ -267,29 +292,75 @@ def _letter_cap(plan: QueryPlan, k: int) -> int:
     return max(cap, -(-k // letters))
 
 
-def _diverse_ok(hits: Sequence[SearchHit], letters_before: int, cap: Optional[int] = None) -> bool:
+_TOPIC_LETTERS: "weakref.WeakKeyDictionary[Any, Dict[FrozenSet[Tuple[str, str]], Dict[int, int]]]" = \
+    weakref.WeakKeyDictionary()
+
+
+def topic_letters(plan: QueryPlan, store: KnowledgeStore) -> Dict[int, int]:
+    """Letter year -> passages tagged with one of the plan's sectors, companies, events or themes that a non-numeric
+    plan can be served (financial, no tables). Memoised per store."""
+    wanted = frozenset((f, v) for f, values in (("sectors", plan.sectors), ("companies", plan.companies),
+                                                ("events", plan.events), ("themes", plan.themes)) for v in values)
+    if not wanted or not len(store):
+        return {}
+    try:
+        memo = _TOPIC_LETTERS.setdefault(store, {})
+    except TypeError:  # a store without weak references: not memoised
+        memo = {}
+    if wanted not in memo:
+        counts: Dict[int, int] = {}
+        for ann in store.annotations():
+            pid = str(ann.get("id", ""))
+            if not pid[:4].isdigit() or not store.is_financial(pid) or store.is_table(pid):
+                continue
+            if any(v in (ann.get(f) or ()) for f, v in wanted):
+                counts[int(pid[:4])] = counts.get(int(pid[:4]), 0) + 1
+        memo[wanted] = counts
+    return memo[wanted]
+
+
+def letter_quotas(plan: QueryPlan, store: KnowledgeStore, k: int) -> Dict[int, int]:
+    """FINANCE_LETTER_QUOTA: the places of each letter for a diverse plan, ceil(k x the letter's share of the passages
+    on the plan's topic (`topic_letters`, inside the question's explicit years when it names some)), never below the
+    per-letter cap (`_letter_cap`). {} when off or when the plan names no topic; a letter without a quota keeps the cap."""
+    if not finance_setting("FINANCE_LETTER_QUOTA") or k <= 0:
+        return {}
+    counts = topic_letters(plan, store)
+    spans = _spans(plan)
+    if spans:
+        lo, hi = min(a for a, _ in spans), max(b for _, b in spans)
+        counts = {y: n for y, n in counts.items() if lo <= y <= hi}
+    total = sum(counts.values())
+    if not total:
+        return {}
+    cap = _letter_cap(plan, k)
+    return {y: max(cap, -(-k * n // total)) for y, n in counts.items()}
+
+
+def _diverse_ok(hits: Sequence[SearchHit], letters_before: int, cap: Optional[int] = None,
+                quota: Optional[Dict[Any, int]] = None) -> bool:
     counts: Dict[Any, int] = {}
     for hit in hits:
         counts[_letter(hit)] = counts.get(_letter(hit), 0) + 1
     cap = max(1, finance_setting("FINANCE_MAX_PER_LETTER")) if cap is None else cap
-    return (max(counts.values(), default=0) <= cap
+    return (all(n <= (quota or {}).get(y, cap) for y, n in counts.items())
             and len(counts) >= min(letters_before, finance_setting("FINANCE_MIN_LETTERS")))
 
 
 def _protect(hits: List[SearchHit], pool: Sequence[SearchHit], protected: Sequence[str], k: int,
-             diverse: bool, cap: Optional[int] = None) -> List[SearchHit]:
+             diverse: bool, cap: Optional[int] = None, quota: Optional[Dict[Any, int]] = None) -> List[SearchHit]:
     """Put each protected pool hit that was not selected back, replacing the lowest-ranked unprotected hit."""
     order = {h.id: i for i, h in enumerate(pool)}
     keep = set(protected)
     for hit in pool:
         if hit.id not in keep or hit.id in {h.id for h in hits}:
             continue
-        if len(hits) < k and (not diverse or _diverse_ok([*hits, hit], len({_letter(h) for h in hits}), cap)):
+        if len(hits) < k and (not diverse or _diverse_ok([*hits, hit], len({_letter(h) for h in hits}), cap, quota)):
             hits = [*hits, hit]
             continue
         for victim in sorted((h for h in hits if h.id not in keep), key=lambda h: -order[h.id]):
             trial = [h for h in hits if h is not victim] + [hit]
-            if not diverse or _diverse_ok(trial, len({_letter(h) for h in hits}), cap):
+            if not diverse or _diverse_ok(trial, len({_letter(h) for h in hits}), cap, quota):
                 hits = trial
                 break
     return sorted(hits, key=lambda h: order[h.id])
@@ -297,7 +368,7 @@ def _protect(hits: List[SearchHit], pool: Sequence[SearchHit], protected: Sequen
 
 def _reserve_slots(hits: List[SearchHit], pool: Sequence[SearchHit], protected: Sequence[str],
                    source_ids: Sequence[str], slots: int, k: int, diverse: bool, cap: Optional[int] = None,
-                   added: Optional[List[str]] = None) -> List[SearchHit]:
+                   added: Optional[List[str]] = None, quota: Optional[Dict[Any, int]] = None) -> List[SearchHit]:
     """FINANCE_SOURCE_SLOTS: serve the best `slots` source candidates the budget cut off.
 
     `pool` is the reranked order (the cross-encoder's, period reservations first). The source candidates (ids in
@@ -316,12 +387,12 @@ def _reserve_slots(hits: List[SearchHit], pool: Sequence[SearchHit], protected: 
             break
         if hit.id not in sources or hit.id in {h.id for h in hits}:
             continue
-        if len(hits) < k and (not diverse or _diverse_ok([*hits, hit], len({_letter(h) for h in hits}), cap)):
+        if len(hits) < k and (not diverse or _diverse_ok([*hits, hit], len({_letter(h) for h in hits}), cap, quota)):
             hits = [*hits, hit]
         else:
             victims = sorted((h for h in hits if h.id not in keep and h.id not in sources), key=lambda h: -order[h.id])
             victim = next((v for v in victims if not diverse or _diverse_ok(
-                [h for h in hits if h is not v] + [hit], len({_letter(h) for h in hits}), cap)), None)
+                [h for h in hits if h is not v] + [hit], len({_letter(h) for h in hits}), cap, quota)), None)
             if victim is None:
                 continue
             hits = [h for h in hits if h is not victim] + [hit]
@@ -333,9 +404,10 @@ def _reserve_slots(hits: List[SearchHit], pool: Sequence[SearchHit], protected: 
 
 def _select(ranked: Sequence[SearchHit], plan: QueryPlan, k: int, protected: Sequence[str] = (),
             diverse: Optional[bool] = None, source_ids: Sequence[str] = (), slots: int = 0,
-            added: Optional[List[str]] = None) -> List[SearchHit]:
+            added: Optional[List[str]] = None, quota: Optional[Dict[Any, int]] = None) -> List[SearchHit]:
     """Pick k hits: period reservation first, then (diverse questions) the per-letter cap and the minimum letters;
-    `slots` of the places then go to the best source candidates the cut left out (`_reserve_slots`)."""
+    `slots` of the places then go to the best source candidates the cut left out (`_reserve_slots`). A diverse
+    question with a `quota` (`letter_quotas`) caps each letter at its quota instead (the cap where it has none)."""
     pool = list(ranked)
     if k <= 0:
         return []
@@ -366,15 +438,16 @@ def _select(ranked: Sequence[SearchHit], plan: QueryPlan, k: int, protected: Seq
         if _letter(hit) not in counts:
             take(hit)
     chosen = {h.id for h in picked}
+    limit = quota or {}
     for hit in pool:  # second pass: fill by rank under the cap
         if len(picked) >= k:
             break
-        if hit.id not in chosen and counts.get(_letter(hit), 0) < cap:
+        if hit.id not in chosen and counts.get(_letter(hit), 0) < limit.get(_letter(hit), cap):
             take(hit)
             chosen.add(hit.id)
     order = {h.id: i for i, h in enumerate(pool)}
-    hits = _protect(sorted(picked, key=lambda h: order[h.id]), pool, protected, k, diverse=True, cap=cap)
-    return _reserve_slots(hits, pool, protected, source_ids, slots, k, True, cap, added)
+    hits = _protect(sorted(picked, key=lambda h: order[h.id]), pool, protected, k, diverse=True, cap=cap, quota=quota)
+    return _reserve_slots(hits, pool, protected, source_ids, slots, k, True, cap, added, quota)
 
 
 def _hybrid_ranking(retriever: Any, query: str, fetch_k: int, where: Optional[Dict[str, Any]]) -> List[SearchHit]:
@@ -490,7 +563,7 @@ def finance_search(
         combined = [*combined, *source_hits]
 
     pool_ids = [h.id for h in fused]
-    numeric = plan.kind == NUMERIC
+    numeric = tables_allowed(plan)  # tables only for numeric plans (FINANCE_TABLE_CUE: and figure questions)
     kept = [h for h in fused if store.is_financial(h.id) and (numeric or not store.is_table(h.id))]
     kept_ids = {h.id for h in kept}
     dropped = [h.id for h in fused if h.id not in kept_ids]
@@ -529,9 +602,11 @@ def finance_search(
     pin_ids = {h.id for h in pins}
     diverse = _diverse(plan)
     slot_ids: List[str] = []  # source candidates placed by FINANCE_SOURCE_SLOTS
+    quota = letter_quotas(plan, store, k - len(pins)) if diverse else {}
     hits = pins + _select([h for h in kept if h.id not in pin_ids], plan, k - len(pins),
                           [p for p in protected if p not in pin_ids], diverse,
-                          [h.id for h in source_hits], max(0, finance_setting("FINANCE_SOURCE_SLOTS")), slot_ids)
+                          [h.id for h in source_hits], max(0, finance_setting("FINANCE_SOURCE_SLOTS")), slot_ids,
+                          quota)
     lo_hi = (min(a for a, _ in blocks), max(b for _, b in blocks)) if blocks else None
     debug = {
         "coverage": store.coverage(pool_ids),
@@ -561,4 +636,6 @@ def finance_search(
         "fetch_k": fetch_k,
         "letters": len({_letter(h) for h in hits}),
     }
+    if quota:
+        debug["letter_quota"] = {y: n for y, n in sorted(quota.items()) if n > _letter_cap(plan, k - len(pins))}
     return hits, debug

@@ -14,13 +14,19 @@ names a founder, a family or a meeting; jokes, anecdotes, longevity, attendance,
 annual meeting are personal; in a question with a personal clause, a clause with no financial cue at all is a
 personal follow-up ("... and what did he credit for their longevity?"). The scope vote cannot make a question
 about a business's figures personal: it only drops the clauses that carry no financial cue.
+
+Premise check (finance-answer-quality, group 2): with `FINANCE_PREMISE_CHECK=1` (or `premise_check=True`) a question that
+names a period the topic does not belong to gets a one-sentence `premise_note`: the event's real years miss the asked
+period, or the knowledge store has no passage on the topic in the asked years but has some in other years. The note names
+the letter years that do carry the topic. Off by default: `premise_note` stays None and the plan is unchanged.
 """
 from __future__ import annotations
 
 import re
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple
 
+from config import finance_setting
 from src.generation.decompose import split_question
 from src.knowledge import KnowledgeStore
 
@@ -34,6 +40,14 @@ LAST_LETTER_YEAR = 2024
 
 # --- user event phrasings the letters never use (events.json keeps only phrases found in the letters) ---
 # phrase -> event id (used only if the store knows it), fallback letter years, topic terms for the boost.
+# An entry without a store event also carries what the premise check needs: how the note names the event, the real
+# years of the event as inclusive spans, and the words a passage summary uses when a letter does mention it.
+_OIL_SHOCKS: Dict[str, Any] = {
+    "event": None, "years": (1973, 1982), "terms": ("oil", "energy", "OPEC", "gasoline"),
+    "label": "the oil shocks", "plural": True, "real_years": ((1973, 1974), (1979, 1979)),
+    "letter_phrases": ("oil shock", "oil crisis", "oil embargo", "energy crisis", "oil price", "price of oil",
+                       "foreign oil", "energy dependence"),
+}
 USER_EVENT_ALIASES: Dict[str, Dict[str, Any]] = {
     "2008 crisis": {"event": "financial_crisis_2008", "years": (2007, 2010)},
     "2008 financial crisis": {"event": "financial_crisis_2008", "years": (2007, 2010)},
@@ -55,13 +69,31 @@ USER_EVENT_ALIASES: Dict[str, Dict[str, Any]] = {
     "dot com": {"event": "dotcom_bubble", "years": (1999, 2002)},
     "dotcom": {"event": "dotcom_bubble", "years": (1999, 2002)},
     "tech bubble": {"event": "dotcom_bubble", "years": (1999, 2002)},
-    "oil crisis": {"event": None, "years": (1973, 1982), "terms": ("oil", "energy", "OPEC", "gasoline")},
-    "oil shock": {"event": None, "years": (1973, 1982), "terms": ("oil", "energy", "OPEC", "gasoline")},
-    "oil embargo": {"event": None, "years": (1973, 1982), "terms": ("oil", "energy", "OPEC", "gasoline")},
-    "energy crisis": {"event": None, "years": (1973, 1982), "terms": ("oil", "energy", "OPEC", "gasoline")},
+    "oil crisis": _OIL_SHOCKS,
+    "oil shock": _OIL_SHOCKS,
+    "oil embargo": _OIL_SHOCKS,
+    "energy crisis": _OIL_SHOCKS,
     "volcker": {"event": "high_inflation_late70s_early80s", "years": (1979, 1984),
                 "terms": ("Volcker", "interest rates", "inflation")},
 }
+
+# How the premise note names the events of events.json (an id missing here is named "the <id with spaces>").
+EVENT_NAMES: Dict[str, str] = {
+    "bear_market_1973_74": "the 1973-74 bear market",
+    "high_inflation_late70s_early80s": "the high inflation of the late 1970s and early 1980s",
+    "crash_1987": "the October 1987 market crash",
+    "banking_real_estate_1990": "the 1989-91 bank and real-estate troubles",
+    "salomon_1991": "the 1991 Salomon scandal",
+    "hurricane_andrew_1992": "Hurricane Andrew",
+    "dotcom_bubble": "the dot-com bubble",
+    "ltcm_1998": "the 1998 collapse of Long-Term Capital Management",
+    "accounting_scandals_2002": "the 2001-02 accounting scandals",
+    "sept11_2001": "the September 11 attacks",
+    "katrina_2005": "Hurricane Katrina",
+    "financial_crisis_2008": "the 2008 financial crisis",
+    "tax_act_2017": "the 2017 tax act",
+}
+_PLURAL_EVENT_NAMES = {"accounting_scandals_2002", "sept11_2001"}
 
 # --- entities ---
 SECTOR_TERMS: Dict[str, Tuple[str, ...]] = {
@@ -248,6 +280,7 @@ class QueryPlan:
     vote_share: Optional[float] = None
     numeric: bool = False                       # the question asks for a figure (any kind)
     superlative: str = ""                       # "sector:positive" | "company:negative" | ... | "" (corpus-wide ranking)
+    premise_note: Optional[str] = None          # FINANCE_PREMISE_CHECK: one sentence correcting the asked period, else None
 
 
 def _norm(text: str) -> str:
@@ -381,6 +414,11 @@ def _parse_years(text: str):
 # --- events ---
 def _match_events(text: str, store: KnowledgeStore):
     """(event ids, fallback/event year range, terms, text with the matched phrases blanked out)."""
+    return _scan_events(text, store)[:4]
+
+
+def _scan_events(text: str, store: KnowledgeStore):
+    """`_match_events` plus the alias entries that name an event the store has no id for (they carry `real_years`)."""
     known = store.events()
     phrases: Dict[str, Dict[str, Any]] = {}
     for key, ev in known.items():
@@ -395,6 +433,7 @@ def _match_events(text: str, store: KnowledgeStore):
     events: List[str] = []
     terms: List[str] = []
     fallback: List[Tuple[int, int]] = []
+    unknown: List[Dict[str, Any]] = []
     blanked = list(text)
     for start, end, phrase in found:
         if any(start < b and a < end for a, b in taken):
@@ -412,11 +451,13 @@ def _match_events(text: str, store: KnowledgeStore):
             fallback.append(_event_range(known[event], spec.get("years")))
         elif spec.get("years"):
             fallback.append(tuple(spec["years"]))
+        if not (event and event in known) and spec.get("real_years") and spec not in unknown:
+            unknown.append(spec)
         for term in spec.get("terms", ()):
             if term not in terms:
                 terms.append(term)
     rng = (min(r[0] for r in fallback), max(r[1] for r in fallback)) if fallback else None
-    return tuple(events), rng, tuple(terms), "".join(blanked)
+    return tuple(events), rng, tuple(terms), "".join(blanked), unknown
 
 
 _YEAR_BEFORE = re.compile(rf"\b({_YEAR})\s+(?:[\w'-]+\s+){{0,2}}$")
@@ -517,9 +558,132 @@ def _vote_share(scope_vote: Callable[[str], float], text: str) -> Optional[float
     return share
 
 
+# --- premise check ---
+PREMISE_MAX_LISTED = 6  # letter-year runs the note names at most; more end with "and other"
+# "the 2023 collapse of ...": the year dates the event; it does not ask for the letters of that year
+_EVENT_NOUN = (r"(?:collapse|crash|crisis|bankruptcy|failure|buyout|acquisition|purchase|merger|takeover|deal|scandal|"
+               r"attacks?|bubble|recession|panic|meltdown|bailout|default|earthquake|hurricane|storm|bid)")
+_DATED_EVENT = re.compile(rf"\b(?:the|its|his|her|their|an?)\s+({_YEAR})\s+(?:[a-z-]+\s+){{0,2}}?{_EVENT_NOUN}\b", re.I)
+
+
+def _runs(years: Sequence[int]) -> List[Tuple[int, int]]:
+    """Consecutive years as inclusive spans: [1994, 2007, 2008] -> [(1994, 1994), (2007, 2008)]."""
+    out: List[List[int]] = []
+    for year in sorted(set(years)):
+        if out and year == out[-1][1] + 1:
+            out[-1][1] = year
+        else:
+            out.append([year, year])
+    return [(a, b) for a, b in out]
+
+
+def _span_text(a: int, b: int) -> str:
+    if a == b:
+        return str(a)
+    return f"{a}-{b % 100:02d}" if a // 100 == b // 100 else f"{a}-{b}"
+
+
+def _join(items: Sequence[str], tail: str = "and") -> str:
+    return items[0] if len(items) == 1 else ", ".join(items[:-1]) + f" {tail} " + items[-1]
+
+
+def _asked_text(spans: Sequence[Tuple[int, int]]) -> str:
+    """"the 1980s", "1999", "1990-1993"; several mentions are joined with "and"."""
+    return _join([f"the {a}s" if a % 10 == 0 and b == a + 9 else str(a) if a == b else f"{a}-{b}" for a, b in spans])
+
+
+def _letters_text(years: Sequence[int]) -> str:
+    """"1994 and 2023", "2007-11"; past PREMISE_MAX_LISTED runs the rest is "other"."""
+    runs = [_span_text(a, b) for a, b in _runs(years)]
+    return _join(runs[:PREMISE_MAX_LISTED] + (["other"] if len(runs) > PREMISE_MAX_LISTED else []))
+
+
+def _overlaps(spans: Sequence[Tuple[int, int]], years: Sequence[int]) -> bool:
+    return any(a <= year <= b for a, b in spans for year in years)
+
+
+def _span_years(spans: Sequence[Tuple[int, int]]) -> List[int]:
+    return [year for a, b in spans for year in range(a, b + 1)]
+
+
+def _topic_label(text: str, key: str, table: Dict[str, Sequence[str]]) -> str:
+    """The words the question uses for a sector or theme ("airlines"); the key with spaces when none match."""
+    hits = _find_phrases(text, table.get(key, ()))
+    if not hits:
+        return key.replace("_", " ")
+    start, end, _ = min(hits, key=lambda hit: (hit[0], hit[0] - hit[1]))  # earliest, then longest ("oil and gas")
+    return text[start:end].lower()
+
+
+def _event_subjects(plan: QueryPlan, store: KnowledgeStore, text: str) -> List[Dict[str, Any]]:
+    """Events the question names: label, plural, real-year spans (empty when unknown) and the letter years that carry it."""
+    known = store.events()
+    out: List[Dict[str, Any]] = []
+    for key in plan.events:
+        ev = known.get(key)
+        if ev is None:
+            continue
+        out.append({"label": EVENT_NAMES.get(key) or "the " + key.replace("_", " "), "plural": key in _PLURAL_EVENT_NAMES,
+                    "real": _runs(ev["event_years"]),
+                    "letters": sorted(set(ev["letter_years"]) | set(store.letter_years_with(event=key)))})
+    for spec in _scan_events(text, store)[4]:
+        out.append({"label": spec["label"], "plural": bool(spec.get("plural")), "real": list(spec["real_years"]),
+                    "letters": store.letter_years_mentioning(spec.get("letter_phrases", ()))})
+    return out
+
+
+def premise_note(plan: QueryPlan, store: Optional[KnowledgeStore] = None) -> Optional[str]:
+    """One plain sentence when the asked period does not fit the question's topic, else None.
+
+    Needs a period the question names itself (`year_source == "explicit"`). With a named event the plan is checked
+    against the event: its real years miss the asked period, or no passage tagged with the event (or, for an event
+    the store has no id for, no passage summary naming it) lies in the asked years while some lie in other years.
+    A letter from the asked years that carries the event, or an event that did happen in the asked years, means there is
+    nothing to correct. A question that names no event, company or figure is checked against its sectors and themes by
+    the tag test alone. A year that dates an event in the question ("the 2023 collapse of ...") is not an asked period.
+    The note names the letter years that do carry the topic.
+    """
+    store = store if store is not None else KnowledgeStore.empty()
+    text = plan.financial_query or plan.query
+    dated = {int(m.group(1)) for m in _DATED_EVENT.finditer(text)}
+    spans = tuple(span for span in plan.year_spans if not (span[0] == span[1] and span[0] in dated))
+    if plan.scope == PERSONAL or plan.year_source != "explicit" or not spans:
+        return None
+    asked, asked_years = _asked_text(spans), _span_years(spans)
+    events = _event_subjects(plan, store, text)
+    for ev in events:
+        if _overlaps(spans, ev["letters"]):
+            continue
+        pronoun = "them" if ev["plural"] else "it"
+        letters = _letters_text(ev["letters"]) if ev["letters"] else ""
+        if ev["real"] and not _overlaps(ev["real"], asked_years):
+            when = _join([_span_text(a, b) for a, b in ev["real"]])
+            name = ev["label"][0].upper() + ev["label"][1:]
+            mention = f", but the {letters} letters mention {pronoun}" if letters else ""
+            return f"{name} {'were' if ev['plural'] else 'was'} in {when}; " \
+                   f"the letters from {asked} do not discuss {pronoun}{mention}."
+        if letters and not ev["real"]:  # the event did happen in the asked years: its date is right, nothing to correct
+            return f"The letters from {asked} do not discuss {ev['label']}, but the {letters} letters do."
+    letter_range = any(a <= LAST_LETTER_YEAR and b >= FIRST_LETTER_YEAR for a, b in spans)
+    if events or plan.companies or plan.numeric or not letter_range:
+        return None  # no tag claim for a company or figure question, or for years before the first letter
+    sector_table = _sector_terms(store) if plan.sectors else {}
+    topics = [(_topic_label(text, key, sector_table), store.letter_years_with(sector=key)) for key in plan.sectors]
+    topics += [(_topic_label(text, key, THEME_TERMS), store.letter_years_with(theme=key)) for key in plan.themes]
+    topics = [(label, letters) for label, letters in topics if letters]  # a topic no letter carries has nothing to name
+    if not topics or any(_overlaps(spans, letters) for _, letters in topics):
+        return None
+    label, letters = topics[0]
+    return f"The letters from {asked} do not discuss {label}, but the {_letters_text(letters)} letters do."
+
+
 def plan_query(query: str, store: Optional[KnowledgeStore] = None,
-               scope_vote: Optional[Callable[[str], float]] = None) -> QueryPlan:
-    """Plan one question. `scope_vote(query)` is called only when the scope rules are silent."""
+               scope_vote: Optional[Callable[[str], float]] = None,
+               premise_check: Optional[bool] = None) -> QueryPlan:
+    """Plan one question. `scope_vote(query)` is called only when the scope rules are silent.
+
+    `premise_check` fills `premise_note` (see `premise_note`); None reads FINANCE_PREMISE_CHECK at call time.
+    """
     store = store if store is not None else KnowledgeStore.empty()
     query = _norm(str(query or ""))
     scope, financial_query, personal = _scope_from_rules(query, store)
@@ -548,8 +712,12 @@ def plan_query(query: str, store: Optional[KnowledgeStore] = None,
     themes = _match_keys(blanked, THEME_TERMS)  # "Long-Term Capital Management" is an event, not the management theme
     companies = _match_companies(text, store)
     kind = _kind(text, year_range, year_hard, events, years)
-    return QueryPlan(
+    plan = QueryPlan(
         query=query, scope=scope, financial_query=financial_query, kind=kind, year_range=year_range,
         year_hard=year_hard, years=years, year_spans=spans, year_source=year_source, events=events, sectors=sectors,
         companies=companies, themes=themes, terms=terms, personal_clauses=personal, scope_source=source,
         vote_share=share, numeric=_numeric_intent(text), superlative=_superlative(text))
+    if premise_check is None:
+        premise_check = bool(finance_setting("FINANCE_PREMISE_CHECK"))
+    note = premise_note(plan, store) if premise_check else None
+    return replace(plan, premise_note=note) if note else plan

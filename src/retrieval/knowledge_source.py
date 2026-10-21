@@ -44,8 +44,8 @@ import numpy as np
 
 from config import RETRIEVAL_FETCH_K, finance_setting
 from src.knowledge import KnowledgeStore
-from src.query.plan import CORPUS_WIDE, NUMERIC, TREND, QueryPlan
-from src.retrieval import decade_source, multiquery_source, summary_source
+from src.query.plan import CORPUS_WIDE, TREND, QueryPlan
+from src.retrieval import decade_source, finance_policy, multiquery_source, summary_source
 from src.retrieval.finance_policy import _boost, _has_entities, _hybrid_ranking
 from src.storage import SearchHit
 
@@ -196,7 +196,7 @@ def _candidates(plan: QueryPlan, store: KnowledgeStore, retriever: Any, query: s
     plan_tags = {"sectors": set(plan.sectors), "companies": set(plan.companies), "events": set(plan.events),
                  "themes": set(plan.themes)}
     blocks, _ = _boost(plan, store)
-    numeric = plan.kind == NUMERIC
+    numeric = finance_policy.tables_allowed(plan)
     inside: List[str] = []
     outside: List[str] = []
     for pid in dict.fromkeys(ids):
@@ -354,5 +354,6 @@ SOURCES: List[Tuple[str, Callable]] = [
     ("FINANCE_DIGEST_SOURCE", digest_source),
     ("FINANCE_STANCE_SOURCE", stance_source),
     *multiquery_source.SOURCES,  # FINANCE_MULTI_QUERY, FINANCE_DIGEST_QUERY (finance-recall-75-r3)
+    *multiquery_source.PLAN_SOURCES,  # FINANCE_PLAN_QUERY (finance-answer-quality)
     *decade_source.SOURCES,  # FINANCE_DECADE_BLOCKS (finance-recall-75-r4)
 ]

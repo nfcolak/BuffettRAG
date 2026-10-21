@@ -41,7 +41,7 @@ import numpy as np
 
 from config import finance_setting, retrieval_setting
 from src.knowledge import default_dir
-from src.query.plan import NUMERIC, QueryPlan
+from src.query.plan import QueryPlan
 from src.retrieval.bm25 import BM25Retriever
 from src.retrieval.retriever import reciprocal_rank_fusion
 from src.storage import SearchHit, StoredDoc
@@ -228,7 +228,8 @@ def summary_candidates(plan: QueryPlan, store: Any, retriever: Any, query: str, 
     passages = _passages(retriever)
     if not passages:
         return []
-    numeric = plan.kind == NUMERIC
+    from src.retrieval.finance_policy import tables_allowed  # lazy: finance_policy loads this module lazily
+    numeric = tables_allowed(plan)
     out: List[SearchHit] = []
     for hit in summary_ranking(plan, store, retriever, query):
         doc = passages.get(hit.id)

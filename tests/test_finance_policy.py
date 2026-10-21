@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from config import llm_context_passages
+from config import FINANCE_DEFAULTS, llm_context_passages
 from src.knowledge import KnowledgeStore
 from src.query.plan import QueryPlan
 from src.retrieval.bm25 import _meta_matches
@@ -303,8 +303,11 @@ def test_a_range_of_three_letters_is_diverse_and_the_cap_grows_so_k_is_filled(st
     ranking = [_hit(f"{y}_x{n:02d}") for y in (1986, 1987, 1988, 1989, 1990) for n in range(8)]
     hits, debug = finance_search(_explicit("period", (1986, 1990)), FakeRetriever(ranking), store, k=16)
     years = [h.metadata["year"] for h in hits]
-    assert debug["diverse"] and len(hits) == 16  # cap = ceil(16 / 5) = 4, not 2 (which would serve 10)
-    assert max(years.count(y) for y in set(years)) <= 4 and len(set(years)) >= 4
+    # cap = max(FINANCE_MAX_PER_LETTER, ceil(16 / 5) = 4): 6 since finance-answer-quality round 5 (4 at a cap of 2 or 3,
+    # which alone would serve 10 or 15)
+    cap = max(FINANCE_DEFAULTS["FINANCE_MAX_PER_LETTER"], -(-16 // 5))
+    assert debug["diverse"] and len(hits) == 16
+    assert max(years.count(y) for y in set(years)) <= cap and len(set(years)) >= 4
     two, _ = finance_search(_explicit("period", (1986, 1987)), FakeRetriever(ranking), store)
     assert [h.metadata["year"] for h in two].count(1986) == 8  # a 2-letter range is narrow: not capped
 

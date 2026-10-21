@@ -7,6 +7,7 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import re
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional
 
@@ -66,6 +67,11 @@ def _read_jsonl(path: Path) -> List[Dict[str, Any]]:
 
 def _read_json(path: Path) -> Dict[str, Any]:
     return json.loads(path.read_text(encoding="utf-8")) if path.is_file() else {}
+
+
+def _letter_year(pid: str) -> Optional[int]:
+    head = str(pid).partition("_")[0]
+    return int(head) if head.isdigit() else None
 
 
 def _as_set(value: Optional[Any]) -> Optional[set]:
@@ -146,6 +152,20 @@ class KnowledgeStore:
             return []
         return [pid for pid, ann in self._ann.items()
                 if all(values.intersection(ann.get(field) or ()) for field, values in wanted)]
+
+    def letter_years_with(self, sector=None, theme=None, event=None, company=None) -> List[int]:
+        """Sorted letter years of the passages `passages_with` returns (a passage id starts with its letter year)."""
+        years = (_letter_year(pid) for pid in self.passages_with(sector=sector, theme=theme, event=event, company=company))
+        return sorted({year for year in years if year is not None})
+
+    def letter_years_mentioning(self, phrases: Iterable[str]) -> List[int]:
+        """Sorted letter years with a passage summary that names any phrase (whole words, plural allowed, any case)."""
+        phrases = [p for p in phrases if p]
+        if not phrases:
+            return []
+        pattern = re.compile(r"(?<!\w)(?:" + "|".join(re.escape(p) for p in phrases) + r")(?:e?s)?(?!\w)", re.I)
+        years = (_letter_year(pid) for pid, ann in self._ann.items() if pattern.search(str(ann.get("summary") or "")))
+        return sorted({year for year in years if year is not None})
 
     def coverage(self, pids: Iterable[str]) -> float:
         """Share of the given passages that have an annotation (0.0 for none given)."""

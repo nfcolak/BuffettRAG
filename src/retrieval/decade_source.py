@@ -69,7 +69,7 @@ def pooled(plan: QueryPlan, store: KnowledgeStore, retriever: Any, query: str, k
     for name, source in finance_policy.candidate_sources():
         if source is decade_candidates:
             break
-        after = after or source in (multiquery_source.multi_query_source, multiquery_source.digest_query_source)
+        after = after or source in multiquery_source.FAMILY  # the multi-query and plan-query sources
         if not after or finance_policy.source_unavailable(name, source):
             continue
         try:
@@ -111,9 +111,10 @@ def decade_candidates(plan: QueryPlan, store: KnowledgeStore, retriever: Any, qu
         rankings = [search.result() for search in searches]
     letter = lambda pid: ks.letter_of(pid, docs)  # noqa: E731
     rows = []
-    for ranking in rankings:  # tables only for numeric plans, and a corpus-wide / trend plan is never numeric
+    tables = finance_policy.tables_allowed(plan)  # a corpus-wide / trend plan is never numeric: figure questions only
+    for ranking in rankings:
         ids = [h.id for h in ranking if h.id not in skip and h.id in docs and store.is_financial(h.id)
-               and not store.is_table(h.id)]
+               and (tables or not store.is_table(h.id))]
         rows.append(_spread(list(dict.fromkeys(ids)), m, letter))
     picked = [pid for row in zip_longest(*rows) for pid in row if pid is not None]  # the best of every block first
     return ks._hits(list(dict.fromkeys(picked)), docs)

@@ -409,15 +409,63 @@ def _plan_with_history(query: str, resolved: str, history: List[Dict[str, Any]],
     follow-up) and only the vote made it personal, the previous user question is planned on its own; when that one is
     financial, the follow-up is a financial follow-up and is planned from the rules alone (a personal rule that fires
     still gives the scope reply). FINANCE_FOLLOWUP_HISTORY (default off) switches this on.
+
+    Two more settings (finance-answer-quality group 4, default off):
+      - FINANCE_FOLLOWUP_VOTE=N: such a short or referential follow-up that the vote alone made personal or mixed stays
+        financial unless the vote share reaches N / 10 (the planner's own threshold is 0.6).
+      - FINANCE_FOLLOWUP_PLAN: a question with history whose previous user question plans financial (or mixed) carries
+        that plan where its own plan is empty (`_carry_plan`): its explicit years, as a boost, when the question names
+        no years of its own, and its events, companies, sectors, themes and topic terms when it names none of its own.
+        With 2, a question with explicit years of its own (not a "YYYY letter" one) also keeps the previous question's
+        years as one more span.
     """
     plan = plan_query(resolved, store, scope_vote=vote)
-    if not finance_setting("FINANCE_FOLLOWUP_HISTORY") or plan.scope != PERSONAL or plan.scope_source != "vote" \
-            or resolved == query:
-        return plan
     previous = next((str(turn.get("content", "")) for turn in reversed(history) if turn.get("role") == "user"), "")
-    if previous and plan_query(previous, store, scope_vote=vote).scope == FINANCIAL:
-        return replace(plan_query(resolved, store), scope_source="history", vote_share=plan.vote_share)
+    before: List[QueryPlan] = []
+
+    def previous_plan() -> Optional[QueryPlan]:
+        if previous and not before:
+            before.append(plan_query(previous, store, scope_vote=vote))
+        return before[0] if before else None
+
+    gentle = finance_setting("FINANCE_FOLLOWUP_VOTE")
+    if gentle and plan.scope != FINANCIAL and plan.scope_source == "vote" and resolved != query \
+            and (plan.vote_share or 0.0) < gentle / 10:
+        plan = replace(plan_query(resolved, store), scope_source="vote", vote_share=plan.vote_share)
+    if finance_setting("FINANCE_FOLLOWUP_HISTORY") and plan.scope == PERSONAL and plan.scope_source == "vote" \
+            and resolved != query:
+        earlier = previous_plan()
+        if earlier is not None and earlier.scope == FINANCIAL:
+            plan = replace(plan_query(resolved, store), scope_source="history", vote_share=plan.vote_share)
+    carry = finance_setting("FINANCE_FOLLOWUP_PLAN")
+    if carry and plan.scope != PERSONAL:
+        earlier = previous_plan()
+        if earlier is not None and earlier.scope != PERSONAL:
+            plan = _carry_plan(plan, earlier, carry)
     return plan
+
+
+def _carry_plan(plan: QueryPlan, before: QueryPlan, mode: int) -> QueryPlan:
+    """FINANCE_FOLLOWUP_PLAN: `plan` (a follow-up) with the previous financial question's plan `before` where its own is
+    empty. Topics (events, companies, sectors, themes, topic terms) come over only when the follow-up names none; the
+    previous explicit years come over as a boost (never hard) when the follow-up names no explicit years (an event's
+    years do not count), and with mode 2 they are added as more spans to a follow-up's own explicit years unless the
+    follow-up asks for one letter. The kind stays the follow-up's."""
+    changes: Dict[str, Any] = {}
+    if not (plan.events or plan.companies or plan.sectors or plan.themes):
+        changes.update(events=before.events, companies=before.companies, sectors=before.sectors, themes=before.themes,
+                       terms=tuple(dict.fromkeys((*plan.terms, *before.terms))))
+    spans = before.year_spans if before.year_source == "explicit" else ()
+    if spans and plan.year_source != "explicit":
+        years = [y for span in spans for y in span] + list(plan.year_range or ())
+        changes.update(year_spans=spans, years=before.years, year_range=(min(years), max(years)), year_hard=False,
+                       year_source="explicit")
+    elif spans and mode >= 2 and not plan.year_hard:
+        joined = tuple(dict.fromkeys((*plan.year_spans, *spans)))
+        years = [y for span in joined for y in span]
+        changes.update(year_spans=joined, years=tuple(sorted(set(plan.years) | set(before.years))),
+                       year_range=(min(years), max(years)))
+    return replace(plan, **changes) if changes else plan
 
 
 def finance_route_steps(req: AskRequest):

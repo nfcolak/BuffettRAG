@@ -25,6 +25,13 @@ them, at most `knowledge_source.PER_LETTER` per letter (raised when few letters 
 
 With both settings on, the multi-query source runs the digest search with its own (one fusion, one cap) and the digest
 source returns nothing. No LLM runs at query time.
+
+FINANCE_PLAN_QUERY=N (finance-answer-quality, group 4) rewrites the search from the plan for the questions the
+multi-query source leaves alone (`plan_queries`): up to N topic queries (as above) for a question that is not a view
+question (or when FINANCE_MULTI_QUERY is off), and for every plan event one query with the event's aliases and its real
+years (`event_query`); a plan with topic terms but no store event (an alias such as "oil crisis") gets one query with
+those terms. `plan_query_source` searches them like the multi-query source (same year logic, one fusion) and adds at most
+PQ_CAP new passages; it skips what the pool and the multi-query sources before it already hold.
 """
 from __future__ import annotations
 
@@ -55,6 +62,10 @@ THEME_QUERY = "keywords"     # what a topic adds to the core: "description" | "k
 KEYWORDS = 8             # summary words per topic ("keywords")
 KEYWORD_MIN_DOCS = 3     # ... each in at least this many tagged summaries
 DIGEST_LINES = 2         # sentences of the digest overview that make the digest query
+PQ_CAP = 16              # passages the plan-query source adds per question, at most (FINANCE_PLAN_QUERY)
+EVENT_ALIASES = 6        # aliases of an event in its rewritten search
+PQ_TOPICS = True         # FINANCE_PLAN_QUERY: topic queries for the questions the multi-query source leaves alone
+PQ_EVENTS = True         # FINANCE_PLAN_QUERY: event (and topic-term) queries
 
 _FRAME = re.compile(r"\b(?:Mr\.?\s+|Warren\s+(?:E\.\s+)?)?Buffett(?:'s|’s)?(?!\w)", re.I)
 _SENTENCE = re.compile(r"(?<=[.!?])\s+")
@@ -168,6 +179,31 @@ def queries(plan: QueryPlan, store: KnowledgeStore, retriever: Any, query: str, 
     return list(dict.fromkeys(q for q in out if q.strip()))
 
 
+def event_query(core: str, store: KnowledgeStore, event: str) -> str:
+    """One rewritten search for a plan event: the financial core, the event's first EVENT_ALIASES aliases and its real
+    years (`event_years`, the years it happened, not the letters that discuss it)."""
+    spec = store.events().get(event) or {}
+    years = [str(y) for y in spec.get("event_years") or ()]
+    return " ".join([core, *list(spec.get("aliases") or ())[:EVENT_ALIASES], *years]).strip()
+
+
+def plan_queries(plan: QueryPlan, store: KnowledgeStore, retriever: Any, query: str, n: int) -> List[str]:
+    """FINANCE_PLAN_QUERY=n: up to n topic queries (`topic_query`) when the multi-query source does not search the
+    question's topics (not a view question, or FINANCE_MULTI_QUERY off), one `event_query` per plan event, and for a
+    plan with topic terms but no store event one query with those terms."""
+    if n <= 0:
+        return []
+    core = financial_core(plan)
+    out: List[str] = []
+    if PQ_TOPICS and not (is_view(plan) and finance_setting("FINANCE_MULTI_QUERY") > 0):
+        out += [topic_query(core, store, field, key) for field, key in topics(plan, store, retriever, query)[:n]]
+    if PQ_EVENTS:
+        out += [event_query(core, store, event) for event in plan.events]
+        if plan.terms and not plan.events:
+            out.append(" ".join([core, *plan.terms]))
+    return list(dict.fromkeys(q for q in out if q.strip() and q != core))
+
+
 def _searches(plan: QueryPlan, store: KnowledgeStore, texts: Sequence[str]
               ) -> List[Tuple[str, Optional[Dict[str, Any]], float]]:
     """(query, filter, RRF weight) of every ranking: per query one per year block and the unfiltered one, as in
@@ -223,8 +259,8 @@ def fused_ranking(plan: QueryPlan, store: KnowledgeStore, retriever: Any, texts:
 def pooled(plan: QueryPlan, store: KnowledgeStore, retriever: Any, query: str, k: int) -> Set[str]:
     """The ids `finance_search` holds before this source runs: its shallow rankings (the unfiltered one unless the year
     is hard, one per year block, the plan's topic terms per block), the entity-tagged passages of its deeper ranking
-    (inside the blocks of a narrow question) and the hits of the candidate sources registered before this one that are
-    on. The cap is spent on new candidates only."""
+    (inside the blocks of a narrow question) and the hits of the candidate sources registered before the first source
+    of this module (`FAMILY`) that are on. The cap is spent on new candidates only."""
     fetch_k = max(RETRIEVAL_FETCH_K, k * finance_setting("FINANCE_OVERFETCH"))
     blocks, narrow = _boost(plan, store)
     rankings = [] if (blocks and plan.year_hard) else [_hybrid_ranking(retriever, query, fetch_k, None)]
@@ -244,7 +280,7 @@ def pooled(plan: QueryPlan, store: KnowledgeStore, retriever: Any, query: str, k
                 if any(values.intersection(ann.get(f) or ()) for f, values in wanted.items()):
                     out.add(hit.id)
     for name, source in finance_policy.candidate_sources():
-        if source in (multi_query_source, digest_query_source):
+        if source in FAMILY:
             break
         if finance_policy.source_unavailable(name, source):
             continue
@@ -255,17 +291,39 @@ def pooled(plan: QueryPlan, store: KnowledgeStore, retriever: Any, query: str, k
     return out
 
 
+def _pooled_before(plan: QueryPlan, store: KnowledgeStore, retriever: Any, query: str, k: int, me: Callable
+                   ) -> Set[str]:
+    """`pooled` plus the hits of the sources of this module registered before `me` that are on."""
+    out = pooled(plan, store, retriever, query, k)
+    for name, source in finance_policy.candidate_sources():
+        if source is me:
+            break
+        if source not in FAMILY:
+            continue
+        try:
+            out.update(h.id for h in source(plan, store, retriever, query, k))
+        except Exception:  # noqa: BLE001 - finance_search skips a failing source too
+            continue
+    return out
+
+
 def _source(plan: QueryPlan, store: KnowledgeStore, retriever: Any, query: str, k: int, n: int,
             digest: bool) -> List[SearchHit]:
+    return _new_hits(plan, store, retriever, query, k, queries(plan, store, retriever, query, n, digest), MQ_CAP,
+                     lambda: pooled(plan, store, retriever, query, k))
+
+
+def _new_hits(plan: QueryPlan, store: KnowledgeStore, retriever: Any, query: str, k: int, texts: Sequence[str],
+              cap: int, skipped: Callable[[], Set[str]]) -> List[SearchHit]:
+    """At most `cap` passages of the fused rankings of `texts` that `skipped()` does not hold (in range first)."""
     ks = _ks()
-    texts = queries(plan, store, retriever, query, n, digest)
     docs = ks._docs(retriever)
     if not texts or not docs:
         return []
     calls = _ranking_calls(plan, store, retriever, texts)
-    skip, *rankings = _parallel([lambda: pooled(plan, store, retriever, query, k), *(call for call, _ in calls)])
+    skip, *rankings = _parallel([skipped, *(call for call, _ in calls)])
     blocks, _ = _boost(plan, store)
-    numeric = plan.kind == NUMERIC
+    numeric = finance_policy.tables_allowed(plan)
     inside: List[str] = []
     outside: List[str] = []
     for hit in _fuse(rankings, [w for _, w in calls]):
@@ -275,9 +333,9 @@ def _source(plan: QueryPlan, store: KnowledgeStore, retriever: Any, query: str, 
         year = ks.letter_of(pid, docs)
         (inside if not blocks or any(a <= year <= b for a, b in blocks) else outside).append(pid)
     letter = lambda pid: ks.letter_of(pid, docs)  # noqa: E731
-    picked = ks._cap_letters(inside, MQ_CAP, letter)
+    picked = ks._cap_letters(inside, cap, letter)
     if not plan.year_hard:
-        picked += ks._cap_letters(outside, MQ_CAP - len(picked), letter)
+        picked += ks._cap_letters(outside, cap - len(picked), letter)
     return ks._hits(picked, docs)
 
 
@@ -298,7 +356,17 @@ def digest_query_source(plan: QueryPlan, store: KnowledgeStore, retriever: Any, 
     return _source(plan, store, retriever, query, k, 0, True)
 
 
+def plan_query_source(plan: QueryPlan, store: KnowledgeStore, retriever: Any, query: str, k: int
+                      ) -> List[SearchHit]:
+    """The searches rewritten from the plan (FINANCE_PLAN_QUERY), at most PQ_CAP new passages."""
+    texts = plan_queries(plan, store, retriever, query, max(0, finance_setting("FINANCE_PLAN_QUERY")))
+    return _new_hits(plan, store, retriever, query, k, texts, PQ_CAP,
+                     lambda: _pooled_before(plan, store, retriever, query, k, plan_query_source))
+
+
 SOURCES: List[Tuple[str, Callable]] = [
     ("FINANCE_MULTI_QUERY", multi_query_source),
     ("FINANCE_DIGEST_QUERY", digest_query_source),
 ]
+PLAN_SOURCES: List[Tuple[str, Callable]] = [("FINANCE_PLAN_QUERY", plan_query_source)]  # registered right after SOURCES
+FAMILY = tuple(source for _, source in (*SOURCES, *PLAN_SOURCES))  # `pooled` stops at the first of them

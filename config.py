@@ -212,7 +212,7 @@ FINANCE_DEFAULTS: dict = {
     "FINANCE_ENTITY_BOOST_WEIGHT": 1,  # weight of the ranking of passages tagged with the plan's entities
     "FINANCE_TAG_DEPTH": 200,          # depth of the ranking the entity-tagged candidates are drawn from
     "FINANCE_TAG_POOL": 24,            # entity-tagged candidates the reranker always sees, beyond RERANK_CANDIDATES
-    "FINANCE_MAX_PER_LETTER": 3,       # questions spanning several letters: passages per letter at most (finance-recall-75-r2: 2 -> 3)
+    "FINANCE_MAX_PER_LETTER": 6,       # questions spanning several letters: passages per letter at most (finance-recall-75-r2: 2 -> 3; finance-answer-quality: 3 -> 6)
     "FINANCE_MIN_LETTERS": 4,          # questions spanning several letters: different letters at least, when available
     # finance-recall-75: candidate sources (src/retrieval/finance_policy.py registry) and served budget. Group 5 adopted the
     # ones that raised dev served gold without lowering heldout_v6 and still add gold in the combination; the rest stay
@@ -224,6 +224,10 @@ FINANCE_DEFAULTS: dict = {
     # finance-recall-75-r4 group 4 adopted window packing 2, K_TREND / K_CORPUS / K_SPECIFIC 80 and 50 rerank candidates
     # (dev anchors / merged 72.6 / 85.9 -> 81.3 / 85.3, heldout_v6 72.6 / 76.2 -> 74.3 / 74.9); packing frees the window
     # the larger budgets need. The decade blocks and the superlative rerank stay off; K_PERIOD stays 40.
+    # finance-answer-quality group 4 (round 5) adopted 6 passages per letter, tables for figure questions, the follow-up
+    # plan carry-over (2) and the gentler follow-up vote (7) (dev anchors / merged 81.3 / 85.3 -> 82.4 / 85.3, heldout_v6
+    # 74.3 / 74.9 -> 79.3 / 80.0, heldout_v4+v5 72.2 / 76.1 -> 78.7 / 81.5); the plan-query rewrite and the per-letter
+    # topic quotas stay off.
     "FINANCE_SUMMARY_SOURCE": 1,       # 1: candidates from the annotation-summary index (summary_source.py)
     "FINANCE_TAGGED_SOURCE": 1,        # 1: passages tagged with the plan's / inferred sectors, companies, events, themes (knowledge_source.py)
     "FINANCE_DIGEST_SOURCE": 1,        # 1: digest timeline source passages for trend / corpus-wide questions (knowledge_source.py)
@@ -249,6 +253,12 @@ FINANCE_DEFAULTS: dict = {
     "FINANCE_WINDOW_PACK": 2,          # 1: drop merged neighbours of low-ranked hits before whole hits; 2: also shorten them (finance-recall-75-r4: 0 -> 2)
     "FINANCE_DECADE_BLOCKS": 0,        # corpus-wide/trend plans: top M per decade block as extra candidates (0 = off)
     "FINANCE_SUPERLATIVE_RERANK": 0,   # superlative route: serve the top N winner passages by cross-encoder score (0 = off)
+    # finance-answer-quality group 4 (retrieval round 5); the adopted ones are noted "round 5", the other two stay off.
+    "FINANCE_PLAN_QUERY": 0,           # N: searches rewritten from the plan (topic keywords for non-view plans, event aliases + real years)
+    "FINANCE_LETTER_QUOTA": 0,         # 1: diverse plans give each letter places in proportion to its passages on the plan's topic
+    "FINANCE_FOLLOWUP_PLAN": 2,        # 1: a follow-up without years / entities carries the previous financial question's; 2: also adds its letters (round 5: 0 -> 2)
+    "FINANCE_FOLLOWUP_VOTE": 7,        # N: a short follow-up is scope-voted personal / mixed only at a vote share >= N / 10 (0 = the planner's 0.6; round 5: 0 -> 7)
+    "FINANCE_TABLE_CUE": 1,            # 1: table passages also join a non-numeric plan that asks for figures (numeric intent or a figure cue; round 5: 0 -> 1)
     "FINANCE_PREMISE_CHECK": 0,        # 1: plan.premise_note when the asked period misses the event / topic years
     "FINANCE_ANSWER_V3": 0,            # 1: year-grouped evidence pack, premise sentence, dedupe, partial retry
 }

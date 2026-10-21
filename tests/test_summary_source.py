@@ -250,11 +250,14 @@ def test_the_candidate_count_is_capped(kdir, store, monkeypatch):
     assert len(summary_candidates(_plan(), store, IndexedRetriever(), QUERY, 8)) == 2
 
 
-def test_tables_are_candidates_only_for_numeric_plans(kdir, store):
+def test_tables_are_candidates_only_for_numeric_plans(kdir, store, monkeypatch):
     query = "yearend holdings cost market value"
+    monkeypatch.setenv("FINANCE_TABLE_CUE", "0")  # the rule before finance-answer-quality round 5: numeric plans only
     assert "2008_p0003" not in _ids(summary_candidates(_plan(query), store, IndexedRetriever(), query, 8))
     numeric = summary_candidates(_plan(query, kind=NUMERIC), store, IndexedRetriever(), query, 8)
     assert _ids(numeric)[0] == "2008_p0003"
+    monkeypatch.delenv("FINANCE_TABLE_CUE")  # the round-5 default: a question that names figures ("market value") too
+    assert "2008_p0003" in _ids(summary_candidates(_plan(query), store, IndexedRetriever(), query, 8))
 
 
 def test_a_hard_year_never_leaves_its_range(kdir, store):
