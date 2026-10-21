@@ -19,7 +19,10 @@ WORKSPACE = Path.home() / "AI-Workplace/Artifacts/BuffettRAG/agent-runs/finance-
 CASE_FILES = {
     "dev": REPO / "data/evaluation/finance_v1/dev.json",
     "test": WORKSPACE / "out/finance_v1_test.json",
+    # finance_v2: a fresh sealed 40-question test set (the v1 test half was opened once, 2026-10-21)
+    "v2test": WORKSPACE.parent / "finance-testset-v2/out/finance_v2_test.json",
 }
+SEALED_SETS = {"test", "v2test"}
 RUNS_DIR = WORKSPACE / "runs"
 SECRET = Path.home() / "AI-Workplace/Artifacts/BuffettRAG/cloud/secrets/site_password.env"
 FINAL_RUN_FLAG = "--i-am-the-main-agent-final-run"
@@ -28,8 +31,8 @@ FINAL_RUN_FLAG = "--i-am-the-main-agent-final-run"
 def case_file(set_name: str, final_run: bool = False) -> Path:
     if set_name not in CASE_FILES:
         raise SystemExit(f"unknown set {set_name!r}")
-    if set_name == "test" and not final_run:
-        raise SystemExit(f"--set test is the frozen half: refused without {FINAL_RUN_FLAG}")
+    if set_name in SEALED_SETS and not final_run:
+        raise SystemExit(f"--set {set_name} is sealed: refused without {FINAL_RUN_FLAG}")
     return CASE_FILES[set_name]
 
 
@@ -60,7 +63,7 @@ def main(argv=None) -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--url", required=True, help="deployed app base URL")
     ap.add_argument("--name", required=True, help="run name: <runs dir>/<name>/responses.jsonl")
-    ap.add_argument("--set", default="dev", choices=["dev", "test"], dest="set_name")
+    ap.add_argument("--set", default="dev", choices=sorted(CASE_FILES), dest="set_name")
     ap.add_argument("--runs-dir", type=Path, default=RUNS_DIR)
     ap.add_argument(FINAL_RUN_FLAG, action="store_true", dest="final_run")
     args = ap.parse_args(argv)

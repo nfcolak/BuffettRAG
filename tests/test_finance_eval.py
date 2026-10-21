@@ -86,3 +86,12 @@ def test_record_keeps_anchors_as_served_and_merged_separately():
     rec = record({"qid": "q1"}, "dev", None, data, 1.0)
     assert rec["served_ids"] == ["a", "b"]          # pre-registered measure: anchors only
     assert rec["served_ids_merged"] == ["a", "a_prev", "b"]
+
+
+def test_v2test_is_sealed_without_the_final_run_flag():
+    import pytest
+    from scripts.eval.finance_eval import case_file
+
+    with pytest.raises(SystemExit):
+        case_file("v2test")
+    assert case_file("v2test", final_run=True).name == "finance_v2_test.json"
