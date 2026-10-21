@@ -27,7 +27,7 @@ from src.generation.prompt import (
     parse_citations,
     strip_chat_artifacts,
 )
-from src.generation import finance_answer
+from src.generation import finance_answer, window_pack
 from src.generation.answer_expand import expand_answer
 from src.generation.compare import comparison_periods, generate_comparison_answer, prepare_answer_context
 from src.generation.decompose import answer_by_parts, split_question
@@ -438,6 +438,9 @@ def finance_route_steps(req: AskRequest):
     (`FINANCE_K_TREND` / `_CORPUS` / `_PERIOD`); a budget beyond that is cut back, lowest ranks first, until the prompt
     fits the reader window (`reader_window_chars`), never below `llm_context_passages()`. With FINANCE_WINDOW_TOKENS on
     the prompt is counted in tokens instead (`token_count.count_tokens_and_source`) against `reader_window_tokens`.
+    With FINANCE_WINDOW_PACK (finance-recall-75-r4) a full window first loses the merged neighbour text of the
+    lowest-ranked hits (their `merged_ids` leave `served_ids`), and with 2 the passages beyond today's budget are cut
+    to their sentences with the most question words, before any whole passage goes (`window_pack.pack`).
     """
     retriever: Retriever = _state["retriever"]
     store = _knowledge_store()
@@ -513,9 +516,15 @@ def finance_route_steps(req: AskRequest):
         context_hits, prompt = compose(served)
         if limit > cap:  # an adaptive budget: the passages beyond today's budget must fit the reader window
             before = len(served)
+            pack = finance_setting("FINANCE_WINDOW_PACK")  # neighbour text (2: and sentences) goes before whole passages
             if finance_setting("FINANCE_WINDOW_TOKENS"):  # counted in tokens, with a safety margin
                 window = reader_window_tokens(req.max_new_tokens)
                 used, source = count_tokens_and_source(prompt)
+                if pack and used > window:
+                    done = window_pack.pack(served, compose, count_tokens_and_source, window, cap, query, pack)
+                    served, context_hits, prompt, used, source = (done.served, done.ordered, done.prompt, done.used,
+                                                                  done.source)
+                    debug.update(done.debug)
                 while len(served) > cap and used > window:
                     served.pop()
                     context_hits, prompt = compose(served)
@@ -523,6 +532,10 @@ def finance_route_steps(req: AskRequest):
                 debug.update(window_tokens=window, prompt_tokens=used, token_source=source)
             else:
                 window = reader_window_chars(req.max_new_tokens)
+                if pack and len(prompt) > window:
+                    done = window_pack.pack(served, compose, window_pack.count_chars, window, cap, query, pack)
+                    served, context_hits, prompt = done.served, done.ordered, done.prompt
+                    debug.update(done.debug)
                 while len(served) > cap and len(prompt) > window:
                     served.pop()
                     context_hits, prompt = compose(served)

@@ -98,7 +98,8 @@ def _deep(year, n):  # ranks 30-59 of the corpus order: not pooled by finance_se
 
 # --- registry and settings ---
 def test_both_settings_registered_last_with_the_adopted_defaults(monkeypatch):
-    assert ks.SOURCES[-2:] == mq.SOURCES
+    first = ks.SOURCES.index(mq.SOURCES[0])  # later rounds append theirs after these (finance-recall-75-r4: the decade source)
+    assert ks.SOURCES[first:first + len(mq.SOURCES)] == mq.SOURCES
     assert [name for name, _ in mq.SOURCES] == list(SETTINGS)
     for name in SETTINGS:
         monkeypatch.delenv(name)

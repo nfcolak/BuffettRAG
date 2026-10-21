@@ -45,7 +45,7 @@ import numpy as np
 from config import RETRIEVAL_FETCH_K, finance_setting
 from src.knowledge import KnowledgeStore
 from src.query.plan import CORPUS_WIDE, NUMERIC, TREND, QueryPlan
-from src.retrieval import multiquery_source, summary_source
+from src.retrieval import decade_source, multiquery_source, summary_source
 from src.retrieval.finance_policy import _boost, _has_entities, _hybrid_ranking
 from src.storage import SearchHit
 
@@ -354,4 +354,5 @@ SOURCES: List[Tuple[str, Callable]] = [
     ("FINANCE_DIGEST_SOURCE", digest_source),
     ("FINANCE_STANCE_SOURCE", stance_source),
     *multiquery_source.SOURCES,  # FINANCE_MULTI_QUERY, FINANCE_DIGEST_QUERY (finance-recall-75-r3)
+    *decade_source.SOURCES,  # FINANCE_DECADE_BLOCKS (finance-recall-75-r4)
 ]

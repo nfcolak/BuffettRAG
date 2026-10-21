@@ -274,13 +274,14 @@ def test_the_api_reports_neighbour_merged_ids_in_served_ids(monkeypatch):
     assert route.served_ids == body["debug"]["served_ids"]
 
 
-def test_the_eval_recorder_scores_the_debug_served_ids_when_the_api_sends_them():
+def test_the_eval_recorder_scores_anchors_and_keeps_the_debug_merged_ids_apart():
     case = {"qid": "q1"}
     data = {"hits": [{"id": "a"}], "debug": {"served_ids": ["a", "b"]}}
-    assert finance_eval.record(case, "dev", None, data, 1.0)["served_ids"] == ["a", "b"]
-    assert finance_eval.record(case, "dev", None, {"hits": [{"id": "a"}]}, 1.0)["served_ids"] == ["a"]
-    assert finance_eval.record(case, "dev", None, {"hits": [{"id": "a"}], "debug": {"served_ids": []}},
-                               1.0)["served_ids"] == ["a"]
+    rec = finance_eval.record(case, "dev", None, data, 1.0)
+    assert rec["served_ids"] == ["a"]  # pre-registered measure: anchors only
+    assert rec["served_ids_merged"] == ["a", "b"]
+    rec = finance_eval.record(case, "dev", None, {"hits": [{"id": "a"}]}, 1.0)
+    assert rec["served_ids"] == ["a"] and rec["served_ids_merged"] is None
 
 
 # --- follow-up planning ---

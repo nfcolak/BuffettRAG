@@ -24,6 +24,9 @@ Final answers, returned as they are (no evidence gate, no claim validator, no `e
     With FINANCE_SUPERLATIVE_TAGGED=N (finance-recall-75-r3) up to N passages tagged with the winner and carrying a
     stance of the asked polarity (`tagged_stance_ids`) come first among the uncited evidence, taking their places from
     the same budget.
+    With FINANCE_SUPERLATIVE_RERANK=N (finance-recall-75-r4) the cross-encoder scores up to 60 of those tagged passages
+    against the question and the best N, spread across letters, come first of all (`reranked_stance_ids`); without a
+    reranker the setting is skipped and the answer says so in its detail.
 
 Matching figure rows never use another entity's rows: when the question names a company other than Berkshire, only
 that company's rows match; Berkshire's rows are the default only when no other company is named.
@@ -85,6 +88,7 @@ MAX_NUMERIC_ROWS = 6
 DIGEST_GAP_PASSAGES = 4  # reader passages appended after the digest's quoted passages, at most
 SUPERLATIVE_TOP = 3      # targets named in a superlative answer
 SUPERLATIVE_QUOTES = 6   # quotes from the winner's digest timeline, at most
+SUPERLATIVE_RERANK_POOL = 60  # tagged passages of the winner the cross-encoder scores (FINANCE_SUPERLATIVE_RERANK)
 BERKSHIRE = {"berkshire", "berkshire hathaway"}
 FIGURES_BEGIN = "BEGIN FIGURES FROM THE PASSAGES (each row cites the passage it comes from)"
 FIGURES_END = "END FIGURES"
@@ -559,13 +563,55 @@ def tagged_stance_ids(plan: QueryPlan, store: KnowledgeStore, docs_by_id: Mappin
     return spread_letters([pid for _, pid in scored], n, lambda pid: letter_of(pid, docs_by_id))
 
 
+def _retriever_reranker() -> Any:
+    """The cross-encoder of the app's retriever (`ask_flow._state`), None when there is none. ask_flow imports this
+    module, so it is imported here, at call time."""
+    try:
+        from src.services import ask_flow
+        return getattr(ask_flow._state.get("retriever"), "reranker", None)
+    except Exception:  # noqa: BLE001 - no retriever (a unit test, an offline script) means no reranker
+        return None
+
+
+def _spread_ranked(ranked: Sequence[str], n: int, docs_by_id: Mapping[str, Any]) -> List[str]:
+    """The first n of `ranked` taken in rounds: a round takes the next passage of every letter that has one left, in
+    rank order, so no letter gets a second passage before every letter has a first. Unlike `spread_letters`, which
+    spaces the letters of a round evenly over time, the rank decides which letters come first."""
+    taken: Dict[Optional[int], int] = {}
+    keyed: List[Tuple[int, int, str]] = []
+    for rank, pid in enumerate(ranked):
+        letter = _letter_of(pid, docs_by_id)
+        keyed.append((taken.get(letter, 0), rank, pid))
+        taken[letter] = taken.get(letter, 0) + 1
+    return [pid for _, _, pid in sorted(keyed)[:max(0, n)]]
+
+
+def reranked_stance_ids(plan: QueryPlan, store: KnowledgeStore, docs_by_id: Mapping[str, Any], reranker: Any, kind: str,
+                        winner: str, polarity: str, skip: set, n: int) -> List[str]:
+    """Up to n of the winner's tagged stance passages that the cross-encoder scores highest against the question
+    (FINANCE_SUPERLATIVE_RERANK), best first.
+
+    The candidates are the first SUPERLATIVE_RERANK_POOL ids of `tagged_stance_ids` (same pool: the asked polarity on
+    the winner, `skip` ids left out); the question is the one `finance_search` reranks with. The best N are taken in
+    rounds across the letters (`_spread_ranked`), so one letter does not fill the list."""
+    if n <= 0:
+        return []
+    pool = tagged_stance_ids(plan, store, docs_by_id, kind, winner, polarity, skip, SUPERLATIVE_RERANK_POOL)
+    if not pool:
+        return []
+    candidates = [_hit_from_doc(docs_by_id[pid]) for pid in pool]
+    scored = reranker.rerank(plan.financial_query or plan.query, candidates, top_k=len(candidates))
+    return _spread_ranked([h.id for h in scored], n, docs_by_id)
+
+
 def superlative_answer(plan: QueryPlan, store: KnowledgeStore, docs_by_id: Mapping[str, Any],
-                       max_hits: int = 16, max_new_tokens: int = 900) -> Optional[FinanceAnswer]:
+                       max_hits: int = 16, max_new_tokens: int = 900, reranker: Any = None) -> Optional[FinanceAnswer]:
     """Top targets by distinct letters with a stance of the asked polarity, then quotes from the winner's digest
     timeline (or, without a digest, its stance quotes), citing the quoted passages; None without stance data.
 
     The served budget is `max_hits`, or FINANCE_K_CORPUS when that is larger; what is served beyond `max_hits` is cut
-    to fit the reader window (`max_new_tokens` is the answer budget the window leaves out)."""
+    to fit the reader window (`max_new_tokens` is the answer budget the window leaves out). FINANCE_SUPERLATIVE_RERANK
+    uses `reranker`, else the retriever's (`_retriever_reranker`)."""
     if not plan.superlative:
         return None
     ranked = [r for r in stance_letters(plan, store, docs_by_id) if r[2]]
@@ -615,9 +661,24 @@ def superlative_answer(plan: QueryPlan, store: KnowledgeStore, docs_by_id: Mappi
     cited = len(hits)
     limit = max(max_hits, finance_setting("FINANCE_K_CORPUS"))
     budget = max(0, limit - cited)
-    tagged = tagged_stance_ids(plan, store, docs_by_id, kind, winner, polarity, set(index),
-                               min(finance_setting("FINANCE_SUPERLATIVE_TAGGED"), budget))
-    extra = tagged + _source_evidence(plan, top, digest, docs_by_id, set(index) | set(tagged), budget - len(tagged))
+    relevant: List[str] = []
+    rerank_note = ""
+    if finance_setting("FINANCE_SUPERLATIVE_RERANK") > 0:
+        reranker = reranker if reranker is not None else _retriever_reranker()
+        if reranker is None:
+            rerank_note = "skipped: no reranker"
+        else:
+            try:
+                relevant = reranked_stance_ids(plan, store, docs_by_id, reranker, kind, winner, polarity, set(index),
+                                               min(finance_setting("FINANCE_SUPERLATIVE_RERANK"), budget))
+                rerank_note = f"{len(relevant)} served"
+            except Exception as exc:  # noqa: BLE001 - a rerank failure never fails the answer
+                rerank_note = f"skipped: {type(exc).__name__}"
+    taken = set(index) | set(relevant)
+    tagged = tagged_stance_ids(plan, store, docs_by_id, kind, winner, polarity, taken,
+                               min(finance_setting("FINANCE_SUPERLATIVE_TAGGED"), budget - len(relevant)))
+    extra = relevant + tagged + _source_evidence(plan, top, digest, docs_by_id, taken | set(tagged),
+                                                 budget - len(relevant) - len(tagged))
     # uncited evidence for the count: the winner's other stance passages, one per letter, after the quoted ones
     by_letter_ids: Dict[int, str] = {}
     served_letters = {_year(h) for h in hits} | {_letter_of(pid, docs_by_id) for pid in extra}
@@ -631,6 +692,8 @@ def superlative_answer(plan: QueryPlan, store: KnowledgeStore, docs_by_id: Mappi
         window, per_passage = reader_window_chars(max_new_tokens), retrieval_setting("LLM_PASSAGE_MAX_CHARS")
         while len(hits) > max(max_hits, cited) and sum(min(len(h.text), per_passage) for h in hits) > window:
             hits.pop()
+    detail = {"ranking": [(t, len(y)) for t, y, _ in top], "cited": cited, "evidence": len(hits) - cited}
+    if rerank_note:
+        detail["rerank"] = rerank_note
     return FinanceAnswer(answer=answer, hits=hits, citations=parse_citations(answer, hits[:cited]), route="superlative",
-                         detail={"ranking": [(t, len(y)) for t, y, _ in top], "cited": cited,
-                                 "evidence": len(hits) - cited})
+                         detail=detail)
