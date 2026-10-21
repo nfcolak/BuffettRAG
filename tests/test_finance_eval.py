@@ -76,3 +76,13 @@ def test_record_stores_debug_only_when_present() -> None:
     case = {"qid": "a1"}
     assert "debug" not in finance_eval.record(case, "dev", None, {"answer": "x"}, 1.0)
     assert finance_eval.record(case, "dev", None, {"answer": "x", "debug": {"route": "reader"}}, 1.0)["debug"] == {"route": "reader"}
+
+
+def test_record_keeps_anchors_as_served_and_merged_separately():
+    from scripts.eval.finance_eval import record
+
+    data = {"answer": "x", "hits": [{"id": "a"}, {"id": "b"}],
+            "debug": {"served_ids": ["a", "a_prev", "b"]}}
+    rec = record({"qid": "q1"}, "dev", None, data, 1.0)
+    assert rec["served_ids"] == ["a", "b"]          # pre-registered measure: anchors only
+    assert rec["served_ids_merged"] == ["a", "a_prev", "b"]

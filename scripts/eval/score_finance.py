@@ -56,6 +56,8 @@ def score_rows(responses: list[dict], cases: dict[str, dict], half: str) -> list
             "claim_cov": (sum(hit) / len(hit)) if hit else None,
             "term_cov": (sum(has(ans, t) for t in terms) / len(terms)) if terms else None,
             "recall_served": (len(gold & set(r.get("served_ids") or [])) / len(gold)) if gold else None,
+            "recall_merged": (len(gold & set(r.get("served_ids_merged") or [])) / len(gold))
+                             if gold and r.get("served_ids_merged") is not None else None,
             "recall_retrieved": (len(gold & set(r.get("retrieved_ids") or [])) / len(gold)) if gold else None,
             "refused": REFUSE in ans or bool(REFUSAL_WORDS.search(ans)) or not ans,
             "scoped": SCOPE in ans,
@@ -67,6 +69,7 @@ def score_rows(responses: list[dict], cases: dict[str, dict], half: str) -> list
 def agg_line(rs: list[dict], label: str) -> str:
     ans_rs = [x for x in rs if x["claim_cov"] is not None]
     rec = [x["recall_served"] for x in rs if x["recall_served"] is not None]
+    merged = [x["recall_merged"] for x in rs if x.get("recall_merged") is not None]
     unans = [x for x in rs if x["type"] == "unanswerable"]
     oos = [x for x in rs if x["type"] == "out_of_scope"]
     part = [x for x in rs if x["type"] == "partial"]
@@ -74,7 +77,8 @@ def agg_line(rs: list[dict], label: str) -> str:
     f = lambda v: f"{100 * sum(v) / len(v):.0f}%" if v else "-"  # noqa: E731
     return (f"{label:28s} n={len(rs):2d} | claim coverage {f([x['claim_cov'] for x in ans_rs])} (n={len(ans_rs)}), "
             f"terms {f([x['term_cov'] for x in ans_rs])} "
-            f"| gold passages served {f(rec)} | unanswerable refused {sum(x['refused'] for x in unans)}/{len(unans)} "
+            f"| gold passages served {f(rec)}" + (f" (merged {f(merged)})" if merged else "") + " "
+            f"| unanswerable refused {sum(x['refused'] for x in unans)}/{len(unans)} "
             f"| partial states gap {sum(x['refused'] for x in part)}/{len(part)} "
             f"| personal: scope reply {sum(x['scoped'] for x in oos)}/{len(oos)}, refused {sum(x['refused'] for x in oos)}/{len(oos)}, "
             f"answered {sum(not x['refused'] and not x['scoped'] for x in oos)}/{len(oos)} "
