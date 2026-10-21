@@ -32,6 +32,7 @@ SMOKE_ROWS, SMOKE_VALID_ROWS = 20, 6
 LLAMA_CPP_COMMIT = '46ca246de9bb1c35269722a6240d37d9dfd79cad'
 PIN_KEYS = ('unsloth', 'unsloth_zoo', 'transformers', 'trl', 'peft', 'bitsandbytes')
 DEFAULT_PINS = {'unsloth': '2026.10.6', 'transformers': '5.16.1', 'trl': '1.15.0'}   # FT-r3 log; the rest is filled from the smoke's pins_resolved.json
+DATA_CELL_CHARS = 1_000_000
 FIXTURE_PLACEHOLDER = 'FIXTURE ROWS ONLY: synthetic text, rebuild with --train/--valid'
 
 # Gemma 4's turn format as the local tokenizer_config declares it (sot `<|turn>`, eot `<turn|>`, start anchor `<|turn>model\n`); the same text
@@ -1226,8 +1227,16 @@ def build_notebook(train_lines, valid_lines, opts):
         'RUN_NAME': opts['run_name'], 'SMOKE': bool(opts['smoke']), 'BASE_REVISION': BASE_REVISION, 'PINS': repr(pins),
         'REQUIRE_ALL_PINS': not opts['smoke'], 'LLAMA_CPP_COMMIT': LLAMA_CPP_COMMIT, 'MAX_SEQ': opts['max_seq'], 'EPOCHS': opts['epochs'],
         'SAVE_STEPS': opts['save_steps'], 'EVAL_STEPS': opts['eval_steps']})
-    b64_cells = [hidden_code_cell(f'{name} = """\n' + '\n'.join(blobs[sp][i:i + 4096] for i in range(0, len(blobs[sp]), 4096)) + '\n"""\n', f'embedded {sp} rows (gzip+base64)')
-                 for sp, name in (('train', 'DATA_TRAIN_B64'), ('valid', 'DATA_VALID_B64'))]
+    # Full-run lesson: one 11 MB data cell never left 'pending' on Colab (the runtime idled 2 h), so a blob is split into
+    # cells of at most DATA_CELL_CHARS; the first assigns, the rest append.
+    b64_cells = []
+    for sp, name in (('train', 'DATA_TRAIN_B64'), ('valid', 'DATA_VALID_B64')):
+        blob = blobs[sp]
+        parts = [blob[i:i + DATA_CELL_CHARS] for i in range(0, len(blob), DATA_CELL_CHARS)] or ['']
+        for k, part in enumerate(parts):
+            body = '\n'.join(part[i:i + 4096] for i in range(0, len(part), 4096))
+            op = '=' if k == 0 else '+='
+            b64_cells.append(hidden_code_cell(f'{name} {op} """\n' + body + '\n"""\n', f'embedded {sp} rows (gzip+base64), part {k + 1}/{len(parts)}'))
     meta_cell = hidden_code_cell('DATA_META = ' + repr(meta) + '\n', 'what the builder recorded about the rows')
     cells = [md_cell(TOP_MD), md_cell(SETTINGS_MD), code_cell(settings), md_cell(DATA_MD), *b64_cells, meta_cell,
              code_cell(COMMON_PY), g(IMPORT_COMMON_PY), md_cell(UNPACK_MD), g(UNPACK_PY), g(EFFECTIVE_PY),

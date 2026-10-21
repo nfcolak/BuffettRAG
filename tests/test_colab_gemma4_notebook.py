@@ -83,6 +83,8 @@ def decode_rows(nb, split):
     meta = embedded_meta(nb)
     ns = {}
     exec(code(nb, f'DATA_{split.upper()}_B64 = '), ns)
+    for extra in [c for c in cells(nb) if f'DATA_{split.upper()}_B64 += ' in c]:
+        exec(extra, ns)
     raw = gzip.decompress(base64.b64decode(''.join(ns[f'DATA_{split.upper()}_B64'].split())))
     assert hashlib.sha256(raw).hexdigest() == meta[split]['sha256']
     return raw
@@ -1110,3 +1112,11 @@ def test_kernel_cells_are_guarded_and_failures_print_plain_text(nb_fixture):
     kernel = [c for c in cells(nb_fixture) if not c.startswith('%%writefile')][1:]
     kernel = [c for c in kernel if not c.startswith('# @title')]
     assert kernel and all(c.startswith('%%guarded\n') for c in kernel), [c[:40] for c in kernel if not c.startswith('%%guarded')]
+
+
+def test_large_blobs_are_split_into_append_cells(tmp_path, monkeypatch):
+    """Full-run lesson: an 11 MB data cell stayed pending on Colab; blobs above DATA_CELL_CHARS span several cells."""
+    monkeypatch.setattr(B, 'DATA_CELL_CHARS', 300)
+    nb = build(tmp_path)
+    assert sum('DATA_TRAIN_B64 += ' in c for c in cells(nb)) >= 1
+    decode_rows(nb, 'train')
