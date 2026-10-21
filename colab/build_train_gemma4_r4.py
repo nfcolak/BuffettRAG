@@ -70,7 +70,12 @@ Timings of this run are not measured yet: the ETA comes from `smoke_report.json`
 
 SETTINGS_MD = '## a. Settings'
 
-SETTINGS_PY = r'''RUN_NAME = '@@RUN_NAME@@'              # drives the Drive folder, the GGUF name and every record
+SETTINGS_PY = r'''import os
+try:
+    os.makedirs('/content/work', exist_ok=True)  # the %%writefile cells below need the folder (IPython does not create it)
+except OSError:
+    pass  # not on Colab (local stub tests)
+RUN_NAME = '@@RUN_NAME@@'              # drives the Drive folder, the GGUF name and every record
 SMOKE = @@SMOKE@@                    # True: 20 rows, 10 steps, Drive round trip, export check, no GGUF upload; writes pins_resolved.json + smoke_report.json
 RESUME = False                       # True: continue from the newest complete checkpoint on Drive (after a disconnect)
 ALLOW_PLACEHOLDER = False            # a notebook built with --fixture refuses to train

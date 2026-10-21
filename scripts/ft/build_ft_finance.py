@@ -71,7 +71,7 @@ GEMMA_TOKENIZER = ROOT / 'data/tokenizer/gemma4_12b_it/tokenizer.json'
 GEMMA_REVISION = '707f0a3b8a3c7ad586ed01e27eafbad8a27dd0f7'
 CACHE_NAME = 'model_cache.pkl'
 PROMPT_VERSION = 'v2'               # tasks.md 3.1: the Gemma reader's system prompt stays the v2 text
-MAX_TOKENS = 15500                  # tasks.md 1.1: Gemma tokens of prompt + target
+MAX_TOKENS = 16200                  # Gemma tokens of prompt + target; 15500 dropped 13/40 pilot rows (served prompts are ~15.3k), notebook MAX_SEQ 16384
 QUESTION_OVERLAP_MAX = CT.QUESTION_OVERLAP_MAX
 KINDS = CT.KINDS
 ANSWER_KINDS = CT.ANSWER_KINDS
@@ -483,8 +483,8 @@ SHAPES = {
     'partial': '{"question": "...?", "answer": [{"year": 1987, "sentences": ["1987_p0012#3"]}], '
                '"gap": {"ask": "the price Berkshire paid for X", "missing": ["X"]}}',
     'near': '{"question": "...?", "answer": [], "present": ["Name that is in the passages"], '
-            '"missing": ["Name or number that is not in the passages"]}',
-    'off': '{"question": "...?", "answer": [], "missing": ["Name that is not in the passages"]}',
+            '"missing": ["Name that is in no letter"]}',
+    'off': '{"question": "...?", "answer": [], "missing": ["Name that is in no letter"]}',
     'mixed_scope': '{"question": "...?", "financial_part": "...", "personal_part": "...", '
                    '"answer": [{"year": 1990, "sentences": ["1990_p0040#2"]}], "personal_sentences": ["1990_p0041#3"]}',
 }
@@ -545,24 +545,25 @@ def task_text(job):
     if kind == 'partial':
         return (f'TASK (partial): these passages come from the {year} letter. Write ONE question with two parts joined naturally. '
                 'One part is answered by the passages. The other part asks for a specific detail the passages do NOT give (a '
-                'figure of another year, a named person or company they do not mention, a number they do not state); that detail '
-                'must appear in your question as a distinctive capitalised name, year or number that does NOT occur in the '
-                f'passages. Answer the covered part with 1-{CT.MAX_PER_LETTER} sentences. "gap.ask" is a short noun phrase that '
+                'named person, company, product or deal that Buffett\'s letters never mention); that detail must appear in your '
+                'question as a distinctive capitalised name that occurs in NO Berkshire letter (never a bare year: a question '
+                'naming a year retrieves that letter, so the year is always served; the checker rejects a name found in any letter).'
+                f' The passages are from the {year} letter. Answer the covered part with 1-{CT.MAX_PER_LETTER} sentences. "gap.ask" is a short noun phrase that '
                 'completes "The retrieved passages do not cover ___." (for example "the price Berkshire paid for Fechheimer"); '
-                '"gap.missing" lists the 1-2 distinctive words or numbers of your question that are not in the passages.')
+                '"gap.missing" lists the 1-2 distinctive capitalised names of your question that no letter contains.')
     if kind == 'refusal' and job.get('variant') == 'near':
         return ('TASK (refusal): write ONE plausible finance question about a company, person, business or event that IS '
                 'discussed in these passages, but that asks for a specific detail the passages do NOT give: a figure, date, name '
-                'or reason that is not stated, or something that did not happen. Stay inside the period of the letters (no year '
+                'or a counterpart (a company, person, product or deal) that no Berkshire letter mentions. Stay inside the period of the letters (no year '
                 'after 2024) and never ask for a stock, share or crypto price. The question must contain, as distinctive words '
-                'or numbers (a capitalised name, a year or a number), both the subject that IS in the passages ("present") and '
-                'the detail that is NOT ("missing"). Nothing in the passages answers it, so "answer" is [].')
+                '(capitalised names), both the subject that IS in the passages ("present") and the counterpart that is in NO letter '
+                '("missing"; never a bare year, the checker rejects names found in any letter). Nothing in the passages answers it, so "answer" is [].')
     if kind == 'refusal':
         return ('TASK (refusal): write ONE plausible finance question in the same business area as these passages about a '
                 "specific company, person, product or deal that these passages do not mention and that Buffett's letters most "
                 'likely never discuss. Stay inside the period of the letters (no year after 2024) and never ask for a stock, '
-                'share or crypto price. "missing" lists the distinctive capitalised names or numbers of your question that are '
-                'not in the passages; "answer" is [].')
+                'share or crypto price. "missing" lists the distinctive capitalised names of your question that occur in NO '
+                'Berkshire letter (never a bare year; the checker rejects names found in any letter); "answer" is [].')
     return (f'TASK (mixed_scope): the FINANCIAL passages come from the business part of the {when} letter(s); the PERSONAL passage '
             'tells a personal story (family, health, age, hobbies, a joke, a life story). Write ONE question with two parts joined '
             'naturally: a financial part answered by the FINANCIAL passages and a personal part about the PERSONAL passage that '
@@ -699,6 +700,10 @@ For your batch NNN:
 
 Rules:
 - Use only the passages of the job; no outside facts, no other files of the repository, never an evaluation set.
+- The question must be one that your chosen sentences really answer. When the passages only mention the job's topic in
+  passing (e.g. Freddie Mac named in a list inside a catastrophe-risk paragraph), ask about what the sentences do say,
+  or skip the job; never pair a topic question with sentences about something else.
+- Do not pick two sentences that say almost the same thing (the letters repeat paragraphs across years); keep one.
 - Do not edit the batch files. Do not run anything else than the checker.
 - The checker also runs the finance planner on your question: a question it would answer from a digest, the numbers
   table, a superlative ranking or a per-period comparison is rejected, and a premise_partial question must make the

@@ -67,17 +67,17 @@ HINTS = {
     'no_sentences': 'pick at least one answer sentence',
     'too_many_sentences': f'at most {MAX_PER_LETTER} sentences per letter and {MAX_SENTENCES} in all',
     'sentence_too_short': f'pick complete sentences of at least {MIN_WORDS} words',
-    'bad_sentence': 'pick normal sentences: capital start, end mark, under 70 words, no row of asterisks',
+    'bad_sentence': 'pick normal sentences: capital start, end mark, under 70 words, no row of asterisks, no mailing address',
     'dependent_start': 'a sentence that starts with This, That, It, They, However, But, And... needs the sentence before it chosen too, or pick another',
     'too_few_letters': 'answer from more letters (crisis_period: at least 2, view_over_time: at least 3)',
     'too_few_decades': 'view_over_time: the answer letters must span at least two decades',
     'year_missing': 'single_year: the question must name the letter year literally',
     'no_figure': 'figure: at least one chosen sentence must state a figure (an amount, a percentage, a count)',
     'period_missing': 'premise_partial: the question must name the wrong period exactly as the task gives it',
-    'bad_gap': 'partial: "gap" = {"ask": "<noun phrase, 6-100 chars>", "missing": ["<1-2 capitalised names, years or numbers '
-               'that are in your question and NOT in the passages>"]}',
+    'bad_gap': 'partial: "gap" = {"ask": "<noun phrase, 6-100 chars>", "missing": ["<1-2 capitalised names or numbers '
+               'that are in your question and in NO Berkshire letter (not a bare year; e.g. a company Berkshire never discussed)>"]}',
     'refusal_has_answer': 'refusal: "answer" must be []',
-    'bad_missing': 'refusal: "missing" lists 1-3 capitalised names, years or numbers that are in your question and NOT in the passages',
+    'bad_missing': 'refusal: "missing" lists 1-3 capitalised names or numbers that are in your question and in NO Berkshire letter (not a bare year)',
     'bad_present': 'refusal (near): "present" lists 1-3 capitalised names or numbers that are in your question AND in the passages',
     'refusal_cue': 'refusal: no year after 2024 and no stock, share or crypto price in the question',
     'bad_parts': 'mixed_scope: give "financial_part" and "personal_part", each a short phrase',
@@ -192,7 +192,7 @@ def answer_problem(answer, job, table):
     for entry in chosen:
         if len(entry['text'].split()) < MIN_WORDS:
             return 'sentence_too_short', None
-        if V6.bad_sentence(entry['text']):
+        if V6.bad_sentence(entry['text']) or MAILING.search(entry['text']):
             return 'bad_sentence', None
         if C.DEPENDENT_START.match(entry['text']) and f"{entry['passage_id']}#{entry['n'] - 1}" not in seen:
             return 'dependent_start', None
@@ -208,7 +208,30 @@ def distinctive_terms(values, question, texts, *, present):
         return None
     if any(V6.term_present(t, texts) != present for t in terms):
         return None
+    if not present:
+        # Pilot lesson: a bare year as the missing term is useless; a question naming a year retrieves that letter, so
+        # the year is always served and the row drops (refusal_term_served 5/5, partial_gap_term_served 3/3). The
+        # teacher sees only the seed passages, so an absent term must be absent from EVERY letter, not just the seeds.
+        if any(BARE_YEAR.match(t) for t in terms) or any(corpus_has(t) for t in terms):
+            return None
     return terms
+
+
+# Pilot lesson: '(Write to: Corporate Secretary, Salomon Inc, Seven World Trade Center, New York, NY 10048)' was quoted.
+MAILING = re.compile(r"\bWrite to:|P\.\s?O\.\s?Box|\b[A-Z]{2} \d{5}\b")
+BARE_YEAR = re.compile(r"^\s*(?:fiscal\s+)?(?:19|20)\d\ds?\s*$", re.I)
+_CORPUS = []
+
+
+def corpus_has(term):
+    """True when the term occurs in any letter passage (chunks_v3_paragraph.jsonl); no corpus file -> False."""
+    if not _CORPUS:
+        path = Path(__file__).resolve().parents[2] / 'data' / 'processed' / 'chunks_v3_paragraph.jsonl'
+        if path.exists():
+            _CORPUS.extend(json.loads(line)['text'] for line in path.open() if line.strip())
+        else:
+            _CORPUS.append('')
+    return V6.term_present(term, _CORPUS)
 
 
 def kind_problem(job, obj, chosen, question):
