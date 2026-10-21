@@ -208,13 +208,56 @@ def _finalize_answer(llm, prompt: str, context_hits, raw_answer: str, max_new_to
     the validator's reader options (`finance_answer.READER_VALIDATION`) and neighbour expansion
     (`finance_answer.READER_EXPANSION`). Every other prompt is finalized exactly as before.
 
+    A v3 reader prompt (FINANCE_ANSWER_V3, `finance_answer.is_v3_prompt`) and its retry prompt also get: the model's
+    own uncited premise sentence taken out and the plan's premise note put first (`finance_answer.strip_premise_line`,
+    `with_premise`), and repeated sentences dropped before the validator and again after expansion
+    (`finance_answer.dedupe_sentences`, listed in the trace as `validator.deduped`). When the model refused a v3 prompt
+    that carries a premise note, or whose served hits carry the plan's topic tags, one retry asks for the covered part
+    (`finance_answer.partial_retry_prompt`, `_partial_retry`).
+
     A refusal is not a provider error. Repeating the same prompt until the
     model answers selects against justified abstention without new evidence.
     """
+    answer, citations = _finalize_once(prompt, context_hits, raw_answer, trace)
+    if answer == REFUSAL_LINE:
+        retry_prompt = finance_answer.partial_retry_prompt(prompt, strip_chat_artifacts(raw_answer), context_hits)
+        if retry_prompt:
+            return _partial_retry(llm, retry_prompt, context_hits, max_new_tokens, trace)
+    return answer, citations
+
+
+def _partial_retry(llm, retry_prompt: str, context_hits, max_new_tokens: int, trace: Optional[Dict[str, Any]]):
+    """FINANCE_ANSWER_V3: the one retry for the covered part, finalized like the first answer (it gets no retry of its
+    own); its answer is used when the validator keeps a sentence of it, else the refusal line stays. The trace records
+    it as the legacy retry does: refusal_retry, first_raw_answer, retry_prompt_chars, then the retry's own fields."""
+    try:
+        retry_raw = llm.generate(retry_prompt, max_new_tokens=max_new_tokens)
+    except Exception as exc:
+        if EXPOSE_DEBUG_STATUS:
+            print(f"[backend] LLM provider unavailable: {exc}", flush=True)
+        return REFUSAL_LINE, []
+    retry_trace: Optional[Dict[str, Any]] = {} if trace is not None else None
+    retried = _finalize_answer(llm, retry_prompt, context_hits, retry_raw, max_new_tokens, retry_trace)
+    if trace is not None:
+        trace["refusal_retry"] = True
+        trace["first_raw_answer"] = trace.get("raw_answer")
+        trace["retry_prompt_chars"] = len(retry_prompt)
+        trace.update(retry_trace)
+    return retried
+
+
+def _finalize_once(prompt: str, context_hits, raw_answer: str, trace: Optional[Dict[str, Any]] = None):
+    """`_finalize_answer` without the v3 partial retry."""
     reader = finance_answer.is_reader_prompt(prompt)
+    v3 = finance_answer.is_v3_prompt(prompt, with_retry=True)
+    premise = finance_answer.prompt_premise(prompt) if v3 else None
     answer = (finance_answer.format_reader_answer if reader else format_answer_markdown)(strip_chat_artifacts(raw_answer))
     if trace is not None:
         trace["raw_answer"] = raw_answer
+    deduped: List[str] = []
+    if v3:
+        stripped = finance_answer.strip_premise_line(answer, premise)
+        answer, deduped = finance_answer.dedupe_sentences(stripped if stripped or not answer else REFUSAL_LINE)
     if is_citation_only(answer):
         if trace is not None:
             trace["validator"] = {"skipped": "citation_only", "kept": [], "dropped": []}
@@ -244,6 +287,11 @@ def _finalize_answer(llm, prompt: str, context_hits, raw_answer: str, max_new_to
         answer = finance_answer.drop_personal_sentences(answer, context_hits, _knowledge_store())
         if answer == REFUSAL_LINE:
             return answer, []
+        if v3:  # expansion can add a sentence the answer already has; the premise note goes first
+            answer, more = finance_answer.dedupe_sentences(finance_answer.with_premise(answer, premise))
+            deduped += more
+            if trace is not None and deduped:
+                trace["validator"]["deduped"] = deduped
     elif answer != REFUSAL_LINE:
         answer = expand_answer(answer, context_hits)
     return answer, parse_citations(answer, context_hits)
@@ -489,6 +537,11 @@ def finance_route_steps(req: AskRequest):
     With FINANCE_WINDOW_PACK (finance-recall-75-r4) a full window first loses the merged neighbour text of the
     lowest-ranked hits (their `merged_ids` leave `served_ids`), and with 2 the passages beyond today's budget are cut
     to their sentences with the most question words, before any whole passage goes (`window_pack.pack`).
+    With FINANCE_ANSWER_V3 (finance-answer-quality group 3) every reader question is served in year order with the v3
+    prompt (`finance_answer.reader_prompt_v3`: letter-year headers, the plan's `premise_note`, the v3 instructions); the
+    finished prompt is then counted in tokens at any budget and loses its lowest-ranked passages until it leaves the
+    answer budget free (`reader_window_tokens`), and the served hits that carry the plan's topic tags are flagged for
+    the partial retry (`finance_answer.mark_topic_hits`).
     """
     retriever: Retriever = _state["retriever"]
     store = _knowledge_store()
@@ -554,10 +607,15 @@ def finance_route_steps(req: AskRequest):
             periods=None if per_period else (),
         )
 
+        v3 = bool(finance_setting("FINANCE_ANSWER_V3"))
+
         def compose(served: List[Any]):
-            ordered = finance_answer.sort_by_year(served) if plan.kind == TREND else served
+            ordered = finance_answer.sort_by_year(served) if plan.kind == TREND or v3 else served
             ordered = order_passages(ordered)
-            text = finance_answer.reader_prompt(query, ordered, history, trend=plan.kind == TREND)
+            if v3:
+                text = finance_answer.reader_prompt_v3(query, ordered, history, plan.premise_note)
+            else:
+                text = finance_answer.reader_prompt(query, ordered, history, trend=plan.kind == TREND)
             return ordered, (finance_answer.figures_prompt(text, rows, ordered) if rows else text)
 
         served = list(context_hits)[:limit]
@@ -589,6 +647,19 @@ def finance_route_steps(req: AskRequest):
                     context_hits, prompt = compose(served)
                 debug["window_chars"] = window
             debug["window_trimmed"] = before - len(served)
+        if v3:  # the v3 prompt must leave the answer budget free at any budget, counted in tokens as above
+            window = reader_window_tokens(req.max_new_tokens)
+            used, source = count_tokens_and_source(prompt)
+            before = len(served)
+            while len(served) > 1 and used > window:
+                served.pop()
+                context_hits, prompt = compose(served)
+                used, source = count_tokens_and_source(prompt)
+            debug.update(window_tokens=window, prompt_tokens=used, token_source=source)
+            if len(served) < before:
+                debug["window_trimmed_v3"] = before - len(served)
+            context_hits = finance_answer.mark_topic_hits(plan, store, context_hits)  # the partial retry's trigger
+            debug["premise_note"] = plan.premise_note
     return FinanceRoute("reader", plan, query, hits=context_hits, retrieved_hits=hits, used_filter=used_filter,
                         reranked=reranked, llm=llm, prompt=prompt, debug=debug, per_period=per_period)
 

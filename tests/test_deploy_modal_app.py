@@ -23,7 +23,7 @@ def test_live_name_needs_deploy_live() -> None:
 
 
 def test_finance_settings_baked_through_image_env() -> None:
-    assert '"FINANCE_PIPELINE"' in TEXT and '"KNOWLEDGE_DIR"' in TEXT
+    assert '"FINANCE_"' in TEXT and '"KNOWLEDGE_DIR"' in TEXT  # every FINANCE_* setting is baked
     assert "**_baked_env()" in TEXT
     fn = TEXT.split("def _baked_env", 1)[1].split("def _download_retrieval_models", 1)[0]
     assert "modal.is_local()" in fn

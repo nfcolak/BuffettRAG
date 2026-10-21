@@ -42,7 +42,8 @@ def _baked_env() -> dict:
     """Deploy-time settings copied into the image: a local env variable does not reach the container otherwise."""
     if not modal.is_local():
         return {}
-    return {k: os.environ[k] for k in ("FINANCE_PIPELINE", "FINANCE_DEBUG", "KNOWLEDGE_DIR") if os.environ.get(k)}
+    # FINANCE_* settings (config.FINANCE_DEFAULTS overrides, e.g. a staging trial of a new answer setting) and KNOWLEDGE_DIR
+    return {k: v for k, v in os.environ.items() if v and (k.startswith("FINANCE_") or k == "KNOWLEDGE_DIR")}
 
 
 def _download_retrieval_models() -> None:

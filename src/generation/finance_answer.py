@@ -49,6 +49,19 @@ Reader route helpers (the answer still goes through `ask_flow._finalize_answer`)
   - `figure_rows(plan, store, docs_by_id)` and `figures_prompt(prompt, rows, hits)`: a question with numeric intent
     that is not a plain lookup goes to the reader; its matching figure rows' source passages are served first and
     the rows are added to the user block as extra context, each citing its served passage.
+
+Reader v3 (FINANCE_ANSWER_V3, finance-answer-quality group 3; the caller reads the flag, everything below follows the
+prompt, so /ask and /ask/stream behave alike):
+  - `reader_prompt_v3(query, hits, history, premise_note)`: the evidence pack by year. The caller serves the passages
+    in year order (`sort_by_year`); the user block lists them under letter-year headers (`year_passage_block`) with
+    the same `[n] (year=..., source=...)` lines, then the premise correction when the plan has a `premise_note`, then
+    V3_INSTRUCTIONS. The system prompt, the question block and the "Answer:" cue stay as for the other prompts;
+    `is_reader_prompt` accepts the v3 prompt and its retry prompt, so the reader settings apply;
+  - post-processing (`ask_flow._finalize_answer`): `strip_premise_line` takes out the model's own uncited premise
+    sentence and `with_premise` puts the planner's note first instead; `dedupe_sentences` drops repeated sentences
+    (normalised text, the first kept) before the validator and again after expansion;
+  - `partial_retry_prompt`: one retry for the covered part (RETRY_INSTRUCTIONS) when the model refused while the prompt
+    carries a premise note or a served hit carries the plan's topic tags (`mark_topic_hits`).
 """
 from __future__ import annotations
 
@@ -59,7 +72,8 @@ from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple
 
 from config import finance_setting, retrieval_setting
 from src.generation.decompose import split_question
-from src.generation.prompt import REFUSAL_LINE, build_cited_prompt, format_answer_markdown, parse_citations
+from src.generation.prompt import (REFUSAL_LINE, _passage_block, build_cited_prompt, format_answer_markdown,
+                                   parse_citations)
 from src.knowledge import KnowledgeStore
 from src.query.plan import QueryPlan
 from src.retrieval.finance_policy import reader_window_chars
@@ -78,6 +92,29 @@ READER_INSTRUCTIONS = (
     "Write the refusal line only when no passage answers any part of the question; a passage that only shares a "
     "topic word with the question does not answer it."
 )
+# FINANCE_ANSWER_V3: the user-block instructions of the year-grouped reader prompt, the premise correction around a
+# plan's `premise_note`, and the shorter instructions of the one partial retry.
+V3_INSTRUCTIONS = (
+    "The passages are grouped by letter year, oldest first. "
+    "For each letter year or period that answers part of the question, write one or two sentences, copying the "
+    "passage sentence when you can, and end every sentence with the citation of the passage it comes from. "
+    "Prefer Buffett's views, actions, figures and lessons over narration of events. "
+    "Never repeat a sentence. "
+    "If the passages answer only part of the question, answer that part, then say in one sentence which part they "
+    "do not cover. "
+    "Write the refusal line only when no passage answers any part of the question; a passage that only shares a "
+    "topic word with the question does not answer it."
+)
+PREMISE_OPEN = "Correction to the question: "
+PREMISE_CLOSE = (" Start the answer with one sentence that makes this correction, then give what the passages say on "
+                 "the topic, whatever their letter year.")
+RETRY_INSTRUCTIONS = (
+    "Some passages answer part of the question. Answer that part in a few sentences, each ending with the citation "
+    "of its passage, then say in one sentence which part they do not cover. Do not write the refusal line."
+)
+TOPIC_FLAG = "plan_topic"     # hit metadata: the served passage carries the plan's topic tags (`mark_topic_hits`)
+DEDUPE_MIN_WORDS = 3          # a shorter sentence is never dropped as a repeat
+PREMISE_LINE_MAX_WORDS = 60
 # Passage sentences added after / before every verbatim reader-answer sentence (staging_v3 replay of the raw answers:
 # claim coverage 6.2% -> 14.3% with 2/0, 13.8% with 1/1, 17.5% with 2/1; sentences before an anchor often open
 # mid-argument, so none are added before).
@@ -101,6 +138,10 @@ _SECOND_ASK = re.compile(r"(?:[,;]|\band\b)\s*(?:and\s+)?(?:how|what|why|which|w
 
 _ANSWER_SUFFIX = "\n\nAnswer:"
 _READER_TAIL = f" {READER_INSTRUCTIONS}{_ANSWER_SUFFIX}"
+_V3_TAIL = f" {V3_INSTRUCTIONS}{_ANSWER_SUFFIX}"
+_RETRY_TAIL = f" {RETRY_INSTRUCTIONS}{_ANSWER_SUFFIX}"
+_PASSAGES_BEGIN = "BEGIN UNTRUSTED PASSAGES\n"
+_QUESTION_END = "END USER QUESTION"
 # a gap sentence: "The (retrieved) passages / letters ... do not ...", or "There is no information ..."
 _GAP_START = re.compile(
     r"^(?:(?:however|but),?\s+)?(?:(?:the|these)\s+(?:[a-z-]+\s+){0,3}?(?:passages?|letters?|excerpts?)\b"
@@ -181,8 +222,9 @@ def reader_prompt(query: str, hits: Sequence[SearchHit], history: Optional[Seque
 
 
 def is_reader_prompt(prompt: str) -> bool:
-    """True for a prompt built by `reader_prompt` (the question text cannot reach the tail)."""
-    return bool(prompt) and prompt.endswith(_READER_TAIL)
+    """True for a prompt built by `reader_prompt` or `reader_prompt_v3`, or a v3 retry prompt (the question text cannot
+    reach the tail)."""
+    return bool(prompt) and prompt.endswith((_READER_TAIL, _V3_TAIL, _RETRY_TAIL))
 
 
 def is_gap_line(text: str) -> bool:
@@ -254,6 +296,192 @@ def format_reader_answer(text: str) -> str:
 # claim validator options and neighbour expansion of the finance reader route (ask_flow._finalize_answer)
 READER_VALIDATION: Dict[str, Any] = {"repair_citations": True, "gap_line": is_gap_line, "drop_contentless": True}
 READER_EXPANSION: Dict[str, int] = {"after": READER_NEIGHBOR_AFTER, "before": READER_NEIGHBOR_BEFORE}
+
+
+# --- reader v3 (FINANCE_ANSWER_V3) ---
+def year_passage_block(hits: Sequence[SearchHit]) -> str:
+    """The numbered passages exactly as `build_cited_prompt` writes them ([n] in served order), with a letter-year
+    header before each run of passages from the same letter."""
+    out: List[str] = []
+    start = 0
+    while start < len(hits):
+        year = hits[start].metadata.get("year", "?")
+        end = start + 1
+        while end < len(hits) and str(hits[end].metadata.get("year", "?")) == str(year):
+            end += 1
+        span = f"passage [{start + 1}]" if end == start + 1 else f"passages [{start + 1}]-[{end}]"
+        label = f"LETTER OF {year}" if str(year).strip() not in ("", "?", "None") else "LETTER YEAR UNKNOWN"
+        out.append(f"{label} ({span})")
+        out += [f"[{n}]{_passage_block([hit])[len('[1]'):]}" for n, hit in enumerate(hits[start:end], start + 1)]
+        start = end
+    return "\n\n".join(out)
+
+
+def reader_prompt_v3(query: str, hits: Sequence[SearchHit], history: Optional[Sequence[Dict[str, str]]] = None,
+                     premise_note: Optional[str] = None) -> str:
+    """The v3 finance reader prompt: the cited prompt with its passages grouped under letter-year headers (the caller
+    serves them in year order) and, at the end of the user block, the premise correction (when the plan has a
+    `premise_note`) and V3_INSTRUCTIONS. The system prompt, the [n] passage lines, the question block and the
+    "Answer:" cue are unchanged."""
+    prompt = build_cited_prompt(query=query, hits=hits, history=history)
+    block = f"{_PASSAGES_BEGIN}{_passage_block(hits)}\n\n"
+    if not prompt.endswith(_ANSWER_SUFFIX) or block not in prompt:  # defensive, as in trend_prompt
+        return prompt
+    prompt = prompt.replace(block, f"{_PASSAGES_BEGIN}{year_passage_block(hits)}\n\n", 1)
+    note = " ".join(str(premise_note or "").split())
+    premise = f" {PREMISE_OPEN}{note}{PREMISE_CLOSE}" if note else ""
+    return prompt[:-len(_ANSWER_SUFFIX)] + premise + _V3_TAIL
+
+
+def is_v3_prompt(prompt: str, with_retry: bool = False) -> bool:
+    """True for a prompt built by `reader_prompt_v3`; with `with_retry` also for its retry prompt."""
+    return bool(prompt) and prompt.endswith((_V3_TAIL, _RETRY_TAIL) if with_retry else _V3_TAIL)
+
+
+def prompt_premise(prompt: str) -> Optional[str]:
+    """The premise note a v3 prompt or its retry prompt carries after the question block, else None."""
+    for tail in (_V3_TAIL, _RETRY_TAIL):
+        if prompt and prompt.endswith(tail):
+            body = prompt[:-len(tail)]
+            start = body.rfind(f" {PREMISE_OPEN}")
+            if body.endswith(PREMISE_CLOSE) and start > body.rfind(_QUESTION_END):
+                return body[start + 1 + len(PREMISE_OPEN):-len(PREMISE_CLOSE)] or None
+    return None
+
+
+def mark_topic_hits(plan: QueryPlan, store: KnowledgeStore, hits: Sequence[SearchHit]) -> List[SearchHit]:
+    """The served hits; a hit with one of the plan's events, sectors, themes or companies among the annotation tags
+    of its passages (its own id or a `merged_ids` one) is a copy with TOPIC_FLAG set. Ids, text and order stay."""
+    wanted = {"events": set(plan.events), "sectors": set(plan.sectors), "themes": set(plan.themes),
+              "companies": set(plan.companies)}
+
+    def tagged(pid: str) -> bool:
+        ann = store.annotation(pid) or {}
+        return any(values.intersection(ann.get(name) or ()) for name, values in wanted.items())
+
+    return [SearchHit(h.id, h.text, {**h.metadata, TOPIC_FLAG: True}, h.score)
+            if any(tagged(pid) for pid in (h.id, *(h.metadata.get("merged_ids") or ()))) else h
+            for h in hits]
+
+
+# a sentence end: . ! or ?, closing quotes or brackets, citation markers, then space before the next sentence
+_SENTENCE_BREAK_RE = re.compile(r"(?<=[.!?])[\"'”’)]*(?:\s*\[\d+(?:\s*,\s*\d+)*\])*(?=\s+[^\s\[])")
+_ABBREVIATION_END_RE = re.compile(r"(?:^|[^A-Za-z])(?:[A-Z]|Mr|Mrs|Ms|Dr|St|Jr|Sr|Co|Inc|Corp|Ltd|No|vs)\.$")
+_LIST_PREFIX_RE = re.compile(r"^\s*(?:[-*•]|\d+\.)\s+")
+_YEAR_TOKEN_RE = re.compile(r"^(?:18|19|20)\d\d")
+_PREMISE_STOP = {"the", "a", "an", "of", "in", "on", "at", "and", "or", "to", "was", "were", "is", "are", "it", "its",
+                 "them", "they", "that", "this", "but", "from", "do", "does", "did", "not", "no", "s"}
+
+
+def _sentence_spans(line: str) -> List[Tuple[int, int]]:
+    """(start, end) of each sentence of a line, its closing quotes and markers included; "U.S." or "Mr." does not end
+    one."""
+    spans: List[Tuple[int, int]] = []
+    start = 0
+    for m in _SENTENCE_BREAK_RE.finditer(line):
+        if not m.group() and _ABBREVIATION_END_RE.search(line[start:m.start()]):
+            continue
+        spans.append((start, m.end()))
+        start = m.end()
+        while start < len(line) and line[start].isspace():
+            start += 1
+    spans.append((start, len(line)))
+    return [(a, b) for a, b in spans if line[a:b].strip()]
+
+
+def _sentence_key(sentence: str) -> str:
+    """A sentence as the dedupe compares it: no markers, list prefix, case or punctuation (quotes and dashes too)."""
+    text = _LIST_PREFIX_RE.sub("", _CITE_RE.sub(" ", sentence)).lower()
+    return " ".join(re.sub(r"[^\w\s]|_", " ", text).split())
+
+
+def dedupe_sentences(text: str) -> Tuple[str, List[str]]:
+    """(text, dropped): a sentence whose normalised text (`_sentence_key`) repeats an earlier one is dropped, the first
+    kept; a sentence under DEDUPE_MIN_WORDS words always stays. A line left empty goes and the blank lines around it
+    collapse; a text without a repeat comes back unchanged."""
+    seen: set = set()
+    dropped: List[str] = []
+    lines: List[str] = []
+    for line in str(text or "").split("\n"):
+        prefix = _LIST_PREFIX_RE.match(line)
+        head = prefix.group() if prefix else ""
+        body = line[len(head):]
+        kept, repeats = [], 0
+        for a, b in _sentence_spans(body):
+            sentence = body[a:b].strip()
+            key = _sentence_key(sentence)
+            if len(key.split()) >= DEDUPE_MIN_WORDS:
+                if key in seen:
+                    dropped.append(sentence)
+                    repeats += 1
+                    continue
+                seen.add(key)
+            kept.append(sentence)
+        if not repeats:
+            lines.append(line)
+        elif kept:
+            lines.append(head + " ".join(kept))
+    if not dropped:
+        return text, []
+    return re.sub(r"\n{3,}", "\n\n", "\n".join(lines)).strip(), dropped
+
+
+def is_premise_line(sentence: str, premise: str) -> bool:
+    """The sentence restates the premise note: it names one of the note's years or decades, at least half of its
+    content words are the note's, and it has no money or percent figure."""
+    words = [w for w in _sentence_key(sentence).split() if w not in _PREMISE_STOP]
+    if not words or len(words) > PREMISE_LINE_MAX_WORDS or _GAP_FIGURE.search(sentence):
+        return False
+    note = set(_sentence_key(premise).split())
+    shared = [w for w in words if w in note]
+    return any(_YEAR_TOKEN_RE.match(w) for w in shared) and len(shared) * 2 >= len(words)
+
+
+def strip_premise_line(answer: str, premise: Optional[str]) -> str:
+    """The answer without its first sentence when that one is uncited and restates the premise (`is_premise_line`):
+    the planner's note goes first instead (`with_premise`), so no premise wording of the model's own is kept."""
+    if not premise or not answer:
+        return answer
+    lines = answer.split("\n")
+    first = next((i for i, line in enumerate(lines) if line.strip()), None)
+    if first is None:
+        return answer
+    spans = _sentence_spans(lines[first])
+    sentence = lines[first][spans[0][0]:spans[0][1]]
+    if _CITE_RE.search(sentence) or not is_premise_line(sentence, premise):
+        return answer
+    lines[first] = lines[first][spans[1][0]:] if len(spans) > 1 else ""
+    return "\n".join(lines).strip()
+
+
+def with_premise(answer: str, premise: Optional[str]) -> str:
+    """The premise note first, then the answer (a list after a blank line); the refusal line stays alone."""
+    if not premise or not answer or answer == REFUSAL_LINE:
+        return answer
+    sep = "\n\n" if _LIST_PREFIX_RE.match(answer) else " "
+    return f"{premise}{sep}{answer}"
+
+
+def model_refused(raw_answer: str, premise: Optional[str] = None) -> bool:
+    """The model's answer holds the refusal line, or is nothing but a premise sentence."""
+    text = " ".join(_CITE_RE.sub(" ", str(raw_answer or "")).split())
+    if _sentence_key(REFUSAL_LINE) in _sentence_key(text):
+        return True
+    return bool(premise and text) and not strip_premise_line(text, premise)
+
+
+def partial_retry_prompt(prompt: str, raw_answer: str, hits: Sequence[SearchHit]) -> Optional[str]:
+    """The prompt of the one partial retry, or None. Only a v3 prompt gets one, when the model refused
+    (`model_refused`) while the prompt carries a premise note or a served hit carries the plan's topic tags
+    (TOPIC_FLAG). The retry keeps the system prompt, the passages, the question and the premise correction, and asks
+    for the covered part with RETRY_INSTRUCTIONS, which are shorter than V3_INSTRUCTIONS: the retry prompt fits the
+    reader window wherever the first prompt did."""
+    if not is_v3_prompt(prompt):
+        return None
+    premise = prompt_premise(prompt)
+    if not model_refused(raw_answer, premise) or not (premise or any(h.metadata.get(TOPIC_FLAG) for h in hits)):
+        return None
+    return prompt[:-len(_V3_TAIL)] + _RETRY_TAIL
 
 
 # --- scope ---
