@@ -1236,7 +1236,7 @@ def build_notebook(train_lines, valid_lines, opts):
              md_cell(EXPORT_SCRIPT_MD), code_cell(EXPORT_SCRIPT_PY), md_cell(EXPORT_RUN_MD), g(EXPORT_RUN_PY),
              md_cell(FINISH_MD), g(FINISH_PY), md_cell(RELEASE_MD), g(RELEASE_PY)]
     return {'nbformat': 4, 'nbformat_minor': 0,
-            'metadata': {'accelerator': 'GPU', 'colab': {'gpuType': 'A100', 'machine_shape': 'hm', 'provenance': []},
+            'metadata': {'accelerator': 'GPU', 'colab': {'gpuType': opts.get('gpu', 'A100'), 'machine_shape': 'hm', 'provenance': []},
                          'kernelspec': {'name': 'python3', 'display_name': 'Python 3'}, 'language_info': {'name': 'python'}},
             'cells': cells}
 
@@ -1247,6 +1247,7 @@ def main():
     ap.add_argument('--valid', help='valid.jsonl')
     ap.add_argument('--fixture', action='store_true', help='placeholder notebook from synthetic rows; it refuses to train')
     ap.add_argument('--out', default=None)
+    ap.add_argument('--gpu', default='A100', choices=['A100', 'H100'], help='Colab accelerator (A100 was unavailable once and Colab handed out an L4)')
     ap.add_argument('--smoke', action='store_true', help='smoke notebook: SMOKE = True and only the 20 + 6 rows the smoke uses')
     ap.add_argument('--run-name', default='r4')
     ap.add_argument('--epochs', type=int, default=2)
@@ -1268,7 +1269,7 @@ def main():
         pins = {k: versions[k] for k in PIN_KEYS}
     out = Path(a.out) if a.out else (DEFAULT_OUT.with_name('train_gemma4_12b_r4_smoke.ipynb') if a.smoke else DEFAULT_OUT)
     opts = {'run_name': a.run_name, 'smoke': a.smoke, 'epochs': a.epochs, 'save_steps': a.save_steps, 'eval_steps': a.eval_steps or a.save_steps,
-            'pins': pins, 'max_seq': a.max_seq, 'tokenizer_dir': a.tokenizer_dir, 'source': 'fixture' if a.fixture else 'rows'}
+            'pins': pins, 'max_seq': a.max_seq, 'tokenizer_dir': a.tokenizer_dir, 'source': 'fixture' if a.fixture else 'rows', 'gpu': a.gpu}
     nb = build_notebook(train_lines, valid_lines, opts)
     out.write_text(json.dumps(nb, indent=1, ensure_ascii=False) + '\n')
     print(f"wrote {out} ({out.stat().st_size / 2**20:.2f} MiB), {len(nb['cells'])} cells, source={opts['source']}, smoke={a.smoke}")
