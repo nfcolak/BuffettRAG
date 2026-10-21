@@ -249,6 +249,8 @@ FINANCE_DEFAULTS: dict = {
     "FINANCE_WINDOW_PACK": 2,          # 1: drop merged neighbours of low-ranked hits before whole hits; 2: also shorten them (finance-recall-75-r4: 0 -> 2)
     "FINANCE_DECADE_BLOCKS": 0,        # corpus-wide/trend plans: top M per decade block as extra candidates (0 = off)
     "FINANCE_SUPERLATIVE_RERANK": 0,   # superlative route: serve the top N winner passages by cross-encoder score (0 = off)
+    "FINANCE_PREMISE_CHECK": 0,        # 1: plan.premise_note when the asked period misses the event / topic years
+    "FINANCE_ANSWER_V3": 0,            # 1: year-grouped evidence pack, premise sentence, dedupe, partial retry
 }
 
 
