@@ -144,6 +144,8 @@ def expected_prompt_version(model_path, sha256: Optional[str] = None) -> Optiona
     """Prompt version the model was trained on (None for a model the registry does not know)."""
     if sha256 and sha256.lower() in MODEL_SHA256_PROMPT_VERSION:
         return MODEL_SHA256_PROMPT_VERSION[sha256.lower()]
+    if "gemma" in os.path.basename(str(model_path)).lower():
+        return None  # the ft-r<N> numbering is the Qwen series': a Gemma GGUF serves the PROMPT_VERSION it is deployed with
     match = _FT_ROUND_RE.search(os.path.basename(str(model_path)))
     return _FT_ROUND_PROMPT_VERSION.get(match.group(1)) if match else None
 
