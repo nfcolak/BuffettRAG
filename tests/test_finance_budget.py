@@ -10,6 +10,7 @@ from fastapi.testclient import TestClient
 
 from config import FINANCE_DEFAULTS
 from src.knowledge import KnowledgeStore
+from src.generation.token_count import reader_window_tokens
 from src.retrieval.finance_policy import (finance_search, kind_budget, rerank_depth, reader_window_chars,
                                           served_budget)
 from src.services import ask_flow, backend_app as backend
@@ -48,10 +49,10 @@ def test_new_follow_up_setting_defaults_off():
 def test_served_budget_follows_the_plan_kind(monkeypatch):
     monkeypatch.setenv("LLM_CONTEXT_PASSAGES", "8")
     kinds = ("trend", "corpus_wide", "period", "comparison", "specific", "numeric")
-    # the adopted defaults: 32 for trend, period and comparison plans (finance-recall-75, task 5.1), 32 for corpus-wide
-    # and 21 for specific and numeric plans (finance-recall-75-r2, task 4.1)
-    assert [served_budget(_plan(k)) for k in kinds] == [32, 32, 32, 32, 21, 21]
-    assert [kind_budget(_plan(k)) for k in kinds] == [32, 32, 32, 32, 21, 21]
+    # the adopted defaults: 32 for trend plans (finance-recall-75, task 5.1), 32 for corpus-wide (finance-recall-75-r2,
+    # task 4.1), 40 for period and comparison plans and 32 for specific and numeric plans (finance-recall-75-r3, task 4.1)
+    assert [served_budget(_plan(k)) for k in kinds] == [32, 32, 40, 40, 32, 32]
+    assert [kind_budget(_plan(k)) for k in kinds] == [32, 32, 40, 40, 32, 32]
     for name in ("FINANCE_K_TREND", "FINANCE_K_CORPUS", "FINANCE_K_PERIOD", "FINANCE_K_SPECIFIC"):
         monkeypatch.setenv(name, "0")  # 0: the kind keeps today's budget
     assert [served_budget(_plan(k)) for k in kinds] == [8] * 6 and [kind_budget(_plan(k)) for k in kinds] == [0] * 6
@@ -149,7 +150,14 @@ def test_the_default_trend_budget_is_the_adopted_one_and_fits_the_window(flow, m
     monkeypatch.setenv("LLM_CONTEXT_PASSAGES", "4")
     route = _route()
     assert route.plan.kind == "trend" and route.debug["k"] == FINANCE_DEFAULTS["FINANCE_K_TREND"] == 32
-    assert len(route.hits) == len(flow.docs) and route.debug["window_trimmed"] == 0  # 24 passages fit the window
+    # the token-counted window is the default (finance-recall-75-r3): the 24 passages are cut, lowest ranks first,
+    # until the prompt fits it (these made-up words take more tokens than characters / 4)
+    assert FINANCE_DEFAULTS["FINANCE_WINDOW_TOKENS"] == 1 and "window_chars" not in route.debug
+    assert 4 <= len(route.hits) <= len(flow.docs) and route.debug["window_trimmed"] == len(flow.docs) - len(route.hits)
+    assert route.debug["prompt_tokens"] <= route.debug["window_tokens"] == reader_window_tokens(900)
+    monkeypatch.setenv("FINANCE_WINDOW_TOKENS", "0")  # the character window: the 24 passages fit
+    route = _route()
+    assert len(route.hits) == len(flow.docs) and route.debug["window_trimmed"] == 0
     assert len(route.prompt) <= route.debug["window_chars"]
 
 
@@ -165,6 +173,7 @@ def test_a_trend_budget_serves_more_passages(flow, monkeypatch):
 
 
 def test_the_extra_passages_are_cut_to_fit_the_reader_window_lowest_rank_first(flow, monkeypatch):
+    monkeypatch.setenv("FINANCE_WINDOW_TOKENS", "0")  # the character window (the token window: test_finance_window_tokens.py)
     monkeypatch.setenv("LLM_CONTEXT_PASSAGES", "4")
     monkeypatch.setenv("FINANCE_K_TREND", "12")
     full = _route()
@@ -187,6 +196,7 @@ def test_the_window_never_cuts_below_todays_budget(flow, monkeypatch):
 
 
 def test_the_window_uses_the_requests_answer_budget(flow, monkeypatch):
+    monkeypatch.setenv("FINANCE_WINDOW_TOKENS", "0")  # the character window (the token window: test_finance_window_tokens.py)
     monkeypatch.setenv("LLM_CONTEXT_PASSAGES", "4")
     monkeypatch.setenv("FINANCE_K_TREND", "12")
     monkeypatch.setenv("LLM_N_CTX", "6000")

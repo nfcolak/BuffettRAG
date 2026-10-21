@@ -97,7 +97,8 @@ def _clean_env(monkeypatch):
     for name in ("FINANCE_SUMMARY_SOURCE", "FINANCE_YEAR_BOOST_WEIGHT", "FINANCE_K", "LLM_CONTEXT_PASSAGES",
                  "HYBRID_VECTOR_WEIGHT", "HYBRID_BM25_WEIGHT", "KNOWLEDGE_DIR"):
         monkeypatch.delenv(name, raising=False)
-    for name in ("FINANCE_SUMMARY_SOURCE", "FINANCE_TAGGED_SOURCE", "FINANCE_DIGEST_SOURCE", "FINANCE_STANCE_SOURCE"):
+    for name in ("FINANCE_SUMMARY_SOURCE", "FINANCE_TAGGED_SOURCE", "FINANCE_DIGEST_SOURCE", "FINANCE_STANCE_SOURCE",
+                 "FINANCE_MULTI_QUERY", "FINANCE_DIGEST_QUERY"):
         monkeypatch.setenv(name, "0")  # every source off; a test turns on the one it checks
     monkeypatch.setenv("RETRIEVAL_DEDUP", "0")
     summary_source.reset_cache()

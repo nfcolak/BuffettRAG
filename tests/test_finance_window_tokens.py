@@ -118,7 +118,7 @@ def tiny_tokenizer_file(path: Path) -> Path:
 
 # --- the settings and the margin ---
 def test_the_setting_key_exists_and_the_margin_is_64_tokens():
-    assert "FINANCE_WINDOW_TOKENS" in FINANCE_DEFAULTS
+    assert FINANCE_DEFAULTS["FINANCE_WINDOW_TOKENS"] == 1  # adopted by finance-recall-75-r3 group 4 (task 4.1)
     assert token_count.WINDOW_MARGIN_TOKENS == 64
 
 
@@ -143,6 +143,7 @@ def test_the_server_counts_when_the_setting_is_on(stub, monkeypatch):
 
 
 def test_the_server_is_not_asked_while_the_setting_is_off(stub, monkeypatch):
+    monkeypatch.setenv("FINANCE_WINDOW_TOKENS", "0")
     monkeypatch.setenv("REMOTE_LLM_URL", stub.url)
     fake = use_tokenizer(monkeypatch, FakeTokenizer())
     assert token_count.count_tokens_and_source("abcd" * 10) == (20, "tokenizer")
@@ -318,6 +319,7 @@ def test_the_trim_counts_tokens_and_keeps_the_margin_free(flow, monkeypatch):
 
 
 def test_a_number_dense_prompt_that_the_character_window_keeps_is_trimmed_by_tokens(flow, monkeypatch):
+    monkeypatch.setenv("FINANCE_WINDOW_TOKENS", "0")
     full = _route()  # the character path, a large window: all 12 passages
     assert len(full.hits) == 12
     monkeypatch.setenv("LLM_N_CTX", str(900 + len(full.prompt) // 4 + 1))  # just wide enough in characters
@@ -354,6 +356,7 @@ def test_without_any_tokenizer_the_trim_counts_characters_over_four(flow, monkey
 
 
 def test_the_setting_off_keeps_the_character_trim_and_its_debug(flow, monkeypatch):
+    monkeypatch.setenv("FINANCE_WINDOW_TOKENS", "0")
     fake = use_tokenizer(monkeypatch, FakeTokenizer())
     monkeypatch.setenv("LLM_N_CTX", "6000")
     route = _route()

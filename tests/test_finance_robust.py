@@ -21,7 +21,8 @@ from test_finance_policy import FakeRetriever, _hit, _plan  # noqa: E402
 
 FIX = Path(__file__).parent / "fixtures" / "knowledge_mini"
 APP = Path(__file__).resolve().parent.parent / "deploy" / "modal" / "app.py"
-SOURCE_SETTINGS = ("FINANCE_SUMMARY_SOURCE", "FINANCE_TAGGED_SOURCE", "FINANCE_DIGEST_SOURCE", "FINANCE_STANCE_SOURCE")
+SOURCE_SETTINGS = ("FINANCE_SUMMARY_SOURCE", "FINANCE_TAGGED_SOURCE", "FINANCE_DIGEST_SOURCE", "FINANCE_STANCE_SOURCE",
+                   "FINANCE_MULTI_QUERY", "FINANCE_DIGEST_QUERY")  # the multi-query source is on by default since finance-recall-75-r3
 SPECIFIC_Q = "What did Buffett say about bonds?"
 
 
@@ -151,7 +152,7 @@ def test_every_search_reports_empty_source_debug_when_no_source_runs(store):
 
 # --- 1.2 FINANCE_K_SPECIFIC ---
 def test_the_specific_budget_defaults_to_the_adopted_value():
-    assert FINANCE_DEFAULTS["FINANCE_K_SPECIFIC"] == 21  # finance-recall-75-r2, task 4.1
+    assert FINANCE_DEFAULTS["FINANCE_K_SPECIFIC"] == 32  # finance-recall-75-r3, task 4.1 (21 in round 2)
 
 
 def test_the_specific_budget_is_read_by_specific_and_numeric_plans_only(monkeypatch):
@@ -159,14 +160,15 @@ def test_the_specific_budget_is_read_by_specific_and_numeric_plans_only(monkeypa
     monkeypatch.setenv("FINANCE_K_CORPUS", "0")    # corpus_wide: the kind without a budget of its own here
     monkeypatch.setenv("FINANCE_K_SPECIFIC", "0")  # off
     kinds = ("trend", "corpus_wide", "period", "comparison", "specific", "numeric")
-    assert [kind_budget(_plan(k)) for k in kinds] == [32, 0, 32, 32, 0, 0]  # off: today's budget
+    # period and comparison plans: FINANCE_K_PERIOD, 40 since finance-recall-75-r3
+    assert [kind_budget(_plan(k)) for k in kinds] == [32, 0, 40, 40, 0, 0]  # off: today's budget
     monkeypatch.setenv("FINANCE_K_SPECIFIC", "24")
-    assert [kind_budget(_plan(k)) for k in kinds] == [32, 0, 32, 32, 24, 24]
-    assert [served_budget(_plan(k)) for k in kinds] == [32, 8, 32, 32, 24, 24]
+    assert [kind_budget(_plan(k)) for k in kinds] == [32, 0, 40, 40, 24, 24]
+    assert [served_budget(_plan(k)) for k in kinds] == [32, 8, 40, 40, 24, 24]
     monkeypatch.setenv("FINANCE_K", "12")  # FINANCE_K stays the fallback of a kind without its own setting
-    assert [served_budget(_plan(k)) for k in kinds] == [32, 12, 32, 32, 24, 24]
+    assert [served_budget(_plan(k)) for k in kinds] == [32, 12, 40, 40, 24, 24]
     monkeypatch.setenv("FINANCE_K_SPECIFIC", "0")
-    assert [served_budget(_plan(k)) for k in kinds] == [32, 12, 32, 32, 12, 12]
+    assert [served_budget(_plan(k)) for k in kinds] == [32, 12, 40, 40, 12, 12]
 
 
 def test_finance_search_serves_the_specific_budget(store, monkeypatch):
@@ -209,6 +211,7 @@ def test_a_specific_route_serves_the_specific_budget_and_leaves_todays_without_i
 
 
 def test_the_specific_budget_is_capped_by_the_reader_window_lowest_rank_first(flow, monkeypatch):
+    monkeypatch.setenv("FINANCE_WINDOW_TOKENS", "0")  # the character window (the token window: test_finance_window_tokens.py)
     monkeypatch.setenv("LLM_CONTEXT_PASSAGES", "4")
     monkeypatch.setenv("FINANCE_K_SPECIFIC", "12")
     full = _route()

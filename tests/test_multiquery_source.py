@@ -29,9 +29,11 @@ OVERVIEW = "Buffett backs repurchases below value. He refuses them above it. A t
 
 @pytest.fixture(autouse=True)
 def _clean_env(monkeypatch):
-    for name in (*SETTINGS, "FINANCE_K", "FINANCE_OVERFETCH", "FINANCE_TAG_DEPTH", "FINANCE_TAG_POOL",
+    for name in ("FINANCE_K", "FINANCE_OVERFETCH", "FINANCE_TAG_DEPTH", "FINANCE_TAG_POOL",
                  "FINANCE_YEAR_BOOST_WEIGHT", "LLM_CONTEXT_PASSAGES", "FINANCE_RERANK_CANDIDATES"):
         monkeypatch.delenv(name, raising=False)
+    for name in SETTINGS:  # both off (FINANCE_MULTI_QUERY defaults to 1 since finance-recall-75-r3): a test turns on what it checks
+        monkeypatch.setenv(name, "0")
     for name in OTHER_SOURCES:  # the other sources off: a test sees only what this source adds
         monkeypatch.setenv(name, "0")
     monkeypatch.setenv("RETRIEVAL_DEDUP", "0")
@@ -95,11 +97,17 @@ def _deep(year, n):  # ranks 30-59 of the corpus order: not pooled by finance_se
 
 
 # --- registry and settings ---
-def test_both_settings_registered_last_off_by_default(monkeypatch):
+def test_both_settings_registered_last_with_the_adopted_defaults(monkeypatch):
     assert ks.SOURCES[-2:] == mq.SOURCES
     assert [name for name, _ in mq.SOURCES] == list(SETTINGS)
-    assert [FINANCE_DEFAULTS[name] for name in SETTINGS] == [0, 0]
-    assert all(finance_setting(name) == 0 for name in SETTINGS)
+    for name in SETTINGS:
+        monkeypatch.delenv(name)
+    # finance-recall-75-r3 group 4: one multi-query search passed the adoption rule, the digest query did not
+    assert [FINANCE_DEFAULTS[name] for name in SETTINGS] == [1, 0]
+    assert [finance_setting(name) for name in SETTINGS] == [1, 0]
+    assert [name for name, _ in candidate_sources() if name in SETTINGS] == ["FINANCE_MULTI_QUERY"]
+    for name in SETTINGS:
+        monkeypatch.setenv(name, "0")
     assert not [name for name, _ in candidate_sources() if name in SETTINGS]
     monkeypatch.setenv("FINANCE_MULTI_QUERY", "2")
     assert [name for name, _ in candidate_sources() if name in SETTINGS] == ["FINANCE_MULTI_QUERY"]

@@ -218,25 +218,28 @@ FINANCE_DEFAULTS: dict = {
     # ones that raised dev served gold without lowering heldout_v6 and still add gold in the combination; the rest stay
     # off or at today's value. finance-recall-75-r2 group 4 applied the same rule to the round-2 settings below (and
     # FINANCE_MAX_PER_LETTER / FINANCE_K_CORPUS); summary fusion, source slots and the stance source stay off.
+    # finance-recall-75-r3 group 4 adopted the token-counted window, K_SPECIFIC 32, K_PERIOD 40, summary fusion 1 and
+    # one multi-query search (dev anchors 65.4 -> 72.6, heldout_v6 71.5 -> 72.6); the digest query and the superlative
+    # tagged passages stay off.
     "FINANCE_SUMMARY_SOURCE": 1,       # 1: candidates from the annotation-summary index (summary_source.py)
     "FINANCE_TAGGED_SOURCE": 1,        # 1: passages tagged with the plan's / inferred sectors, companies, events, themes (knowledge_source.py)
     "FINANCE_DIGEST_SOURCE": 1,        # 1: digest timeline source passages for trend / corpus-wide questions (knowledge_source.py)
     "FINANCE_STANCE_SOURCE": 0,        # 1: passages with a stance on the plan's sector or company (knowledge_source.py)
     "FINANCE_K_TREND": 32,             # served passages for a trend plan; 0 = today's budget (FINANCE_K / llm_context_passages())
     "FINANCE_K_CORPUS": 32,            # served passages for a corpus-wide plan (and the superlative route); 0 = today's budget
-    "FINANCE_K_PERIOD": 32,            # served passages for a period / comparison plan; 0 = today's budget
+    "FINANCE_K_PERIOD": 40,            # served passages for a period / comparison plan; 0 = today's budget (finance-recall-75-r3: 32 -> 40)
     "FINANCE_RERANK_CANDIDATES": 30,   # candidates sent to the cross-encoder on the finance path (today: RERANK_CANDIDATES)
     "FINANCE_FOLLOWUP_HISTORY": 0,     # 1: a short / referential follow-up to a financial question is planned on that question, never scope-replied for being short (ask_flow.py)
     # served passages for a specific / numeric plan, capped by the reader window like the trend budget; 0 = today's budget.
-    # 21, not more: the character window does not bound number-dense prompts (~3.1 chars per Qwen token), so the
-    # passage count does; 21 keeps them >1,000 tokens under the window, 22 left 95 tokens and 24 overflowed.
-    "FINANCE_K_SPECIFIC": 21,
-    "FINANCE_SUMMARY_FUSE_WEIGHT": 0,  # RRF weight of the summary ranking fused into the candidate order (0 = off)
+    # 32 since finance-recall-75-r3: the token-counted window (FINANCE_WINDOW_TOKENS) bounds number-dense prompts
+    # (~3.1 chars per Qwen token), which the character window did not (round 2 kept 21 for that reason; 24 overflowed it).
+    "FINANCE_K_SPECIFIC": 32,
+    "FINANCE_SUMMARY_FUSE_WEIGHT": 1,  # RRF weight of the summary ranking fused into the candidate order (0 = off; finance-recall-75-r3: 1)
     "FINANCE_THEME_CENTROIDS": 1,      # 1: theme inference also matches tagged-passage summary centroids
     "FINANCE_SOURCE_SLOTS": 0,         # served slots reserved for source candidates below the rerank cut
     "FINANCE_PLAN_TERM_BOOST": 5,      # integer, hundredths (5 = +0.05): rerank score bonus for candidates tagged with the plan's targets (0 = off)
-    "FINANCE_WINDOW_TOKENS": 0,        # 1: finance reader trim counts tokens (server /tokenize, else tokenizer.json, else chars/4)
-    "FINANCE_MULTI_QUERY": 0,          # extra theme-description searches for view/opinion plans (0 = off)
+    "FINANCE_WINDOW_TOKENS": 1,        # 1: finance reader trim counts tokens (server /tokenize, else tokenizer.json, else chars/4); 0: characters / 4
+    "FINANCE_MULTI_QUERY": 1,          # extra theme searches for view/opinion plans (0 = off; N = 1, 2 and 3 measured the same)
     "FINANCE_DIGEST_QUERY": 0,         # 1: one extra search with the matching digest's summary as the query
     "FINANCE_SUPERLATIVE_TAGGED": 0,   # superlative route: serve up to N positive-stance passages of the winner (0 = off)
 }

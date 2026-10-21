@@ -125,14 +125,16 @@ def _hit(pid):
 
 
 def test_the_new_settings_default_to_the_adopted_values():
-    # finance-recall-75-r2 group 4: the centroids passed the adoption rule, the fusion did not
-    assert FINANCE_DEFAULTS["FINANCE_SUMMARY_FUSE_WEIGHT"] == 0
+    # finance-recall-75-r2 group 4: the centroids passed the adoption rule, the fusion did not; finance-recall-75-r3
+    # group 4: under the token-counted window the fusion at weight 1 passed it too
+    assert FINANCE_DEFAULTS["FINANCE_SUMMARY_FUSE_WEIGHT"] == 1
     assert FINANCE_DEFAULTS["FINANCE_THEME_CENTROIDS"] == 1
 
 
 # --- FINANCE_SUMMARY_FUSE_WEIGHT -----------------------------------------------------------------------------------
 def test_fusion_promotes_a_pooled_passage_whose_summary_matches(kdir, store, monkeypatch):
     pool = [_hit(_pid(i, 1)) for i in range(5)]  # theme 4's passage is pooled last
+    monkeypatch.setenv("FINANCE_SUMMARY_FUSE_WEIGHT", "0")
     assert fuse_summary(pool, _plan("summ4"), store, Retriever(), "summ4") == pool  # weight 0: unchanged
     monkeypatch.setenv("FINANCE_SUMMARY_FUSE_WEIGHT", "1")
     fused = fuse_summary(pool, _plan("summ4"), store, Retriever(), "summ4")
