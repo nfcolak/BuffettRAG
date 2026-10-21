@@ -65,11 +65,13 @@ def cells(nb, kind='code'):
 def code(nb, marker):
     found = [c for c in cells(nb) if marker in c]
     assert len(found) == 1, (marker, len(found))
-    return found[0]
+    return found[0][len('%%guarded\n'):] if found[0].startswith('%%guarded\n') else found[0]
 
 
 def body(src):
     """The Python a code cell holds: a %%writefile cell is the file after its first line."""
+    if src.startswith('%%guarded\n'):
+        return src.split('\n', 1)[1]
     return src.split('\n', 1)[1] if src.startswith('%%writefile') else src
 
 
@@ -961,7 +963,7 @@ class Harness:
                 head, text = src.split('\n', 1)
                 Path(head.split()[1]).write_text(text)
                 continue
-            exec(compile(src, 'cell', 'exec'), ns)
+            exec(compile(body(src), 'cell', 'exec'), ns)
             if 'import r4_common as C' in src:
                 self.patch_common(ns['C'])
         return ns
@@ -1099,3 +1101,12 @@ def test_gguf_summary_reads_architecture_file_type_tensors_and_the_chat_template
     summary = C.gguf_summary(str(path), str(tmp_path / 'no_llama_checkout'))              # falls back to the installed gguf-py
     assert summary == {'architecture': 'gemma4', 'file_type': 15, 'tensors': 1, 'chat_template_sha256': hashlib.sha256(template.encode()).hexdigest(),
                        'chat_template_has_turn_marker': True}
+
+
+def test_kernel_cells_are_guarded_and_failures_print_plain_text(nb_fixture):
+    """Smoke lesson: an error output hides the log tail in a cross-origin iframe; kernel cells run through %%guarded."""
+    s = code(nb_fixture, 'RUN_NAME = ')
+    assert 'def guarded(line, cell)' in s and "'CELL_FAILED '" in s and 'failure.json' in s
+    kernel = [c for c in cells(nb_fixture) if not c.startswith('%%writefile')][1:]
+    kernel = [c for c in kernel if not c.startswith('# @title')]
+    assert kernel and all(c.startswith('%%guarded\n') for c in kernel), [c[:40] for c in kernel if not c.startswith('%%guarded')]

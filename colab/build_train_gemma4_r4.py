@@ -75,6 +75,34 @@ try:
     os.makedirs('/content/work', exist_ok=True)  # the %%writefile cells below need the folder (IPython does not create it)
 except OSError:
     pass  # not on Colab (local stub tests)
+FAILED = None
+try:
+    from IPython.core.magic import register_cell_magic
+
+    @register_cell_magic
+    def guarded(line, cell):
+        """Run the cell; on failure write the traceback as plain text and stop every later guarded cell.
+
+        Smoke lesson: an error output makes Colab render the whole cell output in a cross-origin iframe, so the log tail
+        printed before the error could not be read from Chrome. The failing cell therefore ends without an error output,
+        its message also goes to Drive as failure.json, and the next guarded cell raises to stop Run all."""
+        import sys, traceback
+        ns = get_ipython().user_ns
+        if ns.get('FAILED'):
+            raise RuntimeError('stopped: an earlier cell failed, its plain-text output says why: ' + ns['FAILED'])
+        try:
+            exec(compile(cell, '<cell>', 'exec'), ns)
+        except BaseException as e:
+            text = traceback.format_exc()
+            ns['FAILED'] = (type(e).__name__ + ': ' + str(e))[:300]
+            sys.stdout.write('CELL_FAILED ' + ns['FAILED'] + '\n' + text[-4000:] + '\n')
+            if ns.get('STORE') is not None:
+                try:
+                    ns['STORE'].write_json('failure.json', {'error': ns['FAILED'], 'traceback': text[-20000:]})
+                except Exception:
+                    pass
+except Exception:
+    pass  # not in IPython (local stub tests)
 RUN_NAME = '@@RUN_NAME@@'              # drives the Drive folder, the GGUF name and every record
 SMOKE = @@SMOKE@@                    # True: 20 rows, 10 steps, Drive round trip, export check, no GGUF upload; writes pins_resolved.json + smoke_report.json
 RESUME = False                       # True: continue from the newest complete checkpoint on Drive (after a disconnect)
@@ -1161,6 +1189,14 @@ def fill(template, values):
     return template
 
 
+GUARD = '%%guarded\n'
+
+
+def g(source):
+    """A kernel cell run through the %%guarded magic of the settings cell."""
+    return code_cell(GUARD + source)
+
+
 def build_notebook(train_lines, valid_lines, opts):
     """Notebook dict from the jsonl lines of both splits. opts: run_name, smoke, epochs, save_steps, eval_steps, pins, max_seq, tokenizer_dir, source."""
     C = load_common()
@@ -1194,11 +1230,11 @@ def build_notebook(train_lines, valid_lines, opts):
                  for sp, name in (('train', 'DATA_TRAIN_B64'), ('valid', 'DATA_VALID_B64'))]
     meta_cell = hidden_code_cell('DATA_META = ' + repr(meta) + '\n', 'what the builder recorded about the rows')
     cells = [md_cell(TOP_MD), md_cell(SETTINGS_MD), code_cell(settings), md_cell(DATA_MD), *b64_cells, meta_cell,
-             code_cell(COMMON_PY), code_cell(IMPORT_COMMON_PY), md_cell(UNPACK_MD), code_cell(UNPACK_PY), code_cell(EFFECTIVE_PY),
-             md_cell(GPU_MD), code_cell(GPU_PY), md_cell(DRIVE_MD), code_cell(DRIVE_PY), md_cell(INSTALL_MD), code_cell(INSTALL_PY),
-             md_cell(TRAIN_SCRIPT_MD), code_cell(TRAIN_SCRIPT_PY), md_cell(TRAIN_RUN_MD), code_cell(TRAIN_RUN_PY), md_cell(SMOKE_MD), code_cell(SMOKE_PY),
-             md_cell(EXPORT_SCRIPT_MD), code_cell(EXPORT_SCRIPT_PY), md_cell(EXPORT_RUN_MD), code_cell(EXPORT_RUN_PY),
-             md_cell(FINISH_MD), code_cell(FINISH_PY), md_cell(RELEASE_MD), code_cell(RELEASE_PY)]
+             code_cell(COMMON_PY), g(IMPORT_COMMON_PY), md_cell(UNPACK_MD), g(UNPACK_PY), g(EFFECTIVE_PY),
+             md_cell(GPU_MD), g(GPU_PY), md_cell(DRIVE_MD), g(DRIVE_PY), md_cell(INSTALL_MD), g(INSTALL_PY),
+             md_cell(TRAIN_SCRIPT_MD), code_cell(TRAIN_SCRIPT_PY), md_cell(TRAIN_RUN_MD), g(TRAIN_RUN_PY), md_cell(SMOKE_MD), g(SMOKE_PY),
+             md_cell(EXPORT_SCRIPT_MD), code_cell(EXPORT_SCRIPT_PY), md_cell(EXPORT_RUN_MD), g(EXPORT_RUN_PY),
+             md_cell(FINISH_MD), g(FINISH_PY), md_cell(RELEASE_MD), g(RELEASE_PY)]
     return {'nbformat': 4, 'nbformat_minor': 0,
             'metadata': {'accelerator': 'GPU', 'colab': {'gpuType': 'A100', 'machine_shape': 'hm', 'provenance': []},
                          'kernelspec': {'name': 'python3', 'display_name': 'Python 3'}, 'language_info': {'name': 'python'}},
