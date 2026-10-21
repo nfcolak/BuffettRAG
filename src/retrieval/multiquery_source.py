@@ -10,8 +10,8 @@ written out, fuses them by RRF and adds the best passages the pool does not hold
   - FINANCE_MULTI_QUERY=N: up to N searches, one per topic of the question: the plan's themes, then the themes
     `knowledge_source.infer_themes` infers, then (MQ_SECTORS) the plan's sectors. Each search is the question's
     financial core (`financial_core`: the finance query without the opinion frame, VIEW_CUE words and Buffett's name)
-    plus the topic's taxonomy description (THEME_QUERY "description", the first sentence as theme inference embeds
-    it), the top words of the summaries of its tagged passages ("keywords", `topic_keywords`) or both ("both").
+    plus the top words of the summaries of the topic's tagged passages (THEME_QUERY "keywords", `topic_keywords`, the
+    default), its taxonomy description ("description", the first sentence as theme inference embeds it) or both.
   - FINANCE_DIGEST_QUERY=1: when a digest matches the plan's topic (`knowledge_source.digest_topics`, the inferred
     themes only when no named topic has one), one more search with the first DIGEST_LINES sentences of the digest's
     overview as the query.
@@ -48,8 +48,10 @@ MQ_CAP = 16              # passages the source adds per question, at most
 MQ_DEPTH = 60            # hits fetched per search (dense and BM25) before the fusion
 MQ_WORKERS = 4           # threads the searches run on
 MQ_SECTORS = True        # the plan's sectors are topics too, after the themes
-MQ_SUMMARY = True        # each query also searches the annotation-summary index (summary_source.summary_ranking)
-THEME_QUERY = "description"  # what a topic adds to the core: "description" | "keywords" | "both"
+MQ_SUMMARY = False       # each query also searches the annotation-summary index (summary_source.summary_ranking)
+THEME_QUERY = "keywords"     # what a topic adds to the core: "description" | "keywords" | "both"
+# MQ_SUMMARY and THEME_QUERY were chosen on dev (finance-recall-75-r3, task 2.2): keywords beat the description and
+# "both", and the summary rankings only crowded the cap; heldout_v6 did not move under any of them.
 KEYWORDS = 8             # summary words per topic ("keywords")
 KEYWORD_MIN_DOCS = 3     # ... each in at least this many tagged summaries
 DIGEST_LINES = 2         # sentences of the digest overview that make the digest query

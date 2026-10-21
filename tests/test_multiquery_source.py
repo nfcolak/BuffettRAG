@@ -36,6 +36,7 @@ def _clean_env(monkeypatch):
         monkeypatch.setenv(name, "0")
     monkeypatch.setenv("RETRIEVAL_DEDUP", "0")
     monkeypatch.setenv("FINANCE_TAG_DEPTH", "30")  # = the shallow depth (fetch_k) at k=4: only ranks 0-29 are pooled
+    monkeypatch.setattr(mq, "THEME_QUERY", "description")  # the fake rankings below key on the topic description
 
 
 def _pid(year, n):
@@ -179,9 +180,12 @@ def test_topic_keywords_set_the_tagged_summaries_apart(monkeypatch):
     store = _store(anns)
     words = mq.topic_keywords(store, "themes", "buybacks")
     assert words[:2] == ("below", "repurchased") and "berkshire" not in words
-    monkeypatch.setattr(mq, "THEME_QUERY", "keywords")
+    monkeypatch.undo()  # the module defaults: keywords, chosen on dev
+    assert mq.THEME_QUERY == "keywords" and mq.MQ_SUMMARY is False
     text = mq.topic_query("core", store, "themes", "buybacks")
     assert text.startswith("core below repurchased") and "share repurchases." not in text
+    monkeypatch.setattr(mq, "THEME_QUERY", "both")
+    assert mq.topic_query("core", store, "themes", "buybacks").startswith("core buybacks: share repurchases. below")
 
 
 # --- the source ---
@@ -242,6 +246,23 @@ def test_hits_of_the_sources_before_it_are_not_added_again(monkeypatch):
     plan = _plan(themes=("buybacks",))
     assert mq.pooled(plan, _store(), retriever, plan.query, 4) >= {a, _pid(1990, 0)}
     assert _ids(mq.multi_query_source(plan, _store(), retriever, plan.query, 4))[:1] == [b]
+
+
+def test_the_summary_index_rankings_join_the_fusion_only_with_mq_summary(monkeypatch):
+    a, b = _deep(1991, 5), _deep(1992, 5)
+    retriever = Retriever(_docs(), {"buybacks:": [a]})
+    plan = _plan(themes=("buybacks",))
+    seen = []
+
+    def summary_ranking(plan_, store_, retriever_, text):
+        seen.append(text)
+        return [SearchHit(id=b, text="summary", metadata={"year": 1992}, score=1.0)]
+
+    monkeypatch.setattr(mq.summary_source, "summary_ranking", summary_ranking)
+    texts = mq.queries(plan, _store(), retriever, plan.query, 1, False)
+    assert _ids(mq.fused_ranking(plan, _store(), retriever, texts))[0] == a and seen == []
+    monkeypatch.setattr(mq, "MQ_SUMMARY", True)
+    assert set(_ids(mq.fused_ranking(plan, _store(), retriever, texts))[:2]) == {a, b} and seen == texts
 
 
 def test_non_financial_and_table_passages_are_skipped():
