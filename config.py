@@ -221,19 +221,23 @@ FINANCE_DEFAULTS: dict = {
     # finance-recall-75-r3 group 4 adopted the token-counted window, K_SPECIFIC 32, K_PERIOD 40, summary fusion 1 and
     # one multi-query search (dev anchors 65.4 -> 72.6, heldout_v6 71.5 -> 72.6); the digest query and the superlative
     # tagged passages stay off.
+    # finance-recall-75-r4 group 4 adopted window packing 2, K_TREND / K_CORPUS / K_SPECIFIC 80 and 50 rerank candidates
+    # (dev anchors / merged 72.6 / 85.9 -> 81.3 / 85.3, heldout_v6 72.6 / 76.2 -> 74.3 / 74.9); packing frees the window
+    # the larger budgets need. The decade blocks and the superlative rerank stay off; K_PERIOD stays 40.
     "FINANCE_SUMMARY_SOURCE": 1,       # 1: candidates from the annotation-summary index (summary_source.py)
     "FINANCE_TAGGED_SOURCE": 1,        # 1: passages tagged with the plan's / inferred sectors, companies, events, themes (knowledge_source.py)
     "FINANCE_DIGEST_SOURCE": 1,        # 1: digest timeline source passages for trend / corpus-wide questions (knowledge_source.py)
     "FINANCE_STANCE_SOURCE": 0,        # 1: passages with a stance on the plan's sector or company (knowledge_source.py)
-    "FINANCE_K_TREND": 32,             # served passages for a trend plan; 0 = today's budget (FINANCE_K / llm_context_passages())
-    "FINANCE_K_CORPUS": 32,            # served passages for a corpus-wide plan (and the superlative route); 0 = today's budget
+    "FINANCE_K_TREND": 80,             # served passages for a trend plan; 0 = today's budget (FINANCE_K / llm_context_passages()) (finance-recall-75-r4: 32 -> 80)
+    "FINANCE_K_CORPUS": 80,            # served passages for a corpus-wide plan (and the superlative route); 0 = today's budget (finance-recall-75-r4: 32 -> 80)
     "FINANCE_K_PERIOD": 40,            # served passages for a period / comparison plan; 0 = today's budget (finance-recall-75-r3: 32 -> 40)
-    "FINANCE_RERANK_CANDIDATES": 30,   # candidates sent to the cross-encoder on the finance path (today: RERANK_CANDIDATES)
+    "FINANCE_RERANK_CANDIDATES": 50,   # candidates sent to the cross-encoder on the finance path (finance-recall-75-r4: 30 -> 50)
     "FINANCE_FOLLOWUP_HISTORY": 0,     # 1: a short / referential follow-up to a financial question is planned on that question, never scope-replied for being short (ask_flow.py)
     # served passages for a specific / numeric plan, capped by the reader window like the trend budget; 0 = today's budget.
     # 32 since finance-recall-75-r3: the token-counted window (FINANCE_WINDOW_TOKENS) bounds number-dense prompts
     # (~3.1 chars per Qwen token), which the character window did not (round 2 kept 21 for that reason; 24 overflowed it).
-    "FINANCE_K_SPECIFIC": 32,
+    # 80 since finance-recall-75-r4: window packing fits the larger budget into the same token window.
+    "FINANCE_K_SPECIFIC": 80,
     "FINANCE_SUMMARY_FUSE_WEIGHT": 1,  # RRF weight of the summary ranking fused into the candidate order (0 = off; finance-recall-75-r3: 1)
     "FINANCE_THEME_CENTROIDS": 1,      # 1: theme inference also matches tagged-passage summary centroids
     "FINANCE_SOURCE_SLOTS": 0,         # served slots reserved for source candidates below the rerank cut
@@ -242,7 +246,7 @@ FINANCE_DEFAULTS: dict = {
     "FINANCE_MULTI_QUERY": 1,          # extra theme searches for view/opinion plans (0 = off; N = 1, 2 and 3 measured the same)
     "FINANCE_DIGEST_QUERY": 0,         # 1: one extra search with the matching digest's summary as the query
     "FINANCE_SUPERLATIVE_TAGGED": 0,   # superlative route: serve up to N positive-stance passages of the winner (0 = off)
-    "FINANCE_WINDOW_PACK": 0,          # 1: drop merged neighbours of low-ranked hits before whole hits; 2: also shorten them
+    "FINANCE_WINDOW_PACK": 2,          # 1: drop merged neighbours of low-ranked hits before whole hits; 2: also shorten them (finance-recall-75-r4: 0 -> 2)
     "FINANCE_DECADE_BLOCKS": 0,        # corpus-wide/trend plans: top M per decade block as extra candidates (0 = off)
     "FINANCE_SUPERLATIVE_RERANK": 0,   # superlative route: serve the top N winner passages by cross-encoder score (0 = off)
 }

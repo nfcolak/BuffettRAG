@@ -152,7 +152,7 @@ def test_every_search_reports_empty_source_debug_when_no_source_runs(store):
 
 # --- 1.2 FINANCE_K_SPECIFIC ---
 def test_the_specific_budget_defaults_to_the_adopted_value():
-    assert FINANCE_DEFAULTS["FINANCE_K_SPECIFIC"] == 32  # finance-recall-75-r3, task 4.1 (21 in round 2)
+    assert FINANCE_DEFAULTS["FINANCE_K_SPECIFIC"] == 80  # finance-recall-75-r4, task 4.1 (32 in round 3, 21 in round 2)
 
 
 def test_the_specific_budget_is_read_by_specific_and_numeric_plans_only(monkeypatch):
@@ -160,15 +160,15 @@ def test_the_specific_budget_is_read_by_specific_and_numeric_plans_only(monkeypa
     monkeypatch.setenv("FINANCE_K_CORPUS", "0")    # corpus_wide: the kind without a budget of its own here
     monkeypatch.setenv("FINANCE_K_SPECIFIC", "0")  # off
     kinds = ("trend", "corpus_wide", "period", "comparison", "specific", "numeric")
-    # period and comparison plans: FINANCE_K_PERIOD, 40 since finance-recall-75-r3
-    assert [kind_budget(_plan(k)) for k in kinds] == [32, 0, 40, 40, 0, 0]  # off: today's budget
+    # period and comparison plans: FINANCE_K_PERIOD, 40 since finance-recall-75-r3; trend plans 80 since finance-recall-75-r4
+    assert [kind_budget(_plan(k)) for k in kinds] == [80, 0, 40, 40, 0, 0]  # off: today's budget
     monkeypatch.setenv("FINANCE_K_SPECIFIC", "24")
-    assert [kind_budget(_plan(k)) for k in kinds] == [32, 0, 40, 40, 24, 24]
-    assert [served_budget(_plan(k)) for k in kinds] == [32, 8, 40, 40, 24, 24]
+    assert [kind_budget(_plan(k)) for k in kinds] == [80, 0, 40, 40, 24, 24]
+    assert [served_budget(_plan(k)) for k in kinds] == [80, 8, 40, 40, 24, 24]
     monkeypatch.setenv("FINANCE_K", "12")  # FINANCE_K stays the fallback of a kind without its own setting
-    assert [served_budget(_plan(k)) for k in kinds] == [32, 12, 40, 40, 24, 24]
+    assert [served_budget(_plan(k)) for k in kinds] == [80, 12, 40, 40, 24, 24]
     monkeypatch.setenv("FINANCE_K_SPECIFIC", "0")
-    assert [served_budget(_plan(k)) for k in kinds] == [32, 12, 40, 40, 12, 12]
+    assert [served_budget(_plan(k)) for k in kinds] == [80, 12, 40, 40, 12, 12]
 
 
 def test_finance_search_serves_the_specific_budget(store, monkeypatch):

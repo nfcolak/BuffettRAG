@@ -49,10 +49,10 @@ def test_new_follow_up_setting_defaults_off():
 def test_served_budget_follows_the_plan_kind(monkeypatch):
     monkeypatch.setenv("LLM_CONTEXT_PASSAGES", "8")
     kinds = ("trend", "corpus_wide", "period", "comparison", "specific", "numeric")
-    # the adopted defaults: 32 for trend plans (finance-recall-75, task 5.1), 32 for corpus-wide (finance-recall-75-r2,
-    # task 4.1), 40 for period and comparison plans and 32 for specific and numeric plans (finance-recall-75-r3, task 4.1)
-    assert [served_budget(_plan(k)) for k in kinds] == [32, 32, 40, 40, 32, 32]
-    assert [kind_budget(_plan(k)) for k in kinds] == [32, 32, 40, 40, 32, 32]
+    # the adopted defaults: 40 for period and comparison plans (finance-recall-75-r3, task 4.1), 80 for trend,
+    # corpus-wide, specific and numeric plans (finance-recall-75-r4, task 4.1; 32 before)
+    assert [served_budget(_plan(k)) for k in kinds] == [80, 80, 40, 40, 80, 80]
+    assert [kind_budget(_plan(k)) for k in kinds] == [80, 80, 40, 40, 80, 80]
     for name in ("FINANCE_K_TREND", "FINANCE_K_CORPUS", "FINANCE_K_PERIOD", "FINANCE_K_SPECIFIC"):
         monkeypatch.setenv(name, "0")  # 0: the kind keeps today's budget
     assert [served_budget(_plan(k)) for k in kinds] == [8] * 6 and [kind_budget(_plan(k)) for k in kinds] == [0] * 6
@@ -88,6 +88,9 @@ def _window(store, monkeypatch=None):
 
 
 def test_rerank_depth_is_todays_until_the_finance_setting_is_set(store, monkeypatch):
+    # the adopted default (50 since finance-recall-75-r4, task 4.1) governs the finance path
+    assert rerank_depth() == FINANCE_DEFAULTS["FINANCE_RERANK_CANDIDATES"] == 50 and _window(store) == 50
+    monkeypatch.setitem(FINANCE_DEFAULTS, "FINANCE_RERANK_CANDIDATES", 30)  # a default left at today's value
     assert rerank_depth() == 30 and _window(store) == 30
     monkeypatch.setenv("RERANK_CANDIDATES", "10")  # the global setting still governs the finance path
     assert rerank_depth() == 10 and _window(store) == 10
@@ -149,7 +152,7 @@ def test_a_zero_kind_budget_is_todays_and_leaves_no_window_trace(flow, monkeypat
 def test_the_default_trend_budget_is_the_adopted_one_and_fits_the_window(flow, monkeypatch):
     monkeypatch.setenv("LLM_CONTEXT_PASSAGES", "4")
     route = _route()
-    assert route.plan.kind == "trend" and route.debug["k"] == FINANCE_DEFAULTS["FINANCE_K_TREND"] == 32
+    assert route.plan.kind == "trend" and route.debug["k"] == FINANCE_DEFAULTS["FINANCE_K_TREND"] == 80
     # the token-counted window is the default (finance-recall-75-r3): the 24 passages are cut, lowest ranks first,
     # until the prompt fits it (these made-up words take more tokens than characters / 4)
     assert FINANCE_DEFAULTS["FINANCE_WINDOW_TOKENS"] == 1 and "window_chars" not in route.debug

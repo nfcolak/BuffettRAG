@@ -116,8 +116,8 @@ def _sizes(monkeypatch):
 
 
 # --- the setting and the helpers ---
-def test_the_setting_key_exists_and_is_off():
-    assert FINANCE_DEFAULTS["FINANCE_WINDOW_PACK"] == 0 and window_pack.MIN_SENTENCES == 2
+def test_the_setting_key_exists_and_defaults_to_the_adopted_mode():
+    assert FINANCE_DEFAULTS["FINANCE_WINDOW_PACK"] == 2 and window_pack.MIN_SENTENCES == 2  # finance-recall-75-r4, task 4.1
 
 
 def test_own_chunk_keeps_the_anchor_text_and_drops_the_neighbour_ids(flow, monkeypatch):

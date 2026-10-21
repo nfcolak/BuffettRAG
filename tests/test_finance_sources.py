@@ -22,8 +22,8 @@ FIX = Path(__file__).parent / "fixtures" / "knowledge_mini"
 # the defaults group 5 adopted (finance-recall-75, task 5.1), K_CORPUS 32 since finance-recall-75-r2 (task 4.1),
 # K_PERIOD 40 and one multi-query search since finance-recall-75-r3 (task 4.1); the rest stay off or at today's value
 NEW_SETTINGS = {"FINANCE_SUMMARY_SOURCE": 1, "FINANCE_TAGGED_SOURCE": 1, "FINANCE_DIGEST_SOURCE": 1,
-                "FINANCE_STANCE_SOURCE": 0, "FINANCE_K_TREND": 32, "FINANCE_K_CORPUS": 32, "FINANCE_K_PERIOD": 40,
-                "FINANCE_RERANK_CANDIDATES": 30, "FINANCE_MULTI_QUERY": 1, "FINANCE_DIGEST_QUERY": 0}
+                "FINANCE_STANCE_SOURCE": 0, "FINANCE_K_TREND": 80, "FINANCE_K_CORPUS": 80, "FINANCE_K_PERIOD": 40,
+                "FINANCE_RERANK_CANDIDATES": 50, "FINANCE_MULTI_QUERY": 1, "FINANCE_DIGEST_QUERY": 0}
 SOURCE_SETTINGS = ("FINANCE_SUMMARY_SOURCE", "FINANCE_TAGGED_SOURCE", "FINANCE_DIGEST_SOURCE", "FINANCE_STANCE_SOURCE",
                    "FINANCE_MULTI_QUERY", "FINANCE_DIGEST_QUERY")  # the multi-query source is on by default since finance-recall-75-r3
 

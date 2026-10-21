@@ -79,9 +79,11 @@ def test_trend_plan_serves_at_least_four_letters_and_at_most_two_per_letter(stor
 @pytest.mark.parametrize("kind,year_range", [("period", (1980, 2010)), ("specific", (1980, 2010)), ("corpus_wide", None)])
 def test_questions_spanning_several_letters_are_diverse_too(store, kind, year_range, monkeypatch):
     monkeypatch.setenv("FINANCE_MAX_PER_LETTER", "2")
-    hits, _ = finance_search(_plan(kind, year_range=year_range), FakeRetriever(_clustered()), store)
+    hits, debug = finance_search(_plan(kind, year_range=year_range), FakeRetriever(_clustered()), store)
     years = [h.metadata["year"] for h in hits]
-    assert len(set(years)) >= 4 and max(years.count(y) for y in set(years)) <= 2
+    # a range raises the cap to ceil(k / its letters): the 31 letters of 1980-2010 take 3 each at k = 80
+    cap = max(2, -(-debug["k"] // 31)) if year_range else 2
+    assert len(set(years)) >= 4 and max(years.count(y) for y in set(years)) <= cap
 
 
 def test_specific_plan_is_not_capped(store, monkeypatch):
@@ -341,7 +343,7 @@ class Recorder:
 
 
 def test_tagged_passages_deeper_than_the_fetch_reach_the_reranker(store, monkeypatch):
-    monkeypatch.setenv("RERANK_CANDIDATES", "10")
+    monkeypatch.setenv("FINANCE_RERANK_CANDIDATES", "10")  # the adopted default (finance-recall-75-r4) beats RERANK_CANDIDATES
     monkeypatch.setenv("FINANCE_ENTITY_BOOST_WEIGHT", "0")  # no boost: only the tag pool can bring it in
     filler = [_hit(f"19{60 + n // 10}_f{n:02d}", 1960 + n // 10) for n in range(80)]  # untagged
     ranking = filler + [_hit("1990_p0102")]  # tagged airlines_aviation, rank 80 (> fetch_k 48)
