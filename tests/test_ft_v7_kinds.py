@@ -394,7 +394,7 @@ def test_comparison_job_builds_one_row_per_period_call_exactly_as_serving_does(t
     question = comparison_obj()['question']
     periods = comparison_periods(question)
     assert [r['period'] for r in rows] == ['1995', '2010'] and all(r['kind'] == 'comparison' for r in rows)
-    for row, period in zip(rows, periods):
+    for row, period in zip(rows, periods, strict=True):
         assert row['question'] == period_question(question, period, periods) and '(focus: ' in row['question'] and row['job_question'] == question
         years = {y for y, _, _ in B.parse_prompt_passages(row['messages'][1]['content']).values()}
         assert years == {str(period['year'])}
@@ -410,7 +410,7 @@ def test_comparison_job_builds_one_row_per_period_call_exactly_as_serving_does(t
             return REFUSAL_LINE
     generate_comparison_answer(Llm(), question, context, max_new_tokens=300)
     assert len(sent) == 2
-    for row, prompt in zip(rows, sent):
+    for row, prompt in zip(rows, sent, strict=True):
         assert row['messages'][0]['content'] + '\n\n' + row['messages'][1]['content'] == prompt
 
 

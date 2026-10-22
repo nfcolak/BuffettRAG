@@ -98,7 +98,7 @@ def _free_port() -> int:
 
 def _expected_messages(received: List[Dict[str, Any]]) -> List[Dict[str, str]]:
     """Rebuild the prompt from what the fake got and run the embedded provider's message builder."""
-    system, user = received[0]["content"], received[-1]["content"]
+    user = received[-1]["content"]
     prompt = system_prompt().strip() + "\n\n" + user if received[0]["role"] == "system" else user
     return LlamaCppProvider._messages(None, prompt)  # type: ignore[arg-type]
 

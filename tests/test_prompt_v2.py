@@ -46,7 +46,7 @@ def test_v2_differs_in_the_three_specified_places():
     assert "Warren Buffett's Buffett Partnership letters (1957-1970) and Berkshire Hathaway shareholder letters (1977-2024)" in v2
     assert "annual Berkshire Hathaway" not in v2
     a, b = v1.splitlines(), v2.splitlines()
-    assert len(a) == len(b) and sum(x != y for x, y in zip(a, b)) == 3
+    assert len(a) == len(b) and sum(x != y for x, y in zip(a, b, strict=True)) == 3
 
 
 @pytest.mark.parametrize("version", ["v1", "v2"])
@@ -71,6 +71,6 @@ def test_v3_is_v2_with_the_berkshire_only_corpus_line():
     assert "Warren Buffett's annual Berkshire Hathaway shareholder letters (1977-2024)" in v3
     assert "Answer every part of the question" in v3 and "Concise: one solid sentence" not in v3
     a, b, c = v1.splitlines(), v2.splitlines(), v3.splitlines()
-    assert len(c) == len(b) and sum(x != y for x, y in zip(b, c)) == 1   # only the corpus line differs from v2
-    assert sum(x != y for x, y in zip(a, c)) == 2                         # coverage and tone lines differ from v1
+    assert len(c) == len(b) and sum(x != y for x, y in zip(b, c, strict=True)) == 1   # only the corpus line differs from v2
+    assert sum(x != y for x, y in zip(a, c, strict=True)) == 2                         # coverage and tone lines differ from v1
     assert P.system_prompt("v3") == v3

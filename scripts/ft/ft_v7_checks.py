@@ -3,7 +3,6 @@ question style, refusal terms, the partial-answer gap line, source position mix 
 from __future__ import annotations
 
 from functools import lru_cache
-import random
 import re
 
 from src.evaluation.claim_validator import evidence_sentences, validate_and_filter_answer

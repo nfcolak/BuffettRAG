@@ -1,7 +1,6 @@
 """finance-recall-75 group 4: adaptive served budget, rerank depth, merged-id accounting, follow-up planning."""
 from __future__ import annotations
 
-import json
 import sys
 from pathlib import Path
 

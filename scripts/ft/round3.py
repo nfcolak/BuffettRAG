@@ -13,7 +13,7 @@ import common
 import make_examples as examples
 from make_questions import TOPIC_WORDS, _json_object, unavailable_templates
 from src.evaluation.citation_faithfulness import split_sentences
-from src.generation.prompt import REFUSAL_LINE, SYSTEM_PROMPT, build_cited_prompt, parse_citations
+from src.generation.prompt import REFUSAL_LINE, parse_citations
 from src.generation.evidence_gate import assess_evidence
 from src.retrieval.context import expand_hits_with_neighbors
 from src.storage import SearchHit

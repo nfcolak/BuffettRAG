@@ -94,7 +94,6 @@ def rerank(ce, query, cands, depth):
 
 def evaluate(name, kind, rank_fn, gold, hn_sets):
     rows, lat, ranked_by_q = {}, [], {}
-    queries = [(g.qid, g.query) for g in gold]
     for g in gold:
         t = time.perf_counter()
         hits = rank_fn(g.query)[:RANK_DEPTH]
@@ -156,7 +155,6 @@ def main():
     results.append(evaluate("bm25", "bm25", bm_search, gold, hn_sets))
 
     hybrid_bge = None
-    bge_model = None
     for name in EMBEDDERS:
         model, emb = corpus_embeddings(name, docs, corpus_sha, args.cache_dir, args.batch_size)
         vi = VectorIndex(name, model, emb, docs)
@@ -170,7 +168,6 @@ def main():
         results.append(evaluate(f"hybrid:{short}", "hybrid", hybrid, gold, hn_sets))
         if name == "BAAI/bge-base-en-v1.5":
             hybrid_bge = hybrid
-            bge_model = model
 
     results.append(evaluate("hybrid:bge-base-en-v1.5+rerank:none", "hybrid+rerank",
                             hybrid_bge, gold, hn_sets))

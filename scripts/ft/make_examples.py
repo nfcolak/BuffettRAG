@@ -4,13 +4,10 @@ import argparse
 from collections import Counter
 import fcntl
 import json
-import math
-import os
-from pathlib import Path
 import re
 import time
 
-from common import OUT, ROOT, SEED, Teacher, append, atomic_json, content_terms, inputs, read_jsonl, sha
+from common import OUT, SEED, Teacher, append, atomic_json, content_terms, inputs, read_jsonl, sha
 from make_questions import generate_pending, generate_pending_v2, init_v2
 from src.evaluation.claim_validator import validate_and_filter_answer, _split_original
 from src.evaluation.citation_faithfulness import split_sentences

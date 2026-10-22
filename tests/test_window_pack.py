@@ -65,7 +65,7 @@ def _chained_docs(n: int = LIMIT):
         year = 1980 + i
         ids = [f"{year}_p{j:04d}" for j in range(3)]
         texts = [" ".join(FILLER) + f" Note {i} came first.", _anchor_text(year), " ".join(FILLER) + f" Note {i} came last."]
-        for j, (pid, text) in enumerate(zip(ids, texts)):
+        for j, (pid, text) in enumerate(zip(ids, texts, strict=True)):
             meta = {"year": year, "source_file": f"{year}.pdf"}
             if j > 0:
                 meta["previous_chunk_id"] = ids[j - 1]

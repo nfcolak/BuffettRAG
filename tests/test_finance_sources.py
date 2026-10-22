@@ -8,10 +8,8 @@ import pytest
 
 from config import FINANCE_DEFAULTS, finance_setting
 from src.knowledge import KnowledgeStore
-from src.query.plan import QueryPlan
 from src.retrieval import finance_policy, knowledge_source, summary_source
 from src.retrieval.finance_policy import candidate_sources, finance_search
-from src.storage import SearchHit
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "scripts" / "eval"))
 import finance_route_debug as frd  # noqa: E402

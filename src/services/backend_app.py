@@ -41,7 +41,6 @@ if str(PROJECT_ROOT) not in sys.path:
 from config import (
     API_KEYS,
     CORS_ORIGINS,
-    DEFAULT_LLM_PROVIDER,
     EMBEDDING_DEVICE,
     EMBEDDING_MODEL_PRIMARY,
     EXPOSE_DEBUG_STATUS,

@@ -36,14 +36,13 @@ from config import (
     CHUNK_MIN_CHARS_V2,
     CHUNKS_V2_FILE,
     METADATA_V2_FILE,
-    RAW_DATA_DIR,
     START_YEAR,
     END_YEAR,
 )
 from src.ingestion.chunker import split_text
 from src.ingestion.pdf_extractor import extract_text_from_pdf, load_text_file
 from src.ingestion.topic_tagger import tag_topics
-from src.ingestion.legacy_utils import extract_year_from_filename, get_all_letters_sorted
+from src.ingestion.legacy_utils import get_all_letters_sorted
 
 
 def build_chunk_record(

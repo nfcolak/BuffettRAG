@@ -658,7 +658,7 @@ def _fmt(rank: Optional[int]) -> str:
 
 def diagnose_miss(ask_flow, cache, case: Dict[str, Any], row: Dict[str, Any], claim: List[str]) -> Dict[str, Any]:
     """Where the best gold passage of one unserved claim sits in each stage, which queries were used, and a cause."""
-    from config import RETRIEVAL_FETCH_K, retrieval_setting
+    from config import retrieval_setting
     from src.generation.decompose import split_question
     from src.retrieval.query_expansion import build_followup_retrieval_query
     from src.retrieval.retriever import (_meta_matches, detect_temporal_comparison, detect_year_filter,

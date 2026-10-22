@@ -2,7 +2,6 @@
 from __future__ import annotations
 from collections import defaultdict
 import json
-import re
 import common
 from common import OUT, inputs, near_frozen, read_jsonl
 from src.evaluation.claim_validator import validate_and_filter_answer, _split_original

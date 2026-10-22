@@ -295,7 +295,7 @@ def _pooled_before(plan: QueryPlan, store: KnowledgeStore, retriever: Any, query
                    ) -> Set[str]:
     """`pooled` plus the hits of the sources of this module registered before `me` that are on."""
     out = pooled(plan, store, retriever, query, k)
-    for name, source in finance_policy.candidate_sources():
+    for _name, source in finance_policy.candidate_sources():
         if source is me:
             break
         if source not in FAMILY:

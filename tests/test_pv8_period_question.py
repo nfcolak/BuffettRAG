@@ -51,7 +51,7 @@ def test_old_headless_fragments_are_gone():
 
 
 def test_no_dangling_connectors_or_orphan_compare():
-    for query, expected in CASES.values():
+    for query, _expected in CASES.values():
         periods = comparison_periods(query)
         for period in periods:
             stem = period_question(query, period, periods).rsplit(" (focus:", 1)[0]

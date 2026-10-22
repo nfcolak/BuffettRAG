@@ -21,7 +21,6 @@ import csv
 import json
 import sys
 import time
-from dataclasses import asdict
 from pathlib import Path
 from typing import Dict, List
 

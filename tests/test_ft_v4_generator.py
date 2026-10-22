@@ -78,7 +78,7 @@ def test_temporal_job_yields_one_prompt_per_period_like_generate_comparison_answ
     assert all(p['gate'] for p in prompts), 'pick a query whose periods both pass the evidence gate'
     assert sent == [joined(p) for p in prompts]
     assert all(period_question(query, period, periods) in joined(p)
-               for p, period in zip(prompts, periods))
+               for p, period in zip(prompts, periods, strict=True))
     for prompt in prompts:   # only that period's passages
         assert {h.metadata['year'] for h in prompt['hits']} == {int(prompt['period'])}
 

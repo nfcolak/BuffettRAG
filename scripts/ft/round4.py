@@ -26,8 +26,8 @@ import make_examples as examples
 import round3
 from make_questions import TOPIC_WORDS, _json_object, unavailable_templates
 from config import (
-    ANSWER_CONTEXT_MAX_CHARS, ANSWER_CONTEXT_NEIGHBORS, LLM_CONTEXT_PASSAGES, LLM_N_CTX,
-    LLM_PASSAGE_MAX_CHARS, RETRIEVAL_FETCH_K, llm_context_passages, llm_n_ctx, retrieval_setting,
+    ANSWER_CONTEXT_MAX_CHARS, ANSWER_CONTEXT_NEIGHBORS, LLM_CONTEXT_PASSAGES, LLM_N_CTX,  # noqa: F401  (tests read round4.<NAME>)
+    LLM_PASSAGE_MAX_CHARS, RETRIEVAL_FETCH_K, llm_context_passages, llm_n_ctx, retrieval_setting,  # noqa: F401
 )
 from src.evaluation.claim_validator import _split_original, validate_and_filter_answer
 from src.generation.compare import comparison_periods, period_label, period_question, prepare_answer_context

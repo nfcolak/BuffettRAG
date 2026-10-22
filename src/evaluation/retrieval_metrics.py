@@ -15,7 +15,7 @@ Aggregation across queries reports mean and per-query breakdown.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Dict, List, Sequence
+from typing import Dict, Sequence
 
 from src.evaluation.gold_set import GoldQuery
 from src.storage import SearchHit

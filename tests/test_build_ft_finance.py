@@ -345,7 +345,7 @@ def test_check_teacher_cli(env, capsys):
     batch, teacher = env.tmp / 'batch.jsonl', env.tmp / 'teacher.jsonl'
     B.V6.write_jsonl_file(batch, jobs)
     lines = [B.fake_answer(j, env.store) for j in jobs]
-    ok = [line for line, j in zip(lines, jobs) if CT.validate(j, line, store=env.store)[0] is None]
+    ok = [line for line, j in zip(lines, jobs, strict=True) if CT.validate(j, line, store=env.store)[0] is None]
     assert ok, 'the fake teacher must pass on some jobs'
     teacher.write_text(''.join(json.dumps(line) + '\n' for line in lines))
     CT.planner_store.cache_clear()

@@ -23,7 +23,7 @@ from config import (
     VECTOR_BACKEND,
 )
 from src.storage.embeddings import get_embedder
-from src.storage.index_manifest import build_index_manifest, write_index_manifest
+from src.storage.index_manifest import build_index_manifest, write_index_manifest  # noqa: F401  (tests import build_index_manifest from here)
 from src.storage import get_vector_store, load_chunks_as_docs
 from src.storage.faiss_store import FaissStore
 

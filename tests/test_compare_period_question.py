@@ -1,5 +1,4 @@
 """Compare path: each period's model call gets the period-neutral question; a refused period is retried once."""
-from src.generation import compare
 from src.generation.compare import comparison_periods, generate_comparison_answer, period_question
 from src.generation.prompt import REFUSAL_LINE
 from src.storage import SearchHit

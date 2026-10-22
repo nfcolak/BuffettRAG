@@ -49,7 +49,7 @@ import random
 import re
 import sys
 import time
-from typing import Any, Dict, List, Optional, Sequence
+from typing import Any, Dict, List
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))

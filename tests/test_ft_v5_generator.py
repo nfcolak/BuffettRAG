@@ -17,7 +17,7 @@ import round5  # noqa: E402
 os.environ.clear()
 os.environ.update(_env)
 
-from src.generation.prompt import REFUSAL_LINE, SYSTEM_PROMPT, build_cited_prompt  # noqa: E402
+from src.generation.prompt import SYSTEM_PROMPT, build_cited_prompt  # noqa: E402
 from src.generation.providers.llama_provider import split_prompt  # noqa: E402
 from src.retrieval.bm25 import BM25Retriever  # noqa: E402
 from src.retrieval.retriever import Retriever  # noqa: E402

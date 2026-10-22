@@ -221,7 +221,7 @@ def test_markers_come_from_the_template_and_the_loss_covers_only_the_target(hf_t
     prep = C.prepare_split('train', rows, render, encode, hf_tok.bos_token_id, turn_end, 16384)
     # what unsloth's train_on_responses_only leaves unmasked: everything after the response marker, i.e. target + turn end
     dataset = []
-    for text, row in zip(prep['texts'], rows):
+    for text, row in zip(prep['texts'], rows, strict=True):
         ids, prompt_ids = encode(text), encode(render(row['messages'][:2], True))
         dataset.append({'input_ids': ids, 'labels': [-100] * len(prompt_ids) + ids[len(prompt_ids):]})
     live = C.check_loss_masks('train', dataset, hf_tok.decode, [r['messages'][2]['content'] for r in rows], turn_end)

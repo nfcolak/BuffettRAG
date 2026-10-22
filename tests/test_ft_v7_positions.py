@@ -19,7 +19,6 @@ os.environ.clear()
 os.environ.update(_env)
 
 from src.generation.compare import comparison_periods, period_label, period_question  # noqa: E402
-from src.generation.prompt import REFUSAL_LINE  # noqa: E402
 from src.storage import SearchHit  # noqa: E402
 
 

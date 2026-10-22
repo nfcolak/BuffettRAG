@@ -44,7 +44,7 @@ import common  # noqa: E402  (sets offline env flags, puts the repo root on sys.
 import ft_v7_checks as C  # noqa: E402
 import round4  # noqa: E402
 import round5  # noqa: E402
-from src.evaluation.claim_validator import _split_original, evidence_sentences, validate_and_filter_answer  # noqa: E402
+from src.evaluation.claim_validator import evidence_sentences  # noqa: E402
 from src.generation.compare import comparison_periods, period_label, period_question  # noqa: E402
 from src.generation.prompt import REFUSAL_LINE, build_cited_prompt, parse_citations, system_prompt  # noqa: E402
 from src.retrieval.context import truncate_around_anchor  # noqa: E402

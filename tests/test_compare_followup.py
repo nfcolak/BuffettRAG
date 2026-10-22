@@ -5,7 +5,7 @@ import json
 
 import pytest
 
-from src.generation.compare import generate_comparison_answer, prepare_answer_context
+from src.generation.compare import generate_comparison_answer
 from src.generation.prompt import REFUSAL_LINE, build_cited_prompt
 from src.retrieval.context import build_doc_lookup, expand_hits_with_neighbors, fit_context_to_llm
 from src.retrieval.query_expansion import build_followup_retrieval_query

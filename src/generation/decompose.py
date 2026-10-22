@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import re
-from typing import Any, Dict, List, Sequence
+from typing import Any, List, Sequence
 
 from src.evaluation.claim_validator import evidence_sentences, validate_and_filter_answer
 from src.generation.prompt import (

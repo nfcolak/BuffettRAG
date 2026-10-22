@@ -234,7 +234,6 @@ def test_backend_post_validation_blocks_unsupported_cited_claim(monkeypatch):
 
 def test_backend_generation_gate_blocks_provider_before_generation():
     from src.services.ask_flow import _generate_answer
-    from src.storage import SearchHit
 
     class ShouldNotRun:
         def generate(self, *_args, **_kwargs):
@@ -271,7 +270,6 @@ def test_streaming_gate_does_not_open_provider_when_evidence_is_insufficient(mon
 
 
 def test_streaming_never_emits_raw_unvalidated_llm_deltas(monkeypatch):
-    import json
     from fastapi.testclient import TestClient
     from src.services import backend_app as backend, ask_flow
     from src.retrieval.retriever import RetrievalResult

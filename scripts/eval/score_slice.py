@@ -52,7 +52,6 @@ def load_slice(slice_dir: Path) -> Tuple[Dict[str, Any], Dict[str, List[Dict[str
 
 def score(gen: Dict[str, str], doc: Dict[str, Any], prompts: Dict[str, List[Dict[str, Any]]]) -> Dict[str, Any]:
     """Counters for the slice; `gen` keys are prompt ids or bare qids."""
-    totals: Dict[str, collections.Counter] = {"deep": collections.Counter(), "anchors": collections.Counter()}
     claims = collections.Counter()
     cites = collections.Counter()
     missing, refusals_ok, refusals_n = [], 0, 0

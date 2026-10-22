@@ -2,8 +2,6 @@
 import sys
 from pathlib import Path
 
-import pytest
-
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'scripts' / 'ft'))
 
@@ -38,7 +36,7 @@ def _same_as_serving(asked, served):
 
 
 def test_env_overrides_reach_ask_and_serving_settings_alike(monkeypatch):
-    for key, value in zip(KEYS, ('2', '3000', '12288', '12')):
+    for key, value in zip(KEYS, ('2', '3000', '12288', '12'), strict=True):
         monkeypatch.setenv(key, value)
     asked = _asked_kwargs(monkeypatch)
     served = round4.serving_settings()

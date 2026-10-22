@@ -23,7 +23,7 @@ the letter years that do carry the topic. Off by default: `premise_note` stays N
 from __future__ import annotations
 
 import re
-from dataclasses import dataclass, field, replace
+from dataclasses import dataclass, replace
 from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple
 
 from config import finance_setting

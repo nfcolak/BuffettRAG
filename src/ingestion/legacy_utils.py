@@ -131,7 +131,7 @@ def print_summary(metadata: Dict[str, Any]):
     print(f"Year range: {metadata['year_range'][0]} - {metadata['year_range'][1]}")
     print(f"Average chunks per letter: {metadata['avg_chunks_per_letter']:.1f}")
     print(f"Total text size: {metadata['total_text_size_mb']:.2f} MB")
-    print(f"\nOutput files:")
+    print("\nOutput files:")
     print(f"  - Chunks: {metadata['chunks_file']}")
     print(f"  - Metadata: {metadata['metadata_file']}")
     print("="*60 + "\n")
