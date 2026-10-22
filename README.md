@@ -37,6 +37,57 @@ The final results are recorded in [`comparison.md`](data/evaluation/heldout_v1/f
 
 The extractive engine (first row) was removed from the code and is no longer a runnable option; its row is a past result, and its fixes were diagnosed partly on this held-out set, so its 18/24 is optimistic. The LLM rows were not tuned on it. Latencies are measurements from these runs, not deployment guarantees.
 
+## Finance product (2026-10)
+
+### Goal
+
+The app answers questions about Warren Buffett's financial views and Berkshire Hathaway's financial data (crises and macro events, sectors and companies, views over time, figures, whole-collection questions). Personal content from the letters (family, friends, anecdotes) is out of scope: the app replies with a fixed scope sentence instead of answering. The finance path is switched on with `FINANCE_PIPELINE=1`; with it off, the app behaves as described in the sections above.
+
+### Pipeline
+
+1. **Finance plan** (`src/query/plan.py`). Each question is turned into a plan by rules, without a model: scope (financial, personal or mixed), kind (specific, period, trend, comparison, numeric or corpus-wide), the years or ranges it asks for, and the sectors, companies, events and themes it names.
+2. **Knowledge layer** (`data/knowledge/`, built offline). All 5,831 passages carry annotations (financial or not, sectors, themes, stance, personal-content flag). A numbers table holds 3,670 figures with their letter and year. 106 topic digests give a timeline per topic. Events and a taxonomy complete it. A MANIFEST lists the file hashes.
+3. **Finance search** (`src/retrieval/finance_policy.py`). BM25 and vector search are fused as before, with extra candidate sources: the annotation-summary index, passages tagged with the plan's targets, digest timelines, decade blocks and extra theme searches for opinion questions. Year hints boost rather than filter, and questions that span years keep a minimum number of different letters.
+4. **Window packing** (`src/generation/window_pack.py`, `token_count.py`). The reader's context is filled by token count, not characters, and drops neighbouring text before it drops served passages.
+5. **FT-r1 reader.** The same embedded Qwen2.5-7B-Instruct LoRA model described below (FT-r1) writes the cited answer.
+6. **Personal-sentence filter** (`src/generation/finance_answer.py`). A sentence that carries a personal cue and cites only personal or non-financial passages is removed from the answer.
+
+### Measured results
+
+Cases come from a private evaluation set (finance_v1, 80 cases: 40 dev and 40 frozen test) and a sealed second set (finance_v2, 40 cases). The dev half was used to tune retrieval; the test halves were each run once per system. "Served gold" is the share of gold passages that reached the reader (anchor passages only; "merged" also counts neighbours merged into them). "Terms" is the share of required terms found in the answer. The scorer is lexical, not an LLM judge. Raw score files are kept outside the repository.
+
+finance_v1 frozen test half (40 cases, run once). The new path is the 2026-10-21 retrieval with the FT-r1 reader; "live legacy" is the app before the finance path:
+
+| Measure | Live legacy | New path | Target |
+| --- | --- | --- | --- |
+| Served gold | 51% | 75% (merged 78%) | at least 75%: met |
+| Terms in the answer | 7% | 15% | at least 25%: not met |
+| Claim coverage | 4% | 12% | none set |
+| Unanswerable questions refused | 5/5 | 5/5 | keep: met |
+| Personal questions with scope reply | 0/3 | 3/3 | 3/3: met |
+| Mixed questions leaking personal content | 0/2 | 0/2 | 0/2: met |
+| Seconds per answer | 7.8 | 11.6 | none set |
+
+finance_v2 sealed test (40 cases, each system run once). Staging is the 2026-10-21 retrieval from cloud-serve `d2f506e` with default `FINANCE_*` settings; live is `fa47f6e`:
+
+| Measure | Live | Staging |
+| --- | --- | --- |
+| Served gold | 75% | 76% (merged 87%) |
+| Terms in the answer | 13% | 14% |
+| Claim coverage | 10% | 10% |
+| Unanswerable questions refused | 3/3 | 3/3 |
+| Personal questions with scope reply | 1/3 | 1/3 |
+| Mixed questions leaking personal content | 1/2 | 1/2 |
+| Errors | 0 | 0 |
+
+A promotion rule was written before the run: staging replaces live only if no measure is lower and mixed leaks are 0. Staging met every condition except the leak count, which live fails too, so **live stays as it is**. The two systems are within two points of each other on every measure. Gold passages that were served but not cited stay high (78% staging, 80% live): the reader uses few of the passages it is given.
+
+finance_v1 dev half (40 cases, tuning set), final staging run `staging_v8`: served gold 82% (live legacy 40%), terms 16% (live legacy 7%), claim coverage 12% (live legacy 3%), unanswerable refused 4/4, scope reply 3/3, mixed leaks 0/2. These numbers are optimistic because retrieval was tuned on this half.
+
+### FT-r4 (Gemma 4 12B finance fine-tune): open, not trained
+
+The reader (FT-r1) is the bottleneck: answers are short and most served gold is not cited. FT-r4 was planned as a Gemma 4 12B fine-tune on finance data. The training data (623 rows: 557 train, 66 validation, from 726 teacher jobs) and the Colab notebook (`colab/train_gemma4_12b_r4.ipynb`, built by `colab/build_train_gemma4_r4.py`) are ready, and a smoke run trained and exported a GGUF. The full run was **not trained**: the Colab compute units ran out (idle GPU sessions and one stalled run used them), and a full run needs about 140 steps, roughly 3.3 hours on a G4 GPU. The project was closed before more compute was bought. The model, its evaluation and the serving switch are therefore absent; the live app still uses FT-r1.
+
 ## Quick start
 
 Python 3.10+ is recommended.
