@@ -365,3 +365,15 @@ def test_finalize_routes_compose_prompt_without_expansion():
     answer, citations = ask_flow._finalize_once(prompt, _COMPOSE_HITS, raw, trace)
     assert answer == raw and trace["validator"]["mode"] == "compose"
     assert [c["years"] for c in citations] == [[1999], [2024]]
+
+
+def test_validate_composed_accepts_cited_years_and_decades_only():
+    ok = ("In 1999, Buffett said he had no insights into which tech participants had a durable advantage [1]. "
+          "In the 2020s Berkshire owned a small percentage of very profitable household names such as Apple [2].")
+    assert fa.validate_composed(ok, _COMPOSE_HITS) == (ok, [])
+    wrong_year = "In 1987, Buffett said he had no insights into which tech participants had a durable advantage [1]."
+    kept, dropped = fa.validate_composed(wrong_year, _COMPOSE_HITS)
+    assert kept == fa.REFUSAL_LINE and dropped[0]["reason"] == "unsupported_number:1987"
+    assert fa._number_supported("2,387", False, "employees grew from 2,387 to 8,043", [])
+    assert fa._number_supported("2387", False, "employees grew from 2,387 to 8,043", [])
+    assert not fa._number_supported("387", False, "employees grew from 2,387 to 8,043", [])

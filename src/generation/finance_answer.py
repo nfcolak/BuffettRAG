@@ -389,7 +389,8 @@ COMPOSE_INSTRUCTIONS = (
     "When the question asks how something changed or compares periods, say what Buffett said in each period, "
     "name the years, and state plainly what changed. "
     "Give the figures the passages state. "
-    "End every sentence with the citation of the passage or passages it is based on, like [2] or [2,5]. "
+    "End every sentence with the citation of the passage or passages it is based on, like [2] or [2,5]; "
+    "cite at most three passages per sentence. "
     "Use only what the passages state; never add numbers, names, years or causes they do not give. "
     "If the passages answer only part of the question, answer that part, then say in one sentence which part they "
     "do not cover."
@@ -403,7 +404,8 @@ _STOPWORDS = frozenset(
     "while whom will with would your buffett berkshire letter letters passage passages said says wrote year years "
     "says".split())
 _WORD_RE = re.compile(r"[a-z][a-z'-]{3,}")
-_NUMBER_RE = re.compile(r"\d[\d,]*(?:\.\d+)?")
+_NUMBER_RE = re.compile(r"\d+(?:,\d{3})*(?:\.\d+)?(s\b)?")   # group 1: a decade ("1990s")
+_YEAR_RE = re.compile(r"(?:19|20)\d\d")
 
 
 def reader_prompt_compose(query: str, hits: Sequence[SearchHit], history: Optional[Sequence[Dict[str, str]]] = None,
@@ -429,6 +431,21 @@ def _content_words(text: str) -> List[str]:
 
 def _hit_text(hit: SearchHit) -> str:
     return str(getattr(hit, "text", "") or "")
+
+
+def _number_supported(number: str, decade: bool, source: str, years: Sequence[int]) -> bool:
+    """A number of a composed sentence is supported when the cited passages state it, or it is a year (or a decade,
+    "1990s") that one of the cited passages was written in."""
+    if not decade and re.search(rf"(?<![\d.,]){re.escape(number)}(?![\d]|[.,]\d)", source):
+        return True
+    plain = number.replace(",", "")
+    flat = re.sub(r"(?<=\d),(?=\d{3})", "", source)  # "2,387" in a passage supports "2387" and the reverse
+    if not decade and re.search(rf"(?<![\d.]){re.escape(plain)}(?![\d]|\.\d)", flat):
+        return True
+    if _YEAR_RE.fullmatch(plain):
+        year = int(plain)
+        return any(year <= y <= year + 9 for y in years) if decade else year in years
+    return False
 
 
 def validate_composed(answer: str, hits: Sequence[SearchHit],
@@ -462,9 +479,9 @@ def validate_composed(answer: str, hits: Sequence[SearchHit],
                     dropped.append({"sentence": sentence, "reason": "no_citation"})
                 continue
             source = " ".join(_hit_text(hits[n - 1]) for n in cited)
-            years = {str(hits[n - 1].metadata.get("year")) for n in cited}
-            plain = source.replace(",", "")
-            missing = [x for x in _NUMBER_RE.findall(body) if x.replace(",", "") not in plain and x not in years]
+            years = [int(y) for y in (hits[n - 1].metadata.get("year") for n in cited) if str(y).isdigit()]
+            missing = [m.group() for m in _NUMBER_RE.finditer(body)
+                       if not _number_supported(m.group().rstrip("s"), bool(m.group(1)), source, years)]
             if missing:
                 dropped.append({"sentence": sentence, "reason": "unsupported_number:" + ",".join(missing)})
                 continue
