@@ -274,6 +274,7 @@ def ask(req: AskRequest):
             llm, prompt, context_hits, req.max_new_tokens, query, ask_flow._extra_queries(req, expanded),
             [turn.model_dump() for turn in req.history], per_period, **kwargs,
         )
+        answer, citations = ask_flow.finance_mixed_filter(route, answer, citations)
 
     debug = None
     if debug_on:
@@ -357,6 +358,7 @@ def ask_stream(req: AskRequest) -> StreamingResponse:
                 llm, prompt, context_hits, req.max_new_tokens, query, extras,
                 [turn.model_dump() for turn in req.history], per_period,
             )
+            answer, citations = ask_flow.finance_mixed_filter(route, answer, citations)
             yield _sse("done", {"answer": answer, "citations": citations})
             return
         if not hits:
@@ -382,11 +384,13 @@ def ask_stream(req: AskRequest) -> StreamingResponse:
             # The non-streaming path carries the full retry/fallback logic.
             answer, citations = ask_flow._generate_answer(llm, prompt, context_hits, req.max_new_tokens, query, extras,
                                                           None, per_period)
+            answer, citations = ask_flow.finance_mixed_filter(route, answer, citations)
             yield _sse("done", {"answer": answer, "citations": citations})
             return
 
         yield _sse("status", {"stage": "validating"})
         answer, citations = ask_flow._finalize_answer(llm, prompt, context_hits, raw_answer, req.max_new_tokens)
+        answer, citations = ask_flow.finance_mixed_filter(route, answer, citations)
         yield _sse("done", {"answer": answer, "citations": citations})
 
     return StreamingResponse(

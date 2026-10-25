@@ -671,6 +671,21 @@ def finance_answer_mode(route: FinanceRoute) -> str:
     return "reader:periods" if route.per_period else "reader"
 
 
+def finance_mixed_filter(route: Optional[FinanceRoute], answer: Optional[str], citations: List[Dict[str, Any]]):
+    """FINANCE_MIXED_STRICT=1: a reader answer to a mixed question loses the sentences that only tell the personal story
+    (`finance_answer.drop_mixed_personal_sentences`); the citations are parsed again for what is left. Anything else
+    (flag off, no route, a finished route, a financial or personal plan) is returned unchanged."""
+    if not finance_setting("FINANCE_MIXED_STRICT") or route is None or route.final or not answer \
+            or answer == REFUSAL_LINE or getattr(route.plan, "scope", None) != MIXED:
+        return answer, citations
+    filtered = finance_answer.drop_mixed_personal_sentences(answer, route.hits, _knowledge_store())
+    if filtered == answer:
+        return answer, citations
+    if filtered == REFUSAL_LINE:
+        return filtered, []
+    return filtered, parse_citations(filtered, route.hits)
+
+
 def finance_route(req: AskRequest) -> FinanceRoute:
     """Plan and route one question without streaming stage names."""
     steps = finance_route_steps(req)

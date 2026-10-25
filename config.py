@@ -261,6 +261,7 @@ FINANCE_DEFAULTS: dict = {
     "FINANCE_TABLE_CUE": 1,            # 1: table passages also join a non-numeric plan that asks for figures (numeric intent or a figure cue; round 5: 0 -> 1)
     "FINANCE_PREMISE_CHECK": 0,        # 1: plan.premise_note when the asked period misses the event / topic years
     "FINANCE_ANSWER_V3": 0,            # 1: year-grouped evidence pack, premise sentence, dedupe, partial retry
+    "FINANCE_MIXED_STRICT": 0,         # 1: mixed plans drop answer sentences cited only to personal passages that carry no business figure (FT-r4 fix round)
 }
 
 

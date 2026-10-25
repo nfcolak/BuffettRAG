@@ -265,3 +265,56 @@ def test_drop_personal_sentences_removes_family_story_cited_to_personal_passage(
     # nothing financial left -> refusal line
     from src.generation.prompt import REFUSAL_LINE
     assert drop_personal_sentences("He told a joke about his age. [1]", hits, Store()) == REFUSAL_LINE
+
+
+def test_drop_mixed_personal_sentences_removes_story_without_business_figure():
+    from src.generation.finance_answer import drop_mixed_personal_sentences
+    from src.generation.prompt import REFUSAL_LINE
+    from src.storage import SearchHit
+
+    class Store:
+        def has_personal(self, pid):
+            return pid.startswith("p_personal")
+
+        def is_financial(self, pid):
+            return True
+
+    hits = [SearchHit("p_personal_1", "", {}, 0.0), SearchHit("p_fin", "", {}, 0.0),
+            SearchHit("p_personal_2", "", {}, 0.0)]
+    answer = ("In 1971, Paul was working as a purchasing agent for General Dynamics when the roof fell in. [1] "
+              "The company set itself up to distribute small electronic components, and first-year sales totaled "
+              "$112,000. [1] Earnings have increased 673%. [3]\nHe moved to Omaha. [2]")
+    out = drop_mixed_personal_sentences(answer, hits, Store())
+    assert "General Dynamics" not in out                       # personal source, no business figure (a year is not one)
+    assert "first-year sales totaled $112,000. [1]" in out     # personal source, but a business figure
+    assert "Earnings have increased 673%. [3]" in out
+    assert "He moved to Omaha. [2]" in out                     # cited to a financial passage: kept
+    assert drop_mixed_personal_sentences("He was born in Latvia. [1]", hits, Store()) == REFUSAL_LINE
+    assert drop_mixed_personal_sentences(REFUSAL_LINE, hits, Store()) == REFUSAL_LINE
+
+
+def test_finance_mixed_filter_only_for_mixed_reader_routes_with_the_flag(monkeypatch):
+    from src.query.plan import FINANCIAL, MIXED, QueryPlan
+    from src.services import ask_flow
+    from src.storage import SearchHit
+
+    class Store:
+        def has_personal(self, pid):
+            return pid == "p_personal"
+
+        def is_financial(self, pid):
+            return True
+
+    monkeypatch.setattr(ask_flow, "_knowledge_store", lambda: Store())
+    hits = [SearchHit("p_personal", "story", {"year": 2021}, 0.0), SearchHit("p_fin", "figures", {"year": 2021}, 0.0)]
+    answer = "Paul was working for General Dynamics when the roof fell in. [1] Sales rose 21%. [2]"
+    mixed = ask_flow.FinanceRoute("reader", QueryPlan(query="q", scope=MIXED), "q", hits=hits)
+    financial = ask_flow.FinanceRoute("reader", QueryPlan(query="q", scope=FINANCIAL), "q", hits=hits)
+    monkeypatch.delenv("FINANCE_MIXED_STRICT", raising=False)
+    assert ask_flow.finance_mixed_filter(mixed, answer, ["c"]) == (answer, ["c"])      # flag off: unchanged
+    monkeypatch.setenv("FINANCE_MIXED_STRICT", "1")
+    assert ask_flow.finance_mixed_filter(financial, answer, ["c"]) == (answer, ["c"])  # not a mixed plan
+    assert ask_flow.finance_mixed_filter(None, answer, ["c"]) == (answer, ["c"])       # legacy route
+    out, cites = ask_flow.finance_mixed_filter(mixed, answer, ["c"])
+    assert out == "Sales rose 21%. [2]"
+    assert [c["passage_ids"] for c in cites] == [["p_fin"]]

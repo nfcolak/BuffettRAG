@@ -287,6 +287,46 @@ def drop_personal_sentences(answer: str, hits: Sequence[SearchHit], store: Knowl
     return text or REFUSAL_LINE
 
 
+# A sentence with a business figure or money/percent amount is about the business, even when told inside a founder's
+# story (bare years are not figures: "In 1971, Paul was working ..." is the story).
+_MIXED_BUSINESS_CUE = re.compile(
+    r"\b(?:sales|revenues?|earn(?:s|ed|ing|ings)?|profits?|margins?|growth|grew|grow(?:s|n|ing)?|prices?|priced|paid|"
+    r"costs?|valuation|book value|float|premiums?|dividends?|market share|operating ratio|returns? on|"
+    r"million|billion|per[- ]share)\b|[$%]|\d+(?:\.\d+)?\s*%", re.I)
+
+
+def drop_mixed_personal_sentences(answer: str, hits: Sequence[SearchHit], store: KnowledgeStore) -> str:
+    """FINANCE_MIXED_STRICT, mixed plans only: the personal part of the question is not answered, so a sentence is
+    removed when every passage it cites carries personal facts (or is non-financial) and the sentence itself has no
+    business figure (`_MIXED_BUSINESS_CUE`). Wider than `drop_personal_sentences`, which needs a family/health word:
+    "Paul was working as a purchasing agent for General Dynamics when the roof fell in" has none. Returns the refusal
+    line when nothing is left."""
+    if not answer or answer == REFUSAL_LINE:
+        return answer
+
+    def personal_source(n: int) -> bool:
+        if not 1 <= n <= len(hits):
+            return False
+        ids = hits[n - 1].metadata.get("merged_ids") or [hits[n - 1].id]
+        return any(store.has_personal(pid) or not store.is_financial(pid) for pid in ids)
+
+    def story(sentence: str) -> bool:
+        cited = [int(x) for m in _CITE_RE.findall(sentence) for x in m.split(",")]
+        if not cited or not all(personal_source(n) for n in cited):
+            return False
+        return not _MIXED_BUSINESS_CUE.search(_CITE_RE.sub("", sentence))
+
+    out_lines = []
+    for line in answer.split("\n"):
+        parts = _SENTENCE_END_RE.split(line)
+        sentences = [parts[i] + (parts[i + 1] if i + 1 < len(parts) else "") for i in range(0, len(parts), 2)]
+        kept = [x for x in sentences if x.strip() and not story(x)]
+        if kept or not line.strip():
+            out_lines.append(" ".join(x.strip() for x in kept))
+    text = "\n".join(out_lines).strip()
+    return text or REFUSAL_LINE
+
+
 def format_reader_answer(text: str) -> str:
     """`format_answer_markdown` that keeps a number with thousands separators whole: its inline-list split turns
     "... is about 600,000. [2]" into "... is about 600" and a list item "000. [2]"."""
