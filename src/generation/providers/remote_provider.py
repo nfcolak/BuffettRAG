@@ -104,6 +104,9 @@ class RemoteProvider:
 
     def generate_stream(self, prompt: str, max_new_tokens: Optional[int] = None) -> Iterator[str]:
         response = self._post(self._payload(prompt, max_new_tokens, stream=True), stream=True)
+        # llama-server sends text/event-stream without a charset; requests would then decode it as ISO-8859-1 and
+        # turn every curly quote into mojibake ("can’t" -> "canâ\x80\x99t"), which also defeats sentence dedupe.
+        response.encoding = "utf-8"
         try:
             for raw in response.iter_lines(decode_unicode=True):
                 if not raw or not raw.startswith("data:"):

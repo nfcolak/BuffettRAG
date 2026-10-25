@@ -26,6 +26,7 @@ class _Stub:
     def __init__(self) -> None:
         self.requests: list = []
         self.script: list = []
+        self.stream_pieces: tuple = ("Buffett ", "wrote ", "[1].")
         stub = self
 
         class Handler(BaseHTTPRequestHandler):
@@ -46,9 +47,9 @@ class _Stub:
                     self.send_response(200)
                     self.send_header("Content-Type", "text/event-stream")
                     self.end_headers()
-                    for piece in ("Buffett ", "wrote ", "[1]."):
+                    for piece in stub.stream_pieces:  # raw UTF-8 like llama-server (no \\u escapes, no charset)
                         chunk = {"choices": [{"delta": {"content": piece}}]}
-                        self.wfile.write(f"data: {json.dumps(chunk)}\n\n".encode())
+                        self.wfile.write(f"data: {json.dumps(chunk, ensure_ascii=False)}\n\n".encode("utf-8"))
                     self.wfile.write(b"data: [DONE]\n\n")
                 else:
                     payload = json.dumps({"choices": [{"message": {"content": f" {ANSWER} "}}]}).encode()
@@ -118,6 +119,12 @@ def test_generate_stream_yields_deltas(stub):
     pieces = list(RemoteProvider().generate_stream(_prompt()))
     assert "".join(pieces) == "Buffett wrote [1]."
     assert stub.requests[0]["body"]["stream"] is True
+
+
+def test_generate_stream_decodes_utf8_without_charset(stub):
+    # text/event-stream without a charset: requests would decode it as ISO-8859-1 ("canât")
+    stub.stream_pieces = ("We can’t ", "value Moody’s.")
+    assert "".join(RemoteProvider().generate_stream(_prompt())) == "We can’t value Moody’s."
 
 
 def test_retry_on_503_then_success(stub):
