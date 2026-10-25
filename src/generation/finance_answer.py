@@ -224,7 +224,7 @@ def reader_prompt(query: str, hits: Sequence[SearchHit], history: Optional[Seque
 def is_reader_prompt(prompt: str) -> bool:
     """True for a prompt built by `reader_prompt` or `reader_prompt_v3`, or a v3 retry prompt (the question text cannot
     reach the tail)."""
-    return bool(prompt) and prompt.endswith((_READER_TAIL, _V3_TAIL, _RETRY_TAIL))
+    return bool(prompt) and prompt.endswith((_READER_TAIL, _V3_TAIL, _RETRY_TAIL, _COMPOSE_TAIL))
 
 
 def is_gap_line(text: str) -> bool:
@@ -376,6 +376,113 @@ def reader_prompt_v3(query: str, hits: Sequence[SearchHit], history: Optional[Se
 def is_v3_prompt(prompt: str, with_retry: bool = False) -> bool:
     """True for a prompt built by `reader_prompt_v3`; with `with_retry` also for its retry prompt."""
     return bool(prompt) and prompt.endswith((_V3_TAIL, _RETRY_TAIL) if with_retry else _V3_TAIL)
+
+
+# --- compose mode (FINANCE_COMPOSE) ---------------------------------------------------------------------------------
+# The reader writes a short answer in its own words instead of copying passage sentences. Its sentences are checked
+# by `validate_composed` (citation, figures, content words), not by the copy-oriented claim validator, and they are
+# not padded with neighbour sentences.
+COMPOSE_INSTRUCTIONS = (
+    "The passages are grouped by letter year, oldest first. "
+    "Write a short answer of three to six sentences in your own words that directly answers the question: "
+    "summarize and connect what the passages say instead of copying their sentences. "
+    "When the question asks how something changed or compares periods, say what Buffett said in each period, "
+    "name the years, and state plainly what changed. "
+    "Give the figures the passages state. "
+    "End every sentence with the citation of the passage or passages it is based on, like [2] or [2,5]. "
+    "Use only what the passages state; never add numbers, names, years or causes they do not give. "
+    "If the passages answer only part of the question, answer that part, then say in one sentence which part they "
+    "do not cover."
+)
+_COMPOSE_TAIL = f" {COMPOSE_INSTRUCTIONS}{_ANSWER_SUFFIX}"
+COMPOSE_MIN_OVERLAP = 0.3   # share of a sentence's content words that must occur in the passages it cites
+_STOPWORDS = frozenset(
+    "about above after again against also among because been before being between both but could does doing during "
+    "each from further have having here into itself just more most much must only other over same should since some "
+    "such than that their them then there these they this those through under until very were what when where which "
+    "while whom will with would your buffett berkshire letter letters passage passages said says wrote year years "
+    "says".split())
+_WORD_RE = re.compile(r"[a-z][a-z'-]{3,}")
+_NUMBER_RE = re.compile(r"\d[\d,]*(?:\.\d+)?")
+
+
+def reader_prompt_compose(query: str, hits: Sequence[SearchHit], history: Optional[Sequence[Dict[str, str]]] = None,
+                          premise_note: Optional[str] = None) -> str:
+    """The v3 prompt (year-grouped passages, premise note) with COMPOSE_INSTRUCTIONS instead of V3_INSTRUCTIONS."""
+    prompt = reader_prompt_v3(query, hits, history, premise_note)
+    if not prompt.endswith(_V3_TAIL):  # defensive: reader_prompt_v3 fell back to the plain cited prompt
+        return prompt
+    return prompt[:-len(_V3_TAIL)] + _COMPOSE_TAIL
+
+
+def is_compose_prompt(prompt: str) -> bool:
+    return bool(prompt) and prompt.endswith(_COMPOSE_TAIL)
+
+
+def _stem(word: str) -> str:
+    return word[:5]
+
+
+def _content_words(text: str) -> List[str]:
+    return [w for w in _WORD_RE.findall(text.lower().replace("’", "'")) if w not in _STOPWORDS]
+
+
+def _hit_text(hit: SearchHit) -> str:
+    return str(getattr(hit, "text", "") or "")
+
+
+def validate_composed(answer: str, hits: Sequence[SearchHit],
+                      min_overlap: float = COMPOSE_MIN_OVERLAP) -> Tuple[str, List[Dict[str, str]]]:
+    """(answer, dropped): a composed sentence stays when it cites at least one served passage, every number in it
+    occurs in the cited passages (or is one of their letter years), and at least `min_overlap` of its content words
+    (5-letter stems) occur in them. A gap line ("The passages do not cover ...") stays without a citation when a cited
+    sentence stays. Nothing left -> the refusal line."""
+    if not answer or answer == REFUSAL_LINE:
+        return answer, []
+    dropped: List[Dict[str, str]] = []
+    out_lines: List[str] = []
+    any_cited = False
+    for line in answer.split("\n"):
+        if not line.strip():
+            out_lines.append("")
+            continue
+        prefix = _LIST_PREFIX_RE.match(line)
+        head = prefix.group() if prefix else ""
+        body_line = line[len(head):]
+        sentences = [body_line[a:b] for a, b in _sentence_spans(body_line)]
+        kept = []
+        for sentence in (s for s in sentences if s.strip()):
+            body = _CITE_RE.sub("", sentence).strip()
+            cited = [int(x) for m in _CITE_RE.findall(sentence) for x in m.split(",") if x.strip().isdigit()]
+            cited = [n for n in cited if 1 <= n <= len(hits)]
+            if not cited:
+                if is_gap_line(body):
+                    kept.append((sentence, False))
+                else:
+                    dropped.append({"sentence": sentence, "reason": "no_citation"})
+                continue
+            source = " ".join(_hit_text(hits[n - 1]) for n in cited)
+            years = {str(hits[n - 1].metadata.get("year")) for n in cited}
+            plain = source.replace(",", "")
+            missing = [x for x in _NUMBER_RE.findall(body) if x.replace(",", "") not in plain and x not in years]
+            if missing:
+                dropped.append({"sentence": sentence, "reason": "unsupported_number:" + ",".join(missing)})
+                continue
+            words = _content_words(body)
+            if words:
+                stems = {_stem(w) for w in _content_words(source)}
+                share = sum(1 for w in words if _stem(w) in stems) / len(words)
+                if share < min_overlap:
+                    dropped.append({"sentence": sentence, "reason": f"low_overlap:{share:.2f}"})
+                    continue
+            kept.append((sentence, True))
+            any_cited = True
+        if kept:
+            out_lines.append(head + " ".join(s.strip() for s, _ in kept))
+    if not any_cited:
+        return REFUSAL_LINE, dropped
+    text = re.sub(r"\n{3,}", "\n\n", "\n".join(out_lines)).strip()
+    return text or REFUSAL_LINE, dropped
 
 
 def prompt_premise(prompt: str) -> Optional[str]:

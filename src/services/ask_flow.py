@@ -246,8 +246,39 @@ def _partial_retry(llm, retry_prompt: str, context_hits, max_new_tokens: int, tr
     return retried
 
 
+def _finalize_composed(context_hits, raw_answer: str, trace: Optional[Dict[str, Any]] = None):
+    """FINANCE_COMPOSE: the composed answer is checked by `finance_answer.validate_composed` (citation, figures, content
+    words) instead of the copy-oriented claim validator, loses personal sentences and repeats, and gets no neighbour
+    sentences."""
+    answer = finance_answer.format_reader_answer(strip_chat_artifacts(raw_answer))
+    if trace is not None:
+        trace["raw_answer"] = raw_answer
+    if is_citation_only(answer) or not answer.strip():
+        if trace is not None:
+            trace["validator"] = {"skipped": "citation_only", "kept": [], "dropped": []}
+        return REFUSAL_LINE, []
+    if answer == REFUSAL_LINE:
+        if trace is not None:
+            trace["validator"] = {"skipped": "model_refused", "kept": [], "dropped": []}
+        return answer, []
+    answer, dropped = finance_answer.validate_composed(answer, context_hits)
+    if trace is not None:
+        trace["validator"] = {"mode": "compose", "dropped": dropped}
+    if answer == REFUSAL_LINE:
+        return answer, []
+    answer = finance_answer.drop_personal_sentences(answer, context_hits, _knowledge_store())
+    if answer == REFUSAL_LINE:
+        return answer, []
+    answer, deduped = finance_answer.dedupe_sentences(answer)
+    if trace is not None and deduped:
+        trace["validator"]["deduped"] = deduped
+    return answer, parse_citations(answer, context_hits)
+
+
 def _finalize_once(prompt: str, context_hits, raw_answer: str, trace: Optional[Dict[str, Any]] = None):
     """`_finalize_answer` without the v3 partial retry."""
+    if finance_answer.is_compose_prompt(prompt):
+        return _finalize_composed(context_hits, raw_answer, trace)
     reader = finance_answer.is_reader_prompt(prompt)
     v3 = finance_answer.is_v3_prompt(prompt, with_retry=True)
     premise = finance_answer.prompt_premise(prompt) if v3 else None
@@ -612,7 +643,9 @@ def finance_route_steps(req: AskRequest):
         def compose(served: List[Any]):
             ordered = finance_answer.sort_by_year(served) if plan.kind == TREND or v3 else served
             ordered = order_passages(ordered)
-            if v3:
+            if v3 and finance_setting("FINANCE_COMPOSE"):
+                text = finance_answer.reader_prompt_compose(query, ordered, history, plan.premise_note)
+            elif v3:
                 text = finance_answer.reader_prompt_v3(query, ordered, history, plan.premise_note)
             else:
                 text = finance_answer.reader_prompt(query, ordered, history, trend=plan.kind == TREND)

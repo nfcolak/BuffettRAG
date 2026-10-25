@@ -318,3 +318,50 @@ def test_finance_mixed_filter_only_for_mixed_reader_routes_with_the_flag(monkeyp
     out, cites = ask_flow.finance_mixed_filter(mixed, answer, ["c"])
     assert out == "Sales rose 21%. [2]"
     assert [c["passage_ids"] for c in cites] == [["p_fin"]]
+
+
+# --- compose mode (FINANCE_COMPOSE) ---
+_COMPOSE_HITS = [
+    SearchHit("1999_p0091", "Our problem is that we have no insights into which participants in the tech field "
+              "possess a truly durable competitive advantage. Our lack of tech insights does not distress us.",
+              {"year": 1999}, 1.0),
+    SearchHit("2024_p0022", "We own a small percentage of a dozen or so very large and highly profitable businesses "
+              "with household names such as Apple, American Express, Coca-Cola and Moody's.", {"year": 2024}, 1.0),
+]
+
+
+def test_compose_prompt_swaps_only_the_instructions():
+    v3 = fa.reader_prompt_v3("How did his tech view change?", _COMPOSE_HITS)
+    compose = fa.reader_prompt_compose("How did his tech view change?", _COMPOSE_HITS)
+    assert fa.is_compose_prompt(compose) and fa.is_reader_prompt(compose)
+    assert not fa.is_compose_prompt(v3) and not fa.is_v3_prompt(compose)
+    assert compose.replace(fa.COMPOSE_INSTRUCTIONS, fa.V3_INSTRUCTIONS) == v3
+
+
+def test_validate_composed_keeps_paraphrase_drops_invented_figure_and_uncited():
+    answer = ("In 1999 Buffett avoided tech because he saw no durable competitive advantage among its participants [1]. "
+              "By 2024 Berkshire owned small stakes in very profitable household names such as Apple [2]. "
+              "Apple returned 45% a year to Berkshire [2]. "
+              "This shows a complete reversal of his philosophy.")
+    kept, dropped = fa.validate_composed(answer, _COMPOSE_HITS)
+    assert kept == ("In 1999 Buffett avoided tech because he saw no durable competitive advantage among its "
+                    "participants [1]. By 2024 Berkshire owned small stakes in very profitable household names such "
+                    "as Apple [2].")
+    assert [d["reason"] for d in dropped] == ["unsupported_number:45", "no_citation"]
+
+
+def test_validate_composed_drops_off_topic_sentence_and_refuses_when_empty():
+    kept, dropped = fa.validate_composed("Railroads move freight across the continent cheaply [1].", _COMPOSE_HITS)
+    assert kept == fa.REFUSAL_LINE and dropped[0]["reason"].startswith("low_overlap")
+    assert fa.validate_composed(fa.REFUSAL_LINE, _COMPOSE_HITS) == (fa.REFUSAL_LINE, [])
+
+
+def test_finalize_routes_compose_prompt_without_expansion():
+    from src.services import ask_flow
+    prompt = fa.reader_prompt_compose("How did his tech view change?", _COMPOSE_HITS)
+    raw = ("In 1999 Buffett avoided tech because he saw no durable competitive advantage among its participants [1]. "
+           "By 2024 Berkshire owned small stakes in very profitable household names such as Apple [2].")
+    trace = {}
+    answer, citations = ask_flow._finalize_once(prompt, _COMPOSE_HITS, raw, trace)
+    assert answer == raw and trace["validator"]["mode"] == "compose"
+    assert [c["years"] for c in citations] == [[1999], [2024]]
