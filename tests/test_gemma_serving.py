@@ -62,12 +62,13 @@ def _fake_modal(local: bool) -> types.ModuleType:
     mod = types.ModuleType("modal")
     mod.chain = _Chain()
     mod.is_local = lambda: local
-    mod.Image = types.SimpleNamespace(from_registry=lambda *a, **k: mod.chain)
+    mod.Image = types.SimpleNamespace(from_registry=lambda *a, **k: mod.chain, debian_slim=lambda *a, **k: mod.chain)
     mod.App = lambda name: types.SimpleNamespace(name=name, function=_decorator)
     mod.Volume = types.SimpleNamespace(from_name=lambda name: name)
     mod.Secret = types.SimpleNamespace(from_name=lambda name: name)
     mod.concurrent = _decorator
     mod.web_server = _decorator
+    mod.fastapi_endpoint = _decorator
     return mod
 
 
@@ -108,6 +109,7 @@ def _serve(module, monkeypatch, tmp_path, gguf_name=None):
     monkeypatch.setenv("LLM_TOKEN", "llm-secret-for-the-test")
     _Popen.calls = []
     monkeypatch.setattr(module.subprocess, "Popen", _Popen)
+    monkeypatch.setattr(module, "_gpu_name", lambda: "NVIDIA L4")  # nvidia-smi would be one more Popen call
     module.serve()
     (llama, llama_kw), (app, app_kw) = _Popen.calls
     assert llama_kw == {"shell": True} and app[:3] == ["python", "-m", "uvicorn"]
@@ -161,8 +163,9 @@ def test_a_file_missing_on_the_volume_fails_at_start_and_lists_what_is_there(loa
 def test_the_setting_is_baked_into_the_image_and_other_variables_are_not(load_app, monkeypatch):
     module = load_app(LLM_GGUF=GEMMA, LLM_PROMPT_VERSION="v3", FINANCE_PIPELINE="1", KNOWLEDGE_DIR="/k", SOME_OTHER="x")
     image_envs = [args[0] for name, args, _kw in module.fake_modal.chain.calls if name == "env"]
-    assert len(image_envs) == 1
-    image_env = image_envs[0]
+    assert len(image_envs) == 2  # the serving image, then the CPU status image (only its app name)
+    image_env, status_env = image_envs
+    assert status_env == {"STATUS_APP_NAME": module.APP_NAME}
     assert image_env["LLM_GGUF"] == GEMMA and image_env["LLM_PROMPT_VERSION"] == "v3"
     assert image_env["FINANCE_PIPELINE"] == "1" and image_env["KNOWLEDGE_DIR"] == "/k"
     assert "SOME_OTHER" not in image_env and "LLM_TOKEN" not in image_env

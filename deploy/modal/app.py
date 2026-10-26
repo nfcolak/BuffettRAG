@@ -31,7 +31,11 @@ TOKENIZER_FILE = "data/tokenizer/qwen_tokenizer.json"  # Qwen BPE tokenizer for 
 GEMMA_TOKENIZER_FILE = "data/tokenizer/gemma4_12b_it/tokenizer.json"  # Gemma 4 12B tokenizer (32 MB, kept local, not in git)
 MODELS_DIR = "/models"
 APP_DIR = "/root/app"
-GPU = "L4"
+# GPU types in preference order: Modal takes the first one with free capacity. On 2026-10-26 Modal had no free L4 for
+# minutes ("waiting to be scheduled on a GPU_L4 worker"); A10G (24 GB, about the L4's price) and L40S (48 GB, dearer)
+# run the same CUDA image and fit the 12B Q4 model.
+GPU = ["L4", "A10G", "L40S"]
+STATUS_DICT = "buffettrag-status"  # modal.Dict: the serving container writes its GPU name here for the status endpoint
 CTX_SIZE = 16384
 LLM_PORT = 8080
 WEB_PORT = 8000
@@ -131,7 +135,8 @@ def _baked_env() -> dict:
         return {}
     # FINANCE_* settings (config.FINANCE_DEFAULTS overrides, e.g. a staging trial of a new answer setting), KNOWLEDGE_DIR and
     # the reader model (LLM_GGUF, LLM_PROMPT_VERSION): the container reads them again when it imports this file
-    baked = ("KNOWLEDGE_DIR", "LLM_GGUF", "LLM_PROMPT_VERSION")
+    # APP_NAME too: `serve` keys its GPU note by it, and a staging container would otherwise write under the live name
+    baked = ("KNOWLEDGE_DIR", "LLM_GGUF", "LLM_PROMPT_VERSION", "APP_NAME")
     return {k: v for k, v in os.environ.items() if v and (k.startswith("FINANCE_") or k in baked)}
 
 
@@ -245,7 +250,12 @@ models = modal.Volume.from_name("buffettrag-models")
 def serve() -> None:
     """Start llama.cpp on localhost and the BuffettRAG app on WEB_PORT; Modal proxies WEB_PORT."""
     require_gguf(MODELS_DIR, GGUF_NAME)
-    print(f"serving {GGUF_NAME} ({MODEL_FAMILY} flags)")
+    gpu_name = _gpu_name()
+    print(f"serving {GGUF_NAME} ({MODEL_FAMILY} flags) on {gpu_name}")
+    try:  # the status endpoint shows visitors which GPU the model runs on
+        modal.Dict.from_name(STATUS_DICT, create_if_missing=True)[APP_NAME] = {"gpu": gpu_name}
+    except Exception as exc:  # noqa: BLE001 - the status note must never stop serving
+        print(f"status note not written ({type(exc).__name__}: {exc})")
     subprocess.Popen(llama_server_command(GGUF_NAME, MODELS_DIR), shell=True)
     env = dict(os.environ)
     env.update(
@@ -266,3 +276,50 @@ def serve() -> None:
         ["python", "-m", "uvicorn", "src.services.space_app:app", "--host", "0.0.0.0", "--port", str(WEB_PORT)],
         cwd=APP_DIR, env=env,
     )
+
+
+def _gpu_name() -> str:
+    """The GPU this container got (one of GPU), e.g. "NVIDIA A10G"; "unknown" when nvidia-smi gives nothing."""
+    try:
+        out = subprocess.run(["nvidia-smi", "--query-gpu=name", "--format=csv,noheader"],
+                             capture_output=True, text=True, timeout=20).stdout.strip()
+        return out.splitlines()[0].strip() if out else "unknown"
+    except Exception:  # noqa: BLE001
+        return "unknown"
+
+
+def wake_status(stats, gpu_note) -> dict:
+    """What the waiting visitor is told, from the serving function's stats and the GPU note `serve` wrote.
+
+    state: "asleep" (no container, nothing queued), "queued" (a request waits and no container has been placed yet:
+    normal for a few seconds, a GPU shortage when it lasts), "running" (a container exists; it may still be loading the
+    model, which /api/ready tells apart).
+    """
+    runners = int(getattr(stats, "num_total_runners", 0) or 0)
+    backlog = int(getattr(stats, "backlog", 0) or 0)
+    state = "running" if runners > 0 else ("queued" if backlog > 0 else "asleep")
+    gpu = (gpu_note or {}).get("gpu") if state == "running" else None
+    return {"state": state, "containers": runners, "queued_requests": backlog, "gpu": gpu, "gpu_options": list(GPU)}
+
+
+status_image = modal.Image.debian_slim(python_version="3.11").pip_install("fastapi[standard]").env(
+    {"STATUS_APP_NAME": APP_NAME})
+
+
+@app.function(image=status_image, scaledown_window=60, timeout=30)
+@modal.fastapi_endpoint(method="GET")
+def status() -> dict:
+    """CPU-only, starts in seconds: tells the waking page whether the GPU server is asleep, waiting for a GPU or up.
+
+    Read-only; it calls nothing on the GPU function, so polling it never wakes or bills a GPU.
+    """
+    name = os.environ.get("STATUS_APP_NAME", LIVE_APP_NAME)
+    try:
+        stats = modal.Function.from_name(name, "serve").get_current_stats()
+    except Exception as exc:  # noqa: BLE001
+        return {"state": "unknown", "error": type(exc).__name__, "gpu_options": list(GPU)}
+    try:
+        note = modal.Dict.from_name(STATUS_DICT, create_if_missing=True).get(name)
+    except Exception:  # noqa: BLE001
+        note = None
+    return wake_status(stats, note)

@@ -6,6 +6,10 @@
   "outputDirectory": "dist",
   "rewrites": [
     {
+      "source": "/status",
+      "destination": "https://nfcolak--buffettrag-app-status.us-east.modal.run/"
+    },
+    {
       "source": "/api/:path*",
       "destination": "https://nfcolak--buffettrag-app-serve.us-east.modal.run/api/:path*"
     }

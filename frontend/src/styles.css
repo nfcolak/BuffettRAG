@@ -1561,3 +1561,92 @@ button {
 .typing-bubble .stage-line {
   margin: 0 0 0 8px;
 }
+
+/* ---------------------------------------------------------------------------
+   Cold-start banner: the GPU backend sleeps when idle and takes ~1 min to wake
+--------------------------------------------------------------------------- */
+.status-chip .dot.waking {
+  background: var(--gold);
+  box-shadow: 0 0 8px var(--gold);
+  animation: wake-pulse 1.2s ease-in-out infinite;
+}
+
+.wake-banner {
+  flex: 0 0 auto;
+  margin: 14px 22px 0;
+  padding: 14px 16px 12px;
+  border: 1px solid rgba(255, 215, 107, 0.32);
+  border-radius: 12px;
+  background: linear-gradient(180deg, rgba(255, 215, 107, 0.10), rgba(255, 215, 107, 0.04));
+  color: var(--text-primary);
+}
+
+.wake-banner.failed {
+  border-color: rgba(255, 120, 140, 0.35);
+  background: rgba(80, 20, 28, 0.55);
+}
+
+.wake-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.wake-title {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--gold);
+}
+
+.wake-banner.failed .wake-title { color: #ffd6dc; }
+
+.wake-clock {
+  margin-left: auto;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.wake-text {
+  margin-top: 6px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+.wake-spinner {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 215, 107, 0.25);
+  border-top-color: var(--gold);
+  animation: wake-spin 0.9s linear infinite;
+}
+
+.wake-bar {
+  margin-top: 10px;
+  height: 4px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.06);
+  overflow: hidden;
+}
+
+.wake-bar-fill {
+  height: 100%;
+  border-radius: 4px;
+  background: linear-gradient(90deg, var(--gold), #ffe9a8);
+  transition: width 1s linear;
+}
+
+.wake-retry {
+  margin-top: 10px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border-strong);
+  background: var(--bg-elev);
+  color: var(--text-primary);
+  cursor: pointer;
+}
+
+@keyframes wake-spin { to { transform: rotate(360deg); } }
+@keyframes wake-pulse { 50% { opacity: 0.35; } }

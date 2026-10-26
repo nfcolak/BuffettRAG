@@ -8,6 +8,7 @@ const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "/api";
 const BACKEND_API_KEY = import.meta.env.VITE_BACKEND_API_KEY || "";
 const HISTORY_KEY = "buffettrag.messages.v1";
 const STAGE_LABELS = {
+  waking: "Waking up the model… the first answer after a pause takes about a minute.",
   expanding: "Expanding query…",
   retrieving: "Searching letters…",
   generating: "Writing answer…",
@@ -169,27 +170,214 @@ async function askBackendStream(query, config, history, handlers) {
   return result;
 }
 
-async function getBackendHealth() {
+// Cold start: the backend (GPU model on Modal) sleeps after ~5 idle minutes and needs 30-90 s to wake. Every probe
+// below also wakes it; probes are short so the browser never sits on one long silent request.
+const WAKE_PROBE_TIMEOUT_MS = 15000;
+const WAKE_RETRY_MS = 2000;
+const WAKE_EXPECTED_S = 60;   // progress bar length
+const WAKE_SLOW_S = 150;      // "taking longer than usual"
+const WAKE_GIVE_UP_S = 420;   // stop polling, ask for a reload
+const IDLE_SLEEP_MS = 4 * 60 * 1000;  // after this long without a request, check before sending
+
+async function probeReady(timeoutMs = WAKE_PROBE_TIMEOUT_MS) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
   try {
-    const response = await fetch(`${BACKEND_URL}/ready`);
-    if (response.ok) {
-      const data = await response.json().catch(() => ({}));
-      return { online: true, indexed_count: data.indexed_count ?? null };
-    }
+    const response = await fetch(`${BACKEND_URL}/ready`, { signal: controller.signal, cache: "no-store" });
+    if (!response.ok) return null;
     const data = await response.json().catch(() => ({}));
-    const alive = await fetch(`${BACKEND_URL}/health`).then((r) => r.ok).catch(() => false);
-    return alive ? { online: true, indexed_count: data.indexed_count ?? null } : null;
+    return { online: true, indexed_count: data.indexed_count ?? null };
   } catch {
-    try {
-      const alive = await fetch(`${BACKEND_URL}/health`);
-      return alive.ok ? { online: true, indexed_count: null } : null;
-    } catch {
-      return null;
-    }
+    return null;
+  } finally {
+    clearTimeout(timer);
   }
 }
 
-function TopBar({ health }) {
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+// What the GPU host is doing while the page waits (deploy/modal/app.py `status`, CPU only, never wakes the GPU):
+// { state: "asleep" | "queued" | "running" | "unknown", gpu, gpu_options }. null when the endpoint is unreachable.
+const STATUS_URL = import.meta.env.VITE_STATUS_URL || "/status";
+const STATUS_POLL_MS = 4000;
+const QUEUED_SHORTAGE_S = 20;  // a request waiting this long with no container placed = no free GPU at the host
+
+async function probeStatus() {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 8000);
+  try {
+    const response = await fetch(STATUS_URL, { signal: controller.signal, cache: "no-store" });
+    if (!response.ok) return null;
+    const data = await response.json();
+    return data && typeof data.state === "string" ? data : null;
+  } catch {
+    return null;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+function gpuLabel(name) {
+  return String(name || "").replace(/^NVIDIA\s+/i, "") || null;
+}
+
+// phase: "checking" (first probe) | "waking" | "slow" | "failed" | "ready"
+function useBackendWake() {
+  const [state, setState] = React.useState({ phase: "checking", startedAt: Date.now(), health: null });
+  const waiting = React.useRef(null);
+  const lastOkAt = React.useRef(0);
+
+  const wake = React.useCallback(() => {
+    if (waiting.current) return waiting.current;
+    const startedAt = Date.now();
+    waiting.current = (async () => {
+      let first = true;
+      for (;;) {
+        const health = await probeReady(first ? 5000 : WAKE_PROBE_TIMEOUT_MS);
+        if (health) {
+          lastOkAt.current = Date.now();
+          setState({ phase: "ready", startedAt, health });
+          return true;
+        }
+        const elapsed = (Date.now() - startedAt) / 1000;
+        if (elapsed > WAKE_GIVE_UP_S) {
+          setState((s) => ({ ...s, phase: "failed", startedAt }));
+          return false;
+        }
+        setState((s) => ({ ...s, phase: elapsed > WAKE_SLOW_S ? "slow" : "waking", startedAt }));
+        first = false;
+        await sleep(WAKE_RETRY_MS);
+      }
+    })().finally(() => {
+      waiting.current = null;
+    });
+    return waiting.current;
+  }, []);
+
+  // A backend idle for a few minutes may be asleep again: check (and wake) it before the next question.
+  const needsCheck = React.useCallback(
+    () => state.phase !== "ready" || Date.now() - lastOkAt.current > IDLE_SLEEP_MS,
+    [state.phase]
+  );
+
+  const markUsed = React.useCallback(() => {
+    lastOkAt.current = Date.now();
+  }, []);
+
+  React.useEffect(() => {
+    wake();
+  }, [wake]);
+
+  // The host's own view (asleep / queued for a GPU / running on which GPU): polled while waking, read once when ready
+  // so the top bar can name the GPU.
+  const [host, setHost] = React.useState(null);
+  const queuedSince = React.useRef(null);
+  React.useEffect(() => {
+    if (state.phase === "checking") return undefined;
+    let stopped = false;
+    const poll = async () => {
+      const data = await probeStatus();
+      if (stopped) return;
+      if (!data) {
+        setHost((h) => (h && h.state === "running" && h.gpu ? h : null));
+        return;
+      }
+      if (data.state === "queued") queuedSince.current = queuedSince.current ?? Date.now();
+      else queuedSince.current = null;
+      const queuedFor = queuedSince.current ? Math.round((Date.now() - queuedSince.current) / 1000) : 0;
+      setHost({ ...data, queuedFor });
+    };
+    poll();
+    if (state.phase === "ready" || state.phase === "failed") return () => { stopped = true; };
+    const id = setInterval(poll, STATUS_POLL_MS);
+    return () => {
+      stopped = true;
+      clearInterval(id);
+    };
+  }, [state.phase]);
+
+  return { ...state, host, wake, needsCheck, markUsed };
+}
+
+function useElapsed(active, startedAt) {
+  const [now, setNow] = React.useState(Date.now());
+  React.useEffect(() => {
+    if (!active) return undefined;
+    const id = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(id);
+  }, [active]);
+  return Math.max(0, Math.round((now - startedAt) / 1000));
+}
+
+// Banner title and text from the host status; the plain cold-start wording when the status is unknown.
+function wakeMessage(wake) {
+  const host = wake.host;
+  const options = (host?.gpu_options || []).join(", ");
+  const typing = "You can type your question now; it is sent as soon as the model is ready.";
+  if (host?.state === "queued" && host.queuedFor >= QUEUED_SHORTAGE_S) {
+    return {
+      title: "Waiting for a free GPU…",
+      text: `Our GPU host (Modal) has no free GPU of the types this demo uses (${options || "L4, A10G, L40S"}) right now. ` +
+        "Your request is in its queue and starts as soon as one frees up. This is outside the demo's control and " +
+        `usually takes a few minutes. ${typing}`,
+    };
+  }
+  if (host?.state === "running") {
+    const gpu = gpuLabel(host.gpu);
+    return {
+      title: gpu ? `GPU found (${gpu}), loading the model…` : "GPU found, loading the model…",
+      text: `The server is up; loading the 12B model onto the GPU takes about a minute. ${typing}`,
+    };
+  }
+  if (host?.state === "queued" || host?.state === "asleep") {
+    return {
+      title: "Starting the GPU server…",
+      text: "To keep the demo free, the GPU server sleeps when nobody is using it. Waking it takes about a minute: " +
+        `first a GPU is reserved, then the model is loaded. ${typing}`,
+    };
+  }
+  return {
+    title: wake.phase === "slow" ? "Still waking up — taking longer than usual…" : "Waking up the model…",
+    text: `To keep the demo free, the GPU server sleeps when nobody is using it. Starting it takes about a minute. ${typing}`,
+  };
+}
+
+function WakeBanner({ wake }) {
+  const active = ["waking", "slow", "failed"].includes(wake.phase);
+  const elapsed = useElapsed(active && wake.phase !== "failed", wake.startedAt);
+  if (!active) return null;
+  const pct = Math.min(95, Math.round((elapsed / WAKE_EXPECTED_S) * 100));
+  const clock = `${Math.floor(elapsed / 60)}:${String(elapsed % 60).padStart(2, "0")}`;
+  if (wake.phase === "failed") {
+    const shortage = wake.host?.state === "queued";
+    return (
+      <div className="wake-banner failed" role="status">
+        <div className="wake-title">The demo backend did not start.</div>
+        <div className="wake-text">
+          {shortage
+            ? "Our GPU host (Modal) still has no free GPU for this demo. Please try again in a few minutes."
+            : "Please reload the page in a minute. If it keeps failing, the GPU host may be busy."}
+        </div>
+        <button className="wake-retry" onClick={() => wake.wake()}>Try again</button>
+      </div>
+    );
+  }
+  const message = wakeMessage(wake);
+  return (
+    <div className="wake-banner" role="status" aria-live="polite">
+      <div className="wake-row">
+        <span className="wake-spinner" />
+        <div className="wake-title">{message.title}</div>
+        <span className="wake-clock">{clock}</span>
+      </div>
+      <div className="wake-text">{message.text}</div>
+      <div className="wake-bar"><div className="wake-bar-fill" style={{ width: `${pct}%` }} /></div>
+    </div>
+  );
+}
+
+function TopBar({ health, phase, host }) {
+  const gpu = phase === "ready" && host?.state === "running" ? gpuLabel(host.gpu) : null;
   return (
     <header className="topbar">
       <div className="brand">
@@ -215,10 +403,18 @@ function TopBar({ health }) {
 
       <div className="status-cluster">
         <span className="status-chip">
-          <span className={`dot ${health?.online ? "" : "idle"}`} />
+          <span className={`dot ${phase === "ready" ? "" : phase === "failed" ? "idle" : "waking"}`} />
           <span>backend</span>
-          <strong>{health?.online ? "online" : "offline"}</strong>
+          <strong>
+            {phase === "ready" ? "online" : phase === "failed" ? "offline" : phase === "checking" ? "checking…" : "waking up…"}
+          </strong>
         </span>
+        {gpu && (
+          <span className="status-chip">
+            <span>gpu</span>
+            <strong>{gpu}</strong>
+          </span>
+        )}
         <span className="status-chip">
           <span>chunks</span>
           <strong>{health?.indexed_count ?? "n/a"}</strong>
@@ -506,6 +702,7 @@ function Stat({ value, label }) {
 }
 
 function ChatColumn({
+  wake,
   messages,
   isTyping,
   stage,
@@ -537,6 +734,8 @@ function ChatColumn({
         <div className="chat-header-spacer" />
         <button className="icon-btn" onClick={onClear} title="Clear chat"><Trash2 /></button>
       </div>
+
+      <WakeBanner wake={wake} />
 
       <div className="chat-scroll" ref={scrollRef}>
         {messages.length === 0 && !isTyping ? <EmptyState /> : (
@@ -710,7 +909,8 @@ function App() {
   const [isTyping, setIsTyping] = React.useState(false);
   const [stage, setStage] = React.useState("");
   const [error, setError] = React.useState("");
-  const [health, setHealth] = React.useState(null);
+  const wake = useBackendWake();
+  const health = wake.health;
   const inputRef = React.useRef(null);
 
   const [config, setConfig] = React.useState({
@@ -722,10 +922,6 @@ function App() {
     year: 2024,
     decade: 1970,
   });
-
-  React.useEffect(() => {
-    getBackendHealth().then(setHealth);
-  }, []);
 
   React.useEffect(() => {
     persistHistory(messages);
@@ -760,6 +956,22 @@ function App() {
     setDraft("");
     setIsTyping(true);
     setStage("");
+
+    // Cold start: wait (with a visible status) until the backend answers /ready instead of sending into a sleeping
+    // server, which would look like a hang and can hit the proxy's first-byte timeout.
+    if (wake.needsCheck()) {
+      const label = setTimeout(() => setStage("waking"), 1200);  // a warm backend answers the check within ~1 s
+      const ok = await wake.wake();
+      clearTimeout(label);
+      if (!ok) {
+        setError("The demo backend did not start. Please reload the page in a minute and ask again.");
+        setIsTyping(false);
+        setStage("");
+        return;
+      }
+      setStage("");
+    }
+    wake.markUsed();
 
     const appendFromResponse = (response) => {
       const assistantMessage = {
@@ -837,8 +1049,12 @@ function App() {
           setIsTyping(false);
           return;
         }
-        // Streaming endpoint unavailable — fall through to the regular path.
+        // Streaming endpoint unavailable (or the proxy gave up on a waking backend): wait until it is ready, then
+        // fall through to the regular path.
         setIsTyping(true);
+        setStage("waking");
+        await wake.wake();
+        setStage("");
       } finally {
         setIsTyping(false);
       }
@@ -868,11 +1084,12 @@ function App() {
 
   return (
     <>
-      <TopBar health={health} />
+      <TopBar health={health} phase={wake.phase} host={wake.host} />
       {error && <div className="error-banner">{error}</div>}
       <div className="workspace">
         <LeftRail config={config} setConfig={setConfig} onPickExample={pickExample} onClear={clearChat} />
         <ChatColumn
+          wake={wake}
           messages={messages}
           isTyping={isTyping}
           stage={stage}
