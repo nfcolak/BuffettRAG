@@ -79,6 +79,33 @@ def test_route_with_a_scope_that_has_no_passages_refuses_without_the_model(env):
     assert env.llm.prompts == []
 
 
+def test_scope_keeps_the_part_of_the_question_years_inside_it():
+    plan = plan_query("How did book value grow from 1985 to 1995?", premise_check=False)
+    scoped = scope_plan(plan, (1990, 1999), premise_check=False)
+    assert scoped.year_range == (1990, 1995) and scoped.year_hard
+
+
+def test_scope_outside_the_question_years_drops_the_figure_lookup():
+    plan = plan_query("What was Berkshire's book value per share in 1987?", premise_check=False)
+    assert plan.kind == "numeric"
+    scoped = scope_plan(plan, (1990, 1990), premise_check=False)
+    assert scoped.kind != "numeric" and not scoped.numeric and scoped.year_range == (1990, 1990)
+
+
+def test_numeric_question_inside_the_scope_is_answered_for_the_asked_year(env):
+    from test_ask_flow_finance import NUMERIC_Q
+    body = _ask(env, NUMERIC_Q, where={"year": 1987})
+    assert "$2,477.47" in body["answer"] and body["used_filter"] == {"year": 1987}
+
+
+def test_numeric_question_outside_the_scope_never_gets_another_year_figure(env):
+    """Live probe 2026-10-26: 1987 asked, 1990 picked -> the numbers table answered with 1990's $4,612.06."""
+    from test_ask_flow_finance import NUMERIC_Q
+    body = _ask(env, NUMERIC_Q, where={"year": 1990})
+    assert "as written" not in (body["answer"] or "") and "$2,477.47" not in (body["answer"] or "")
+    assert all(h["year"] == 1990 for h in body["hits"]) and body["used_filter"] == {"year": 1990}
+
+
 def test_the_site_matches_the_backend_refusal_and_scope_reply_text():
     """The site recognises these two answers by exact text (the scope hint under a refusal, the scope-reply style)."""
     from src.generation.finance_answer import SCOPE_REPLY

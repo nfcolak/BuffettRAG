@@ -589,6 +589,15 @@ def _where_keeps(hit: Any, where: Dict[str, Any]) -> bool:
 
 
 def finance_route_steps(req: AskRequest):
+    """`_finance_route_steps` with the request's Year / Decade scope reported on every route that served passages (a
+    finished numeric answer returns before the reader's `used_filter` is set)."""
+    route = yield from _finance_route_steps(req)
+    if req.where and route.used_filter is None and route.route != "scope":
+        route.used_filter = dict(req.where)
+    return route
+
+
+def _finance_route_steps(req: AskRequest):
     """Generator like `_prepare_ask_steps`: yields stage names, returns a `FinanceRoute` (StopIteration.value).
 
     Plans the question (deterministic, `src/query/plan.py`) and routes it: scope reply, superlative answer

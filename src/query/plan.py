@@ -766,18 +766,34 @@ def scope_plan(plan: QueryPlan, year_range: Tuple[int, int], store: Optional[Kno
                premise_check: Optional[bool] = None) -> QueryPlan:
     """`plan` restricted to the letters the user picked in the site's Year / Decade scope.
 
-    The picked years replace the question's own as a hard filter (the scope is the user's explicit choice, like "in
-    the YYYY letter"); the kind is planned again with them, so a corpus-wide question becomes a period question and the
-    superlative ranking (corpus-wide by design) is not used. The premise note is checked again against the picked
-    years: "What happened in 2008?" with the 2018 scope gets a note when the 2018 letter does not carry the topic."""
+    The scope is the user's explicit choice, like "in the YYYY letter", so it becomes a hard filter. A question with
+    explicit years of its own keeps the part of them inside the scope (1985-1995 with the 1990s picked: 1990-1995). A
+    question whose own years lie wholly outside the scope ("book value in 1987" with 1990 picked) is searched in the
+    scope's letters but loses its figure lookup, so no other year's figure is given as the answer to it. The kind is
+    planned again with the new years (a corpus-wide question becomes a period question; the superlative ranking, which
+    is corpus-wide by design, is not used), and so is the premise note: "What happened in 2008?" with the 2018 scope
+    gets a note when the 2018 letter does not carry the topic."""
     if plan.scope == PERSONAL:
         return plan
     lo, hi = sorted(year_range)
-    years = (lo,) if lo == hi else ()
     text = plan.financial_query or plan.query
-    scoped = replace(plan, year_range=(lo, hi), year_hard=True, years=years, year_spans=((lo, hi),),
-                     year_source="explicit", superlative="", premise_note=None,
-                     kind=_kind(text, (lo, hi), True, plan.events, years))
+    changes: Dict[str, Any] = {}
+    if plan.year_source == "explicit" and plan.year_range:
+        own_lo, own_hi = sorted(plan.year_range)
+        if max(lo, own_lo) <= min(hi, own_hi):  # the question's own years overlap the scope: keep that part
+            lo, hi = max(lo, own_lo), min(hi, own_hi)
+            years = tuple(y for y in plan.years if lo <= y <= hi)
+            spans = tuple((max(a, lo), min(b, hi)) for a, b in plan.year_spans if max(a, lo) <= min(b, hi))
+        else:  # wholly outside the scope: no figure of another year may answer it
+            years, spans = ((lo,) if lo == hi else ()), ((lo, hi),)
+            changes.update(numeric=False)
+    else:
+        years, spans = ((lo,) if lo == hi else ()), ((lo, hi),)
+    kind = _kind(text, (lo, hi), True, plan.events, years)
+    if changes.get("numeric") is False and kind == NUMERIC:
+        kind = PERIOD
+    scoped = replace(plan, year_range=(lo, hi), year_hard=True, years=years, year_spans=spans or ((lo, hi),),
+                     year_source="explicit", superlative="", premise_note=None, kind=kind, **changes)
     if premise_check is None:
         premise_check = bool(finance_setting("FINANCE_PREMISE_CHECK"))
     note = premise_note(scoped, store) if premise_check else None
