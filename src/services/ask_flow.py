@@ -654,15 +654,19 @@ def _finance_route_steps(req: AskRequest):
             return FinanceRoute("superlative", plan, query, done.answer, done.citations, done.hits, [], debug=debug)
 
     rows: List[Any] = []
+    # Under the site's Year / Decade scope a figure counts only when its source passage is in a picked letter (the
+    # 1990 letter's table of 1980s float is not a 1980s letter).
+    figure_docs = ({pid: doc for pid, doc in docs_by_id.items() if _where_keeps(doc, req.where)}
+                   if req.where else docs_by_id)
     if plan.kind == NUMERIC or plan.numeric:
-        rows = finance_answer.figure_rows(plan, store, docs_by_id)
+        rows = finance_answer.figure_rows(plan, store, figure_docs)
         if rows and plan.kind == NUMERIC and finance_answer.plain_figure_lookup(plan) \
                 and finance_answer.metric_named(plan, store):
-            done = finance_answer.numeric_answer(plan, store, docs_by_id)
+            done = finance_answer.numeric_answer(plan, store, figure_docs)
             if done is not None:  # a plain figure lookup, served from the numbers table: no retrieval
                 debug.update(done.detail)
                 return FinanceRoute("numeric", plan, query, done.answer, done.citations, done.hits, [], debug=debug)
-    pinned = finance_answer.figure_source_hits(rows, docs_by_id)[:max(1, cap // 3)]
+    pinned = finance_answer.figure_source_hits(rows, figure_docs)[:max(1, cap // 3)]
     rows = [row for row in rows if row["source_id"] in {h.id for h in pinned}]
     yield "retrieving"
     hits, search_debug = finance_search(plan, retriever, store, pinned=pinned)

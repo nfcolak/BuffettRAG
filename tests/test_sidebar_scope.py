@@ -113,3 +113,44 @@ def test_the_site_matches_the_backend_refusal_and_scope_reply_text():
     site = (Path(__file__).parents[1] / "frontend" / "src" / "main.jsx").read_text(encoding="utf-8")
     assert f'const REFUSAL_LINE = "{REFUSAL_LINE}";' in site
     assert f'const SCOPE_REPLY = "{SCOPE_REPLY}";' in site
+
+
+def test_a_question_year_keeps_the_next_letter_inside_a_wider_scope():
+    """Live proof run W4: "What happened in 2008?" with the 2000s picked was served the 2008 letter only and refused;
+    without a scope the route also reads the 2009 letter, which looks back on 2008."""
+    plan = plan_query("What happened in 2008?", premise_check=False)
+    scoped = scope_plan(plan, (2000, 2009), premise_check=False)
+    assert scoped.year_range == (2008, 2009) and scoped.years == (2008,)
+    assert scope_plan(plan, (2008, 2008), premise_check=False).year_range == (2008, 2008)
+
+
+def test_a_figure_inside_the_scope_from_an_out_of_scope_letter_is_not_served(monkeypatch):
+    """Live proof run W2: float figures for 1980-1985 came from a table in the 1990 letter while the 1980s were picked."""
+    import json as _json
+    from src.services import ask_flow
+    from src.services.schemas import AskRequest
+    from src.storage import StoredDoc
+    chunks = Path(__file__).parents[1] / "data" / "processed" / "chunks_v3_paragraph.jsonl"
+    docs = {}
+    for line in chunks.read_text(encoding="utf-8").splitlines():
+        row = _json.loads(line)
+        docs[row["id"]] = StoredDoc(id=row["id"], text=row["text"], metadata=row.get("metadata") or {"year": int(row["id"][:4])})
+
+    class NoSearch:
+        reranker = None
+
+        def _hybrid_for_filter(self, *a):
+            return []
+
+        def _bm25_search(self, *a, **k):
+            return []
+
+    monkeypatch.setenv("FINANCE_PIPELINE", "1")
+    monkeypatch.setattr(ask_flow, "_state", {"retriever": NoSearch(), "docs_by_id": docs,
+                                             "knowledge": KnowledgeStore.load(), "llm": None})
+    q = "What did Buffett say about insurance float?"
+    open_route = ask_flow.finance_route(AskRequest(query=q))
+    assert open_route.route == "numeric" and any(h.metadata["year"] == 1990 for h in open_route.hits)  # the setup holds
+    route = ask_flow.finance_route(AskRequest(query=q, where={"decade": 1980}))
+    assert route.used_filter == {"decade": 1980}
+    assert all(1980 <= h.metadata["year"] <= 1989 for h in route.hits)

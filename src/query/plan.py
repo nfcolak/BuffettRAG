@@ -780,13 +780,17 @@ def scope_plan(plan: QueryPlan, year_range: Tuple[int, int], store: Optional[Kno
     changes: Dict[str, Any] = {}
     if plan.year_source == "explicit" and plan.year_range:
         own_lo, own_hi = sorted(plan.year_range)
-        if max(lo, own_lo) <= min(hi, own_hi):  # the question's own years overlap the scope: keep that part
-            lo, hi = max(lo, own_lo), min(hi, own_hi)
-            years = tuple(y for y in plan.years if lo <= y <= hi)
-            spans = tuple((max(a, lo), min(b, hi)) for a, b in plan.year_spans if max(a, lo) <= min(b, hi))
-        else:  # wholly outside the scope: no figure of another year may answer it
-            years, spans = ((lo,) if lo == hi else ()), ((lo, hi),)
+        if max(lo, own_lo) > min(hi, own_hi):  # the asked years lie outside the scope: no figure of another year
             changes.update(numeric=False)
+        # "in Y" also reads the letter of Y + 1, which looks back on Y (the same letters `finance_policy._boost` ranks)
+        reach = [(a, b + 1) if a == b else (a, b) for a, b in (plan.year_spans or ((own_lo, own_hi),))]
+        reach_lo, reach_hi = min(a for a, _ in reach), max(b for _, b in reach)
+        if max(lo, reach_lo) <= min(hi, reach_hi):  # the question's letters overlap the scope: keep that part
+            lo, hi = max(lo, reach_lo), min(hi, reach_hi)
+            years = tuple(y for y in plan.years if lo <= y <= hi)
+            spans = tuple((max(a, lo), min(b, hi)) for a, b in reach if max(a, lo) <= min(b, hi))
+        else:
+            years, spans = ((lo,) if lo == hi else ()), ((lo, hi),)
     else:
         years, spans = ((lo,) if lo == hi else ()), ((lo, hi),)
     kind = _kind(text, (lo, hi), True, plan.events, years)
