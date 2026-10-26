@@ -37,7 +37,8 @@ from src.evaluation.claim_validator import validate_and_filter_answer
 from src.generation.providers import create_llm_provider
 from src.knowledge import KnowledgeStore
 from src.query.plan import (COMPARISON, CORPUS_WIDE, FINANCIAL, MIXED, NUMERIC, PERSONAL, TREND, QueryPlan,
-                            plan_query)
+                            plan_query, scope_plan, where_year_range)
+from src.retrieval.bm25 import _meta_matches
 from src.retrieval.finance_policy import finance_search, kind_budget, reader_window_chars
 from src.retrieval.query_expansion import (_REFERENTIAL_RE, build_followup_retrieval_query, expand_query,
                                            expand_query_structured)
@@ -579,6 +580,14 @@ def _carry_plan(plan: QueryPlan, before: QueryPlan, mode: int) -> QueryPlan:
     return replace(plan, **changes) if changes else plan
 
 
+def _where_keeps(hit: Any, where: Dict[str, Any]) -> bool:
+    """The request's metadata filter on one served hit; a hit without a `decade` field gets it from its year."""
+    meta = dict(getattr(hit, "metadata", None) or {})
+    if "decade" not in meta and isinstance(meta.get("year"), int):
+        meta["decade"] = meta["year"] // 10 * 10
+    return _meta_matches(meta, where)
+
+
 def finance_route_steps(req: AskRequest):
     """Generator like `_prepare_ask_steps`: yields stage names, returns a `FinanceRoute` (StopIteration.value).
 
@@ -613,6 +622,12 @@ def finance_route_steps(req: AskRequest):
     resolved = build_followup_retrieval_query(req.query, history)
     timing: Dict[str, float] = {}
     plan = _plan_with_history(req.query, resolved, history, store, _scope_vote(retriever, store, timing))
+    # The site's Year / Decade scope (`req.where`) is the user's explicit choice: the plan is restricted to those
+    # letters and the served passages are filtered by it. Before this the finance route ignored `where` while the site
+    # showed it as the answer's filter (live 2026-10-26: "filter year:2018" on an answer served from 2008 passages).
+    scope_years = where_year_range(req.where)
+    if scope_years is not None:
+        plan = scope_plan(plan, scope_years, store)
     debug: Dict[str, Any] = {"kind": plan.kind, "scope": plan.scope, "scope_source": plan.scope_source, **timing}
     query = plan.financial_query if plan.scope == MIXED and plan.financial_query else req.query
 
@@ -643,9 +658,17 @@ def finance_route_steps(req: AskRequest):
     yield "retrieving"
     hits, search_debug = finance_search(plan, retriever, store, pinned=pinned)
     debug.update(search_debug)
+    if req.where:  # pinned figure sources and extra candidate sources do not go through the year blocks
+        kept = [h for h in hits if _where_keeps(h, req.where)]
+        debug["where_dropped"] = len(hits) - len(kept)
+        hits = kept
+        rows = [row for row in rows if row["source_id"] in {h.id for h in hits}]
     debug["figure_rows"] = len(rows)
-    used_filter = ({"year": {"$gte": min(plan.year_range), "$lte": max(plan.year_range)}}
-                   if plan.year_hard and plan.year_range else None)
+    if req.where:
+        used_filter: Optional[Dict[str, Any]] = dict(req.where)
+    else:
+        used_filter = ({"year": {"$gte": min(plan.year_range), "$lte": max(plan.year_range)}}
+                       if plan.year_hard and plan.year_range else None)
     reranked = bool(search_debug.get("reranked"))
 
     if plan.kind == CORPUS_WIDE:

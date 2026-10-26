@@ -721,3 +721,64 @@ def plan_query(query: str, store: Optional[KnowledgeStore] = None,
         premise_check = bool(finance_setting("FINANCE_PREMISE_CHECK"))
     note = premise_note(plan, store) if premise_check else None
     return replace(plan, premise_note=note) if note else plan
+
+
+# --- the site's Year / Decade scope (the request's `where`) ---
+def where_year_range(where: Optional[Dict[str, Any]]) -> Optional[Tuple[int, int]]:
+    """The inclusive year range a request's metadata filter allows (the site's Year / Decade scope), else None.
+
+    `year` wins over `decade`. A year is an integer or an operator dict ($eq, $gte, $lte, $gt, $lt, $in); a decade
+    (1990) is the years 1990-1999. Open ends fall back to the corpus bounds."""
+    if not where:
+        return None
+
+    def bounds(cond, width: int) -> Optional[Tuple[int, int]]:
+        if isinstance(cond, int) and not isinstance(cond, bool):
+            return cond, cond + width
+        if not isinstance(cond, dict):
+            return None
+        lo, hi = FIRST_LETTER_YEAR, LAST_LETTER_YEAR + width
+        if "$eq" in cond:
+            lo, hi = cond["$eq"], cond["$eq"] + width
+        if "$in" in cond:
+            values = [v for v in cond["$in"] if isinstance(v, int)]
+            if not values:
+                return None
+            lo, hi = min(values), max(values) + width
+        if "$gte" in cond:
+            lo = max(lo, cond["$gte"])
+        if "$gt" in cond:
+            lo = max(lo, cond["$gt"] + 1)
+        if "$lte" in cond:
+            hi = min(hi, cond["$lte"] + width)
+        if "$lt" in cond:
+            hi = min(hi, cond["$lt"] - 1 + width)
+        return (lo, hi) if lo <= hi else None
+
+    if "year" in where:
+        return bounds(where["year"], 0)
+    if "decade" in where:
+        return bounds(where["decade"], 9)
+    return None
+
+
+def scope_plan(plan: QueryPlan, year_range: Tuple[int, int], store: Optional[KnowledgeStore] = None,
+               premise_check: Optional[bool] = None) -> QueryPlan:
+    """`plan` restricted to the letters the user picked in the site's Year / Decade scope.
+
+    The picked years replace the question's own as a hard filter (the scope is the user's explicit choice, like "in
+    the YYYY letter"); the kind is planned again with them, so a corpus-wide question becomes a period question and the
+    superlative ranking (corpus-wide by design) is not used. The premise note is checked again against the picked
+    years: "What happened in 2008?" with the 2018 scope gets a note when the 2018 letter does not carry the topic."""
+    if plan.scope == PERSONAL:
+        return plan
+    lo, hi = sorted(year_range)
+    years = (lo,) if lo == hi else ()
+    text = plan.financial_query or plan.query
+    scoped = replace(plan, year_range=(lo, hi), year_hard=True, years=years, year_spans=((lo, hi),),
+                     year_source="explicit", superlative="", premise_note=None,
+                     kind=_kind(text, (lo, hi), True, plan.events, years))
+    if premise_check is None:
+        premise_check = bool(finance_setting("FINANCE_PREMISE_CHECK"))
+    note = premise_note(scoped, store) if premise_check else None
+    return replace(scoped, premise_note=note) if note else scoped
