@@ -39,7 +39,8 @@ from src.knowledge import KnowledgeStore
 from src.query.plan import (COMPARISON, CORPUS_WIDE, FINANCIAL, MIXED, NUMERIC, PERSONAL, TREND, QueryPlan,
                             plan_query)
 from src.retrieval.finance_policy import finance_search, kind_budget, reader_window_chars
-from src.retrieval.query_expansion import build_followup_retrieval_query, expand_query, expand_query_structured
+from src.retrieval.query_expansion import (_REFERENTIAL_RE, build_followup_retrieval_query, expand_query,
+                                           expand_query_structured)
 from src.retrieval.retriever import Retriever
 from src.services.schemas import AskRequest, HitOut, SearchRequest
 from src.storage import SearchHit
@@ -515,6 +516,11 @@ def _plan_with_history(query: str, resolved: str, history: List[Dict[str, Any]],
         years as one more span.
     """
     plan = plan_query(resolved, store, scope_vote=vote)
+    if finance_setting("FINANCE_FOLLOWUP_OWN_TOPIC") and resolved != query and _own_topic_question(query, store):
+        # A new question with a topic of its own ("What did Buffett say about the oil crisis?" after a 2017 question)
+        # is not a follow-up: planned on the history-joined text it took the earlier question's years and was served
+        # only that letter (live refusal 2026-10-26). Plan it alone and carry nothing over.
+        return plan_query(query, store, scope_vote=vote)
     previous = next((str(turn.get("content", "")) for turn in reversed(history) if turn.get("role") == "user"), "")
     before: List[QueryPlan] = []
 
@@ -538,6 +544,16 @@ def _plan_with_history(query: str, resolved: str, history: List[Dict[str, Any]],
         if earlier is not None and earlier.scope != PERSONAL:
             plan = _carry_plan(plan, earlier, carry)
     return plan
+
+
+def _own_topic_question(query: str, store: KnowledgeStore) -> bool:
+    """FINANCE_FOLLOWUP_OWN_TOPIC: the question names an event, company, sector or theme of its own and refers to
+    nothing earlier ("it", "that", "then", "what about", "he", "she"). Years alone ("and in 2009?") are not a topic:
+    such a question is still a follow-up of the previous topic."""
+    if _REFERENTIAL_RE.search(query) or re.search(r"\b(?:he|she|his|her)\b", query, re.I):
+        return False
+    own = plan_query(query, store)
+    return bool(own.events or own.companies or own.sectors or own.themes)
 
 
 def _carry_plan(plan: QueryPlan, before: QueryPlan, mode: int) -> QueryPlan:

@@ -264,6 +264,7 @@ FINANCE_DEFAULTS: dict = {
     "FINANCE_COMPOSE": 0,              # 1: the reader writes a short answer in its own words (finance_answer.reader_prompt_compose), checked by validate_composed, no neighbour expansion
     "FINANCE_MIXED_STRICT": 0,         # 1: mixed plans drop answer sentences cited only to personal passages that carry no business figure (FT-r4 fix round)
     "FINANCE_GATE_QUERY_ALONE": 0,     # 1: the evidence gate also scores the question's own terms and keeps the better score, so chat-history terms cannot pull a full question below the bar (live 2008 / 2017 refusals, 2026-10-26)
+    "FINANCE_FOLLOWUP_OWN_TOPIC": 0,   # 1: a question naming its own event / company / sector / theme and no referring word is planned alone, not joined to the previous question (live oil-crisis-after-2017 refusal, 2026-10-26)
 }
 
 
