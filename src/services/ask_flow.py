@@ -333,6 +333,26 @@ def _refusal_retry_enabled() -> bool:
     return os.getenv("ANSWER_REFUSAL_RETRY", str(config.ANSWER_REFUSAL_RETRY)) == "1"
 
 
+@dataclass(frozen=True)
+class EvidenceDecision:
+    allowed: bool    # the question may go to the model
+    soft: bool       # allowed only through the soft band (weak overlap; the model or the validator may still refuse)
+    evidence: Any    # the EvidenceAssessment
+
+
+def evidence_decision(query: str, context_hits, extra_queries=()) -> EvidenceDecision:
+    """The pre-model evidence gate, one decision for /ask and /ask/stream.
+
+    Sufficient overlap passes; with EVIDENCE_GATE_SOFT not "0" an overlap in [0.15, 0.30) passes as soft. With
+    FINANCE_GATE_QUERY_ALONE the history terms in `extra_queries` cannot lower the question's own score.
+    """
+    evidence = assess_evidence(query, context_hits, extra_queries=extra_queries,
+                               query_alone=bool(finance_setting("FINANCE_GATE_QUERY_ALONE")))
+    soft = (not evidence.sufficient and os.getenv("EVIDENCE_GATE_SOFT") != "0"
+            and 0.15 <= evidence.best_overlap < 0.30)
+    return EvidenceDecision(evidence.sufficient or soft, soft, evidence)
+
+
 def _generate_answer(llm, prompt: str, context_hits, max_new_tokens: int, query: Optional[str] = None,
                      extra_queries=(), history=None, per_period: Optional[bool] = None,
                      trace: Optional[Dict[str, Any]] = None):
@@ -347,18 +367,14 @@ def _generate_answer(llm, prompt: str, context_hits, max_new_tokens: int, query:
         is_comparison = bool(query and per_period)
     soft_gate = False
     if query and not is_comparison:
-        evidence = assess_evidence(query, context_hits, extra_queries=extra_queries)
-        soft_gate = (
-            not evidence.sufficient
-            and os.getenv("EVIDENCE_GATE_SOFT") != "0"
-            and 0.15 <= evidence.best_overlap < 0.30
-        )
-        if not evidence.sufficient and not soft_gate:
+        gate = evidence_decision(query, context_hits, extra_queries)
+        soft_gate = gate.soft
+        if not gate.allowed:
             if trace is not None:
                 trace["refusal_by"] = "evidence_gate"
             return REFUSAL_LINE, []
         if EXPOSE_DEBUG_STATUS:
-            print(f"[backend] evidence overlap: {evidence.best_overlap:.3f}", flush=True)
+            print(f"[backend] evidence overlap: {gate.evidence.best_overlap:.3f}", flush=True)
     if query and not is_comparison and os.getenv("ANSWER_DECOMPOSE", "0") == "1":
         parts = split_question(query)
         if len(parts) >= 2:

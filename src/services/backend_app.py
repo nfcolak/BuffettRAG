@@ -364,7 +364,7 @@ def ask_stream(req: AskRequest) -> StreamingResponse:
         if not hits:
             yield _sse("done", {"answer": None, "citations": []})
             return
-        if not assess_evidence(query, context_hits, extra_queries=extras).sufficient:
+        if not ask_flow.evidence_decision(query, context_hits, extras).allowed:  # the same gate as /ask, soft band included
             yield _sse("done", {"answer": REFUSAL_LINE, "citations": []})
             return
 

@@ -263,6 +263,7 @@ FINANCE_DEFAULTS: dict = {
     "FINANCE_ANSWER_V3": 0,            # 1: year-grouped evidence pack, premise sentence, dedupe, partial retry
     "FINANCE_COMPOSE": 0,              # 1: the reader writes a short answer in its own words (finance_answer.reader_prompt_compose), checked by validate_composed, no neighbour expansion
     "FINANCE_MIXED_STRICT": 0,         # 1: mixed plans drop answer sentences cited only to personal passages that carry no business figure (FT-r4 fix round)
+    "FINANCE_GATE_QUERY_ALONE": 0,     # 1: the evidence gate also scores the question's own terms and keeps the better score, so chat-history terms cannot pull a full question below the bar (live 2008 / 2017 refusals, 2026-10-26)
 }
 
 
