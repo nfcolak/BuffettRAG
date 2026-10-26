@@ -77,3 +77,12 @@ def test_route_with_a_scope_that_has_no_passages_refuses_without_the_model(env):
     body = _ask(env, "What happened in 2008?", where={"year": 2018})  # the fixture has no 2018 passage
     assert body["hits"] == [] and body["used_filter"] == {"year": 2018}
     assert env.llm.prompts == []
+
+
+def test_the_site_matches_the_backend_refusal_and_scope_reply_text():
+    """The site recognises these two answers by exact text (the scope hint under a refusal, the scope-reply style)."""
+    from src.generation.finance_answer import SCOPE_REPLY
+    from src.generation.prompt import REFUSAL_LINE
+    site = (Path(__file__).parents[1] / "frontend" / "src" / "main.jsx").read_text(encoding="utf-8")
+    assert f'const REFUSAL_LINE = "{REFUSAL_LINE}";' in site
+    assert f'const SCOPE_REPLY = "{SCOPE_REPLY}";' in site

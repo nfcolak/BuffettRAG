@@ -436,6 +436,8 @@ function TopBar({ health, phase, host }) {
 const DEBUG_UI = new URLSearchParams(window.location.search).get("debug") === "1";
 // Exact text of the backend's scope reply (src/generation/finance_answer.py SCOPE_REPLY).
 const SCOPE_REPLY = "I only answer questions about Buffett's financial views and Berkshire's financial results.";
+// Exact text of the backend's refusal (src/generation/prompt.py REFUSAL_LINE).
+const REFUSAL_LINE = "The retrieved passages do not provide enough evidence to answer this question.";
 
 function LeftRail({ config, setConfig, onPickExample, onClear }) {
   const setKey = (key, value) => setConfig((current) => ({ ...current, [key]: value }));
@@ -612,6 +614,10 @@ function Message({ msg, isSelected, onSelectSources }) {
   const blocks = String(msg.content || "").split(/\n{2,}/).filter(Boolean);
   const isLlmError = !isUser && String(msg.content || "").startsWith("[LLM unavailable");
   const isScopeReply = !isUser && String(msg.content || "").trim() === SCOPE_REPLY;
+  // A refusal under the sidebar's Year / Decade scope: say that only those letters were searched.
+  const scopeFilter = msg.meta?.used_filter;
+  const scopeHint = !isUser && !msg.pending && String(msg.content || "").trim() === REFUSAL_LINE && scopeFilter
+    && (typeof scopeFilter.year === "number" || typeof scopeFilter.decade === "number");
 
   return (
     <div className={`msg ${isUser ? "user" : "assistant"}`}>
@@ -629,6 +635,12 @@ function Message({ msg, isSelected, onSelectSources }) {
         >
           {blocks.length ? blocks.map((block, index) => renderBlock(block, index)) : <p />}
           {msg.pending && msg.stage && <div className="stage-line">{STAGE_LABELS[msg.stage] || ""}</div>}
+          {scopeHint && (
+            <div className="stage-line">
+              Only the {formatFilter(scopeFilter).replace(/^(year|decade):/, "")} letters were searched (Scope in the
+              sidebar). Set Scope to All to search every letter.
+            </div>
+          )}
         </div>
 
         {!isUser && (
