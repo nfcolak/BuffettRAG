@@ -1,6 +1,6 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
-import { BookOpen, ChevronRight, Paperclip, Send, Trash2 } from "lucide-react";
+import { BookOpen, ChevronRight, Paperclip, Send, SlidersHorizontal, Trash2, X } from "lucide-react";
 
 import "./styles.css";
 
@@ -44,6 +44,10 @@ const DECADES = [
 ];
 
 const YEARS = Array.from({ length: 48 }, (_, i) => 1977 + i);
+
+// Below this width the settings and sources rails become slide-in drawers (keep in sync with styles.css).
+const MOBILE_QUERY = "(max-width: 980px)";
+const isMobileLayout = () => typeof window !== "undefined" && window.matchMedia(MOBILE_QUERY).matches;
 
 function nowLabel() {
   return new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
@@ -376,7 +380,7 @@ function WakeBanner({ wake }) {
   );
 }
 
-function TopBar({ health, phase, host }) {
+function TopBar({ health, phase, host, sourceCount, onOpenSettings, onOpenSources }) {
   const gpu = phase === "ready" && host?.state === "running" ? gpuLabel(host.gpu) : null;
   return (
     <header className="topbar">
@@ -428,6 +432,17 @@ function TopBar({ health, phase, host }) {
           <strong>embedded</strong>
         </span>
       </div>
+
+      <div className="mobile-actions">
+        <span className={`mobile-dot ${phase === "ready" ? "" : phase === "failed" ? "idle" : "waking"}`} title={`backend ${phase}`} />
+        <button className="icon-btn" onClick={onOpenSettings} aria-label="Settings and example prompts">
+          <SlidersHorizontal />
+        </button>
+        <button className="icon-btn has-badge" onClick={onOpenSources} aria-label="Sources">
+          <BookOpen />
+          {sourceCount > 0 && <span className="icon-badge">{sourceCount}</span>}
+        </button>
+      </div>
     </header>
   );
 }
@@ -439,11 +454,21 @@ const SCOPE_REPLY = "I only answer questions about Buffett's financial views and
 // Exact text of the backend's refusal (src/generation/prompt.py REFUSAL_LINE).
 const REFUSAL_LINE = "The retrieved passages do not provide enough evidence to answer this question.";
 
-function LeftRail({ config, setConfig, onPickExample, onClear }) {
+function DrawerHead({ title, onClose }) {
+  return (
+    <div className="drawer-head">
+      <div className="drawer-title sources-title">{title}</div>
+      <button className="icon-btn" onClick={onClose} aria-label="Close"><X /></button>
+    </div>
+  );
+}
+
+function LeftRail({ config, setConfig, onPickExample, onClear, open, onClose }) {
   const setKey = (key, value) => setConfig((current) => ({ ...current, [key]: value }));
 
   return (
-    <aside className="rail-left">
+    <aside className={`rail-left${open ? " open" : ""}`}>
+      <DrawerHead title="Settings" onClose={onClose} />
       <div className="rail-section">
         <h3 className="rail-heading"><span className="hash">#</span> Retrieval</h3>
 
@@ -684,7 +709,7 @@ function TypingMessage({ stage }) {
   );
 }
 
-function EmptyState() {
+function EmptyState({ onPickExample }) {
   return (
     <div className="empty-state">
       <div className="empty-emblem">
@@ -693,12 +718,17 @@ function EmptyState() {
       <h2 className="empty-title">Ask about Buffett's financial views and Berkshire's results</h2>
       <p className="empty-sub">
         Retrieval-augmented search across 48 Berkshire Hathaway shareholder letters.
-        Try a question, or pick one from the prompts panel.
+        Try a question, or pick one of the example prompts.
       </p>
       <div className="empty-stats">
         <Stat value="48" label="Letters" />
         <Stat value="1977" label="From" />
         <Stat value="2024" label="To" />
+      </div>
+      <div className="empty-examples">
+        {EXAMPLE_QUERIES.slice(0, 4).map((query) => (
+          <button key={query} className="empty-example" onClick={() => onPickExample(query)}>{query}</button>
+        ))}
       </div>
     </div>
   );
@@ -725,6 +755,7 @@ function ChatColumn({
   draft,
   setDraft,
   inputRef,
+  onPickExample,
 }) {
   const scrollRef = React.useRef(null);
 
@@ -750,7 +781,7 @@ function ChatColumn({
       <WakeBanner wake={wake} />
 
       <div className="chat-scroll" ref={scrollRef}>
-        {messages.length === 0 && !isTyping ? <EmptyState /> : (
+        {messages.length === 0 && !isTyping ? <EmptyState onPickExample={onPickExample} /> : (
           <>
             {messages.map((message) => (
               <Message
@@ -834,10 +865,12 @@ function SourceCard({ source, index }) {
   );
 }
 
-function RightRail({ selectedMsg, question }) {
+function RightRail({ selectedMsg, question, open, onClose }) {
+  const railClass = `rail-right${open ? " open" : ""}`;
   if (!selectedMsg || !selectedMsg.sources?.length) {
     return (
-      <aside className="rail-right">
+      <aside className={railClass}>
+        <DrawerHead title="Sources" onClose={onClose} />
         <div className="sources-header">
           <div className="sources-title">Sources</div>
           <div className="sources-kicker">Passages retrieved for the selected answer.</div>
@@ -857,7 +890,11 @@ function RightRail({ selectedMsg, question }) {
 
   const meta = selectedMsg.meta || {};
   return (
-    <aside className="rail-right">
+    <aside className={railClass}>
+      <DrawerHead
+        title={<>Sources <span className="count-badge">{selectedMsg.sources.length}</span></>}
+        onClose={onClose}
+      />
       <div className="sources-header">
         <div className="sources-title">Sources <span className="count-badge">{selectedMsg.sources.length}</span></div>
         {question && <div className="sources-q">"{question}"</div>}
@@ -921,6 +958,8 @@ function App() {
   const [isTyping, setIsTyping] = React.useState(false);
   const [stage, setStage] = React.useState("");
   const [error, setError] = React.useState("");
+  // Mobile only: which rail is open as a drawer ("settings" | "sources" | null).
+  const [panel, setPanel] = React.useState(null);
   const wake = useBackendWake();
   const health = wake.health;
   const inputRef = React.useRef(null);
@@ -938,6 +977,19 @@ function App() {
   React.useEffect(() => {
     persistHistory(messages);
   }, [messages]);
+
+  React.useEffect(() => {
+    if (!panel) return undefined;
+    const onKey = (event) => { if (event.key === "Escape") setPanel(null); };
+    const media = window.matchMedia(MOBILE_QUERY);
+    const onResize = () => { if (!media.matches) setPanel(null); };
+    window.addEventListener("keydown", onKey);
+    media.addEventListener("change", onResize);
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      media.removeEventListener("change", onResize);
+    };
+  }, [panel]);
 
   const selectedMsg = React.useMemo(
     () => messages.find((msg) => msg.id === selectedId && msg.role === "assistant"),
@@ -1091,29 +1143,56 @@ function App() {
 
   const pickExample = (query) => {
     setDraft(query);
+    setPanel(null);
     inputRef.current?.focus();
+  };
+
+  const selectSources = (id) => {
+    setSelectedId(id);
+    if (isMobileLayout()) setPanel("sources");
   };
 
   return (
     <>
-      <TopBar health={health} phase={wake.phase} host={wake.host} />
+      <TopBar
+        health={health}
+        phase={wake.phase}
+        host={wake.host}
+        sourceCount={selectedMsg?.sources?.length ?? 0}
+        onOpenSettings={() => setPanel("settings")}
+        onOpenSources={() => setPanel("sources")}
+      />
       {error && <div className="error-banner">{error}</div>}
       <div className="workspace">
-        <LeftRail config={config} setConfig={setConfig} onPickExample={pickExample} onClear={clearChat} />
+        {panel && <div className="drawer-backdrop" onClick={() => setPanel(null)} />}
+        <LeftRail
+          config={config}
+          setConfig={setConfig}
+          onPickExample={pickExample}
+          onClear={() => { clearChat(); setPanel(null); }}
+          open={panel === "settings"}
+          onClose={() => setPanel(null)}
+        />
         <ChatColumn
           wake={wake}
           messages={messages}
           isTyping={isTyping}
           stage={stage}
           selectedId={selectedId}
-          onSelectSources={setSelectedId}
+          onSelectSources={selectSources}
           onSend={send}
           onClear={clearChat}
           draft={draft}
           setDraft={setDraft}
           inputRef={inputRef}
+          onPickExample={pickExample}
         />
-        <RightRail selectedMsg={selectedMsg} question={selectedQuestion} />
+        <RightRail
+          selectedMsg={selectedMsg}
+          question={selectedQuestion}
+          open={panel === "sources"}
+          onClose={() => setPanel(null)}
+        />
       </div>
     </>
   );
